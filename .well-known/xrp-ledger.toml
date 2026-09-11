@@ -1,0 +1,10 @@
+[[ISSUERS]]
+address = "rh7Sidu91xGW2Za5RvoKiCgS2YB2psTBgq"
+name = "Sailing Frog's Leap"
+
+[[TOKENS]]
+issuer = "rh7Sidu91xGW2Za5RvoKiCgS2YB2psTBgq"
+currency = "LEAP"
+name = "LEAP"
+desc = "The community token of Sailing Frog's Leap."
+icon = "https://rick1307.github.io/leap-logo.png"
