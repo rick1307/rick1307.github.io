@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A note about where Discord and community design could fit into the LEAP membership system." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Where You Fit — LEAP / Sailing Frog's Leap</title>
+
+  <style>
+    :root{
+      --paper:#efe8d8;
+      --paper2:#f8f3e8;
+      --ink:#1a252c;
+      --navy:#16384b;
+      --sea:#2f7481;
+      --foam:#dbece8;
+      --rust:#b84f32;
+      --gold:#d2a34f;
+      --line:rgba(26,37,44,.18);
+      --card:#fffaf0;
+      --max:1060px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:Georgia, "Times New Roman", serif;
+      line-height:1.62;
+    }
+
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+    .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+
+    nav{
+      position:sticky;top:0;z-index:10;
+      background:rgba(239,232,216,.93);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .nav-inner{
+      min-height:64px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;
+    }
+
+    .brand{
+      display:flex;align-items:center;gap:11px;
+      text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:850;letter-spacing:.02em;
+    }
+
+    .brand img{
+      width:40px;height:40px;border-radius:50%;
+      object-fit:cover;border:1px solid rgba(26,37,44,.14);
+      background:white;
+    }
+
+    .back{
+      text-decoration:none;
+      color:#4e5c62;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.9rem;font-weight:750;
+    }
+
+    header{padding:76px 0 48px}
+
+    .kicker{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--rust);
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      font-size:.78rem;
+      font-weight:900;
+    }
+
+    h1{
+      margin:.14em 0 .2em;
+      color:var(--navy);
+      font-size:clamp(3rem,8vw,6rem);
+      line-height:.94;
+      letter-spacing:-.055em;
+    }
+
+    .lede{
+      margin:0;
+      max-width:820px;
+      color:#46575f;
+      font-size:clamp(1.16rem,2vw,1.38rem);
+    }
+
+    .note{
+      margin-top:26px;
+      padding:20px 22px;
+      border-left:4px solid var(--gold);
+      background:rgba(255,250,240,.55);
+      color:#4f5c62;
+      font-size:1.08rem;
+    }
+
+    section{padding:46px 0}
+
+    .section-title{max-width:800px;margin-bottom:22px}
+
+    h2{
+      margin:0 0 10px;
+      color:var(--navy);
+      font-size:clamp(2rem,5vw,3rem);
+      line-height:1.05;
+      letter-spacing:-.035em;
+    }
+
+    .section-title p{
+      margin:0;color:#5a686e;font-size:1.05rem;
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:24px;
+    }
+
+    .card h3{
+      margin:0 0 8px;
+      color:var(--navy);
+      font-size:1.4rem;
+    }
+
+    .card p{margin:0;color:#58666c}
+
+    .label{
+      display:inline-block;
+      margin-bottom:8px;
+      color:var(--rust);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.75rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .bridge{
+      background:var(--navy);
+      color:white;
+      border-radius:20px;
+      padding:40px;
+    }
+
+    .bridge h2{color:white;margin-bottom:12px}
+    .bridge p{font-size:1.16rem;max-width:820px;margin:0 0 1rem}
+    .bridge p:last-child{margin-bottom:0}
+
+    .flow{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:12px;
+      align-items:stretch;
+    }
+
+    .flow-item{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:18px 14px;
+      text-align:center;
+    }
+
+    .flow-item b{
+      display:block;
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      margin-bottom:5px;
+    }
+
+    .flow-item span{color:#647177;font-size:.92rem}
+
+    .arrow{
+      color:var(--rust);
+      font-size:1.5rem;
+      text-align:center;
+      align-self:center;
+    }
+
+    .roles{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+
+    .role{
+      background:var(--foam);
+      border:1px solid rgba(47,116,129,.17);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    .role .num{
+      width:34px;height:34px;border-radius:50%;
+      display:grid;place-items:center;
+      background:var(--navy);color:white;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:900;margin-bottom:12px;
+    }
+
+    .role h3{margin:0 0 7px;color:var(--navy)}
+    .role p{margin:0;color:#526167}
+
+    .ladder{
+      border-top:2px solid var(--navy);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:170px 1fr;
+      gap:18px;
+      padding:17px 2px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .row b{
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .row span{color:#59676d}
+
+    .callout{
+      background:linear-gradient(135deg,#e6efeb,#f7f0e3);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:30px;
+    }
+
+    .callout blockquote{
+      margin:0;
+      color:var(--navy);
+      font-size:clamp(1.4rem,3vw,2rem);
+      line-height:1.3;
+      font-weight:700;
+    }
+
+    .callout p{
+      margin:14px 0 0;
+      color:#5b686e;
+    }
+
+    .business{
+      background:var(--paper2);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:30px;
+    }
+
+    .business h3{margin:0 0 9px;color:var(--navy);font-size:1.5rem}
+    .business p{margin:0;color:#58666c}
+
+    .small{
+      margin-top:22px;
+      color:#66737a;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.9rem;
+    }
+
+    footer{
+      padding:38px 0 48px;
+      color:#69757a;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.86rem;
+    }
+
+    .foot{
+      padding-top:20px;
+      border-top:1px solid var(--line);
+      display:flex;justify-content:space-between;gap:18px;
+    }
+
+    @media(max-width:850px){
+      .split,.roles{grid-template-columns:1fr}
+      .flow{grid-template-columns:1fr}
+      .arrow{transform:rotate(90deg)}
+      .row{grid-template-columns:1fr}
+      .bridge{padding:28px}
+    }
+  </style>
+</head>
+
+<body>
+<header>
+    <div class="wrap">
+      <div class="kicker">A note for the next builder</div>
+      <h1>Where you fit.</h1>
+
+      <p class="lede">
+        Your dad has spent a lot of time learning the XRP Ledger and building LEAP.
+        He understands the token, the issuer, the distributor, the ranks, and the idea of turning participation
+        into a permanent crew identity.
+      </p>
+
+      <div class="note">
+        The part he does <strong>not</strong> understand nearly as well is the younger-generation community layer:
+        Discord, online culture, how people actually hang out together, what feels natural, and what feels like friction.
+        That is where you could be unusually useful.
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>This is really two systems.</h2>
+          <p>
+            LEAP becomes much more interesting when you separate the permanent membership state from the place where the community actually lives.
+          </p>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <span class="label">The ledger layer</span>
+            <h3>LEAP / XRPL</h3>
+            <p>
+              This is the permanent record. Who owns LEAP? How many? What rank does that imply?
+              What badges or history has someone earned? The blockchain is the logbook.
+            </p>
+          </div>
+
+          <div class="card">
+            <span class="label">The social layer</span>
+            <h3>Discord / community</h3>
+            <p>
+              This is where the membership becomes useful. Conversation, private channels, polls,
+              events, status, jokes, recognition, early access, and the feeling of actually being part of something.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="bridge">
+          <h2>The opportunity is the bridge between them.</h2>
+          <p>
+            Imagine somebody earns 10 LEAP and becomes a Quartermaster.
+            Their wallet already proves that. Discord could simply reflect it.
+          </p>
+          <p>
+            Connect wallet → verify ownership → read LEAP balance → assign Discord role.
+            The blockchain says who they are. Discord changes what they can do.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>What that could look like</h2>
+          <p>Not everything has to be automated on day one.</p>
+        </div>
+
+        <div class="flow">
+          <div class="flow-item">
+            <b>Viewer earns LEAP</b>
+            <span>They become part of the crew.</span>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="flow-item">
+            <b>Wallet proves balance</b>
+            <span>No passwords or private keys.</span>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="flow-item">
+            <b>Discord reflects rank</b>
+            <span>Deckhand, Bosun, Quartermaster, etc.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Your role could start very simply.</h2>
+          <p>
+            This does not need to begin as a software project. It could begin as community design.
+          </p>
+        </div>
+
+        <div class="roles">
+          <div class="role">
+            <div class="num">1</div>
+            <h3>Build the clubhouse</h3>
+            <p>
+              Design the Sailing Frog's Leap Discord: channels, roles, permissions, voice rooms, culture, naming, moderation, and the things that make it feel alive.
+            </p>
+          </div>
+
+          <div class="role">
+            <div class="num">2</div>
+            <h3>Be the usability filter</h3>
+            <p>
+              Tell us where the whole system feels old, awkward, confusing, too crypto-heavy, or simply like something people your age will not bother doing.
+            </p>
+          </div>
+
+          <div class="role">
+            <div class="num">3</div>
+            <h3>Help automate what works</h3>
+            <p>
+              If people actually care about Discord ranks and access, then we build the wallet connection, automatic role assignment, badges, and member tools.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Do it in phases.</h2>
+          <p>The point is to learn before overbuilding.</p>
+        </div>
+
+        <div class="ladder">
+          <div class="row">
+            <b>Phase 1 — Manual</b>
+            <span>
+              Open the Discord. Create Deckhand, Bosun, Quartermaster, First Mate, and Master of the Leap roles.
+              Verify LEAP balances manually and assign roles by hand.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Phase 2 — Learn</b>
+            <span>
+              Watch what people actually use. Which channels matter? Do people care about rank?
+              Do they want private rooms, polls, live chat, events, or something we have not thought of yet?
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Phase 3 — Automate</b>
+            <span>
+              Build a small LEAP bot/app that links a Discord user to an XRPL wallet,
+              checks LEAP balance, and assigns the right role automatically.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Phase 4 — Productize</b>
+            <span>
+              Once it works for Sailing Frog's Leap, turn the system into a repeatable creator package:
+              token + ranks + website + Discord + wallet verification + community tools.
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="callout">
+          <blockquote>
+            “Dad is building the membership infrastructure. You could help build the place where the membership actually feels real.”
+          </blockquote>
+
+          <p>
+            That is the simplest way to think about it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Why this could become bigger than one channel</h2>
+          <p>
+            If LEAP works, the next creator may not need LEAP at all.
+          </p>
+        </div>
+
+        <div class="business">
+          <h3>Imagine the same system for other communities.</h3>
+          <p>
+            A woodworking channel might have NAIL. A fishing channel might have HOOK.
+            A guitar channel might have RIFF. The token changes, but the machinery underneath is similar:
+            membership, ranks, badges, Discord roles, access, and community identity.
+          </p>
+        </div>
+
+        <p class="small">
+          The valuable thing may eventually be the system, not the individual token.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>What we would want from you first</h2>
+          <p>Not code. Not a commitment. Just your eyes.</p>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <span class="label">Question one</span>
+            <h3>Would your generation actually use this?</h3>
+            <p>
+              What would make it cool? What would make it lame? What would make somebody participate instead of ignoring it?
+            </p>
+          </div>
+
+          <div class="card">
+            <span class="label">Question two</span>
+            <h3>What should Discord do?</h3>
+            <p>
+              If LEAP proves membership, what experiences should that membership unlock?
+              What would make the Discord worth joining and staying in?
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>Sailing Frog's Leap • LEAP Membership System</div>
+      <div>The blockchain is the logbook. The point is the crew.</div>
+    </div>
+  </footer>
+</body>
+</html>
