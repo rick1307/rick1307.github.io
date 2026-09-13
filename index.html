@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="LEAP is the on-chain crew membership token for Sailing Frog's Leap." />
+  <meta name="theme-color" content="#071a26" />
+  <title>LEAP — Sailing Frog's Leap Crew</title>
+  <style>
+    :root{
+      --bg:#06131c; --panel:#0b2230; --text:#f5fbff; --muted:#a9c0cc;
+      --accent:#57d7a0; --accent2:#7bdcff; --line:rgba(255,255,255,.11);
+      --radius:20px; --max:1080px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(87,215,160,.12), transparent 38rem),
+        radial-gradient(circle at 85% 12%, rgba(123,220,255,.10), transparent 32rem),
+        var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.55;
+    }
+    .wrap{width:min(calc(100% - 36px),var(--max));margin:auto}
+    nav{position:sticky;top:0;z-index:20;background:rgba(6,19,28,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .nav-inner{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.04em;text-decoration:none;color:var(--text)}
+    .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#032018;font-weight:950}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{font-size:.93rem;color:var(--muted);text-decoration:none}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:999px;text-decoration:none;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04211b}
+    .btn.alt{background:transparent;color:var(--text);border:1px solid var(--line)}
+    header{padding:90px 0 58px}
+    .hero{display:grid;grid-template-columns:1.4fr .8fr;gap:44px;align-items:center}
+    .eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;font-size:.8rem;letter-spacing:.13em}
+    h1{font-size:clamp(3rem,8vw,6.5rem);line-height:.9;margin:.2em 0 .22em;letter-spacing:-.055em}
+    h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lede{font-size:clamp(1.1rem,2vw,1.35rem);color:var(--muted);max-width:700px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+    .token-card{background:linear-gradient(180deg,rgba(16,44,61,.95),rgba(9,29,41,.95));border:1px solid var(--line);border-radius:28px;padding:30px}
+    .coin{width:150px;height:150px;border-radius:50%;margin:4px auto 24px;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,#c9ffec 0,#57d7a0 26%,#169865 65%,#0b563e 100%);color:#03231a;font-size:2.2rem;font-weight:950;border:7px solid rgba(255,255,255,.24)}
+    .token-card h3,.token-card p{text-align:center}.token-card p{color:var(--muted)}
+    section{padding:56px 0}.section-head{max-width:780px;margin-bottom:28px}
+    h2{font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.035em;margin:0 0 10px}
+    .section-head p,.card p,.meaning{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:rgba(11,34,48,.78);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+    .num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(87,215,160,.14);color:var(--accent);font-weight:900;margin-bottom:16px}
+    .card h3{margin:0 0 6px}
+    .ranks{overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:rgba(11,34,48,.7)}
+    .rank-row{display:grid;grid-template-columns:160px 1fr 2fr;gap:18px;padding:18px 22px;border-bottom:1px solid var(--line);align-items:center}
+    .rank-row:last-child{border-bottom:0}.rank-row.header{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+    .amount{font-weight:900;color:var(--accent2)}.rank{font-weight:900}
+    .badge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.badge{display:flex;gap:15px}
+    .badge-icon{flex:0 0 48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:1.5rem;background:rgba(244,207,114,.12);border:1px solid rgba(244,207,114,.22)}
+    .quote{padding:32px;border-radius:var(--radius);border:1px solid rgba(87,215,160,.3);background:linear-gradient(135deg,rgba(87,215,160,.09),rgba(123,220,255,.06));font-size:1.45rem;font-weight:800}
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .step{padding:20px;border-top:3px solid var(--accent);background:rgba(11,34,48,.6);border-radius:0 0 16px 16px}.step b{display:block;margin-bottom:7px}.step span{color:var(--muted);font-size:.94rem}
+    .note{margin-top:24px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--muted);font-size:.92rem}
+    .cta{text-align:center;padding:54px 24px;border-radius:28px;background:linear-gradient(135deg,#0d6048,#0c4764)}
+    .cta p{color:#d3eaf2;max-width:680px;margin:0 auto 24px}
+    footer{padding:36px 0 50px;color:var(--muted);font-size:.88rem}.foot{display:flex;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding-top:24px}
+    @media(max-width:800px){
+      .nav-links a:not(.btn){display:none}.hero{grid-template-columns:1fr}.grid,.steps,.badge-grid{grid-template-columns:1fr}
+      .rank-row{grid-template-columns:90px 1fr}.rank-row .meaning{grid-column:1/-1}.rank-row.header .meaning{display:none}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top"><span class="mark">L</span><span>SAILING FROG'S LEAP</span></a>
+      <div class="nav-links">
+        <a href="#how">How it works</a><a href="#ranks">Crew ranks</a><a href="#badges">Badges</a>
+        <a class="btn" href="#join">Join the Crew</a>
+      </div>
+    </div>
+  </nav>
+
+  <header id="top">
+    <div class="wrap hero">
+      <div>
+        <div class="eyebrow">🐸 Sailing Frog's Leap • XRPL Crew Membership</div>
+        <h1>JOIN THE <span>CREW.</span></h1>
+        <p class="lede">LEAP is the on-chain membership token for Sailing Frog's Leap. Receive your first LEAP and you are officially a Deckhand. Participate, earn recognition, advance through the crew ranks, and become part of the story.</p>
+        <div class="hero-actions"><a class="btn" href="#join">Get your first LEAP</a><a class="btn alt" href="#ranks">See crew ranks</a></div>
+      </div>
+      <aside class="token-card">
+        <div class="coin">LEAP</div>
+        <h3>Your crew credential</h3>
+        <p>Issued on the XRP Ledger for the Sailing Frog's Leap community.</p>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section id="how">
+      <div class="wrap">
+        <div class="section-head"><h2>What is LEAP?</h2><p>LEAP turns participation in Sailing Frog's Leap into a persistent crew identity. Your balance determines your crew rank; special badges recognize what you actually did with, for, or alongside the community.</p></div>
+        <div class="grid">
+          <article class="card"><div class="num">1</div><h3>Receive a LEAP</h3><p>Your first LEAP makes you a Deckhand and officially puts you on the crew.</p></article>
+          <article class="card"><div class="num">2</div><h3>Participate</h3><p>Useful comments, polls, livestreams, community contributions, and special events can earn recognition.</p></article>
+          <article class="card"><div class="num">3</div><h3>Advance</h3><p>As your LEAP balance grows, your permanent crew rank rises with it.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ranks">
+      <div class="wrap">
+        <div class="section-head"><h2>Crew ranks</h2><p>Your rank reflects how many LEAP tokens you currently hold.</p></div>
+        <div class="ranks">
+          <div class="rank-row header"><div>LEAP held</div><div>Rank</div><div class="meaning">What it means</div></div>
+          <div class="rank-row"><div class="amount">1–4</div><div class="rank">Deckhand</div><div class="meaning">“I'm officially part of the crew.”</div></div>
+          <div class="rank-row"><div class="amount">5–9</div><div class="rank">Bosun</div><div class="meaning">Regular participant; gets occasional recognition.</div></div>
+          <div class="rank-row"><div class="amount">10–24</div><div class="rank">Quartermaster</div><div class="meaning">Established supporter; access to member polls and questions.</div></div>
+          <div class="rank-row"><div class="amount">25–50</div><div class="rank">First Mate</div><div class="meaning">Inner-circle status; priority Q&A and occasional early content.</div></div>
+          <div class="rank-row"><div class="amount">51+</div><div class="rank">Master of the Leap</div><div class="meaning">Highest permanent rank; public recognition and special access.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="badges">
+      <div class="wrap">
+        <div class="section-head"><h2>Ranks tell how much. Badges tell the story.</h2><p>Special Recognition Badges are separate from rank. They mark memorable participation, voyages, projects, places, and moments in the Sailing Frog's Leap story.</p></div>
+        <div class="badge-grid">
+          <article class="card badge"><div class="badge-icon">⚓</div><div><h3>Voyage & port badges</h3><p>Recognition tied to passages, ports, canal transits, and special cruising milestones.</p></div></article>
+          <article class="card badge"><div class="badge-icon">🧭</div><div><h3>Participation badges</h3><p>Earned for meaningful contributions, useful information, community help, or special events.</p></div></article>
+        </div>
+        <div class="quote" style="margin-top:20px">Rank is how much LEAP you hold. A badge is what you actually did.</div>
+      </div>
+    </section>
+
+    <section id="join">
+      <div class="wrap">
+        <div class="section-head"><h2>Get your first LEAP</h2><p>LEAP lives on the XRP Ledger. The onboarding process will be kept as simple as possible while the crew pilot is rolled out.</p></div>
+        <div class="steps">
+          <div class="step"><b>1. Set up an XRPL wallet</b><span>Xaman is the recommended wallet for the initial LEAP pilot.</span></div>
+          <div class="step"><b>2. Add the LEAP trustline</b><span>This tells your wallet that you want to hold the Sailing Frog's Leap token.</span></div>
+          <div class="step"><b>3. Join the crew</b><span>Participate in Sailing Frog's Leap and receive your first LEAP.</span></div>
+          <div class="step"><b>4. Build your history</b><span>Earn more LEAP, advance your rank, and collect recognition along the way.</span></div>
+        </div>
+        <div class="note"><strong>Pilot note:</strong> LEAP is being introduced first as a community membership and recognition system. It is not a promise of profit or future monetary value.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="cta">
+          <h2>The first LEAP makes you crew.</h2>
+          <p>Follow Sailing Frog's Leap and watch for the first crew onboarding invitations. Early participants will help shape how the LEAP membership system develops.</p>
+          <!-- Replace the URL below with your actual YouTube channel URL -->
+          <a class="btn" href="https://www.youtube.com/" target="_blank" rel="noopener">Sailing Frog's Leap on YouTube</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap foot"><div>© Sailing Frog's Leap • LEAP Membership System</div><div>Built on the XRP Ledger</div></div></footer>
+</body>
+</html>
