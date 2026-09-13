@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Explore LEAP badges: permanent recognition for voyages, milestones, participation, contribution, and shared history in the Sailing Frog's Leap crew." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Badges & Crew Logbook — Sailing Frog's Leap</title>
+
+  <style>
+    :root{
+      --paper:#efe8d8;--paper2:#f8f3e8;--ink:#1a252c;--navy:#16384b;
+      --sea:#2f7481;--foam:#dbece8;--rust:#b84f32;--gold:#d2a34f;
+      --line:rgba(26,37,44,.18);--card:#fffaf0;--max:1060px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:Georgia,"Times New Roman",serif;line-height:1.62;
+    }
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+    nav{
+      position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);
+      backdrop-filter:blur(10px);border-bottom:1px solid var(--line)
+    }
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+    .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
+    header{padding:78px 0 48px}
+    .kicker{color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}
+    h1{margin:.14em 0 .2em;color:var(--navy);font-size:clamp(3.2rem,8vw,6.3rem);line-height:.94;letter-spacing:-.055em}
+    .lede{max-width:860px;margin:0;color:#46575f;font-size:clamp(1.16rem,2vw,1.4rem)}
+    .hero-note{margin-top:25px;padding:20px 22px;border-left:4px solid var(--gold);background:rgba(255,250,240,.58);color:#4f5c62;font-size:1.08rem}
+    section{padding:46px 0}
+    .section-title{max-width:830px;margin-bottom:22px}
+    h2{margin:0 0 10px;color:var(--navy);font-size:clamp(2rem,5vw,3rem);line-height:1.05;letter-spacing:-.035em}
+    .section-title p{margin:0;color:#5a686e;font-size:1.05rem}
+    .manifesto{background:var(--navy);color:white;padding:42px;border-radius:20px}
+    .manifesto p{max-width:840px;margin:0 0 1rem;font-size:1.17rem}.manifesto p:last-child{margin-bottom:0}
+
+    .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .principle{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+    .principle b{display:block;margin-bottom:7px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem}
+    .principle h3{margin:0 0 7px;color:var(--navy);font-size:1.25rem}
+    .principle p{margin:0;color:#58666c}
+
+    .badge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .badge-card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 10px 26px rgba(26,37,44,.05)}
+    .badge-head{display:flex;gap:16px;align-items:center;padding:22px 24px;border-bottom:1px solid var(--line)}
+    .badge-icon{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:var(--foam);font-size:1.45rem;flex:0 0 auto}
+    .badge-head h3{margin:0;color:var(--navy);font-size:1.45rem}
+    .badge-head p{margin:4px 0 0;color:#627077;font-style:italic}
+    .badge-body{padding:22px 24px}
+    .badge-body p{margin:0 0 14px;color:#56646a}.badge-body p:last-child{margin-bottom:0}
+    .examples{margin:13px 0 0;padding-left:20px;color:#536269}
+    .examples li{margin:6px 0}
+    .label{display:inline-block;margin-bottom:8px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+
+    .mechanic{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .step{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:21px}
+    .step .num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:white;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:900;margin-bottom:12px}
+    .step h3{margin:0 0 7px;color:var(--navy);font-size:1.18rem}.step p{margin:0;color:#58666c}
+
+    .logbook{background:linear-gradient(135deg,#e5efeb,#f7f0e3);border:1px solid var(--line);border-radius:18px;padding:30px}
+    .logbook h3{margin:0 0 8px;color:var(--navy);font-size:1.55rem}.logbook p{margin:0 0 14px;color:#58666c}
+    .record{display:grid;grid-template-columns:160px 1fr;gap:10px 18px;margin-top:18px;padding:22px;border-radius:14px;background:rgba(255,255,255,.6);border:1px solid var(--line);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    .record b{color:var(--navy)}.record span{color:#4f5d63}
+
+    .compare{border-top:2px solid var(--navy)}
+    .compare-row{display:grid;grid-template-columns:190px 1fr;gap:18px;padding:18px 2px;border-bottom:1px solid var(--line)}
+    .compare-row b{color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    .compare-row span{color:#58666c}
+
+    .quote{text-align:center;padding:44px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .quote blockquote{max-width:850px;margin:0 auto;color:var(--navy);font-size:clamp(1.55rem,4vw,2.45rem);line-height:1.24;font-weight:700}
+    .quote cite{display:block;margin-top:14px;color:#67747a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-style:normal;font-size:.9rem}
+
+    .faq{border-top:2px solid var(--navy)}
+    .faq-row{display:grid;grid-template-columns:280px 1fr;gap:22px;padding:18px 2px;border-bottom:1px solid var(--line)}
+    .faq-row b{color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    .faq-row span{color:#58666c}
+
+    .return-box{background:linear-gradient(135deg,#e5efeb,#f7f0e3);border:1px solid var(--line);border-radius:18px;padding:30px;text-align:center}
+    .return-box h3{margin:0 0 8px;color:var(--navy);font-size:1.55rem}.return-box p{margin:0;color:#58666c}
+    .button{display:inline-flex;align-items:center;justify-content:center;margin-top:18px;padding:12px 18px;border-radius:8px;text-decoration:none;background:var(--rust);color:white;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+
+    footer{padding:38px 0 48px;color:#69757a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.86rem}
+    .foot{padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px}
+
+    @media(max-width:850px){
+      .nav-links a:nth-child(3){display:none}
+      .principles,.badge-grid{grid-template-columns:1fr}
+      .mechanic{grid-template-columns:1fr}
+      .record,.faq-row,.compare-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html">
+        <img src="leap-logo.png" alt="LEAP logo">
+        <span>Sailing Frog's Leap</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">← Home</a>
+        <a href="ranks.html">Crew ranks</a>
+        <a href="state-machine.html">State machine</a>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap">
+      <div class="kicker">LEAP Badges & Crew Logbook</div>
+      <h1>Your badges are the story.</h1>
+      <p class="lede">
+        LEAP badges recognize the moments, contributions, voyages, places, milestones, and shared experiences
+        that make one crew member's history different from another's.
+      </p>
+      <div class="hero-note">
+        A badge is not another rank. It is a permanent piece of the member's story.
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <div class="manifesto">
+          <p>
+            Rank answers a simple question: <strong>Where does this crew member stand right now?</strong>
+          </p>
+          <p>
+            Badges answer a different question: <strong>What happened along the way?</strong>
+          </p>
+          <p>
+            A rank can rise or fall with current LEAP holdings. A badge is meant to preserve history.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Three ideas define the badge system</h2>
+          <p>Badges work best when they are meaningful, scarce enough to matter, and easy to understand.</p>
+        </div>
+
+        <div class="principles">
+          <div class="principle">
+            <b>Idea one</b>
+            <h3>Badges recognize events</h3>
+            <p>
+              A badge should mean something actually happened: a passage, a contribution, a milestone, an event, a useful act, or a shared moment.
+            </p>
+          </div>
+
+          <div class="principle">
+            <b>Idea two</b>
+            <h3>Badges preserve history</h3>
+            <p>
+              Unlike rank, a badge is not meant to change just because the member's current LEAP balance changes.
+            </p>
+          </div>
+
+          <div class="principle">
+            <b>Idea three</b>
+            <h3>Badges create identity</h3>
+            <p>
+              Two Quartermasters may hold the same amount of LEAP but have completely different badge histories—and therefore completely different stories.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Types of badges</h2>
+          <p>The system can grow over time, but these categories give LEAP a strong starting structure.</p>
+        </div>
+
+        <div class="badge-grid">
+          <article class="badge-card">
+            <div class="badge-head">
+              <div class="badge-icon">⚓</div>
+              <div><h3>Voyage & Passage Badges</h3><p>“I was part of this chapter.”</p></div>
+            </div>
+            <div class="badge-body">
+              <span class="label">What they recognize</span>
+              <p>Important passages, cruising regions, canal transits, crossings, or voyage milestones connected to the channel.</p>
+              <ul class="examples">
+                <li>Panama Canal</li>
+                <li>Mexican Riviera</li>
+                <li>San Francisco Departure</li>
+                <li>Caribbean Passage</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="badge-card">
+            <div class="badge-head">
+              <div class="badge-icon">📍</div>
+              <div><h3>Port & Place Badges</h3><p>“This place is in my logbook.”</p></div>
+            </div>
+            <div class="badge-body">
+              <span class="label">What they recognize</span>
+              <p>Specific ports, anchorages, marinas, regions, or memorable locations in the Sailing Frog's Leap story.</p>
+              <ul class="examples">
+                <li>Shelter Bay</li>
+                <li>Golfito</li>
+                <li>Bahía del Sol</li>
+                <li>La Cruz</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="badge-card">
+            <div class="badge-head">
+              <div class="badge-icon">🧭</div>
+              <div><h3>Participation Badges</h3><p>“I showed up and took part.”</p></div>
+            </div>
+            <div class="badge-body">
+              <span class="label">What they recognize</span>
+              <p>Community participation that matters: livestreams, polls, special events, recurring involvement, or helping shape a channel decision.</p>
+              <ul class="examples">
+                <li>Founding Crew</li>
+                <li>Live Watch Crew</li>
+                <li>First 100 Members</li>
+                <li>Launch Day Crew</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="badge-card">
+            <div class="badge-head">
+              <div class="badge-icon">🛠️</div>
+              <div><h3>Contribution Badges</h3><p>“I helped make something better.”</p></div>
+            </div>
+            <div class="badge-body">
+              <span class="label">What they recognize</span>
+              <p>Useful contributions to the channel or community: information, problem-solving, technical help, ideas, research, or helping another crew member.</p>
+              <ul class="examples">
+                <li>Problem Solver</li>
+                <li>Chart Table Contributor</li>
+                <li>Crew Helper</li>
+                <li>Useful Intel</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="badge-card">
+            <div class="badge-head">
+              <div class="badge-icon">🏁</div>
+              <div><h3>Milestone Badges</h3><p>“I was here when it happened.”</p></div>
+            </div>
+            <div class="badge-body">
+              <span class="label">What they recognize</span>
+              <p>Moments in the history of Sailing Frog's Leap itself.</p>
+              <ul class="examples">
+                <li>LEAP Genesis</li>
+                <li>First Discord Crew</li>
+                <li>Channel Milestone</li>
+                <li>First LEAP Pilot</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="badge-card">
+            <div class="badge-head">
+              <div class="badge-icon">🐸</div>
+              <div><h3>Special Recognition Badges</h3><p>“This one has a story behind it.”</p></div>
+            </div>
+            <div class="badge-body">
+              <span class="label">What they recognize</span>
+              <p>Rare or one-off recognitions that do not need their own permanent category.</p>
+              <ul class="examples">
+                <li>Captain's Recognition</li>
+                <li>Above & Beyond</li>
+                <li>OG LEAP</li>
+                <li>Special Expedition Crew</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>How a badge becomes part of the blockchain logbook</h2>
+          <p>The mechanic can be remarkably simple.</p>
+        </div>
+
+        <div class="mechanic">
+          <div class="step">
+            <div class="num">1</div>
+            <h3>Something happens</h3>
+            <p>A member earns recognition for a passage, contribution, milestone, place, or event.</p>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <h3>LEAP records it</h3>
+            <p>A small symbolic LEAP transfer is sent to the member's wallet.</p>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <h3>The memo names it</h3>
+            <p>For example: <strong>LEAP-PANAMA-CANAL</strong> or <strong>LEAP-FOUNDING-CREW</strong>.</p>
+          </div>
+          <div class="step">
+            <div class="num">4</div>
+            <h3>The history stays</h3>
+            <p>The transaction remains in the public XRPL history as a permanent record of that recognition.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="logbook">
+          <h3>What a crew logbook could eventually show</h3>
+          <p>
+            A future LEAP page could read the public XRPL history and turn those records into a human-friendly profile.
+          </p>
+
+          <div class="record">
+            <b>Current Rank</b><span>Quartermaster</span>
+            <b>LEAP Held</b><span>17</span>
+            <b>Badges</b><span>Panama Canal • Founding Crew • Problem Solver • Shelter Bay</span>
+            <b>Joined</b><span>First LEAP transaction</span>
+            <b>Proof</b><span>Each recognition links back to its XRPL transaction</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Rank and badges answer different questions</h2>
+          <p>That separation is what makes the system interesting.</p>
+        </div>
+
+        <div class="compare">
+          <div class="compare-row"><b>Rank</b><span>What is this member's current status?</span></div>
+          <div class="compare-row"><b>Badge</b><span>What happened in this member's history?</span></div>
+          <div class="compare-row"><b>Rank can change?</b><span>Yes. It follows current LEAP holdings.</span></div>
+          <div class="compare-row"><b>Badge can change?</b><span>The intention is that historical recognition remains part of the logbook.</span></div>
+          <div class="compare-row"><b>Rank is shared?</b><span>Many members may have the same rank.</span></div>
+          <div class="compare-row"><b>Badge history is shared?</b><span>Potentially not. The combination of badges can make each member's crew history unique.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote">
+      <div class="wrap">
+        <blockquote>
+          “Rank tells where you stand. Badges tell where you've been.”
+        </blockquote>
+        <cite>— Sailing Frog's Leap</cite>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Common questions</h2>
+          <p>The pilot can evolve, but these are the principles behind the system.</p>
+        </div>
+
+        <div class="faq">
+          <div class="faq-row">
+            <b>Does a badge have to add more LEAP?</b>
+            <span>No. The amount can be tiny and symbolic. The important part can be the permanent transaction record and standardized memo.</span>
+          </div>
+          <div class="faq-row">
+            <b>Does the memo travel with one specific LEAP coin?</b>
+            <span>No. LEAP is fungible. The memo belongs to the transaction, not to one individually serialized LEAP unit.</span>
+          </div>
+          <div class="faq-row">
+            <b>Can a Deckhand have a rare badge?</b>
+            <span>Absolutely. Rank and badge history are deliberately separate.</span>
+          </div>
+          <div class="faq-row">
+            <b>Can badges unlock things too?</b>
+            <span>They could. A future Discord or website could recognize a particular badge and unlock a channel, event, poll, or special experience.</span>
+          </div>
+          <div class="faq-row">
+            <b>Who decides when a badge is earned?</b>
+            <span>During the pilot, Sailing Frog's Leap can define the rules manually. If the system grows, some recognitions could later be automated.</span>
+          </div>
+          <div class="faq-row">
+            <b>Why not make every little action a badge?</b>
+            <span>Because badges become more meaningful when they remain selective enough to tell a real story rather than becoming noise.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="return-box">
+          <h3>Badges are the history layer of LEAP.</h3>
+          <p>
+            Explore the crew ranks to see current status, or go deeper into how XRPL turns these events into machine-readable state.
+          </p>
+          <a class="button" href="ranks.html">Explore crew ranks →</a>
+          <a class="button" href="state-machine.html" style="margin-left:8px;background:var(--navy)">Explore the state machine →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>Sailing Frog's Leap • LEAP Badges & Crew Logbook</div>
+      <div><a href="index.html">Home</a> • <a href="ranks.html">Ranks</a> • <a href="state-machine.html">State machine</a></div>
+    </div>
+  </footer>
+</body>
+</html>
