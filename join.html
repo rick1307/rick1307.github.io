@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Join the Sailing Frog's Leap crew. Learn what LEAP membership means, how to get started, and what happens after you receive your first LEAP." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Join the Crew — Sailing Frog's Leap</title>
+  <style>
+    :root{--paper:#efe8d8;--paper2:#f8f3e8;--ink:#1a252c;--navy:#16384b;--sea:#2f7481;--foam:#dbece8;--rust:#b84f32;--gold:#d2a34f;--line:rgba(26,37,44,.18);--card:#fffaf0;--max:1060px}
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:linear-gradient(rgba(22,56,75,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(22,56,75,.028) 1px,transparent 1px),var(--paper);background-size:30px 30px;font-family:Georgia,"Times New Roman",serif;line-height:1.62}
+    a{color:inherit}.wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+    nav{position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}.brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}.nav-links{display:flex;gap:18px;align-items:center}.nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
+    header{padding:78px 0 48px}.kicker{color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}h1{margin:.14em 0 .2em;color:var(--navy);font-size:clamp(3.2rem,8vw,6.3rem);line-height:.94;letter-spacing:-.055em}.lede{max-width:850px;margin:0;color:#46575f;font-size:clamp(1.16rem,2vw,1.4rem)}.hero-note{margin-top:25px;padding:20px 22px;border-left:4px solid var(--gold);background:rgba(255,250,240,.58);color:#4f5c62;font-size:1.08rem}
+    section{padding:46px 0}.section-title{max-width:830px;margin-bottom:22px}h2{margin:0 0 10px;color:var(--navy);font-size:clamp(2rem,5vw,3rem);line-height:1.05;letter-spacing:-.035em}.section-title p{margin:0;color:#5a686e;font-size:1.05rem}
+    .manifesto{background:var(--navy);color:white;padding:42px;border-radius:20px}.manifesto p{max-width:840px;margin:0 0 1rem;font-size:1.17rem}.manifesto p:last-child{margin-bottom:0}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}.card b{display:block;margin-bottom:7px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem}.card h3{margin:0 0 7px;color:var(--navy);font-size:1.28rem}.card p{margin:0;color:#58666c}
+    .steps{counter-reset:step;display:grid;gap:16px}.step{counter-increment:step;display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}.step:before{content:counter(step);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:white;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:900}.step h3{margin:1px 0 6px;color:var(--navy);font-size:1.25rem}.step p{margin:0;color:#58666c}.step .small{margin-top:8px;font-size:.93rem;color:#6a777d}
+    .important{background:linear-gradient(135deg,#e5efeb,#f7f0e3);border:1px solid var(--line);border-radius:18px;padding:28px}.important h3{margin:0 0 8px;color:var(--navy);font-size:1.5rem}.important p{margin:0 0 12px;color:#56646a}.important p:last-child{margin-bottom:0}
+    .what-next{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:var(--foam);border:1px solid rgba(47,116,129,.18);border-radius:18px;padding:24px}.panel h3{margin:0 0 8px;color:var(--navy)}.panel p{margin:0;color:#526167}
+    .compare{border-top:2px solid var(--navy)}.compare-row{display:grid;grid-template-columns:230px 1fr;gap:18px;padding:18px 2px;border-bottom:1px solid var(--line)}.compare-row b{color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}.compare-row span{color:#58666c}
+    .quote{text-align:center;padding:44px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.quote blockquote{max-width:850px;margin:0 auto;color:var(--navy);font-size:clamp(1.55rem,4vw,2.45rem);line-height:1.24;font-weight:700}.quote cite{display:block;margin-top:14px;color:#67747a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-style:normal;font-size:.9rem}
+    .faq{border-top:2px solid var(--navy)}.faq-row{display:grid;grid-template-columns:280px 1fr;gap:22px;padding:18px 2px;border-bottom:1px solid var(--line)}.faq-row b{color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}.faq-row span{color:#58666c}
+    .cta{background:var(--navy);color:white;border-radius:20px;padding:38px;text-align:center}.cta h2{color:white;margin-bottom:10px}.cta p{max-width:700px;margin:0 auto;color:#dce5e8;font-size:1.05rem}.button{display:inline-flex;align-items:center;justify-content:center;margin-top:20px;padding:12px 18px;border-radius:8px;text-decoration:none;background:var(--rust);color:white;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}.button.secondary{margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,.35)}.fine-print{margin-top:20px;color:#68757b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem}
+    footer{padding:38px 0 48px;color:#69757a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.86rem}.foot{padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px}
+    @media(max-width:850px){.nav-links a:nth-child(3){display:none}.three,.what-next{grid-template-columns:1fr}.compare-row,.faq-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a>
+      <div class="nav-links"><a href="index.html">← Home</a><a href="ranks.html">Ranks</a><a href="badges.html">Badges</a><a href="state-machine.html">State machine</a></div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap">
+      <div class="kicker">Join the Sailing Frog's Leap Crew</div>
+      <h1>Your first LEAP gets you aboard.</h1>
+      <p class="lede">LEAP is a crew membership and recognition system built around the Sailing Frog's Leap community. You do not need to be a trader, a crypto expert, or somebody who spends all day thinking about blockchain. You just need to want to be part of the voyage.</p>
+      <div class="hero-note">Think of the wallet as your crew ID, LEAP as your membership credential, and the blockchain as the logbook that remembers your history.</div>
+    </div>
+  </header>
+
+  <main>
+    <section><div class="wrap"><div class="manifesto">
+      <p>Most people who watch a YouTube channel remain anonymous viewers. LEAP is an experiment in making participation more permanent.</p>
+      <p>When you receive your first LEAP, you become a Deckhand. From there, the things you do—the questions you ask, the help you give, the events you participate in, the places and passages you share with the channel—can become part of your crew history.</p>
+      <p><strong>The goal is not to turn viewers into speculators. The goal is to turn a community into a crew.</strong></p>
+    </div></div></section>
+
+    <section><div class="wrap"><div class="section-title"><h2>Who is this for?</h2><p>You do not need a particular level of sailing or crypto experience to belong here.</p></div>
+      <div class="three">
+        <div class="card"><b>The regular</b><h3>You keep showing up</h3><p>You watch the videos, join livestreams, comment, ask questions, and have gradually become part of the familiar crowd.</p></div>
+        <div class="card"><b>The contributor</b><h3>You add something useful</h3><p>You offer information, solve a problem, share experience, help another viewer, or contribute an idea that moves the conversation forward.</p></div>
+        <div class="card"><b>The adventurer</b><h3>You want to be part of the story</h3><p>You may never step aboard Frog's Leap physically, but you enjoy following the journey and want your participation to have a history of its own.</p></div>
+      </div>
+    </div></section>
+
+    <section><div class="wrap"><div class="section-title"><h2>How joining works</h2><p>The technical part sounds more complicated than it actually is.</p></div>
+      <div class="steps">
+        <div class="step"><div><h3>Set up an XRP Ledger wallet</h3><p>You need a wallet capable of holding XRP Ledger issued tokens. During the pilot, Xaman is the recommended wallet because it is designed specifically for the XRP Ledger.</p><p class="small">Your wallet belongs to you. Sailing Frog's Leap should never need your secret numbers, recovery phrase, or private key.</p></div></div>
+        <div class="step"><div><h3>Add the LEAP trustline</h3><p>On the XRP Ledger, a trustline simply tells your wallet that it is willing to hold a particular issued asset—in this case, the official LEAP token. Think of it as adding LEAP to the list of things your wallet knows how to receive.</p></div></div>
+        <div class="step"><div><h3>Receive your first LEAP</h3><p>When your first LEAP arrives, you become a Deckhand. That is the first permanent step in your crew history.</p></div></div>
+        <div class="step"><div><h3>Participate naturally</h3><p>LEAP is intended to recognize meaningful participation—not reward spam. Good questions, useful comments, livestream participation, helping the community, sharing knowledge, and taking part in special events are the kinds of things that can matter.</p></div></div>
+        <div class="step"><div><h3>Build rank and history</h3><p>Your current LEAP balance determines your crew rank. Badges and recognition records preserve the things you actually did along the way.</p></div></div>
+      </div>
+    </div></section>
+
+    <section><div class="wrap"><div class="important"><h3>You are not handing your wallet to us.</h3><p>Your XRP Ledger address is public, much like a public account number used to receive blockchain assets. Your private key or recovery secret is different: it controls the wallet and should remain private.</p><p>The LEAP system can read public information such as a wallet's LEAP balance and public transaction history without needing control of the wallet.</p></div></div></section>
+
+    <section><div class="wrap"><div class="section-title"><h2>What happens after you become a Deckhand?</h2><p>Receiving the first token is the beginning, not the finish line.</p></div>
+      <div class="what-next">
+        <div class="panel"><h3>Your rank can grow</h3><p>Holding more LEAP moves you through Deckhand, Bosun, Quartermaster, First Mate, and eventually Master of the Leap. Rank is meant to show your current place in the crew system.</p></div>
+        <div class="panel"><h3>Your logbook can grow</h3><p>Badges and memo-based recognition can preserve specific moments: a voyage, a port, a contribution, a launch event, founding membership, or some other piece of shared history.</p></div>
+      </div>
+    </div></section>
+
+    <section><div class="wrap"><div class="section-title"><h2>What joining does—and does not—mean</h2></div><div class="compare">
+      <div class="compare-row"><b>It does mean</b><span>You are participating in an experimental on-chain membership and recognition system for the Sailing Frog's Leap community.</span></div>
+      <div class="compare-row"><b>It does mean</b><span>Your public wallet can become the anchor for your crew rank, badges, and participation history.</span></div>
+      <div class="compare-row"><b>It does mean</b><span>Future community features may use LEAP holdings or badges to unlock recognition, polls, Discord roles, events, or other experiences.</span></div>
+      <div class="compare-row"><b>It does not mean</b><span>You are promised profit, investment returns, or future monetary value.</span></div>
+      <div class="compare-row"><b>It does not mean</b><span>You need to become a crypto trader or constantly move tokens around.</span></div>
+      <div class="compare-row"><b>It does not mean</b><span>You give Sailing Frog's Leap control of your wallet or private keys.</span></div>
+    </div></div></section>
+
+    <section class="quote"><div class="wrap"><blockquote>“You don't need to understand the engine room to come aboard. You just need to know what ship you're joining.”</blockquote><cite>— Sailing Frog's Leap</cite></div></section>
+
+    <section><div class="wrap"><div class="section-title"><h2>Common questions before joining</h2><p>The pilot is meant to be understandable even if this is your first experience with the XRP Ledger.</p></div><div class="faq">
+      <div class="faq-row"><b>Do I have to buy LEAP?</b><span>The membership concept is centered on distribution, participation, and recognition. The exact pilot rules can evolve, but joining the crew is not intended to require somebody to become a token speculator.</span></div>
+      <div class="faq-row"><b>Do I need XRP?</b><span>XRP Ledger accounts use XRP for network requirements and transaction fees. The exact amount required can change over time, so onboarding instructions should point members to current wallet guidance rather than a hard-coded number.</span></div>
+      <div class="faq-row"><b>Can people see my wallet?</b><span>XRP Ledger addresses and their public transaction histories are visible on the public ledger. You should treat the address you use for LEAP as public information.</span></div>
+      <div class="faq-row"><b>Can Sailing Frog's Leap take my crypto?</b><span>Not simply because you join LEAP. Control stays with whoever holds the wallet's private keys. Never give a website, Discord user, or community member your recovery secret or private key.</span></div>
+      <div class="faq-row"><b>Can I lose rank?</b><span>Yes. Rank reflects the LEAP currently held by the membership wallet. Historical badges and recognition are intended to remain part of the logbook.</span></div>
+      <div class="faq-row"><b>What if I only want to watch the channel?</b><span>That's completely fine. LEAP is an optional layer for viewers who want deeper participation and a persistent crew identity.</span></div>
+    </div></div></section>
+
+    <section><div class="wrap"><div class="cta"><h2>The first LEAP gets you aboard.</h2><p>From there, what matters is what you do with the crew, what you experience with the channel, and what gets written into your logbook over time.</p><a class="button" href="ranks.html">See the crew ranks →</a><a class="button secondary" href="badges.html">Explore badges →</a></div><p class="fine-print">LEAP is being introduced as an experimental community membership and recognition system. It is not a promise of profit or future monetary value.</p></div></section>
+  </main>
+
+  <footer><div class="wrap foot"><div>Sailing Frog's Leap • Join the LEAP Crew</div><div><a href="index.html">Home</a> • <a href="ranks.html">Ranks</a> • <a href="badges.html">Badges</a> • <a href="state-machine.html">State machine</a></div></div></footer>
+</body>
+</html>
