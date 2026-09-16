@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="LEAP creator membership marketing concept." />
+  <meta name="theme-color" content="#102830" />
+  <title>LEAP Creator Membership — Marketing</title>
+  <style>
+    :root{
+      --ink:#142b32;
+      --deep:#102830;
+      --deep2:#173a43;
+      --paper:#f3ebdc;
+      --paper2:#fffaf1;
+      --sea:#4f8790;
+      --rust:#bf5c42;
+      --gold:#d9b66f;
+      --mist:#dce9e5;
+      --line:rgba(20,43,50,.15);
+      --max:1080px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%,rgba(217,182,111,.18),transparent 28%),
+        radial-gradient(circle at 88% 8%,rgba(79,135,144,.18),transparent 30%),
+        linear-gradient(180deg,#0f252c 0 31%,#e7e7dd 31%,#eee9df 100%);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+
+    .topbar{
+      padding:24px 0 8px;
+      color:white;
+    }
+
+    .brand-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:850;
+      letter-spacing:-.02em;
+    }
+
+    .brand img{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow:0 8px 24px rgba(0,0,0,.18);
+    }
+
+    .brand small{
+      display:block;
+      margin-top:2px;
+      color:rgba(255,255,255,.58);
+      font-size:.72rem;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .marketing-tag{
+      border:1px solid rgba(217,182,111,.48);
+      color:#f0d49b;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:.74rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    header{
+      color:white;
+      padding:64px 0 88px;
+    }
+
+    .kicker{
+      color:var(--gold);
+      font-size:.78rem;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    h1{
+      max-width:920px;
+      margin:.18em 0 .22em;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(3.3rem,9vw,7rem);
+      line-height:.91;
+      letter-spacing:-.055em;
+    }
+
+    .lede{
+      max-width:800px;
+      margin:0;
+      color:rgba(255,255,255,.77);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(1.22rem,2.4vw,1.65rem);
+      line-height:1.5;
+    }
+
+    main{padding:0 0 84px}
+
+    .pitch-shell{
+      margin-top:-28px;
+      background:rgba(255,250,241,.94);
+      border:1px solid rgba(255,255,255,.56);
+      border-radius:26px;
+      box-shadow:0 24px 60px rgba(16,40,48,.16);
+      overflow:hidden;
+    }
+
+    .pitch-head{
+      padding:34px 34px 24px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .pitch-head .label{
+      color:var(--rust);
+      font-size:.76rem;
+      font-weight:900;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+
+    .pitch-head h2{
+      margin:8px 0 0;
+      color:var(--deep);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2rem,5vw,3.3rem);
+      line-height:1.02;
+      letter-spacing:-.035em;
+    }
+
+    .two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:0;
+    }
+
+    .panel{
+      position:relative;
+      padding:34px;
+      min-height:270px;
+    }
+
+    .panel + .panel{border-left:1px solid var(--line)}
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      left:34px;
+      top:0;
+      width:74px;
+      height:4px;
+      border-radius:99px;
+      background:linear-gradient(90deg,var(--gold),var(--sea));
+    }
+
+    .panel h3{
+      margin:0 0 12px;
+      color:var(--deep);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1.7rem;
+      line-height:1.08;
+    }
+
+    .panel p{
+      margin:0 0 14px;
+      color:#53666c;
+      line-height:1.65;
+      font-size:1rem;
+    }
+
+    .panel p:last-child{margin-bottom:0}
+
+    .marketing-stack{display:grid;gap:22px;margin-top:24px}
+
+    .marketing-callout{
+      background:linear-gradient(135deg,var(--deep),#19424c 70%,#235965);
+      color:white;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:24px;
+      padding:34px;
+      box-shadow:0 22px 54px rgba(16,40,48,.17);
+    }
+
+    .marketing-callout h2{
+      margin:0 0 10px;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2rem,5vw,3rem);
+      line-height:1.04;
+      letter-spacing:-.035em;
+    }
+
+    .marketing-callout p{margin:0;color:rgba(255,255,255,.78);line-height:1.7}
+
+    .marketing-section{
+      background:rgba(255,250,241,.92);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:34px;
+      box-shadow:0 18px 44px rgba(16,40,48,.09);
+    }
+
+    .marketing-section .label{
+      color:var(--rust);font-size:.76rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
+    }
+
+    .marketing-section h2{
+      margin:8px 0 8px;color:var(--deep);font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2rem,5vw,3.1rem);line-height:1.04;letter-spacing:-.035em;
+    }
+
+    .marketing-section > p{margin:0;color:#607176;line-height:1.65}
+
+    .marketing-section .panel{margin-top:24px;border-top:1px solid var(--line)}
+
+    .marketing-manifesto{
+      background:#172f36;color:white;border-radius:24px;padding:34px;
+      box-shadow:0 22px 54px rgba(16,40,48,.16);
+    }
+
+    .marketing-manifesto p{margin:0 0 14px;color:rgba(255,255,255,.82);line-height:1.7;font-family:Georgia,"Times New Roman",serif;font-size:1.12rem}
+    .marketing-manifesto p:first-child{color:white;font-size:1.35rem}
+    .marketing-manifesto p:last-child{margin-bottom:0;color:#efd59d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:800;font-size:.95rem}
+
+    footer{
+      padding:30px 0 44px;
+      color:#607176;
+      font-size:.82rem;
+      letter-spacing:.04em;
+    }
+
+    @media(max-width:760px){
+      .marketing-tag{display:none}
+      header{padding:48px 0 72px}
+      .two{grid-template-columns:1fr}
+      .panel + .panel{border-left:0;border-top:1px solid var(--line)}
+      .panel{min-height:auto;padding:30px 26px}
+      .panel::before{left:26px}
+      .pitch-head{padding:30px 26px 22px}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap brand-row">
+      <div class="brand">
+        <img src="leap-logo.png" alt="LEAP logo" />
+        <div>
+          Sailing Frog's Leap
+          <small>Creator Membership System</small>
+        </div>
+      </div>
+      <div class="marketing-tag">Marketing Concept</div>
+    </div>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <div class="kicker">For creators who want participation to matter</div>
+      <h1>Engagement is the game.</h1>
+      <p class="lede">
+        LEAP is not meant to reward passive ownership. It is meant to recognize participation.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="pitch-shell">
+        <div class="pitch-head">
+          <div class="label">The membership idea</div>
+          <h2>Turn participation into progression and history.</h2>
+        </div>
+
+        <div class="two">
+          <div class="panel">
+            <h3>LEAP creates progression</h3>
+            <p>
+              The LEAP you earn through engagement moves your Sailing Frog's Leap crew rank. A Sailing Frog's Leap Deckhand can become a Bosun, Quartermaster, First Mate, and beyond by continuing to participate.
+            </p>
+            <p>
+              The point is not to buy your way through the system. The point is to build a history of engagement with Rick's Sailing Frog's Leap adventure.
+            </p>
+          </div>
+
+          <div class="panel">
+            <h3>Badges create memory</h3>
+            <p>
+              Badges recognize the particular moments you were part of: voyages, places, challenges, milestones, useful contributions, and shared experiences.
+            </p>
+            <p>
+              Two crew members can hold the same rank and still have completely different stories.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div class="marketing-stack">
+        <section class="marketing-callout">
+          <h2>Badges make participation cumulative rather than disposable.</h2>
+          <p>
+            A normal comment, answer, or moment of engagement can disappear as the feed moves on. LEAP gives Rick a way to recognize some of those moments so they can become part of a continuing Sailing Frog's Leap crew history instead.
+          </p>
+        </section>
+
+        <section class="marketing-section">
+          <div class="label">Why history matters</div>
+          <h2>Some moments only happen once.</h2>
+          <p>The adventure itself creates meaning that cannot simply be recreated later.</p>
+
+          <div class="panel">
+            <h3>History creates its own scarcity</h3>
+            <p>
+              A founding-crew moment happens once. A canal transit happens when it happens. An arrival, milestone, episode challenge, or voyage chapter belongs to its place in the story.
+            </p>
+            <p>
+              A badge can matter because the real event happened when it happened — not because scarcity was manufactured around it.
+            </p>
+          </div>
+        </section>
+
+        <section class="marketing-manifesto">
+          <p><strong>The game is participation in Rick's Sailing Frog's Leap adventure.</strong></p>
+          <p>
+            LEAP is the progression and recognition layer underneath it. Challenges create engagement. LEAP tracks progression. Badges preserve history. The voyage keeps creating new moments for the crew to be part of.
+          </p>
+          <p>Watch → Engage → Earn → Build History → Come Back for the Next Adventure.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">Sailing Frog's Leap • LEAP Creator Membership Concept</div>
+  </footer>
+</body>
+</html>
