@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEAP Protocol — Working Operating Standard</title>
+  <style>
+    :root{
+      --ink:#10243a;
+      --muted:#607083;
+      --line:#dbe4ec;
+      --soft:#f5f8fb;
+      --panel:#ffffff;
+      --blue:#0b5fa5;
+      --blue-soft:#eaf4fc;
+      --green:#1d6b4f;
+      --green-soft:#eaf7f1;
+      --amber:#8b6200;
+      --amber-soft:#fff7db;
+      --red:#8c3131;
+      --red-soft:#fff0f0;
+      --code:#0e1722;
+      --code-ink:#dfe9f3;
+      --max:1120px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:#eef3f7;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.58;
+    }
+    a{color:var(--blue)}
+    .shell{max-width:var(--max);margin:0 auto;padding:28px 18px 72px}
+    .hero{
+      background:linear-gradient(135deg,#0b3558,#0c659f);
+      color:#fff;
+      border-radius:20px;
+      padding:34px 34px 30px;
+      box-shadow:0 14px 38px rgba(21,55,82,.16);
+    }
+    .eyebrow{
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:.78rem;
+      font-weight:800;
+      opacity:.8;
+      margin-bottom:7px;
+    }
+    h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.05;margin:.1em 0 .22em}
+    .hero p{max-width:820px;font-size:1.06rem;margin:.5em 0 0;color:#e6f1fa}
+    .meta{
+      display:flex;gap:9px;flex-wrap:wrap;margin-top:20px
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,.32);
+      background:rgba(255,255,255,.11);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:.82rem;
+      font-weight:700;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:245px minmax(0,1fr);
+      gap:22px;
+      margin-top:22px;
+    }
+    .toc{
+      position:sticky;
+      top:16px;
+      align-self:start;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 5px 18px rgba(20,50,70,.05);
+    }
+    .toc strong{display:block;margin-bottom:8px}
+    .toc a{
+      display:block;
+      text-decoration:none;
+      color:#41566a;
+      padding:6px 7px;
+      border-radius:8px;
+      font-size:.91rem;
+    }
+    .toc a:hover{background:var(--soft);color:var(--blue)}
+    main{min-width:0}
+    section{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:26px;
+      margin-bottom:18px;
+      box-shadow:0 5px 18px rgba(20,50,70,.05);
+      scroll-margin-top:16px;
+    }
+    h2{
+      margin:0 0 12px;
+      font-size:1.5rem;
+      line-height:1.2;
+    }
+    h3{margin:24px 0 9px;font-size:1.08rem}
+    p{margin:.6em 0}
+    .lead{font-size:1.05rem;color:#31475b}
+    .rule,.fact,.decision,.note{
+      border-radius:12px;
+      padding:14px 15px;
+      margin:14px 0;
+      border-left:5px solid;
+    }
+    .rule{background:var(--green-soft);border-color:var(--green)}
+    .fact{background:var(--blue-soft);border-color:var(--blue)}
+    .decision{background:var(--amber-soft);border-color:#d09a00}
+    .note{background:var(--soft);border-color:#8192a4}
+    .tag{
+      display:inline-block;
+      font-size:.71rem;
+      font-weight:900;
+      letter-spacing:.075em;
+      text-transform:uppercase;
+      margin-bottom:4px;
+    }
+    .rule .tag{color:var(--green)}
+    .fact .tag{color:var(--blue)}
+    .decision .tag{color:var(--amber)}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:14px 0;
+      font-size:.94rem;
+    }
+    th,td{
+      border-bottom:1px solid var(--line);
+      padding:11px 9px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{background:var(--soft);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+    code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      background:#edf2f6;
+      color:#15334b;
+      padding:.12em .35em;
+      border-radius:5px;
+      font-size:.9em;
+    }
+    pre{
+      overflow:auto;
+      background:var(--code);
+      color:var(--code-ink);
+      border-radius:12px;
+      padding:16px;
+      line-height:1.5;
+      font-size:.88rem;
+      border:1px solid #1f3447;
+    }
+    pre code{background:none;color:inherit;padding:0}
+    ul{padding-left:1.25rem}
+    li{margin:.36em 0}
+    .registry td:first-child{font-weight:700;width:30%}
+    .address{
+      overflow-wrap:anywhere;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:.9rem;
+    }
+    .status-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin:15px 0;
+    }
+    .status-card{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:13px;
+      background:var(--soft);
+    }
+    .status-card b{display:block;margin-bottom:4px}
+    .mini{font-size:.88rem;color:var(--muted)}
+    .flow{
+      text-align:center;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      background:#f7fafc;
+      border:1px dashed #b8c7d4;
+      border-radius:12px;
+      padding:16px;
+      line-height:1.8;
+      margin:15px 0;
+    }
+    .checklist{list-style:none;padding-left:0}
+    .checklist li{padding-left:1.6em;position:relative}
+    .checklist li::before{content:"□";position:absolute;left:0;color:var(--blue);font-weight:700}
+    footer{
+      color:var(--muted);
+      text-align:center;
+      font-size:.86rem;
+      padding:12px 0 0;
+    }
+    @media (max-width:850px){
+      .layout{grid-template-columns:1fr}
+      .toc{position:static}
+      .toc .links{columns:2}
+      .status-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      .shell{padding:14px 10px 50px}
+      .hero{padding:26px 20px;border-radius:15px}
+      section{padding:20px 16px}
+      .toc .links{columns:1}
+      th,td{padding:9px 6px}
+    }
+  </style>
+</head>
+
+<body>
+<div class="shell">
+  <header class="hero">
+    <div class="eyebrow">Sailing Frog's Leap — Internal Operating Document</div>
+    <h1>LEAP Protocol</h1>
+    <p>
+      A working standard for how LEAP is identified, distributed, named, queried, interpreted,
+      and used to establish membership, rank, provenance, events, challenges, and permanent recognition on the XRP Ledger.
+    </p>
+    <div class="meta">
+      <span class="pill">Working Draft 0.1</span>
+      <span class="pill">XRPL Mainnet</span>
+      <span class="pill">Internal / Unlinked</span>
+      <span class="pill">Last revised: 2026-09-16</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Document sections">
+      <strong>Contents</strong>
+      <div class="links">
+        <a href="#purpose">1. Purpose</a>
+        <a href="#principles">2. Core Principles</a>
+        <a href="#registry">3. Authority Registry</a>
+        <a href="#identity">4. LEAP Asset Identity</a>
+        <a href="#naming">5. Naming Conventions</a>
+        <a href="#memos">6. Memo Standard</a>
+        <a href="#transactions">7. Transaction Standards</a>
+        <a href="#membership">8. Membership & Rank</a>
+        <a href="#badges">9. Badges & History</a>
+        <a href="#events">10. Events & Challenges</a>
+        <a href="#queries">11. Query Standards</a>
+        <a href="#validity">12. Validity Rules</a>
+        <a href="#display">13. Display vs Ledger Names</a>
+        <a href="#legacy">14. Legacy Transactions</a>
+        <a href="#change">15. Change Control</a>
+        <a href="#open">16. Open Decisions</a>
+        <a href="#sources">17. XRPL References</a>
+      </div>
+    </nav>
+
+    <main>
+      <section id="purpose">
+        <h2>1. Purpose</h2>
+        <p class="lead">
+          The LEAP Protocol exists so that every future page, script, distribution, badge rule, and XRPL query
+          interprets LEAP in the same way.
+        </p>
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            This document is the operating source of truth for LEAP. Public-facing pages may simplify these rules,
+            but they should not silently invent different ones.
+          </div>
+        </div>
+        <p>
+          This protocol deliberately separates <strong>current state</strong> from <strong>historical fact</strong>.
+          Current state answers questions such as “How much LEAP does this wallet hold now?” Historical fact answers
+          questions such as “Was this wallet officially awarded Panama Crew?”
+        </p>
+      </section>
+
+      <section id="principles">
+        <h2>2. Core Principles</h2>
+        <div class="status-grid">
+          <div class="status-card">
+            <b>Current State</b>
+            <span class="mini">Membership, balance, current rank, outstanding objects.</span>
+          </div>
+          <div class="status-card">
+            <b>Historical State</b>
+            <span class="mini">Awards, events, distributions, provenance, dates, transaction hashes.</span>
+          </div>
+          <div class="status-card">
+            <b>Authority</b>
+            <span class="mini">Only approved issuer/distributor activity can create official LEAP recognition.</span>
+          </div>
+        </div>
+
+        <h3>Operating rules</h3>
+        <ul>
+          <li>Use validated XRPL data for decisions that affect membership, rank, or recognition.</li>
+          <li>Never treat a memo by itself as proof of official LEAP recognition.</li>
+          <li>Always verify LEAP currency identity and issuer identity together.</li>
+          <li>Never use a display label as the canonical machine identifier.</li>
+          <li>Once a canonical identifier has been used on-ledger, do not rename or reuse it.</li>
+          <li>Rank is dynamic. Historical recognition is permanent unless an explicit future revocation rule is created.</li>
+          <li>Each website page may query XRPL independently unless a future architecture change explicitly replaces that rule.</li>
+        </ul>
+      </section>
+
+      <section id="registry">
+        <h2>3. Authority Registry</h2>
+        <p>
+          These accounts define the authority chain for the current LEAP implementation.
+          Additional distributors may be added later through protocol change control.
+        </p>
+
+        <table class="registry">
+          <tr>
+            <th>Role</th>
+            <th>XRPL Account</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>LEAP Issuer</td>
+            <td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td>
+            <td>Authorized</td>
+          </tr>
+          <tr>
+            <td>Distributor 01</td>
+            <td class="address">rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</td>
+            <td>Authorized</td>
+          </tr>
+        </table>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            An official recognition transaction must originate from an account listed as an authorized LEAP authority
+            for that transaction type. A matching memo from any other wallet does not count.
+          </div>
+        </div>
+      </section>
+
+      <section id="identity">
+        <h2>4. LEAP Asset Identity</h2>
+
+        <table>
+          <tr><th>Property</th><th>Working value</th></tr>
+          <tr><td>Public name</td><td>LEAP</td></tr>
+          <tr><td>Network</td><td>XRP Ledger Mainnet</td></tr>
+          <tr><td>Issuer</td><td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td></tr>
+          <tr><td>Declared maximum supply</td><td>1,000,000 LEAP — project rule, not an XRPL protocol-enforced cap</td></tr>
+          <tr><td>Canonical on-ledger currency value</td><td><strong>TO VERIFY FROM LEDGER BEFORE HARD-CODING</strong></td></tr>
+          <tr><td>Genesis ledger / first issuance ledger</td><td><strong>TO RECORD</strong></td></tr>
+        </table>
+
+        <div class="fact">
+          <div class="tag">XRPL Fact</div>
+          <div>
+            Standard XRPL currency codes are three characters. Nonstandard currency codes use a 160-bit hexadecimal value.
+            Because LEAP is four letters, code must compare against the actual on-ledger currency value rather than assuming
+            every API will return the literal text <code>LEAP</code>.
+          </div>
+        </div>
+      </section>
+
+      <section id="naming">
+        <h2>5. Naming Conventions</h2>
+        <p>
+          Human-facing names may be friendly and change over time. Canonical IDs are for machines and must remain stable.
+        </p>
+
+        <table>
+          <tr><th>Object</th><th>Canonical pattern</th><th>Example</th></tr>
+          <tr><td>Project</td><td><code>SFL-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
+          <tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>PANAMA-CREW</code></td></tr>
+          <tr><td>Event ID</td><td>UPPERCASE-HYPHENATED + year when useful</td><td><code>CARTAGENA-2027</code></td></tr>
+          <tr><td>Challenge ID</td><td><code>LEAP-NNN</code></td><td><code>LEAP-001</code></td></tr>
+          <tr><td>Origin ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LEAP-OG</code></td></tr>
+          <tr><td>Protocol version</td><td>major.minor</td><td><code>1.0</code></td></tr>
+        </table>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            Canonical IDs use uppercase ASCII letters, numbers, and hyphens only. Avoid spaces, underscores, punctuation,
+            apostrophes, emojis, and decorative capitalization.
+          </div>
+        </div>
+
+        <h3>Examples</h3>
+        <pre><code>PANAMA-CREW
+PACIFIC-CREW
+SFL-CAMEO
+
+CARTAGENA-2027
+PACIFIC-CROSSING-2027
+
+LEAP-001
+LEAP-002
+
+LEAP-OG</code></pre>
+
+        <div class="note">
+          Public display names can be “Panama Crew” or “Pacific Crossing 2027.”
+          The canonical identifiers remain <code>PANAMA-CREW</code> and <code>PACIFIC-CROSSING-2027</code>.
+        </div>
+      </section>
+
+      <section id="memos">
+        <h2>6. Memo Standard</h2>
+        <p>
+          LEAP uses XRPL's memo array as structured, machine-readable metadata. One memo should represent one semantic idea.
+        </p>
+
+        <div class="fact">
+          <div class="tag">XRPL Fact</div>
+          <div>
+            XRPL transactions can contain a <code>Memos</code> array. Each memo can contain
+            <code>MemoType</code>, <code>MemoFormat</code>, and <code>MemoData</code>. These blob fields are represented as hexadecimal
+            in transaction JSON. The serialized memo array is limited to 1 KB.
+          </div>
+        </div>
+
+        <h3>Proposed LEAP memo types</h3>
+        <table>
+          <tr><th>Meaning</th><th>MemoType after decoding</th><th>MemoData example</th></tr>
+          <tr><td>Protocol version</td><td><code>SFL-LEAP/PROTOCOL</code></td><td><code>1.0</code></td></tr>
+          <tr><td>Badge</td><td><code>SFL-LEAP/BADGE</code></td><td><code>PANAMA-CREW</code></td></tr>
+          <tr><td>Event</td><td><code>SFL-LEAP/EVENT</code></td><td><code>CARTAGENA-2027</code></td></tr>
+          <tr><td>Challenge</td><td><code>SFL-LEAP/CHALLENGE</code></td><td><code>LEAP-001</code></td></tr>
+          <tr><td>Origin</td><td><code>SFL-LEAP/ORIGIN</code></td><td><code>LEAP-OG</code></td></tr>
+        </table>
+
+        <div class="decision">
+          <div class="tag">Proposed Standard — Approve Before Production Use</div>
+          <div>
+            Use <code>MemoFormat = text/plain</code> for these values. Encode the text to hex when building the transaction;
+            decode it from hex when reading transaction history.
+          </div>
+        </div>
+
+        <h3>Example semantic payload</h3>
+        <pre><code>Memo 1
+  Type:   SFL-LEAP/PROTOCOL
+  Format: text/plain
+  Data:   1.0
+
+Memo 2
+  Type:   SFL-LEAP/BADGE
+  Format: text/plain
+  Data:   PANAMA-CREW
+
+Memo 3
+  Type:   SFL-LEAP/EVENT
+  Format: text/plain
+  Data:   PANAMA-2027</code></pre>
+
+        <p>
+          This is preferable to a single free-form string such as
+          <code>Panama Crew event 2027 OG member</code>, because each piece can be validated independently.
+        </p>
+      </section>
+
+      <section id="transactions">
+        <h2>7. Transaction Standards</h2>
+
+        <h3>7.1 Official recognition distribution</h3>
+        <div class="flow">
+          Authorized Distributor<br>
+          ↓<br>
+          CheckCreate<br>
+          ↓<br>
+          Destination + LEAP SendMax + Structured Memos + optional InvoiceID<br>
+          ↓<br>
+          Member<br>
+          ↓<br>
+          CheckCash
+        </div>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            When a Check is used to deliver official recognition, the recognition metadata belongs on the
+            <strong>CheckCreate</strong> transaction because that is the transaction controlled by the LEAP distributor.
+          </div>
+        </div>
+
+        <h3>7.2 Minimum checks for a canonical CheckCreate</h3>
+        <ul class="checklist">
+          <li><code>TransactionType = CheckCreate</code></li>
+          <li><code>Account</code> is an authorized LEAP distributor</li>
+          <li><code>Destination</code> is the intended member wallet</li>
+          <li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
+          <li><code>SendMax.issuer</code> is the LEAP issuer</li>
+          <li>Transaction is successful</li>
+          <li>Transaction is in validated ledger history</li>
+          <li>Structured LEAP protocol memo is present when recognition is being recorded</li>
+        </ul>
+
+        <h3>7.3 Check linkage</h3>
+        <p>
+          Store or derive the Check ledger object's ID from the successful CheckCreate metadata.
+          A later <code>CheckCash.CheckID</code> can be matched back to that exact Check.
+        </p>
+
+        <h3>7.4 InvoiceID</h3>
+        <div class="decision">
+          <div class="tag">Proposed Standard</div>
+          <div>
+            Use <code>InvoiceID</code> as a deterministic event/campaign identifier when many awards belong to the same event.
+            Proposed algorithm: SHA-256 of a canonical source string such as
+            <code>SFL-LEAP|EVENT|CARTAGENA-2027</code>. Record the canonical source string in this protocol registry.
+          </div>
+        </div>
+
+        <h3>7.5 Direct Payment fallback</h3>
+        <p>
+          Direct LEAP Payments may be valid when deliberately used. When determining the amount actually delivered by a Payment,
+          use transaction metadata rather than assuming the requested amount equals the delivered amount.
+        </p>
+      </section>
+
+      <section id="membership">
+        <h2>8. Membership & Rank Rules</h2>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            Membership and rank are determined from the wallet's <strong>current validated LEAP trust-line balance</strong>.
+            They are current-state properties, not historical awards.
+          </div>
+        </div>
+
+        <table>
+          <tr><th>Current LEAP balance</th><th>Meaning</th></tr>
+          <tr><td>0</td><td>No current LEAP membership status</td></tr>
+          <tr><td>1–4</td><td>Deckhand</td></tr>
+          <tr><td>5–9</td><td>Bosun</td></tr>
+          <tr><td>10–24</td><td>Quartermaster</td></tr>
+          <tr><td>25–50</td><td>First Mate</td></tr>
+          <tr><td>51+</td><td>Top-rank display name remains subject to final naming decision</td></tr>
+        </table>
+
+        <p>
+          Rank can rise or fall as the wallet's LEAP balance changes. A badge or historical record does not disappear merely
+          because the current balance changes.
+        </p>
+      </section>
+
+      <section id="badges">
+        <h2>9. Badge & Historical Recognition Rules</h2>
+
+        <p>
+          A badge represents something the wallet owner actually did, attended, contributed to, or was officially recognized for.
+        </p>
+
+        <h3>Badge validity test</h3>
+        <pre><code>VALIDATED
+AND transaction result = success
+AND originating account = authorized distributor
+AND destination = member wallet
+AND currency = canonical LEAP currency
+AND issuer = canonical LEAP issuer
+AND decoded MemoType = SFL-LEAP/BADGE
+AND decoded MemoData = registered badge ID</code></pre>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            A matching memo created by an unauthorized wallet does not establish a badge.
+            Provenance and content must both validate.
+          </div>
+        </div>
+
+        <h3>Badge registry</h3>
+        <table>
+          <tr><th>Canonical ID</th><th>Display label</th><th>Status</th></tr>
+          <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td><td>Example / confirm before first canonical use</td></tr>
+          <tr><td><code>PACIFIC-CREW</code></td><td>Pacific Crew</td><td>Example / confirm before first canonical use</td></tr>
+          <tr><td><code>SFL-CAMEO</code></td><td>SFL Cameo</td><td>Example / confirm before first canonical use</td></tr>
+        </table>
+      </section>
+
+      <section id="events">
+        <h2>10. Event, Challenge & Origin Rules</h2>
+
+        <h3>Event</h3>
+        <p>
+          A specific real-world or channel occurrence that can be referenced by multiple LEAP distributions or recognitions.
+          Example: <code>CARTAGENA-2027</code>.
+        </p>
+
+        <h3>Challenge</h3>
+        <p>
+          A defined participation opportunity. Challenges receive unique IDs and are never recycled.
+          Example: <code>LEAP-001</code>.
+        </p>
+
+        <h3>Origin</h3>
+        <p>
+          A historically meaningful issuance class. Example: <code>LEAP-OG</code>.
+          Origin is provenance; it is not a rank.
+        </p>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            Event, challenge, origin, badge, and rank are separate concepts. Do not overload one identifier to mean another.
+          </div>
+        </div>
+      </section>
+
+      <section id="queries">
+        <h2>11. Query Standards</h2>
+
+        <h3>11.1 Current membership / rank — <code>account_lines</code></h3>
+        <pre><code>{
+  "command": "account_lines",
+  "account": "MEMBER_WALLET",
+  "peer": "LEAP_ISSUER",
+  "ledger_index": "validated"
+}</code></pre>
+        <p>
+          Filter the returned line by the canonical LEAP currency value and issuer. Use the returned balance for rank.
+        </p>
+
+        <h3>11.2 Historical logbook — <code>account_tx</code></h3>
+        <pre><code>{
+  "command": "account_tx",
+  "account": "MEMBER_WALLET",
+  "ledger_index_min": "LEAP_GENESIS_LEDGER",
+  "ledger_index_max": -1,
+  "forward": true,
+  "limit": 200
+}</code></pre>
+        <p>
+          Follow <code>marker</code> pagination until the needed history is exhausted. Parse transactions and metadata;
+          do not assume every transaction involving the account is a LEAP transaction.
+        </p>
+
+        <h3>11.3 Outstanding Checks — <code>account_objects</code></h3>
+        <pre><code>{
+  "command": "account_objects",
+  "account": "MEMBER_WALLET",
+  "ledger_index": "validated",
+  "type": "check"
+}</code></pre>
+
+        <h3>11.4 Query output categories</h3>
+        <table>
+          <tr><th>Question</th><th>Primary source</th></tr>
+          <tr><td>Does this wallet currently hold LEAP?</td><td><code>account_lines</code></td></tr>
+          <tr><td>What is the current LEAP balance?</td><td><code>account_lines</code></td></tr>
+          <tr><td>What is the current rank?</td><td>Calculated from validated balance</td></tr>
+          <tr><td>What official awards exist in history?</td><td><code>account_tx</code> + provenance validation</td></tr>
+          <tr><td>When did an award occur?</td><td>Validated transaction ledger/time</td></tr>
+          <tr><td>Was a specific Check claimed?</td><td>Match Check ID to <code>CheckCash</code></td></tr>
+          <tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
+        </table>
+      </section>
+
+      <section id="validity">
+        <h2>12. Transaction Validity Rules</h2>
+        <p>
+          Before website code treats an XRPL transaction as an official LEAP fact, validate all applicable conditions.
+        </p>
+        <ul class="checklist">
+          <li>Data is from validated ledger history</li>
+          <li>Transaction result indicates success</li>
+          <li>Transaction type is allowed for the intended interpretation</li>
+          <li>Issuer matches the canonical LEAP issuer</li>
+          <li>Currency matches the canonical LEAP currency value</li>
+          <li>Authority account is authorized for the action</li>
+          <li>Destination or affected wallet matches the member being evaluated</li>
+          <li>Memo fields decode successfully when memo-based recognition is required</li>
+          <li>Memo type is recognized by the active protocol version</li>
+          <li>Memo data matches a registered canonical identifier</li>
+        </ul>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            Fail closed. If required provenance cannot be established, the website may display the transaction as history,
+            but it must not convert it into official LEAP recognition.
+          </div>
+        </div>
+      </section>
+
+      <section id="display">
+        <h2>13. Display Names vs. Ledger Identifiers</h2>
+
+        <table>
+          <tr><th>Canonical ledger ID</th><th>Possible display label</th></tr>
+          <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td></tr>
+          <tr><td><code>PACIFIC-CROSSING-2027</code></td><td>Pacific Crossing 2027</td></tr>
+          <tr><td><code>LEAP-OG</code></td><td>Original LEAP Crew</td></tr>
+        </table>
+
+        <div class="rule">
+          <div class="tag">LEAP Standard</div>
+          <div>
+            Display text may be revised without changing historical identifiers.
+            Once an ID has appeared in a canonical on-ledger LEAP transaction, that ID is permanent.
+          </div>
+        </div>
+      </section>
+
+      <section id="legacy">
+        <h2>14. Legacy / Pre-Protocol Transactions</h2>
+        <p>
+          Transactions created before the protocol is finalized are not errors. They are historical records created under an earlier
+          operating method.
+        </p>
+        <div class="decision">
+          <div class="tag">Decision Needed</div>
+          <div>
+            Create a small legacy mapping table once we inventory existing LEAP transactions.
+            Do not pretend older free-form memos followed the new standard.
+          </div>
+        </div>
+
+        <table>
+          <tr><th>Legacy pattern</th><th>Interpretation</th><th>Rule</th></tr>
+          <tr><td><code>LEAP-OG</code> free-form memo</td><td>Potential origin marker</td><td>Verify authority and transaction manually before registering as legacy canonical history</td></tr>
+          <tr><td>No protocol memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge/event meaning without another authoritative rule</td></tr>
+        </table>
+      </section>
+
+      <section id="change">
+        <h2>15. Versioning & Change Control</h2>
+
+        <table>
+          <tr><th>Version</th><th>Use</th></tr>
+          <tr><td><code>0.x</code></td><td>Working drafts before the first production standard</td></tr>
+          <tr><td><code>1.0</code></td><td>First approved production protocol</td></tr>
+          <tr><td><code>1.1, 1.2…</code></td><td>Additive / backward-compatible rules</td></tr>
+          <tr><td><code>2.0</code></td><td>Breaking interpretation change</td></tr>
+        </table>
+
+        <h3>Change rules</h3>
+        <ul>
+          <li>Never silently redefine an identifier already used on-ledger.</li>
+          <li>Never reuse a retired badge, event, challenge, or origin ID for a different meaning.</li>
+          <li>Record newly authorized distributors here before treating their transactions as official.</li>
+          <li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
+          <li>Prefer additive changes over breaking changes.</li>
+        </ul>
+
+        <h3>Change log</h3>
+        <table>
+          <tr><th>Version</th><th>Date</th><th>Change</th></tr>
+          <tr><td>0.1</td><td>2026-09-16</td><td>Initial working protocol document.</td></tr>
+        </table>
+      </section>
+
+      <section id="open">
+        <h2>16. Open Decisions / Next Work</h2>
+        <p>These are intentionally unresolved. They should be settled before declaring Protocol 1.0.</p>
+        <ul class="checklist">
+          <li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
+          <li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
+          <li>Approve or revise the proposed memo-type structure.</li>
+          <li>Approve whether every official recognition transaction carries a protocol-version memo.</li>
+          <li>Approve the deterministic <code>InvoiceID</code> hashing convention.</li>
+          <li>Inventory existing LEAP transactions and create the legacy mapping rules.</li>
+          <li>Finalize the 51+ rank display name.</li>
+          <li>Establish the first official badge registry.</li>
+          <li>Establish the first official event registry.</li>
+          <li>Establish the challenge ID issuance process so IDs are never reused.</li>
+        </ul>
+      </section>
+
+      <section id="sources">
+        <h2>17. XRPL Technical References</h2>
+        <p class="mini">
+          These links describe XRPL behavior. The LEAP naming, provenance, badge, rank, and protocol rules above are project-level standards.
+        </p>
+        <ul>
+          <li><a href="https://xrpl.org/docs/references/protocol/transactions/common-fields">Transaction Common Fields — Memos</a></li>
+          <li><a href="https://xrpl.org/docs/references/protocol/data-types/currency-formats">Currency Formats</a></li>
+          <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_lines">account_lines</a></li>
+          <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_tx">account_tx</a></li>
+          <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_objects">account_objects</a></li>
+          <li><a href="https://xrpl.org/docs/references/protocol/ledger-data/ledger-entry-types/check">Check ledger object</a></li>
+          <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcash">CheckCash</a></li>
+          <li><a href="https://xrpl.org/docs/tutorials/payments/send-a-check">Send a Check</a></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    LEAP Protocol — working internal standard for Sailing Frog's Leap.
+  </footer>
+</div>
+</body>
+</html>
