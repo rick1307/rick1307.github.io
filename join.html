@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Join the Sailing Frog's Leap crew with Xaman Wallet and your first LEAP Check." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Join the Crew — Sailing Frog's Leap</title>
+
+  <style>
+    :root{
+      --paper:#efe8d8;
+      --paper2:#f8f3e8;
+      --ink:#1a252c;
+      --navy:#16384b;
+      --sea:#2f7481;
+      --foam:#dbece8;
+      --rust:#b84f32;
+      --gold:#d2a34f;
+      --line:rgba(26,37,44,.18);
+      --card:#fffaf0;
+      --max:980px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:Georgia,"Times New Roman",serif;
+      line-height:1.62;
+    }
+
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+
+    nav{
+      position:sticky;top:0;z-index:20;
+      background:rgba(239,232,216,.94);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .nav-inner{
+      min-height:64px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;
+    }
+
+    .brand{
+      display:flex;align-items:center;gap:11px;text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:850;
+    }
+
+    .brand img{
+      width:40px;height:40px;border-radius:50%;
+      object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white;
+    }
+
+    .nav-links{display:flex;gap:16px;align-items:center;margin-left:auto}
+
+    .nav-links a{
+      text-decoration:none;color:#4e5c62;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.9rem;font-weight:750;
+    }
+
+    header{padding:72px 0 46px}
+
+    .kicker{
+      color:var(--rust);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      text-transform:uppercase;letter-spacing:.14em;
+      font-size:.78rem;font-weight:900;
+    }
+
+    h1{
+      margin:.15em 0 .2em;
+      color:var(--navy);
+      font-size:clamp(3rem,8vw,5.9rem);
+      line-height:.95;
+      letter-spacing:-.05em;
+    }
+
+    .lede{
+      max-width:820px;margin:0;
+      color:#46575f;
+      font-size:clamp(1.18rem,2vw,1.4rem);
+    }
+
+    .hero-line{
+      margin-top:24px;
+      padding:19px 21px;
+      border-left:4px solid var(--gold);
+      background:rgba(255,250,240,.6);
+      color:#4f5c62;
+      font-size:1.08rem;
+    }
+
+    section{padding:42px 0}
+
+    .section-title{max-width:800px;margin-bottom:22px}
+
+    h2{
+      margin:0 0 10px;
+      color:var(--navy);
+      font-size:clamp(2rem,5vw,2.8rem);
+      line-height:1.08;
+      letter-spacing:-.03em;
+    }
+
+    .section-title p{margin:0;color:#5a686e;font-size:1.05rem}
+
+    .three{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+
+    .mini{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+      text-align:center;
+    }
+
+    .mini .num{
+      width:38px;height:38px;border-radius:50%;
+      display:grid;place-items:center;
+      margin:0 auto 12px;
+      background:var(--navy);color:white;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:900;
+    }
+
+    .mini h3{margin:0 0 7px;color:var(--navy)}
+    .mini p{margin:0;color:#58666c}
+
+    .onboarding{
+      background:linear-gradient(135deg,rgba(228,239,233,.72),rgba(248,242,229,.72));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:28px;
+    }
+
+    .phase{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin:6px 0 16px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .phase + .steps{margin-bottom:24px}
+
+    .phase-badge{
+      flex:0 0 auto;
+      padding:7px 11px;
+      border-radius:999px;
+      background:var(--navy);
+      color:white;
+      font-size:.78rem;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .phase.claim .phase-badge{background:var(--rust)}
+
+    .phase-copy h3{
+      margin:0;
+      color:var(--navy);
+      font-size:1.28rem;
+    }
+
+    .phase-copy p{
+      margin:2px 0 0;
+      color:#5d696e;
+      font-size:.94rem;
+    }
+
+    .phase-divider{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:8px 0 22px;
+      color:#68757a;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.86rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.07em;
+    }
+
+    .phase-divider::before,
+    .phase-divider::after{
+      content:"";
+      height:1px;
+      flex:1;
+      background:var(--line);
+    }
+
+    .safety-strip{
+      margin:4px 0 24px;
+      padding:14px 16px;
+      border-radius:12px;
+      background:rgba(210,163,79,.12);
+      border:1px solid rgba(210,163,79,.38);
+      color:#5c5548;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.93rem;
+    }
+
+    .safety-strip strong{color:var(--navy)}
+
+    .optional-ritual{
+      margin:4px 0 24px;
+      padding:20px 22px;
+      border-radius:14px;
+      background:var(--foam);
+      border:1px solid rgba(47,116,129,.22);
+    }
+    .optional-ritual b{
+      display:block;margin-bottom:6px;color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .optional-ritual p{margin:0;color:#526167}
+
+    .steps{display:grid;gap:16px}
+
+    .step{
+      display:grid;
+      grid-template-columns:58px 1fr;
+      gap:16px;
+      align-items:start;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    .step-num{
+      width:42px;height:42px;border-radius:50%;
+      display:grid;place-items:center;
+      background:var(--navy);color:white;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:900;
+    }
+
+    .step h3{margin:1px 0 6px;color:var(--navy);font-size:1.25rem}
+    .step p{margin:0;color:#58666c}
+    .step p+p{margin-top:9px}
+
+    .official-address{
+      margin-top:14px;
+      padding:16px 18px;
+      background:rgba(219,236,232,.72);
+      border:1px solid rgba(22,56,75,.20);
+      border-left:4px solid var(--gold);
+      border-radius:12px;
+    }
+
+    .official-address b{
+      display:block;
+      margin-bottom:7px;
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .official-address code{
+      display:block;
+      color:var(--ink);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:.94rem;
+      line-height:1.5;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .official-address .verify-note{
+      margin-top:9px;
+      color:#58666c;
+      font-size:.94rem;
+    }
+
+    .invite{
+      background:var(--foam);
+      border:1px solid rgba(47,116,129,.18);
+      border-radius:18px;
+      padding:28px;
+      text-align:center;
+    }
+
+    .invite h3{
+      margin:0 0 8px;
+      color:var(--navy);
+      font-size:1.55rem;
+    }
+
+    .invite p{
+      max-width:700px;
+      margin:0 auto;
+      color:#526167;
+      font-size:1.06rem;
+    }
+
+    .status{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .status div{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:15px;
+    }
+
+    .status b{
+      display:block;
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      margin-bottom:4px;
+    }
+
+    .status span{color:#657278;font-size:.94rem}
+
+    .two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    .panel h3{margin:0 0 8px;color:var(--navy)}
+    .panel p{margin:0;color:#58666c}
+
+    .safety{
+      background:#fff7e9;
+      border:1px solid rgba(210,163,79,.42);
+      border-radius:18px;
+      padding:26px;
+    }
+
+    .learn-more{
+      text-align:center;
+      padding:8px 0 2px;
+    }
+
+    .learn-more h3{
+      margin:0 0 8px;
+      color:var(--navy);
+    }
+
+    .learn-more p{
+      max-width:680px;
+      margin:0 auto;
+      color:#58666c;
+    }
+
+    .learn-more-links{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .learn-more-links .button{
+      margin-top:14px;
+    }
+
+    .safety h3{margin:0 0 8px;color:#714c15}
+    .safety p{margin:0 0 10px;color:#62584b}
+    .safety p:last-child{margin-bottom:0}
+
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:18px;
+      padding:12px 18px;
+      border-radius:8px;
+      text-decoration:none;
+      background:var(--rust);
+      color:white;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:850;
+    }
+
+    .button.secondary{background:var(--navy)}
+
+    footer{
+      padding:38px 0 48px;
+      color:#69757a;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.86rem;
+    }
+
+    .foot{
+      padding-top:20px;
+      border-top:1px solid var(--line);
+      display:flex;justify-content:space-between;gap:18px;
+    }
+
+    @media(max-width:800px){
+      .three,.two,.status{grid-template-columns:1fr}
+      
+    }
+  
+
+    /* Site-wide navigation: mirrored from ranks.html */
+    nav{position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+    .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
+    .nav-links a:hover{color:var(--rust)}
+
+    @media(max-width:850px){
+      .nav-links a{display:inline !important}
+      .nav-links a:nth-child(2),.nav-links a:nth-child(3){display:none !important}
+    }
+  
+
+    /* Site-wide visual system: derived from next.html */
+    :root{
+      --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
+      --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
+      --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
+      --card:rgba(250,252,247,.80);
+    }
+    body{
+      margin:0;color:var(--ink);
+      background:
+        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background-size:auto;
+      font-family:Georgia,"Times New Roman",serif;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
+      background-image:
+        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+    }
+    nav{
+      background:rgba(226,235,230,.88);backdrop-filter:blur(14px) saturate(120%);
+      border-bottom:1px solid rgba(18,59,70,.15);box-shadow:0 8px 24px rgba(11,45,54,.05)
+    }
+    .brand img{border:1px solid rgba(18,59,70,.16);box-shadow:0 4px 14px rgba(11,45,54,.09)}
+    .nav-links a{color:#45636a}.nav-links a:hover{color:var(--rust)}
+    header{
+      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      border-bottom:1px solid rgba(18,59,70,.08)
+    }
+    .kicker{color:var(--rust)}
+    h1,h2{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .lede{color:#3f5a61}
+    main{position:relative}
+    section:nth-of-type(even){background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))}
+    .section-title p{color:#526a70}
+    .button{background:var(--rust);box-shadow:0 8px 20px rgba(184,90,64,.16)}
+    .button.secondary{background:transparent;color:var(--deep);border:1px solid rgba(18,59,70,.18);box-shadow:none}
+    footer{color:#49636a}
+    .foot{border-top:1px solid rgba(18,59,70,.16)}
+
+    .hero-line{
+      background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.52));
+      color:#3f5960;border-radius:0 14px 14px 0;box-shadow:0 12px 28px rgba(11,45,54,.06)
+    }
+    .onboarding{
+      background:linear-gradient(135deg,rgba(207,231,226,.78),rgba(238,243,234,.70));
+      border-color:rgba(18,59,70,.16);border-radius:22px;box-shadow:0 18px 38px rgba(11,45,54,.08)
+    }
+    .mini,.step,.panel,.status div{
+      background:rgba(250,252,247,.78);backdrop-filter:blur(9px);
+      border-color:rgba(18,59,70,.15);box-shadow:0 12px 28px rgba(11,45,54,.06)
+    }
+    .step,.mini,.panel{border-radius:18px}
+    .mini h3,.step h3,.panel h3,.phase-copy h3,.official-address b{color:var(--deep)}
+    .step p,.mini p,.panel p,.phase-copy p,.official-address .verify-note{color:#526970}
+    .optional-ritual{
+      background:linear-gradient(135deg,rgba(211,235,230,.96),rgba(235,243,236,.78));
+      border-color:rgba(47,116,129,.24);box-shadow:0 14px 30px rgba(11,45,54,.055)
+    }
+    .official-address{background:rgba(215,235,231,.72);border-color:rgba(18,59,70,.18)}
+    .invite{
+      background:linear-gradient(135deg,rgba(211,235,230,.96),rgba(235,243,236,.80));
+      border-color:rgba(47,116,129,.24);border-radius:20px;box-shadow:0 18px 38px rgba(11,45,54,.07)
+    }
+    .invite h3{color:var(--deep)}.invite p{color:#496168}
+    .learn-more{
+      background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+      border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:34px;
+      box-shadow:0 22px 46px rgba(11,45,54,.18)
+    }
+    .learn-more h2,.learn-more h3{color:white}.learn-more p{color:rgba(255,255,255,.82)}
+    .learn-more .button.secondary{background:var(--rust);color:white;border-color:transparent;box-shadow:0 8px 20px rgba(184,90,64,.16)}
+
+    .wallet-check{
+      max-width:680px;
+      margin:24px auto 0;
+    }
+    .wallet-check-row{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+    }
+    .wallet-check input{
+      flex:1;
+      min-width:0;
+      padding:13px 14px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.28);
+      background:rgba(255,255,255,.94);
+      color:var(--deep);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:1rem;
+      outline:none;
+    }
+    .wallet-check input:focus{
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px rgba(215,174,98,.18);
+    }
+    .wallet-check .button{
+      margin-top:0;
+      border:0;
+      cursor:pointer;
+      white-space:nowrap;
+      background:var(--rust);
+      box-shadow:0 8px 20px rgba(184,90,64,.16);
+    }
+    .wallet-check .button:disabled{
+      opacity:.68;
+      cursor:wait;
+    }
+    .wallet-status{
+      min-height:1.5em;
+      margin:12px auto 0 !important;
+      color:rgba(255,255,255,.92) !important;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.92rem;
+      text-align:left;
+    }
+    .wallet-status.error{color:#ffd9ce !important}
+    .wallet-status.success{color:#dff5de !important}
+
+    @media(max-width:650px){
+      .wallet-check-row{flex-direction:column}
+      .wallet-check .button{width:100%}
+    }
+
+    .safety{background:rgba(255,247,233,.82);box-shadow:0 12px 26px rgba(11,45,54,.045)}
+
+</style>
+</head>
+
+<body>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a>
+      <div class="nav-links"><a href="index.html">← Home</a></div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap">
+      <div class="kicker">Join the Sailing Frog's Leap Crew</div>
+      <h1>Join the Crew</h1>
+
+      <p class="lede">
+        Ready to go from Leaper to Sailing Frog's Leap crew member?
+        Joining the crew takes a few steps, and we'll walk you through each one.
+        We'll help you get set up, send you your first LEAP Check,
+        and when you cash it, you're officially a Sailing Frog's Leap Deckhand.
+      </p>
+
+    </div>
+  </header>
+
+  <main>
+
+<section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Step by Step</h2>
+          <p>Everything you need and exactly what happens, in one place.</p>
+        </div>
+
+        <div class="onboarding">
+          <div class="phase">
+            <div class="phase-badge">Phase 1</div>
+            <div class="phase-copy">
+              <h3>Get ready</h3>
+              <p>Three steps get you ready for your first LEAP Check.</p>
+            </div>
+          </div>
+
+          <div class="steps">
+
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Open Xaman on your mobile device</h3>
+              <p>
+                Xaman is the wallet app we use to access and control your XRP Ledger account.
+                If you already use Xaman, you are ready. If not, set it up first.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Keep a small amount of XRP in your XRP Ledger account</h3>
+              <p>
+                XRP pays the XRP Ledger's small network fees and satisfies the reserve requirements for your account.
+              </p>
+              <p>
+                You do not need much. A few XRP is plenty for LEAP.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>Send us your public XRP Ledger address</h3>
+              <p>
+                Send Sailing Frog's Leap a DM on Instagram and tell us you want to join the Sailing Frog's Leap crew.
+              </p>
+              <p>
+                In Xaman, copy the public address for the XRP Ledger account you want to use for LEAP and include it in the DM.
+                You do not need to post your address publicly.
+              </p>
+            </div>
+          </div>
+          </div>
+
+          <div class="optional-ritual">
+            <b>Optional crew ritual: Take your first LEAP</b>
+            <p>
+              Want to have some fun with it? Take a picture of yourself leaping into the air, post it on Instagram,
+              and tag <strong>Sailing Frog's Leap</strong>. It is not required to join, but it can become part of your Sailing Frog's Leap crew story and badge history.
+            </p>
+          </div>
+
+          <div class="safety-strip">
+            <strong>Nothing secret.</strong>
+            We never need your recovery words, private key, family seed, or wallet secret.
+          </div>
+
+          <div class="phase-divider">You're ready for your LEAP Check</div>
+
+          <div class="phase claim">
+            <div class="phase-badge">Phase 2</div>
+            <div class="phase-copy">
+              <h3>Claim your first LEAP</h3>
+              <p>We send the Check. You verify it, cash it, and come aboard.</p>
+            </div>
+          </div>
+
+          <div class="steps">
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3>We send your first LEAP Check</h3>
+              <p>
+                When you send us your public XRP Ledger address by DM, we'll send your first LEAP Check to that address.
+              </p>
+              <p>
+                Your first Check is for 1 LEAP.
+              </p>
+              <p>
+                <strong>This is your invite to join the crew of Sailing Frog's Leap.</strong>
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div>
+              <h3>Open the Check in Xaman</h3>
+              <p>
+                Verify the Check before accepting it.
+                Make sure it is for LEAP and was sent by the official Sailing Frog's Leap distributor wallet.
+              </p>
+
+              <div class="official-address">
+                <b>Official LEAP Distributor Address</b>
+                <code>rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</code>
+                <p class="verify-note">
+                  The sending address must match this address exactly. If it does not match, do not cash the Check.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">6</div>
+            <div>
+              <h3>Cash the Check in Xaman</h3>
+              <p>
+                Approve the action in Xaman.
+                The LEAP is credited to your XRP Ledger account and appears in Xaman.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="invite">
+          <h3>Welcome aboard. You're a Sailing Frog's Leap Deckhand.</h3>
+          <p>
+            <strong>Your first LEAP establishes your Sailing Frog's Leap rank as Deckhand.</strong>
+            After that, each LEAP you earn can come to you the same way: by Check.
+          </p>
+          <p>
+            You now hold your first LEAP.
+            Your Sailing Frog's Leap crew story has started.
+          </p>
+
+          <div class="status">
+            <div>
+              <b>Rank</b>
+              <span>Deckhand</span>
+            </div>
+
+            <div>
+              <b>LEAP</b>
+              <span>1</span>
+            </div>
+
+            <div>
+              <b>First log entry</b>
+              <span>LEAP-JOINED</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="learn-more">
+          <h2>What Happens Next?</h2>
+          <p>
+            You're a Sailing Frog's Leap Deckhand. Now the game begins. Watch the show, engage with each episode, take on LEAP Challenges, and build your crew history as the adventure unfolds.
+          </p>
+
+          <div class="wallet-check">
+            <div class="wallet-check-row">
+              <input id="xrplAddress" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter your XRPL wallet address" aria-label="XRPL wallet address">
+              <button class="button" id="checkLeapButton" type="button">Check My LEAP →</button>
+            </div>
+            <p class="wallet-status" id="walletStatus" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>Sailing Frog's Leap • Join the LEAP Crew</div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
+      const XRPL_WS = "wss://xrplcluster.com/";
+      const NEXT_PAGE = "next.html";
+      const addressInput = document.getElementById("xrplAddress");
+      const checkButton = document.getElementById("checkLeapButton");
+      const status = document.getElementById("walletStatus");
+
+      // Classic XRPL addresses begin with r and use the XRP Ledger base58 alphabet.
+      const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+
+      function setStatus(message, kind = "") {
+        status.textContent = message;
+        status.className = "wallet-status" + (kind ? " " + kind : "");
+      }
+
+      function decodeHexCurrency(code) {
+        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
+        try {
+          let text = "";
+          for (let i = 0; i < code.length; i += 2) {
+            const n = parseInt(code.slice(i, i + 2), 16);
+            if (n === 0) break;
+            text += String.fromCharCode(n);
+          }
+          return text;
+        } catch (_) {
+          return code;
+        }
+      }
+
+      function isLeapLine(line) {
+        if (!line || line.account !== LEAP_ISSUER) return false;
+        const currency = decodeHexCurrency(String(line.currency || "")).toUpperCase();
+        return currency === "LEAP" || currency.startsWith("LEAP");
+      }
+
+      function queryAccountLines(account) {
+        return new Promise((resolve, reject) => {
+          const ws = new WebSocket(XRPL_WS);
+          const timer = setTimeout(() => {
+            try { ws.close(); } catch (_) {}
+            reject(new Error("The XRPL server took too long to respond."));
+          }, 12000);
+
+          ws.addEventListener("open", () => {
+            ws.send(JSON.stringify({
+              id: "leap-check",
+              command: "account_lines",
+              account,
+              peer: LEAP_ISSUER,
+              ledger_index: "validated",
+              limit: 400,
+              api_version: 2
+            }));
+          });
+
+          ws.addEventListener("message", event => {
+            let response;
+            try { response = JSON.parse(event.data); }
+            catch (_) { return; }
+            if (response.id !== "leap-check") return;
+
+            clearTimeout(timer);
+            try { ws.close(); } catch (_) {}
+
+            if (response.status === "error" || response.error || response.result?.error) {
+              const code = response.error || response.result?.error || "XRPL error";
+              reject(new Error(code));
+              return;
+            }
+
+            resolve(response.result?.lines || []);
+          });
+
+          ws.addEventListener("error", () => {
+            clearTimeout(timer);
+            reject(new Error("Could not connect to the XRP Ledger."));
+          });
+        });
+      }
+
+      async function checkLeap() {
+        const account = addressInput.value.trim();
+
+        if (!classicAddressPattern.test(account)) {
+          setStatus("Please enter a valid XRPL wallet address beginning with r.", "error");
+          addressInput.focus();
+          return;
+        }
+
+        checkButton.disabled = true;
+        checkButton.textContent = "Checking…";
+        setStatus("Checking the XRP Ledger…");
+
+        try {
+          const lines = await queryAccountLines(account);
+          const leapLine = lines.find(isLeapLine);
+          const balance = leapLine ? Number(leapLine.balance) : 0;
+
+          if (Number.isFinite(balance) && balance > 0) {
+            sessionStorage.setItem("leapWallet", account);
+            sessionStorage.setItem("leapBalance", String(balance));
+            setStatus(`LEAP found: ${balance}. Welcome aboard.`, "success");
+            setTimeout(() => { window.location.href = NEXT_PAGE; }, 450);
+          } else {
+            sessionStorage.removeItem("leapWallet");
+            sessionStorage.removeItem("leapBalance");
+            setStatus("No LEAP found for this wallet yet. Join the crew to earn your first LEAP.", "error");
+          }
+        } catch (error) {
+          const message = String(error?.message || "");
+          if (message.includes("actNotFound")) {
+            setStatus("That XRPL account was not found on the ledger.", "error");
+          } else {
+            setStatus("I couldn't check the XRP Ledger right now. Please try again.", "error");
+          }
+        } finally {
+          checkButton.disabled = false;
+          checkButton.textContent = "Check My LEAP →";
+        }
+      }
+
+      checkButton.addEventListener("click", checkLeap);
+      addressInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") checkLeap();
+      });
+    })();
+  </script>
+
+</body>
+</html>
