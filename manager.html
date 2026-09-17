@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background: #f4f7fa;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .menu {
+      width: min(90%, 420px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 60px;
+    }
+
+    .menu a {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      background: #0b5fa5;
+      color: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .menu a:hover {
+      background: #084b82;
+    }
+
+    .state-machine-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .state-machine-row a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu">
+    <a href="leapProtocol.html">leapProtocol.html</a>
+    <a href="ledgerHistory.html">ledgerHistory.html</a>
+    <a href="marketing.html">marketing.html</a>
+    <div class="state-machine-row">
+      <a href="stateMachine.html">stateMachine.html</a>
+      <a href="globalStateMachine.html">globalStateMachine.html</a>
+    </div>
+    <a href="discordIntegration.html">discordIntegration.html</a>
+  </div>
+</body>
+</html>

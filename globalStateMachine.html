@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Global State Machine</title>
+<style>
+  :root {
+    --bg: #07111f;
+    --bg-2: #0b1728;
+    --panel: rgba(255,255,255,0.055);
+    --panel-2: rgba(255,255,255,0.085);
+    --text: #f4f7fb;
+    --muted: #afbdd0;
+    --line: rgba(255,255,255,0.12);
+    --blue: #57a7ff;
+    --blue-2: #8bc6ff;
+    --green: #6ee7b7;
+    --max: 920px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(61,139,255,.18), transparent 32%),
+      radial-gradient(circle at 100% 12%, rgba(110,231,183,.10), transparent 30%),
+      linear-gradient(180deg, var(--bg) 0%, #07101b 52%, #050b13 100%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    width: min(calc(100% - 34px), var(--max));
+    margin: 0 auto;
+  }
+
+  header {
+    padding: 82px 0 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--blue-2);
+    font-size: .78rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 820px;
+    font-size: clamp(2.7rem, 9vw, 5.6rem);
+    line-height: .98;
+    letter-spacing: -.055em;
+  }
+
+  .hero-copy {
+    max-width: 730px;
+    margin: 28px 0 0;
+    color: #d2dbea;
+    font-size: clamp(1.14rem, 2.5vw, 1.46rem);
+    line-height: 1.55;
+  }
+
+  .hero-thesis {
+    margin-top: 38px;
+    border-left: 4px solid var(--blue);
+    padding: 4px 0 4px 20px;
+    max-width: 760px;
+    color: white;
+    font-size: clamp(1.12rem, 2.4vw, 1.36rem);
+    font-weight: 650;
+  }
+
+  .wave {
+    height: 92px;
+    margin-top: 42px;
+    opacity: .7;
+  }
+  .wave svg { width: 100%; height: 100%; display: block; }
+
+  main { padding-bottom: 70px; }
+
+  section {
+    padding: 72px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .num {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(87,167,255,.45);
+    display: grid;
+    place-items: center;
+    color: var(--blue-2);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: rgba(87,167,255,.06);
+  }
+
+  h2 {
+    margin: 0 0 18px;
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -.035em;
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: #c9d4e3;
+    font-size: 1.06rem;
+  }
+
+  .lead {
+    color: white;
+    font-size: clamp(1.15rem, 2.3vw, 1.34rem);
+    font-weight: 620;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 30px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+  }
+
+  .card strong {
+    display: block;
+    margin-bottom: 7px;
+    color: white;
+    font-size: 1.03rem;
+  }
+
+  .card span {
+    color: var(--muted);
+    font-size: .98rem;
+  }
+
+  .stack {
+    margin: 34px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+
+  .stack-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 16px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 14px;
+  }
+
+  .stack-row b { color: white; }
+  .stack-row span { color: var(--muted); }
+
+  .state-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .state-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    color: #dfe8f4;
+  }
+
+  .state-item::before {
+    content: "→";
+    color: var(--green);
+    font-weight: 900;
+  }
+
+  .big-idea {
+    margin-top: 34px;
+    padding: 28px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(87,167,255,.16), rgba(110,231,183,.08));
+    border: 1px solid rgba(87,167,255,.35);
+  }
+
+  .big-idea p {
+    margin: 0;
+    color: white;
+    font-size: clamp(1.2rem, 2.7vw, 1.6rem);
+    font-weight: 720;
+    line-height: 1.4;
+  }
+
+  .equation {
+    margin-top: 34px;
+    display: grid;
+    gap: 12px;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 760;
+  }
+
+  .equation div {
+    padding: 17px 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+
+  .equation .result {
+    border-color: rgba(110,231,183,.35);
+    background: rgba(110,231,183,.07);
+  }
+
+  .final {
+    padding-top: 92px;
+    padding-bottom: 100px;
+    text-align: center;
+  }
+
+  .final h2 {
+    max-width: 780px;
+    margin: 0 auto 24px;
+    font-size: clamp(2.25rem, 6.6vw, 4.4rem);
+  }
+
+  .final p {
+    max-width: 730px;
+    margin: 0 auto 22px;
+    font-size: clamp(1.1rem, 2.4vw, 1.3rem);
+  }
+
+  .final-thesis {
+    max-width: 790px;
+    margin: 42px auto 0;
+    padding: 30px 26px;
+    border: 1px solid rgba(87,167,255,.45);
+    background: rgba(87,167,255,.09);
+    border-radius: 20px;
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    line-height: 1.4;
+    font-weight: 800;
+  }
+
+  .small {
+    margin-top: 22px !important;
+    color: #8ea0b6 !important;
+    font-size: .92rem !important;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 28px 0 40px;
+    color: #8190a5;
+    font-size: .86rem;
+    text-align: center;
+  }
+
+  @media (max-width: 660px) {
+    header { padding-top: 60px; }
+    .step { grid-template-columns: 1fr; gap: 12px; }
+    .num { width: 42px; height: 42px; }
+    .cards { grid-template-columns: 1fr; }
+    .stack-row { grid-template-columns: 1fr; gap: 3px; }
+    section { padding: 58px 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">A thesis about the next layer of digital infrastructure</div>
+    <h1>The Global State Machine</h1>
+    <p class="hero-copy">AI is getting smarter. Machines are becoming more autonomous. More decisions, payments, permissions, contracts, and transfers will happen without a human touching every step.</p>
+    <div class="hero-thesis">That creates a new infrastructure problem: the world needs a shared way to know what is true now, what changed, and who has the right to change it next.</div>
+    <div class="wave" aria-hidden="true">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,70 C90,10 160,110 250,58 C340,6 410,107 510,63 C610,18 675,105 770,52 C865,1 945,112 1045,56 C1110,21 1160,38 1200,45" fill="none" stroke="rgba(87,167,255,.85)" stroke-width="3"/>
+        <path d="M0,82 C110,125 165,18 275,70 C385,122 455,12 570,72 C685,132 755,15 870,73 C985,130 1075,35 1200,67" fill="none" stroke="rgba(110,231,183,.55)" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap step">
+      <div class="num">01</div>
+      <div>
+        <h2>AI can think. But thinking is not the same as state.</h2>
+        <p class="lead">An AI can decide what should happen next. The world still needs a trusted record of what actually happened.</p>
+        <p>A machine can negotiate a price, approve a purchase, route a shipment, release a payment, or execute a contract. But after the action, everyone involved needs to agree on the result.</p>
+        <div class="state-list">
+          <div class="state-item">Who owns the asset now?</div>
+          <div class="state-item">Was the payment made?</div>
+          <div class="state-item">Did this agent have authority to act?</div>
+          <div class="state-item">Has the inventory already been sold?</div>
+          <div class="state-item">Which version of the record is authoritative?</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap step">
+      <div class="num">02</div>
+      <div>
+        <h2>Inside one company, this is easy.</h2>
+        <p>A company can keep its own database. It controls the users, the rules, the permissions, and the final record.</p>
+        <p class="lead">The problem changes when independent parties have to share state.</p>
+        <p>Now imagine millions of AI agents belonging to different people, banks, companies, governments, machines, and software systems. They will interact constantly. No single private database can automatically be the final authority for all of them.</p>
+        <div class="big-idea">
+          <p>The more autonomous the world becomes, the more valuable a neutral, shared state machine becomes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap step">
+      <div class="num">03</div>
+      <div>
+        <h2>Different infrastructure does different jobs.</h2>
+        <p>This is not a story about blockchain replacing everything else. The pieces work together.</p>
+        <div class="stack">
+          <div class="stack-row"><b>AI</b><span>Creates intelligence, decisions, plans, and actions.</span></div>
+          <div class="stack-row"><b>Data centers</b><span>Provide the computation.</span></div>
+          <div class="stack-row"><b>Networks</b><span>Move information between machines.</span></div>
+          <div class="stack-row"><b>Private databases</b><span>Manage local state inside trusted organizations.</span></div>
+          <div class="stack-row"><b>Blockspace</b><span>Records shared, globally consequential state across independent actors.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap step">
+      <div class="num">04</div>
+      <div>
+        <h2>Blockchains are state machines.</h2>
+        <p class="lead">A blockchain is not valuable because it has a coin. The coin is not the starting point.</p>
+        <p>The starting point is the network’s ability to accept a valid state transition, get independent participants to agree on it, and make that new state durable.</p>
+        <div class="cards">
+          <div class="card"><strong>Ownership changed</strong><span>A security, token, property right, or digital asset moved from one party to another.</span></div>
+          <div class="card"><strong>Payment settled</strong><span>Value moved and the settlement record became final.</span></div>
+          <div class="card"><strong>Permission changed</strong><span>An agent, person, or machine gained or lost the right to act.</span></div>
+          <div class="card"><strong>Obligation changed</strong><span>A contract was created, fulfilled, modified, or closed.</span></div>
+        </div>
+        <div class="big-idea">
+          <p>Every trusted state transition consumes capacity. That capacity is blockspace.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap step">
+      <div class="num">05</div>
+      <div>
+        <h2>AI makes the state problem bigger.</h2>
+        <p>Humans already create economic state slowly: we sign, approve, transfer, reconcile, settle, and record.</p>
+        <p>Autonomous software can do those things continuously, at machine speed, across borders and across organizations.</p>
+        <div class="equation">
+          <div>More autonomous machines</div>
+          <div>↓ More economic interactions</div>
+          <div>↓ More state changes</div>
+          <div class="result">↓ More demand for trusted state-transition capacity</div>
+        </div>
+        <p style="margin-top:26px;">That does not mean every computation belongs on-chain. It means the moments that require shared, durable, authoritative state become increasingly important as machine activity expands.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap step">
+      <div class="num">06</div>
+      <div>
+        <h2>Blockspace becomes an economic resource.</h2>
+        <p class="lead">Once shared state becomes valuable, the capacity to produce trusted state becomes valuable too.</p>
+        <p>Different networks will offer different forms of blockspace: cheap, fast, regulated, private, highly secure, specialized, EVM-compatible, non-EVM, institutional, consumer, machine-to-machine.</p>
+        <p>There does not have to be one winner. Just as the world uses many forms of compute, energy, storage, and bandwidth, it can use many forms of blockspace.</p>
+        <div class="big-idea">
+          <p>The long-term opportunity is not guessing one perfect chain. It is recognizing that demand for the resource class itself can grow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap step">
+      <div class="num">07</div>
+      <div>
+        <h2>The coins are exposure to the suppliers.</h2>
+        <p>Native assets matter because they can sit inside the economics of the networks that supply blockspace: paying fees, securing consensus, providing collateral, supporting liquidity, or governing access to scarce network resources.</p>
+        <p class="lead">The investment question is not simply, “Will crypto be adopted?”</p>
+        <p>It is: <strong>which networks will supply valuable state-machine capacity, and how strongly will their native assets capture the economics of that use?</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <div class="eyebrow">The thesis</div>
+      <h2>The dominant secular wave is not crypto adoption.</h2>
+      <p>Crypto is the label people see. Coins are the instruments people trade. But underneath both is something more fundamental.</p>
+      <div class="final-thesis">The dominant secular wave is growing demand for global state-machine capacity.<br><br>We call that capacity <span style="color:var(--blue-2);">blockspace.</span></div>
+      <p class="small">AI does not replace the rest of the computing stack. Blockspace does not replace it either. The thesis is that a more autonomous digital economy creates more need for trusted, shared state—and therefore more demand for the infrastructure that provides it.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">The Global State Machine — a blockspace thesis</div>
+</footer>
+</body>
+</html>
