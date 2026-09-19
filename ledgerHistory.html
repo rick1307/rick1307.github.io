@@ -371,7 +371,7 @@
 
     <p class="footnote">
       This page is not a hand-maintained reference list. It scans validated XRPL transaction history for the
-      authorized LEAP distributor and extracts recognized LEAP MemoData values. While open, it also listens for
+      authorized LEAP distributor and extracts recognized SFL-LEAP public memo records. While open, it also listens for
       new distributor transactions and updates the list automatically.
     </p>
   </main>
@@ -431,14 +431,14 @@
         errorBox.textContent = "";
       }
 
-      function hexToText(hex) {
-        if (!hex || typeof hex !== "string") return "";
+      function hexToText(value) {
+        if (!value || typeof value !== "string") return "";
+        if (!/^[A-Fa-f0-9]+$/.test(value) || value.length % 2 !== 0) return value;
         try {
-          const clean = hex.length % 2 === 0 ? hex : "0" + hex;
-          const bytes = new Uint8Array(clean.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-          return new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+          const bytes = new Uint8Array(value.match(/.{2}/g).map(pair => parseInt(pair, 16)));
+          return new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/\0+$/g, "");
         } catch {
-          return "";
+          return value;
         }
       }
 
@@ -470,33 +470,70 @@
         return out;
       }
 
+      function parseCanonicalLeapMemo(text) {
+        const value = String(text || "").trim();
+        if (!value) return null;
+
+        const prefix = NAMESPACE + "/";
+        if (!value.toUpperCase().startsWith(prefix)) return null;
+
+        const payload = value.slice(prefix.length);
+        const equals = payload.indexOf("=");
+        if (equals <= 0) return null;
+
+        const key = payload.slice(0, equals).trim().toUpperCase();
+        const factValue = payload.slice(equals + 1).trim();
+
+        // Production convention: one Check, one recognition, one public memo.
+        // Example: SFL-LEAP/BADGE=FIRST-MEMBER
+        if (!RECOGNIZED_KEYS.includes(key)) return null;
+        if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(factValue)) return null;
+
+        return { key, value: factValue };
+      }
+
       function extractFacts(tx) {
         const facts = [];
+        const seen = new Set();
         const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+
+        function addFact(fact) {
+          if (!fact) return;
+          const signature = `${fact.key}=${fact.value}`;
+          if (seen.has(signature)) return;
+          seen.add(signature);
+          facts.push(fact);
+        }
 
         for (const wrapper of memos) {
           const memo = wrapper?.Memo || {};
           const type = hexToText(memo.MemoType).trim();
+          const format = hexToText(memo.MemoFormat).trim();
           const data = hexToText(memo.MemoData).trim();
 
-          // Current canonical format:
-          // MemoType = SFL-LEAP
-          // MemoData = BADGE=...|EVENT=...|CHALLENGE=...
-          if (type === NAMESPACE) {
+          // Current Xaman-friendly convention. The public memo is expected in
+          // MemoData, but checking all three memo fields keeps the reader
+          // tolerant without weakening the SFL-LEAP grammar.
+          addFact(parseCanonicalLeapMemo(data));
+          addFact(parseCanonicalLeapMemo(type));
+          addFact(parseCanonicalLeapMemo(format));
+
+          // Backward compatibility: MemoType=SFL-LEAP,
+          // MemoData=BADGE=FIRST-MEMBER (or EVENT/CHALLENGE).
+          if (type.toUpperCase() === NAMESPACE) {
             const parsed = parseStructuredData(data);
             for (const key of RECOGNIZED_KEYS) {
-              if (parsed[key]) facts.push({ key, value: parsed[key] });
+              if (parsed[key]) addFact({ key, value: parsed[key] });
             }
-            continue;
           }
 
-          // Read-only legacy support for the earlier proposed split-memo form.
-          // This does NOT make the legacy form the current protocol.
+          // Backward compatibility with the earlier split-memo proposal:
+          // MemoType=SFL-LEAP/BADGE, MemoData=FIRST-MEMBER.
           const legacyPrefix = NAMESPACE + "/";
-          if (type.startsWith(legacyPrefix)) {
-            const legacyKey = type.slice(legacyPrefix.length).toUpperCase();
+          if (type.toUpperCase().startsWith(legacyPrefix) && !type.includes("=")) {
+            const legacyKey = type.slice(legacyPrefix.length).trim().toUpperCase();
             if (RECOGNIZED_KEYS.includes(legacyKey) && data) {
-              facts.push({ key: legacyKey, value: data });
+              addFact({ key: legacyKey, value: data });
             }
           }
         }
