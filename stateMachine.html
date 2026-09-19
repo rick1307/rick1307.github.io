@@ -1,695 +1,572 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="How Sailing Frog's Leap uses a small slice of shared ledger capacity as a permanent, machine-readable community logbook for LEAP membership, recognition, and engagement." />
-<meta name="theme-color" content="#07111f" />
-<title>The LEAP Logbook</title>
-<style>
-  :root {
-    --bg: #07111f;
-    --panel: rgba(255,255,255,0.09);
-    --text: #f4f7fb;
-    --muted: #afbdd0;
-    --line: rgba(255,255,255,0.16);
-    --blue: #57a7ff;
-    --blue-2: #8bc6ff;
-    --green: #6ee7b7;
-    --amber: #f0c36b;
-    --max: 920px;
-  }
-
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-
-  body {
-    margin: 0;
-    background:
-      radial-gradient(circle at 15% 0%, rgba(61,139,255,.18), transparent 32%),
-      radial-gradient(circle at 100% 12%, rgba(110,231,183,.10), transparent 30%),
-      linear-gradient(180deg, var(--bg) 0%, #07101b 52%, #050b13 100%);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.55;
-  }
-
-  a { color: inherit; }
-
-  .wrap {
-    width: min(calc(100% - 34px), var(--max));
-    margin: 0 auto;
-  }
-
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: rgba(7,17,31,.88);
-    border-bottom: 1px solid var(--line);
-    backdrop-filter: blur(12px);
-  }
-
-  .nav-inner {
-    min-height: 62px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    font-weight: 780;
-  }
-
-  .brand img {
-    width: 36px;
-    height: 36px;
-    object-fit: cover;
-    border-radius: 9px;
-    border: 1px solid var(--line);
-    background: white;
-  }
-
-  .nav-link {
-    color: var(--blue-2);
-    text-decoration: none;
-    font-size: .9rem;
-    font-weight: 720;
-  }
-
-  header {
-    padding: 82px 0 56px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .eyebrow {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: var(--blue-2);
-    font-size: .78rem;
-    font-weight: 750;
-    text-transform: uppercase;
-    letter-spacing: .14em;
-  }
-
-  h1 {
-    margin: 0;
-    max-width: 820px;
-    font-size: clamp(2.7rem, 9vw, 5.6rem);
-    line-height: .98;
-    letter-spacing: -.055em;
-  }
-
-  .hero-copy {
-    max-width: 760px;
-    margin: 28px 0 0;
-    color: #d2dbea;
-    font-size: clamp(1.14rem, 2.5vw, 1.46rem);
-    line-height: 1.55;
-  }
-
-  .hero-thesis {
-    margin-top: 38px;
-    border-left: 4px solid var(--green);
-    padding: 4px 0 4px 20px;
-    max-width: 780px;
-    color: white;
-    font-size: clamp(1.12rem, 2.4vw, 1.36rem);
-    font-weight: 650;
-  }
-
-  .logline {
-    height: 92px;
-    margin-top: 42px;
-    opacity: .72;
-  }
-  .logline svg { width: 100%; height: 100%; display: block; }
-
-  main { padding-bottom: 70px; }
-
-  section {
-    padding: 72px 0;
-    border-top: 1px solid var(--line);
-  }
-
-  .step {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr);
-    gap: 22px;
-    align-items: start;
-  }
-
-  .num {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid rgba(87,167,255,.45);
-    display: grid;
-    place-items: center;
-    color: var(--blue-2);
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-    background: rgba(87,167,255,.06);
-  }
-
-  h2 {
-    margin: 0 0 18px;
-    font-size: clamp(1.75rem, 4vw, 2.6rem);
-    line-height: 1.1;
-    letter-spacing: -.035em;
-  }
-
-  p {
-    margin: 0 0 18px;
-    color: #c9d4e3;
-    font-size: 1.06rem;
-  }
-
-  .lead {
-    color: white;
-    font-size: clamp(1.15rem, 2.3vw, 1.34rem);
-    font-weight: 620;
-  }
-
-  .big-idea {
-    margin-top: 34px;
-    padding: 28px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(87,167,255,.16), rgba(110,231,183,.08));
-    border: 1px solid rgba(87,167,255,.35);
-  }
-
-  .big-idea p {
-    margin: 0;
-    color: white;
-    font-size: clamp(1.2rem, 2.7vw, 1.6rem);
-    font-weight: 720;
-    line-height: 1.4;
-  }
-
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    margin-top: 30px;
-  }
-
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 22px;
-  }
-
-  .card strong {
-    display: block;
-    margin-bottom: 7px;
-    color: white;
-    font-size: 1.03rem;
-  }
-
-  .card span {
-    color: var(--muted);
-    font-size: .98rem;
-  }
-
-  .cycle {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 30px;
-  }
-
-  .cycle-card {
-    position: relative;
-    min-height: 132px;
-    padding: 19px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--panel);
-  }
-
-  .cycle-card b {
-    display: block;
-    color: white;
-    margin-bottom: 7px;
-  }
-
-  .cycle-card span {
-    color: var(--muted);
-    font-size: .94rem;
-  }
-
-  .cycle-card:not(:last-child)::after {
-    content: "→";
-    position: absolute;
-    right: -11px;
-    top: 50%;
-    transform: translate(50%,-50%);
-    color: var(--green);
-    font-weight: 900;
-    z-index: 2;
-  }
-
-  .state-list {
-    display: grid;
-    gap: 12px;
-    margin-top: 28px;
-  }
-
-  .state-item {
-    display: grid;
-    grid-template-columns: 150px 1fr;
-    gap: 18px;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-  }
-
-  .state-item b { color: white; }
-  .state-item span { color: #c9d4e3; }
-
-  .status-split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-top: 30px;
-  }
-
-  .status-panel {
-    padding: 22px;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--panel);
-  }
-
-  .status-panel h3 {
-    margin: 0 0 16px;
-    color: var(--blue-2);
-    font-size: .82rem;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-  }
-
-  .status-row {
-    padding: 13px 0;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-  }
-
-  .status-row:last-child { border-bottom: 0; }
-  .status-row b { display: block; color: white; margin-bottom: 5px; }
-  .status-row span { color: #c9d4e3; }
-
-  .transition {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr;
-    gap: 10px;
-    align-items: stretch;
-  }
-
-  .transition-card {
-    padding: 20px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--panel);
-  }
-
-  .transition-card b {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--blue-2);
-    font-size: .8rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-  }
-
-  .transition-card span { color: #d7e0ec; }
-  .arrow { align-self: center; color: var(--green); font-size: 1.45rem; font-weight: 900; }
-
-  .record {
-    margin-top: 30px;
-    padding: 24px;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: rgba(255,255,255,.065);
-    overflow: hidden;
-  }
-
-  .record-row {
-    display: grid;
-    grid-template-columns: 170px 1fr;
-    gap: 18px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-  }
-
-  .record-row:last-child { border-bottom: 0; }
-  .record-row b {
-    color: var(--blue-2);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: .86rem;
-  }
-  .record-row span {
-    color: #d3ddeb;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: .9rem;
-    word-break: break-word;
-  }
-
-  .namespace {
-    margin-top: 30px;
-    display: grid;
-    gap: 10px;
-  }
-
-  .namespace-row {
-    display: grid;
-    grid-template-columns: 210px 1fr;
-    gap: 18px;
-    padding: 16px 18px;
-    border: 1px solid var(--line);
-    background: var(--panel);
-    border-radius: 14px;
-  }
-
-  .namespace-row code {
-    color: var(--blue-2);
-    font-weight: 750;
-  }
-
-  .namespace-row span { color: var(--muted); }
-
-  .equation {
-    margin-top: 34px;
-    display: grid;
-    gap: 12px;
-    font-size: clamp(1.08rem, 2.6vw, 1.42rem);
-    font-weight: 740;
-  }
-
-  .equation div {
-    padding: 17px 20px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-  }
-
-  .equation .result {
-    border-color: rgba(110,231,183,.35);
-    background: rgba(110,231,183,.07);
-  }
-
-  .bridge {
-    text-align: center;
-    padding-top: 92px;
-    padding-bottom: 100px;
-  }
-
-  .bridge h2 {
-    max-width: 800px;
-    margin: 0 auto 24px;
-    font-size: clamp(2.25rem, 6.6vw, 4.4rem);
-  }
-
-  .bridge p {
-    max-width: 760px;
-    margin: 0 auto 22px;
-    font-size: clamp(1.1rem, 2.4vw, 1.3rem);
-  }
-
-  .bridge-thesis {
-    max-width: 820px;
-    margin: 42px auto 0;
-    padding: 30px 26px;
-    border: 1px solid rgba(87,167,255,.45);
-    background: rgba(87,167,255,.09);
-    border-radius: 20px;
-    font-size: clamp(1.2rem, 2.8vw, 1.62rem);
-    line-height: 1.45;
-    font-weight: 780;
-  }
-
-  .button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 28px;
-    padding: 13px 18px;
-    border-radius: 10px;
-    background: var(--blue);
-    color: #06111e;
-    text-decoration: none;
-    font-weight: 800;
-  }
-
-  .small {
-    margin-top: 22px !important;
-    color: #8ea0b6 !important;
-    font-size: .92rem !important;
-  }
-
-  footer {
-    border-top: 1px solid var(--line);
-    padding: 28px 0 40px;
-    color: #8190a5;
-    font-size: .86rem;
-    text-align: center;
-  }
-
-  @media (max-width: 760px) {
-    header { padding-top: 60px; }
-    .step { grid-template-columns: 1fr; gap: 12px; }
-    .num { width: 42px; height: 42px; }
-    .cards { grid-template-columns: 1fr; }
-    .cycle { grid-template-columns: 1fr; }
-    .cycle-card:not(:last-child)::after {
-      right: 50%;
-      top: auto;
-      bottom: -12px;
-      transform: translate(50%,50%) rotate(90deg);
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="How LEAP uses XRP Ledger transactions and memos to create a permanent machine-readable logbook, and how that connects to AI and real-world state." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Blockchain as a Real-World State Machine — LEAP</title>
+  <style>
+:root{
+      --bg:#071018;
+      --panel:#0d1822;
+      --panel2:#101f2b;
+      --ink:#e8f1f7;
+      --muted:#98aebd;
+      --line:#203849;
+      --line2:#2b5067;
+      --cyan:#5fd1e6;
+      --cyan2:#8de4f2;
+      --amber:#f0b85f;
+      --green:#7dd6a9;
+      --red:#ef8b82;
+      --max:1120px;
     }
-    .state-item, .record-row, .namespace-row { grid-template-columns: 1fr; gap: 5px; }
-    .status-split { grid-template-columns: 1fr; }
-    .transition { grid-template-columns: 1fr; }
-    .arrow { transform: rotate(90deg); text-align: center; }
-    section { padding: 58px 0; }
-    .brand span { display: none; }
-  }
-</style>
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        linear-gradient(rgba(95,209,230,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(95,209,230,.04) 1px,transparent 1px),
+        radial-gradient(circle at 20% 0%,rgba(95,209,230,.07),transparent 30%),
+        var(--bg);
+      background-size:32px 32px,32px 32px,100% 100%,auto;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.62;
+    }
+
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+    .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+
+    nav{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(7,16,24,.9);
+      backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .nav-inner{
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:11px;
+      text-decoration:none;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+
+    .brand img{
+      width:38px;
+      height:38px;
+      border-radius:8px;
+      object-fit:cover;
+      border:1px solid var(--line2);
+      background:#fff;
+    }
+
+    .back{
+      text-decoration:none;
+      color:var(--cyan2);
+      font-size:.9rem;
+      font-weight:750;
+    }
+
+    header{
+      padding:84px 0 58px;
+      border-bottom:1px solid var(--line);
+      position:relative;
+      overflow:hidden;
+    }
+
+    header:after{
+      content:"STATE / TRANSITION / STATE";
+      position:absolute;
+      right:4vw;
+      bottom:18px;
+      color:rgba(95,209,230,.08);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:clamp(1.4rem,4vw,3.2rem);
+      letter-spacing:.13em;
+      font-weight:800;
+      pointer-events:none;
+    }
+
+    .kicker{
+      color:var(--cyan);
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      font-size:.76rem;
+      font-weight:900;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    }
+
+    h1{
+      margin:.18em 0 .25em;
+      color:#f4fbff;
+      font-size:clamp(3rem,8vw,6.25rem);
+      line-height:.94;
+      letter-spacing:-.055em;
+      max-width:980px;
+    }
+
+    .lede{
+      max-width:860px;
+      margin:0;
+      color:#b8c9d4;
+      font-size:clamp(1.12rem,2vw,1.34rem);
+    }
+
+    .hero-note{
+      margin-top:28px;
+      max-width:880px;
+      padding:18px 20px;
+      border-left:3px solid var(--cyan);
+      background:rgba(13,24,34,.72);
+      border-top:1px solid var(--line);
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      color:#c4d4de;
+      font-size:1.02rem;
+    }
+
+    section{padding:48px 0}
+    section+section{border-top:1px solid rgba(32,56,73,.62)}
+
+    .section-title{
+      max-width:830px;
+      margin-bottom:24px;
+    }
+
+    h2{
+      margin:0 0 10px;
+      color:#f4fbff;
+      font-size:clamp(1.9rem,5vw,3rem);
+      line-height:1.05;
+      letter-spacing:-.035em;
+    }
+
+    .section-title p{
+      margin:0;
+      color:var(--muted);
+      font-size:1.04rem;
+    }
+
+    .manifesto{
+      background:
+        linear-gradient(135deg,rgba(95,209,230,.08),rgba(13,24,34,.4)),
+        var(--panel);
+      border:1px solid var(--line2);
+      border-radius:12px;
+      padding:34px;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 18px 50px rgba(0,0,0,.18);
+    }
+
+    .manifesto:before{
+      content:"SYSTEM THESIS";
+      position:absolute;
+      top:14px;
+      right:16px;
+      color:rgba(95,209,230,.14);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:.72rem;
+      font-weight:800;
+      letter-spacing:.15em;
+    }
+
+    .manifesto p{
+      max-width:850px;
+      margin:0 0 1rem;
+      font-size:1.16rem;
+    }
+
+    .manifesto p:last-child{margin-bottom:0}
+
+    .mechanic{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+    }
+
+    .step{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:21px;
+      min-height:210px;
+      position:relative;
+    }
+
+    .step .num{
+      width:36px;
+      height:36px;
+      display:grid;
+      place-items:center;
+      background:rgba(95,209,230,.1);
+      border:1px solid var(--cyan);
+      color:var(--cyan2);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-weight:900;
+      margin-bottom:14px;
+    }
+
+    .step h3{
+      margin:0 0 8px;
+      color:#f3f8fb;
+      font-size:1.14rem;
+    }
+
+    .step p{margin:0;color:#9fb2bf}
+
+    .example{
+      background:linear-gradient(135deg,#0d1822,#102532);
+      border:1px solid var(--line2);
+      border-radius:12px;
+      padding:26px;
+      box-shadow:inset 0 0 0 1px rgba(95,209,230,.025);
+    }
+
+    .tx{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:150px 1fr;
+      gap:10px 18px;
+      padding:22px;
+      border-radius:8px;
+      background:#09131c;
+      border:1px solid var(--line);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:.94rem;
+    }
+
+    .tx b{
+      color:var(--cyan);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:.82rem;
+    }
+
+    .tx span{
+      color:#c2d2dc;
+      word-break:break-word;
+    }
+
+    .flow{
+      display:grid;
+      grid-template-columns:1fr auto 1fr auto 1fr;
+      gap:12px;
+      align-items:center;
+    }
+
+    .flow-card{
+      min-height:160px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:22px;
+      text-align:center;
+    }
+
+    .flow-card b{
+      display:block;
+      margin-bottom:7px;
+      color:var(--cyan2);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:.92rem;
+    }
+
+    .flow-card span{color:#9fb2bf}
+    .arrow{color:var(--cyan);font-size:1.7rem;font-weight:900}
+
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:23px;
+    }
+
+    .card h3{
+      margin:0 0 8px;
+      color:#f4fbff;
+      font-size:1.28rem;
+    }
+
+    .card p{margin:0;color:#9fb2bf}
+
+    .label{
+      display:inline-block;
+      margin-bottom:8px;
+      color:var(--amber);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:.72rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.09em;
+    }
+
+    .machine{
+      border:1px solid var(--line2);
+      border-radius:10px;
+      overflow:hidden;
+      background:var(--panel);
+    }
+
+    .machine-row{
+      display:grid;
+      grid-template-columns:190px 1fr;
+      gap:18px;
+      padding:18px 20px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .machine-row:last-child{border-bottom:0}
+
+    .machine-row b{
+      color:var(--cyan2);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:.9rem;
+      text-transform:uppercase;
+      letter-spacing:.045em;
+    }
+
+    .machine-row span{color:#a8bbc7}
+
+    .quote{
+      text-align:center;
+      padding:54px 24px;
+      background:rgba(95,209,230,.025);
+    }
+
+    .quote blockquote{
+      max-width:900px;
+      margin:0 auto;
+      color:#f1f8fb;
+      font-size:clamp(1.5rem,4vw,2.45rem);
+      line-height:1.23;
+      font-weight:700;
+    }
+
+    .quote cite{
+      display:block;
+      margin-top:16px;
+      color:var(--cyan);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-style:normal;
+      font-size:.82rem;
+      letter-spacing:.04em;
+    }
+
+    .warning{
+      background:rgba(240,184,95,.07);
+      border:1px solid rgba(240,184,95,.38);
+      border-radius:10px;
+      padding:22px;
+    }
+
+    .warning h3{
+      margin:0 0 8px;
+      color:var(--amber);
+    }
+
+    .warning p{margin:0;color:#c4b79d}
+
+    .return-box{
+      background:var(--panel2);
+      border:1px solid var(--line2);
+      border-radius:10px;
+      padding:28px;
+      text-align:center;
+    }
+
+    .return-box h3{
+      margin:0 0 8px;
+      color:#f4fbff;
+      font-size:1.5rem;
+    }
+
+    .return-box p{margin:0;color:#9fb2bf}
+
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:18px;
+      padding:12px 18px;
+      border-radius:7px;
+      text-decoration:none;
+      background:var(--cyan);
+      color:#061018;
+      font-weight:850;
+    }
+
+    footer{
+      padding:38px 0 48px;
+      color:#778e9d;
+      font-size:.84rem;
+    }
+
+    .foot{
+      padding-top:20px;
+      border-top:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    @media(max-width:850px){
+      .mechanic{grid-template-columns:1fr}
+      .flow{grid-template-columns:1fr}
+      .arrow{transform:rotate(90deg);text-align:center}
+      .split{grid-template-columns:1fr}
+      .machine-row{grid-template-columns:1fr}
+      .tx{grid-template-columns:1fr}
+      .manifesto{padding:28px}
+      header{padding-top:62px}
+      header:after{display:none}
+    }
+  </style>
 </head>
 <body>
-<nav>
-  <div class="wrap nav-inner">
-    <a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a>
-    <a class="nav-link" href="manager.html">Manager →</a>
-  </div>
-</nav>
+<nav><div class="wrap nav-inner"><a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a><a class="back" href="index.html">← Back to LEAP</a></div></nav>
 
 <header>
   <div class="wrap">
-    <div class="eyebrow">Given that shared digital state exists...</div>
-    <h1>The LEAP Logbook</h1>
-    <p class="hero-copy">The infrastructure already exists. It can hold shared, permanent, machine-readable state that independent software can read later. So the next question is smaller and much more practical: what can Sailing Frog's Leap do with a tiny slice of that capacity?</p>
-    <div class="hero-thesis">Our answer is simple: use that capacity as a crew logbook. When a Leaper does something worth remembering, the recognition should not disappear with the episode. It should become part of the record.</div>
-    <div class="logline" aria-hidden="true">
-      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <path d="M0,80 C95,80 100,42 195,42 C290,42 300,84 395,84 C490,84 500,28 595,28 C690,28 700,70 795,70 C890,70 900,38 995,38 C1090,38 1110,58 1200,58" fill="none" stroke="rgba(87,167,255,.82)" stroke-width="3"/>
-        <circle cx="195" cy="42" r="5" fill="rgba(110,231,183,.95)"/>
-        <circle cx="595" cy="28" r="5" fill="rgba(110,231,183,.95)"/>
-        <circle cx="995" cy="38" r="5" fill="rgba(110,231,183,.95)"/>
-      </svg>
-    </div>
+    <div class="kicker">LEAP • XRPL • AI • Machine-readable history</div>
+    <h1>When a logbook becomes a state machine</h1>
+    <p class="lede">A blockchain transaction can do more than move value. It can also record that something happened. With an authorized LEAP Check and one canonical memo, Sailing Frog's Leap can create a permanent, public, machine-readable recognition on the XRP Ledger.</p>
+    <div class="hero-note">The important shift is simple: once events are written in a form that software can read, humans no longer have to reconstruct the history manually. The ledger becomes part of the machine's state.</div>
   </div>
 </header>
 
 <main>
-  <section>
-    <div class="wrap step">
-      <div class="num">01</div>
-      <div>
-        <h2>Start with the use, not the infrastructure.</h2>
-        <p class="lead">We already have the infrastructure. Now give it a job.</p>
-        <p>For Sailing Frog's Leap, that job is participation. People watch the adventure. Some of them do more than watch: they answer a challenge, help solve a problem, show up for an event, contribute an idea, join a poll, take part in the story, or earn a piece of recognition tied to the adventure.</p>
-        <p>That is the community we want to build around. We only need a narrow slice of shared ledger capacity to remember what happened. The blockchain is simply the logbook underneath it.</p>
-        <div class="cycle">
-          <div class="cycle-card"><b>Watch</b><span>Follow the Sailing Frog's Leap adventure.</span></div>
-          <div class="cycle-card"><b>Engage</b><span>Take part in a challenge, event, poll, idea, or community moment.</span></div>
-          <div class="cycle-card"><b>Earn</b><span>Receive LEAP, rank, or recognition for showing up.</span></div>
-          <div class="cycle-card"><b>Build history</b><span>Participation becomes cumulative instead of disposable.</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap"><div class="manifesto">
+  <p>A paper logbook remembers what happened for the people who know where to find it.</p>
+  <p>A blockchain logbook remembers what happened in a form that people, applications, and AI can all read.</p>
+  <p>That turns history into <strong>actionable state</strong>.</p>
+</div></div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">02</div>
-      <div>
-        <h2>Most online participation disappears.</h2>
-        <p>A comment is pushed down the page. A poll closes. A live chat ends. A great contribution becomes another moment buried in another feed.</p>
-        <p class="lead">That makes participation feel temporary even when the relationship is not.</p>
-        <div class="big-idea">
-          <p>Badges make participation cumulative rather than disposable.</p>
-        </div>
-        <p style="margin-top:26px;">LEAP applies the same idea more broadly. Membership, rank, badges, challenges, and events can accumulate into a personal crew history that stays with the member's public XRPL account.</p>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap">
+  <div class="section-title"><h2>The simple LEAP mechanic</h2><p>The recognition event itself can be tiny. The value is in the permanent record.</p></div>
+  <div class="mechanic">
+    <div class="step"><div class="num">1</div><h3>Choose the recognition</h3><p>Decide whether this award records a badge, an event, or a challenge.</p></div>
+    <div class="step"><div class="num">2</div><h3>Issue one LEAP Check</h3><p>The authorized distributor creates a Check for 1 LEAP to the member's wallet. One Check represents one award.</p></div>
+    <div class="step"><div class="num">3</div><h3>Add one canonical memo</h3><p>Use exactly one recognition record, such as <strong>SFL-LEAP/BADGE=LEAP-OG</strong>, <strong>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE</strong>, or <strong>SFL-LEAP/CHALLENGE=LEAP-001</strong>.</p></div>
+    <div class="step"><div class="num">4</div><h3>The ledger remembers</h3><p>Distributor, recipient, LEAP amount, ledger time, memo, and transaction hash become part of the permanent XRPL transaction history.</p></div>
+  </div>
+</div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">03</div>
-      <div>
-        <h2>Use a little bandwidth to create a lot of memory.</h2>
-        <p class="lead">Every tap into shared state has limits. For LEAP, we do not need much.</p>
-        <p>We use the XRP Ledger and a small amount of transaction memo bandwidth. When Sailing Frog's Leap creates a LEAP-related ledger event, the transaction can carry a short, standardized memo. The validated ledger supplies the permanent transaction record and timestamp. The memo tells software what the event means.</p>
-        <div class="record">
-          <div class="record-row"><b>ACCOUNT</b><span>Member's public XRPL account</span></div>
-          <div class="record-row"><b>ASSET</b><span>LEAP</span></div>
-          <div class="record-row"><b>MEMO TYPE</b><span>SFL-LEAP/BADGE</span></div>
-          <div class="record-row"><b>MEMO DATA</b><span>PANAMA-CREW</span></div>
-          <div class="record-row"><b>TIME</b><span>Validated XRPL ledger timestamp</span></div>
-          <div class="record-row"><b>PROOF</b><span>Permanent transaction hash</span></div>
-        </div>
-        <p style="margin-top:24px;">The amount can be small. The important thing is the durable, machine-readable record that says: <strong>this happened.</strong></p>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap">
+  <div class="section-title"><h2>What one event looks like</h2><p>Conceptually, the blockchain now contains a record like this:</p></div>
+  <div class="example"><div class="tx">
+    <b>Sender</b><span>Authorized LEAP distributor wallet</span>
+    <b>Recipient</b><span>Member's XRPL wallet</span>
+    <b>Transaction</b><span>CheckCreate</span>
+    <b>Asset</b><span>LEAP</span>
+    <b>Amount</b><span>1 LEAP</span>
+    <b>Memo</b><span>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE</span>
+    <b>Time</b><span>Validated ledger transaction time</span>
+    <b>Proof</b><span>Unique transaction hash</span>
+  </div></div>
+</div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">04</div>
-      <div>
-        <h2>That is a state transition.</h2>
-        <p>Before the ledger event, that recognition is not part of the member's public LEAP history. After validation, it is.</p>
-        <div class="transition">
-          <div class="transition-card"><b>State A</b><span>The member is part of the crew, but the recognition is not yet recorded.</span></div>
-          <div class="arrow">→</div>
-          <div class="transition-card"><b>Transition</b><span>Sailing Frog's Leap writes a standardized LEAP event to the XRPL.</span></div>
-          <div class="arrow">→</div>
-          <div class="transition-card"><b>State B</b><span>The public ledger now contains permanent evidence of that recognition.</span></div>
-        </div>
-        <div class="big-idea">
-          <p>We are using globally shared infrastructure for a very parochial purpose: keeping the crew logbook for one sailing community.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap">
+  <div class="section-title"><h2>That is a state transition.</h2><p>Before the transaction, the ledger did not contain that recognition. After the transaction, it does.</p></div>
+  <div class="flow">
+    <div class="flow-card"><b>State A</b><span>The wallet has no La Cruz Beach Bonfire recognition in its LEAP history.</span></div>
+    <div class="arrow">→</div>
+    <div class="flow-card"><b>Transaction</b><span>The authorized distributor creates a 1 LEAP Check with memo: SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE.</span></div>
+    <div class="arrow">→</div>
+    <div class="flow-card"><b>State B</b><span>The validated ledger now contains permanent evidence that the authorized LEAP distributor issued that recognition to this wallet.</span></div>
+  </div>
+</div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">05</div>
-      <div>
-        <h2>The logbook can describe different kinds of crew state.</h2>
-        <p>The useful part is not one special memo. It is a consistent language that lets the website, Discord, or future software understand what kind of event it is reading.</p>
-        <div class="namespace">
-          <div class="namespace-row"><code>SFL-LEAP/BADGE</code><span>Permanent recognition for something a member did.</span></div>
-          <div class="namespace-row"><code>SFL-LEAP/EVENT</code><span>A shared moment tied to the Sailing Frog's Leap adventure.</span></div>
-          <div class="namespace-row"><code>SFL-LEAP/CHALLENGE</code><span>An episode or community challenge and its numbered history.</span></div>
-          <div class="namespace-row"><code>SFL-LEAP/PROTOCOL</code><span>The version of the LEAP convention used to interpret the record.</span></div>
-        </div>
-        <p style="margin-top:24px;">The namespace makes the history sortable and searchable by machines. The ledger timestamp already tells us when the event was validated, so the event name does not need to carry redundant dates.</p>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap">
+  <div class="section-title"><h2>Why call this a “real-world state machine”?</h2><p>Because the ledger can increasingly represent facts that matter outside the ledger itself.</p></div>
+  <div class="machine">
+    <div class="machine-row"><b>Membership state</b><span>This wallet is a member of the Sailing Frog's Leap crew.</span></div>
+    <div class="machine-row"><b>Rank state</b><span>This wallet currently holds enough LEAP to be a Bosun, Quartermaster, First Mate, or Master of the Leap.</span></div>
+    <div class="machine-row"><b>Recognition state</b><span>This wallet received a Panama Canal, Founding Crew, passage, port, or contribution recognition.</span></div>
+    <div class="machine-row"><b>Access state</b><span>A Discord app or website can use that membership and rank state to decide which experiences to unlock.</span></div>
+    <div class="machine-row"><b>Economic state</b><span>Assets, balances, transfers, permissions, claims, and other machine-readable rights can be represented in similar ways.</span></div>
+  </div>
+</div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">06</div>
-      <div>
-        <h2>Current status and permanent history are different.</h2>
-        <p class="lead">Some parts of LEAP describe where a member stands right now. Other parts record what that member has done and been part of.</p>
+<section class="quote"><div class="wrap">
+  <blockquote>“The blockchain does not need to describe the whole physical world. It only needs to record the parts of the world that machines need to recognize and act upon.”</blockquote>
+  <cite>LEAP state-machine concept</cite>
+</div></section>
 
-        <div class="status-split">
-          <div class="status-panel">
-            <h3>Current status</h3>
-            <div class="status-row">
-              <b>Membership / Access</b>
-              <span>Holding LEAP tells the system that this public account is part of the crew and can be used to determine what member experiences are available now.</span>
-            </div>
-            <div class="status-row">
-              <b>Rank</b>
-              <span>Current LEAP holdings determine the member's present rank: Deckhand, Bosun, Quartermaster, First Mate, or Master of the Leap.</span>
-            </div>
-          </div>
+<section><div class="wrap">
+  <div class="section-title"><h2>Where AI enters the picture</h2><p>AI becomes much more useful when it can read trusted state instead of depending entirely on unstructured human descriptions.</p></div>
+  <div class="split">
+    <div class="card"><span class="label">AI reads</span><h3>What is true right now?</h3><p>An AI system can query public ledger data and determine balances, transaction history, memos, timestamps, and other recorded facts.</p></div>
+    <div class="card"><span class="label">AI reasons</span><h3>What should happen next?</h3><p>Given the current state, AI can decide whether someone qualifies for a role, badge, benefit, alert, workflow, or next action.</p></div>
+    <div class="card"><span class="label">Software acts</span><h3>Change the experience</h3><p>A Discord bot might assign Quartermaster status. A website might display a badge. An app might unlock a poll or special event.</p></div>
+    <div class="card"><span class="label">The ledger records</span><h3>The new state becomes history</h3><p>Another transaction or attestation can record what happened next, giving the machine a new state from which to continue.</p></div>
+  </div>
+</div></section>
 
-          <div class="status-panel">
-            <h3>Permanent history</h3>
-            <div class="status-row">
-              <b>Badges</b>
-              <span>Permanent recognition for what the member actually did.</span>
-            </div>
-            <div class="status-row">
-              <b>Events</b>
-              <span>Shared moments that become part of the member's personal history with the adventure.</span>
-            </div>
-            <div class="status-row">
-              <b>Challenges completed</b>
-              <span>A lasting record of the challenges the member took part in and completed.</span>
-            </div>
-          </div>
-        </div>
+<section><div class="wrap">
+  <div class="section-title"><h2>Compute, blockspace, and state</h2><p>This is the larger idea behind the LEAP experiment.</p></div>
+  <div class="machine">
+    <div class="machine-row"><b>Compute</b><span>Gives AI the capacity to observe, reason, compare, predict, and decide.</span></div>
+    <div class="machine-row"><b>Blockspace</b><span>Gives the system the capacity to write a trusted state transition into a shared ledger.</span></div>
+    <div class="machine-row"><b>Blockchain</b><span>Preserves the shared state that results from those transitions.</span></div>
+    <div class="machine-row"><b>AI + blockchain</b><span>AI reads the state, decides what to do, software acts, and the ledger records the new agreed state.</span></div>
+  </div>
+</div></section>
 
-        <p style="margin-top:24px;"><strong>Membership / Access and Rank describe where you are now.</strong> Badges, Events, and Challenges Completed describe <strong>what you have done and been part of.</strong></p>
-        <p><strong>Current status can change. History does not.</strong> That is what makes the ledger useful as a logbook.</p>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap"><div class="warning">
+  <h3>One important limit</h3>
+  <p>A blockchain only knows what has been written or credibly attested to it. A memo does not magically prove that a physical-world event occurred. For LEAP, official recognition requires more than matching text: software also verifies the authorized LEAP distributor, the correct LEAP asset, the intended destination, and a successful validated transaction. The trustworthiness of the underlying real-world claim still depends on who made the attestation, the rules of the system, and any supporting evidence.</p>
+</div></div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">07</div>
-      <div>
-        <h2>Machine-readable history changes the engagement loop.</h2>
-        <p>A normal audience interaction ends when the interaction ends. A recorded LEAP interaction can become input for the next experience.</p>
-        <div class="equation">
-          <div>A Leaper participates</div>
-          <div>↓ The participation is recognized</div>
-          <div>↓ The recognition enters the public logbook</div>
-          <div>↓ Software can read that history later</div>
-          <div class="result">↓ The next experience can build on everything that came before</div>
-        </div>
-        <p style="margin-top:26px;">A future page might display a badge automatically. A Discord app might recognize a rank. A new challenge might be available only to members with a particular history. The important thing is that the system does not have to forget between episodes.</p>
-      </div>
-    </div>
-  </section>
+<section><div class="wrap">
+  <div class="section-title"><h2>Why LEAP is a useful experiment</h2><p>LEAP is small enough to understand, but the architecture points toward something much larger.</p></div>
+  <div class="split">
+    <div class="card"><span class="label">Today</span><h3>A sailing-community logbook</h3><p>Membership, rank, badges, participation, voyages, milestones, and shared history can be made machine-readable.</p></div>
+    <div class="card"><span class="label">Tomorrow</span><h3>A machine-readable economy</h3><p>The same pattern can represent ownership, credentials, permissions, claims, settlement, collateral, warranties, receipts, and other economically actionable state.</p></div>
+  </div>
+</div></section>
 
-  <section>
-    <div class="wrap step">
-      <div class="num">08</div>
-      <div>
-        <h2>This is tiny. That is the point.</h2>
-        <p class="lead">Shared digital infrastructure becomes useful one local use at a time.</p>
-        <p>For Sailing Frog's Leap, the use case is deliberately small: a membership credential, a rank, a badge, a challenge, an event, a line in the crew logbook.</p>
-        <p>The pattern is simple: a shared current state, a trusted transition, and a durable new state that independent software can read later.</p>
-        <div class="cards">
-          <div class="card"><strong>The infrastructure</strong><span>Blockspace records shared, durable state across independent actors.</span></div>
-          <div class="card"><strong>Local use</strong><span>LEAP uses that capacity to remember who came aboard, what they did, and how their history with the adventure grew.</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bridge">
-    <div class="wrap">
-      <div class="eyebrow">The LEAP experiment</div>
-      <h2>Turn the adventure into a history people can build.</h2>
-      <p>Watching the adventure is one thing. Becoming part of it is another.</p>
-      <div class="bridge-thesis">LEAP uses a small piece of shared blockspace to turn community participation into a permanent crew logbook—one that people can see, software can read, and future experiences can build upon.</div>
-      <p class="small">The blockchain is not the experience. It is the memory underneath the experience.</p>
-      <a class="button" href="index.html">Sailing Frog's Leap →</a>
-    </div>
-  </section>
+<section class="quote"><div class="wrap">
+  <blockquote>“Compute is the capacity to decide. Blockspace is the capacity to act. Blockchain is the shared state of the machine.”</blockquote>
+  <cite>From the LEAP / global state-machine thesis</cite>
+</div></section>
+<section><div class="wrap"><div class="return-box">
+  <h3>See how this idea becomes a real membership system.</h3>
+  <p>Return to the LEAP crew page to see ranks, badges, onboarding, and the community side of the experiment.</p>
+  <a class="button" href="index.html">← Back to the LEAP membership page</a>
+</div></div></section>
 </main>
 
-<footer>
-  <div class="wrap">The LEAP Logbook — Sailing Frog's Leap</div>
-</footer>
+<footer><div class="wrap foot"><div>Sailing Frog's Leap • LEAP Membership System</div><div><a href="index.html">Back to LEAP →</a></div></div></footer>
 </body>
 </html>
