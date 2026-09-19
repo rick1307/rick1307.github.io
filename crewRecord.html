@@ -170,9 +170,15 @@
       box-shadow:0 10px 24px rgba(11,45,54,.10);
     }
 
-    .discord-cta button:hover{
+    .discord-cta button:hover:not(:disabled){
       transform:translateY(-1px);
       box-shadow:0 13px 28px rgba(11,45,54,.14);
+    }
+    .discord-cta button:disabled{
+      opacity:.48;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:0 7px 16px rgba(11,45,54,.07);
     }
     .console-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
     .console-title{display:flex;align-items:center;gap:12px}
@@ -363,7 +369,7 @@
       </aside>
 
       <div class="discord-cta">
-        <button id="discordCrewButton" type="button" onclick="window.location.href='https://discord.gg/zfe8mbzwHm'">Join the Conversation on Discord →</button>
+        <button id="discordCrewButton" type="button" disabled aria-disabled="true" title="Load a verified LEAP Crew Record to unlock Discord.">Join the Conversation on Discord →</button>
       </div>
     </div>
   </header>
@@ -380,6 +386,8 @@
       const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
       const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
       const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
+      const SFL_LEAP_SESSION_KEY = "sfl.leap.session";
+      const DISCORD_INVITE_URL = "https://discord.gg/zfe8mbzwHm";
       const XRPL_WS = "wss://xrplcluster.com/";
       const addressInput = document.getElementById("crewWalletAddress");
       const loadButton = document.getElementById("loadCrewRecord");
@@ -398,6 +406,7 @@
       const progressLabel = document.getElementById("progressLabel");
       const progressValue = document.getElementById("progressValue");
       const progressFill = document.getElementById("progressFill");
+      const discordCrewButton = document.getElementById("discordCrewButton");
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
       let personalLogbookView = "chronological";
       let personalLogbookSort = "newest";
@@ -429,6 +438,34 @@
         try {
           sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
         } catch (_) {}
+      }
+
+      function saveLeapSession(account, balance) {
+        if (!classicAddressPattern.test(account) || !(balance >= 1)) return;
+        const crewRank = rankFor(balance);
+        const leapSession = {
+          wallet: account,
+          leapBalance: balance,
+          rank: crewRank.name,
+          verifiedAt: new Date().toISOString()
+        };
+        try {
+          localStorage.setItem(SFL_LEAP_SESSION_KEY, JSON.stringify(leapSession));
+        } catch (_) {}
+      }
+
+      function clearLeapSession() {
+        try {
+          localStorage.removeItem(SFL_LEAP_SESSION_KEY);
+        } catch (_) {}
+      }
+
+      function setDiscordAccess(isVerifiedHolder) {
+        discordCrewButton.disabled = !isVerifiedHolder;
+        discordCrewButton.setAttribute("aria-disabled", String(!isVerifiedHolder));
+        discordCrewButton.title = isVerifiedHolder
+          ? "Enter Leaper's Lair on Discord."
+          : "Load a verified LEAP Crew Record to unlock Discord.";
       }
 
       function setStatus(message, kind = "") {
@@ -950,6 +987,7 @@
 
         loadButton.disabled = true;
         loadButton.textContent = "Loading…";
+        setDiscordAccess(false);
         setStatus("Reading your crew record from the XRP Ledger…");
         resetLogbook();
 
@@ -968,10 +1006,19 @@
 
           renderRecord(account, safeBalance);
 
+          if (safeBalance >= 1) {
+            saveWallet(account);
+            saveLeapSession(account, safeBalance);
+            setDiscordAccess(true);
+          } else {
+            clearLeapSession();
+            setDiscordAccess(false);
+          }
+
           if (historyResult.status === "fulfilled") {
             renderLogbook(historyResult.value);
 
-            if (safeBalance > 0 || historyResult.value.length > 0) {
+            if (safeBalance === 0 && historyResult.value.length > 0) {
               saveWallet(account);
             }
 
@@ -983,9 +1030,6 @@
               setStatus("This wallet does not currently hold LEAP and has no official LEAP logbook entries.", "error");
             }
           } else {
-            if (safeBalance > 0) {
-              saveWallet(account);
-            }
             resetLogbook("Current balance loaded, but the logbook could not be read right now.");
             setStatus(
               safeBalance > 0
@@ -996,6 +1040,7 @@
           }
         } catch (error) {
           const message = String(error?.message || "");
+          setDiscordAccess(false);
           resetLogbook("The logbook could not be loaded.");
           setStatus(
             message.includes("actNotFound")
@@ -1010,9 +1055,14 @@
       }
 
       loadButton.addEventListener("click", loadCrewRecord);
+      discordCrewButton.addEventListener("click", () => {
+        if (discordCrewButton.disabled) return;
+        window.location.href = DISCORD_INVITE_URL;
+      });
       personalChronologicalButton.addEventListener("click", () => setPersonalLogbookView("chronological"));
       personalCategoryButton.addEventListener("click", () => setPersonalLogbookView("category"));
       personalSortButton.addEventListener("click", togglePersonalLogbookSort);
+      addressInput.addEventListener("input", () => setDiscordAccess(false));
       addressInput.addEventListener("keydown", event => {
         if (event.key === "Enter") loadCrewRecord();
       });
