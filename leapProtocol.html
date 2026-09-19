@@ -260,7 +260,7 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
     <div class="meta">
-      <span class="pill">Working Draft 0.5</span>
+      <span class="pill">Working Draft 0.6</span>
       <span class="pill">XRPL Mainnet</span>
       <span class="pill">Internal / Unlinked</span>
       <span class="pill">Last revised: 2026-09-19</span>
@@ -478,6 +478,7 @@ LEAP-002</code></pre>
           <li>Challenge values use the form <code>LEAP-NNN</code>, beginning with <code>LEAP-001</code>.</li>
           <li>Do not add spaces around separators.</li>
           <li>Do not append a date merely to preserve event timing; the validated XRPL ledger timestamp is authoritative.</li>
+          <li>The vertical bar character (<code>|</code>) is not part of the current recognition memo grammar and must not be used to bundle multiple recognitions into one Check.</li>
         </ul>
 
         <h3>Production examples</h3>
@@ -520,7 +521,7 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           ↓<br>
           CheckCreate<br>
           ↓<br>
-          Destination + 1 LEAP SendMax + one canonical public memo + optional InvoiceID<br>
+          Destination + 1 LEAP SendMax + one canonical public memo<br>
           ↓<br>
           Member<br>
           ↓<br>
@@ -555,17 +556,7 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           A later <code>CheckCash.CheckID</code> can be matched back to that exact Check.
         </p>
 
-        <h3>7.4 InvoiceID</h3>
-        <div class="decision">
-          <div class="tag">Proposed Standard</div>
-          <div>
-            <code>InvoiceID</code> may be used as a deterministic event/campaign identifier when many separate awards belong to the same event.
-            Proposed algorithm: SHA-256 of a canonical source string such as
-            <code>SFL-LEAP|EVENT|LA-CRUZ-BEACH-BONFIRE</code>. Record the canonical source string in this protocol registry.
-          </div>
-        </div>
-
-        <h3>7.5 Direct Payment fallback</h3>
+        <h3>7.4 Direct Payment fallback</h3>
         <p>
           Direct LEAP Payments may be valid when deliberately used. When determining the amount actually delivered by a Payment,
           use transaction metadata rather than assuming the requested amount equals the delivered amount.
@@ -812,6 +803,7 @@ AND decoded public memo = SFL-LEAP/BADGE=registered badge ID</code></pre>
           <tr><td>0.3</td><td>2026-09-16</td><td>EVENT identifiers no longer carry year or month solely for dating; the XRPL validated transaction timestamp supplies the event date.</td></tr>
           <tr><td>0.4</td><td>2026-09-17</td><td>Simplified the recognition model to <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. OG-style historical recognition is handled as a badge rather than a separate record type.</td></tr>
           <tr><td>0.5</td><td>2026-09-19</td><td>Adopted the Xaman-friendly canonical public memo <code>SFL-LEAP/CATEGORY=VALUE</code>; established one Check / one LEAP / one reason; standardized challenge IDs as <code>LEAP-NNN</code>; confirmed <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> as the current recognition categories; excluded <code>ORIGIN</code> and <code>PROTOCOL</code> from member recognition.</td></tr>
+          <tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
         </table>
       </section>
 
@@ -821,7 +813,6 @@ AND decoded public memo = SFL-LEAP/BADGE=registered badge ID</code></pre>
         <ul class="checklist">
           <li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
           <li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
-          <li>Decide whether the proposed deterministic <code>InvoiceID</code> convention is useful enough to adopt.</li>
           <li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
           <li>Establish the first official event registry.</li>
           <li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier.</li>
