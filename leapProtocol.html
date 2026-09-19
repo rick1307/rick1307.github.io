@@ -260,10 +260,10 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
     <div class="meta">
-      <span class="pill">Working Draft 0.2</span>
+      <span class="pill">Working Draft 0.5</span>
       <span class="pill">XRPL Mainnet</span>
       <span class="pill">Internal / Unlinked</span>
-      <span class="pill">Last revised: 2026-09-16</span>
+      <span class="pill">Last revised: 2026-09-19</span>
     </div>
   </header>
 
@@ -276,7 +276,7 @@
         <a href="#registry">3. Authority Registry</a>
         <a href="#identity">4. LEAP Asset Identity</a>
         <a href="#naming">5. Naming Conventions</a>
-        <a href="#memos">6. Memo Standard</a>
+        <a href="#memos">6. Namespace & Memo Standard</a>
         <a href="#transactions">7. Transaction Standards</a>
         <a href="#membership">8. Membership & Rank</a>
         <a href="#badges">9. Badges & History</a>
@@ -406,102 +406,108 @@
 
         <table>
           <tr><th>Object</th><th>Canonical pattern</th><th>Example</th></tr>
-          <tr><td>Project</td><td><code>SFL-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
-          <tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>PANAMA-CREW</code></td></tr>
+          <tr><td>Root namespace</td><td><code>SFL-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
+          <tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>FIRST-MEMBER</code></td></tr>
           <tr><td>Event ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LA-CRUZ-BEACH-BONFIRE</code></td></tr>
-          <tr><td>Challenge ID</td><td><code>NNN</code></td><td><code>001</code></td></tr>
+          <tr><td>Challenge ID</td><td><code>LEAP-NNN</code></td><td><code>LEAP-001</code></td></tr>
         </table>
 
         <div class="rule">
           <div class="tag">LEAP Standard</div>
           <div>
             Canonical IDs use uppercase ASCII letters, numbers, and hyphens only. Avoid spaces, underscores, punctuation,
-            apostrophes, emojis, and decorative capitalization.
+            apostrophes, emojis, and decorative capitalization. Once used on-ledger, an ID is permanent.
           </div>
         </div>
 
         <h3>Examples</h3>
-        <pre><code>PANAMA-CREW
-PACIFIC-CREW
-SFL-CAMEO
+        <pre><code>FIRST-MEMBER
+LEAP-OG
+PANAMA-CREW
 
 LA-CRUZ-BEACH-BONFIRE
 PACIFIC-CROSSING
 
-001
-002</code></pre>
+LEAP-001
+LEAP-002</code></pre>
 
         <div class="note">
-          Public display names can be “Panama Crew” or “Pacific Crossing.”
-          The canonical identifiers remain <code>PANAMA-CREW</code> and <code>PACIFIC-CROSSING</code>.
+          Public display names can be “First Member,” “LEAP OG,” “Panama Crew,” or “Pacific Crossing.”
+          The canonical identifiers remain unchanged on the ledger.
         </div>
       </section>
 
       <section id="memos">
-        <h2>6. Memo Standard</h2>
+        <h2>6. Namespace & Memo Standard</h2>
         <p>
-          LEAP uses one structured XRPL memo as a small machine-readable record. The memo has three blob fields:
-          <code>MemoType</code>, <code>MemoFormat</code>, and <code>MemoData</code>. LEAP gives each field one clear job.
+          LEAP uses one short public memo string to identify the project, the recognition category, and the canonical value.
+          The root namespace is <code>SFL-LEAP</code>.
         </p>
-
-        <div class="fact">
-          <div class="tag">XRPL Fact</div>
-          <div>
-            XRPL transactions can contain a <code>Memos</code> array. Each memo can contain
-            <code>MemoType</code>, <code>MemoFormat</code>, and <code>MemoData</code>. These blob fields are represented as hexadecimal
-            in transaction JSON. The serialized memo array is limited to 1 KB.
-          </div>
-        </div>
-
-        <h3>LEAP memo structure</h3>
-        <table>
-          <tr><th>Field</th><th>LEAP use</th><th>Example after decoding</th></tr>
-          <tr><td><code>MemoType</code></td><td>Namespace: identifies this as a Sailing Frog's Leap LEAP record</td><td><code>SFL-LEAP</code></td></tr>
-          <tr><td><code>MemoFormat</code></td><td>Tells software how to read the payload</td><td><code>text/plain</code></td></tr>
-          <tr><td><code>MemoData</code></td><td>Structured LEAP facts written as key=value pairs</td><td><code>BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE</code></td></tr>
-        </table>
 
         <div class="rule">
           <div class="tag">LEAP Standard</div>
           <div>
-            The namespace is <code>SFL-LEAP</code>. The namespace says which system owns the record.
-            The keys inside <code>MemoData</code> say what kind of information follows.
+            The canonical public memo grammar is <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.
+            One Check records one recognition reason, so one canonical recognition Check carries one public LEAP memo.
           </div>
         </div>
 
-        <h3>Recognized MemoData keys</h3>
+        <h3>Current recognition categories</h3>
         <table>
-          <tr><th>Key</th><th>Question answered</th><th>Example value</th></tr>
-          <tr><td><code>BADGE</code></td><td>What permanent recognition was earned?</td><td><code>PANAMA-CREW</code></td></tr>
-          <tr><td><code>EVENT</code></td><td>What event was this connected to?</td><td><code>LA-CRUZ-BEACH-BONFIRE</code></td></tr>
-          <tr><td><code>CHALLENGE</code></td><td>Which numbered LEAP challenge caused this?</td><td><code>001</code></td></tr>
+          <tr><th>Category</th><th>What it records</th><th>Canonical example</th></tr>
+          <tr><td><code>BADGE</code></td><td>Permanent recognition for something the member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=FIRST-MEMBER</code></td></tr>
+          <tr><td><code>EVENT</code></td><td>A specific real-world or community occasion connected to the award</td><td><code>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE</code></td></tr>
+          <tr><td><code>CHALLENGE</code></td><td>A numbered LEAP participation challenge</td><td><code>SFL-LEAP/CHALLENGE=LEAP-001</code></td></tr>
         </table>
 
         <div class="decision">
-          <div class="tag">Working LEAP Standard</div>
+          <div class="tag">Current Production Convention</div>
           <div>
-            Use <code>MemoFormat = text/plain</code>. Separate fields in <code>MemoData</code> with a vertical bar (<code>|</code>)
-            and separate each key from its value with <code>=</code>. Do not add spaces around the separators.
-            Encode the finished text to hex when building the transaction and decode it from hex when reading history.
+            <strong>One Check. One LEAP. One reason. One line in the logbook.</strong>
+            Do not bundle a badge, event, and challenge into one Check. If a member earns two separate recognitions,
+            create two separate Checks and give each Check its own canonical public memo.
           </div>
         </div>
 
-        <h3>Examples</h3>
-        <pre><code>MemoType:   SFL-LEAP
-MemoFormat: text/plain
-MemoData:   BADGE=PANAMA-CREW
+        <h3>Canonical grammar rules</h3>
+        <ul class="checklist">
+          <li>The prefix is exactly <code>SFL-LEAP/</code>.</li>
+          <li>The category is one of <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code>.</li>
+          <li>Use one equals sign between category and value: <code>=</code>.</li>
+          <li>The value uses uppercase ASCII letters, numbers, and hyphens only.</li>
+          <li>Challenge values use the form <code>LEAP-NNN</code>, beginning with <code>LEAP-001</code>.</li>
+          <li>Do not add spaces around separators.</li>
+          <li>Do not append a date merely to preserve event timing; the validated XRPL ledger timestamp is authoritative.</li>
+        </ul>
 
-MemoType:   SFL-LEAP
-MemoFormat: text/plain
-MemoData:   BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE|CHALLENGE=001</code></pre>
+        <h3>Production examples</h3>
+        <pre><code>SFL-LEAP/BADGE=FIRST-MEMBER
+SFL-LEAP/BADGE=LEAP-OG
+SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE
+SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
 
-        <p>
-          Only include keys that apply to that transaction. Historically meaningful recognition such as OG status belongs under
-          <code>BADGE</code> rather than creating another record type.
-        </p>
+        <div class="fact">
+          <div class="tag">XRPL Fact</div>
+          <div>
+            XRPL transactions can contain a <code>Memos</code> array. A memo can use the protocol fields
+            <code>MemoType</code>, <code>MemoFormat</code>, and <code>MemoData</code>, which are represented as hexadecimal in transaction JSON.
+            Wallet software may expose these fields through a simpler user interface.
+          </div>
+        </div>
+
+        <div class="rule">
+          <div class="tag">Implementation Rule</div>
+          <div>
+            The LEAP protocol standardizes the <strong>decoded public text</strong>, not a particular wallet's field layout.
+            In Xaman's Check workflow, enter the complete canonical string into the single public memo box.
+            Reader software should decode the transaction memo fields, normalize the wallet representation, and accept only
+            a string that matches the LEAP grammar above.
+          </div>
+        </div>
 
         <div class="note">
-          Protocol version numbers belong to this operating document and its change log. They are not currently required inside every LEAP transaction memo.
+          Earlier draft structures may still be read for backward compatibility, but they are not used for new issuance.
+          <code>ORIGIN</code> and <code>PROTOCOL</code> are not current member-recognition categories. Protocol versions belong to this operating document and its change log.
         </div>
       </section>
 
@@ -514,7 +520,7 @@ MemoData:   BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE|CHALLENGE=001</code></
           ↓<br>
           CheckCreate<br>
           ↓<br>
-          Destination + LEAP SendMax + Structured Memos + optional InvoiceID<br>
+          Destination + 1 LEAP SendMax + one canonical public memo + optional InvoiceID<br>
           ↓<br>
           Member<br>
           ↓<br>
@@ -524,21 +530,23 @@ MemoData:   BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE|CHALLENGE=001</code></
         <div class="rule">
           <div class="tag">LEAP Standard</div>
           <div>
-            When a Check is used to deliver official recognition, the recognition metadata belongs on the
-            <strong>CheckCreate</strong> transaction because that is the transaction controlled by the LEAP distributor.
+            When a Check is used to deliver official recognition, the recognition memo belongs on the
+            <strong>CheckCreate</strong> transaction because that transaction is created by the authorized LEAP distributor.
+            The later <code>CheckCash</code> claims the Check; it does not replace the original recognition record.
           </div>
         </div>
 
-        <h3>7.2 Minimum checks for a canonical CheckCreate</h3>
+        <h3>7.2 Minimum checks for a canonical recognition CheckCreate</h3>
         <ul class="checklist">
           <li><code>TransactionType = CheckCreate</code></li>
           <li><code>Account</code> is an authorized LEAP distributor</li>
           <li><code>Destination</code> is the intended member wallet</li>
           <li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
           <li><code>SendMax.issuer</code> is the LEAP issuer</li>
+          <li>The current recognition workflow uses a value of 1 LEAP per Check</li>
           <li>Transaction is successful</li>
           <li>Transaction is in validated ledger history</li>
-          <li>Structured <code>SFL-LEAP</code> memo is present when recognition is being recorded</li>
+          <li>Exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> public memo records the recognition reason</li>
         </ul>
 
         <h3>7.3 Check linkage</h3>
@@ -551,7 +559,7 @@ MemoData:   BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE|CHALLENGE=001</code></
         <div class="decision">
           <div class="tag">Proposed Standard</div>
           <div>
-            Use <code>InvoiceID</code> as a deterministic event/campaign identifier when many awards belong to the same event.
+            <code>InvoiceID</code> may be used as a deterministic event/campaign identifier when many separate awards belong to the same event.
             Proposed algorithm: SHA-256 of a canonical source string such as
             <code>SFL-LEAP|EVENT|LA-CRUZ-BEACH-BONFIRE</code>. Record the canonical source string in this protocol registry.
           </div>
@@ -561,6 +569,7 @@ MemoData:   BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE|CHALLENGE=001</code></
         <p>
           Direct LEAP Payments may be valid when deliberately used. When determining the amount actually delivered by a Payment,
           use transaction metadata rather than assuming the requested amount equals the delivered amount.
+          The Check workflow remains the current onboarding and recognition standard.
         </p>
       </section>
 
@@ -582,7 +591,7 @@ MemoData:   BADGE=PANAMA-CREW|EVENT=LA-CRUZ-BEACH-BONFIRE|CHALLENGE=001</code></
           <tr><td>5–9</td><td>Bosun</td></tr>
           <tr><td>10–24</td><td>Quartermaster</td></tr>
           <tr><td>25–50</td><td>First Mate</td></tr>
-          <tr><td>51+</td><td>Top-rank display name remains subject to final naming decision</td></tr>
+          <tr><td>51+</td><td>Master Of The Leap</td></tr>
         </table>
 
         <p>
@@ -605,8 +614,7 @@ AND originating account = authorized distributor
 AND destination = member wallet
 AND currency = canonical LEAP currency
 AND issuer = canonical LEAP issuer
-AND decoded MemoType = SFL-LEAP
-AND decoded MemoData contains BADGE=registered badge ID</code></pre>
+AND decoded public memo = SFL-LEAP/BADGE=registered badge ID</code></pre>
 
         <div class="rule">
           <div class="tag">LEAP Standard</div>
@@ -619,6 +627,8 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
         <h3>Badge registry</h3>
         <table>
           <tr><th>Canonical ID</th><th>Display label</th><th>Status</th></tr>
+          <tr><td><code>FIRST-MEMBER</code></td><td>First Member</td><td>Active — unique designation; issued once</td></tr>
+          <tr><td><code>LEAP-OG</code></td><td>LEAP OG</td><td>Active</td></tr>
           <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td><td>Example / confirm before first canonical use</td></tr>
           <tr><td><code>PACIFIC-CREW</code></td><td>Pacific Crew</td><td>Example / confirm before first canonical use</td></tr>
           <tr><td><code>SFL-CAMEO</code></td><td>SFL Cameo</td><td>Example / confirm before first canonical use</td></tr>
@@ -644,8 +654,8 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
 
         <h3>Challenge</h3>
         <p>
-          A defined participation opportunity. Challenges receive unique numeric IDs and are never recycled.
-          Example: <code>001</code>. The LEAP namespace and the <code>CHALLENGE</code> key already tell us what the number means.
+          A defined participation opportunity. Challenges receive unique sequential IDs and are never recycled.
+          Example: <code>LEAP-001</code>. The next challenge receives the next unused number.
         </p>
 
         <div class="rule">
@@ -719,8 +729,8 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
           <li>Authority account is authorized for the action</li>
           <li>Destination or affected wallet matches the member being evaluated</li>
           <li>Memo fields decode successfully when memo-based recognition is required</li>
-          <li><code>MemoType</code> decodes exactly to <code>SFL-LEAP</code></li>
-          <li><code>MemoData</code> parses into recognized keys and registered canonical values</li>
+          <li>The decoded public memo normalizes to exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
+          <li>The category is recognized and the value is a valid canonical identifier</li>
         </ul>
 
         <div class="rule">
@@ -737,9 +747,11 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
 
         <table>
           <tr><th>Canonical ledger ID</th><th>Possible display label</th></tr>
-          <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td></tr>
-          <tr><td><code>PACIFIC-CROSSING</code></td><td>Pacific Crossing 2027</td></tr>
+          <tr><td><code>FIRST-MEMBER</code></td><td>First Member</td></tr>
           <tr><td><code>LEAP-OG</code></td><td>LEAP OG</td></tr>
+          <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td></tr>
+          <tr><td><code>PACIFIC-CROSSING</code></td><td>Pacific Crossing</td></tr>
+          <tr><td><code>LEAP-001</code></td><td>LEAP 001</td></tr>
         </table>
 
         <div class="rule">
@@ -754,22 +766,21 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
       <section id="legacy">
         <h2>14. Legacy / Pre-Protocol Transactions</h2>
         <p>
-          Transactions created before the protocol is finalized are not errors. They are historical records created under an earlier
-          operating method.
+          Reader software may preserve compatibility with earlier LEAP memo experiments so genuine historical records remain readable.
+          New issuance must use the canonical single-string format from Section 6.
         </p>
-        <div class="decision">
-          <div class="tag">Decision Needed</div>
-          <div>
-            Create a small legacy mapping table once we inventory existing LEAP transactions.
-            Do not pretend older free-form memos followed the new standard.
-          </div>
-        </div>
 
         <table>
           <tr><th>Legacy pattern</th><th>Interpretation</th><th>Rule</th></tr>
-          <tr><td><code>LEAP-OG</code> or another earlier free-form memo</td><td>Potential legacy badge marker</td><td>Verify authority and transaction manually before registering it as a legacy badge record</td></tr>
-          <tr><td>No protocol memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge/event meaning without another authoritative rule</td></tr>
+          <tr><td><code>MemoType=SFL-LEAP</code> + <code>MemoData=BADGE=...</code></td><td>Earlier structured LEAP form</td><td>Read-only compatibility after full authority, asset, destination, and validation checks</td></tr>
+          <tr><td><code>MemoType=SFL-LEAP/BADGE</code> + <code>MemoData=...</code></td><td>Earlier split-memo proposal</td><td>Read-only compatibility; do not create new records this way</td></tr>
+          <tr><td>Raw <code>LEAP-OG</code> or another free-form memo</td><td>Potential pre-protocol marker</td><td>Do not automatically grant recognition; map it manually only after provenance is verified</td></tr>
+          <tr><td>No LEAP recognition memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge, event, or challenge meaning without another authoritative rule</td></tr>
         </table>
+
+        <div class="note">
+          Backward-compatible readers are intentionally more tolerant than the production writer. The writer follows one current grammar; readers may understand older approved forms without making those forms current again.
+        </div>
       </section>
 
       <section id="change">
@@ -787,6 +798,7 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
         <ul>
           <li>Never silently redefine an identifier already used on-ledger.</li>
           <li>Never reuse a retired badge, event, or challenge ID for a different meaning.</li>
+          <li>Do not add a new recognition category without updating this protocol.</li>
           <li>Record newly authorized distributors here before treating their transactions as official.</li>
           <li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
           <li>Prefer additive changes over breaking changes.</li>
@@ -799,6 +811,7 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
           <tr><td>0.2</td><td>2026-09-16</td><td>Standardized one <code>SFL-LEAP</code> memo with structured plain-text MemoData; simplified challenge IDs; removed per-transaction protocol-version memo.</td></tr>
           <tr><td>0.3</td><td>2026-09-16</td><td>EVENT identifiers no longer carry year or month solely for dating; the XRPL validated transaction timestamp supplies the event date.</td></tr>
           <tr><td>0.4</td><td>2026-09-17</td><td>Simplified the recognition model to <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. OG-style historical recognition is handled as a badge rather than a separate record type.</td></tr>
+          <tr><td>0.5</td><td>2026-09-19</td><td>Adopted the Xaman-friendly canonical public memo <code>SFL-LEAP/CATEGORY=VALUE</code>; established one Check / one LEAP / one reason; standardized challenge IDs as <code>LEAP-NNN</code>; confirmed <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> as the current recognition categories; excluded <code>ORIGIN</code> and <code>PROTOCOL</code> from member recognition.</td></tr>
         </table>
       </section>
 
@@ -808,14 +821,10 @@ AND decoded MemoData contains BADGE=registered badge ID</code></pre>
         <ul class="checklist">
           <li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
           <li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
-          <li>Approve or revise the structured <code>MemoData</code> grammar: <code>KEY=VALUE|KEY=VALUE</code>.</li>
-          <li>Decide whether any additional MemoData keys are needed beyond BADGE, EVENT, and CHALLENGE.</li>
-          <li>Approve the deterministic <code>InvoiceID</code> hashing convention.</li>
-          <li>Inventory existing LEAP transactions and create the legacy mapping rules.</li>
-          <li>Finalize the 51+ rank display name.</li>
-          <li>Establish the first official badge registry.</li>
+          <li>Decide whether the proposed deterministic <code>InvoiceID</code> convention is useful enough to adopt.</li>
+          <li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
           <li>Establish the first official event registry.</li>
-          <li>Establish the challenge ID issuance process so IDs are never reused.</li>
+          <li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier.</li>
         </ul>
       </section>
 
