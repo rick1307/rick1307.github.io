@@ -239,6 +239,14 @@
     .logbook-view-toggle button[aria-pressed="true"]{
       background:rgba(215,174,98,.16);border-color:rgba(215,174,98,.5);color:#f2d99f
     }
+    .logbook-sort-row{
+      display:flex;justify-content:flex-end;margin:0 0 8px
+    }
+    .logbook-sort-row button{
+      border:0;padding:5px 2px;background:transparent;color:#f2d99f;
+      font:inherit;font-size:.64rem;font-weight:850;letter-spacing:.025em;cursor:pointer
+    }
+    .logbook-sort-row button:hover{color:white}
     .logbook-category{
       padding-top:7px
     }
@@ -344,8 +352,11 @@
             <span>Validated XRPL history</span>
           </div>
           <div class="logbook-view-toggle" aria-label="Personal logbook view">
-            <button id="personalChronologicalButton" type="button" aria-pressed="true">Chronological</button>
+            <button id="personalChronologicalButton" type="button" aria-pressed="true">Timeline</button>
             <button id="personalCategoryButton" type="button" aria-pressed="false">By Category</button>
+          </div>
+          <div class="logbook-sort-row">
+            <button id="personalSortButton" type="button" aria-label="Sort logbook oldest first">Newest First ↓</button>
           </div>
           <div id="logbookEntries" class="logbook-empty">Load your crew record to see your LEAP history.</div>
         </div>
@@ -383,11 +394,13 @@
       const logbookEntries = document.getElementById("logbookEntries");
       const personalChronologicalButton = document.getElementById("personalChronologicalButton");
       const personalCategoryButton = document.getElementById("personalCategoryButton");
+      const personalSortButton = document.getElementById("personalSortButton");
       const progressLabel = document.getElementById("progressLabel");
       const progressValue = document.getElementById("progressValue");
       const progressFill = document.getElementById("progressFill");
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
       let personalLogbookView = "chronological";
+      let personalLogbookSort = "newest";
       let currentLogbookRecords = [];
 
       function getSavedWallet() {
@@ -620,6 +633,7 @@
         return {
           hash: entry.hash || tx.hash || "",
           ledger: entry.ledger_index || tx.ledger_index || null,
+          transactionIndex: meta.TransactionIndex ?? meta.transaction_index ?? null,
           time,
           facts
         };
@@ -728,11 +742,24 @@
         }).format(date);
       }
 
-      function sortLogbookNewestFirst(records) {
+      function sortLogbookRecords(records, direction = personalLogbookSort) {
+        const multiplier = direction === "oldest" ? 1 : -1;
+
         return [...records].sort((a, b) => {
           const ta = a.time ? new Date(a.time).getTime() : 0;
           const tb = b.time ? new Date(b.time).getTime() : 0;
-          return tb - ta;
+
+          if (ta !== tb) return (ta - tb) * multiplier;
+
+          const la = Number(a.ledger || 0);
+          const lb = Number(b.ledger || 0);
+          if (la !== lb) return (la - lb) * multiplier;
+
+          const ia = Number(a.transactionIndex ?? -1);
+          const ib = Number(b.transactionIndex ?? -1);
+          if (ia !== ib) return (ia - ib) * multiplier;
+
+          return String(a.hash || "").localeCompare(String(b.hash || "")) * multiplier;
         });
       }
 
@@ -819,7 +846,7 @@
 
       function renderLogbook(records = currentLogbookRecords) {
         currentLogbookRecords = Array.isArray(records) ? records : [];
-        const sorted = sortLogbookNewestFirst(currentLogbookRecords);
+        const sorted = sortLogbookRecords(currentLogbookRecords);
 
         const uniqueBadges = new Set();
         for (const record of sorted) {
@@ -836,6 +863,13 @@
         const chronological = personalLogbookView === "chronological";
         personalChronologicalButton.setAttribute("aria-pressed", String(chronological));
         personalCategoryButton.setAttribute("aria-pressed", String(!chronological));
+
+        const newestFirst = personalLogbookSort === "newest";
+        personalSortButton.textContent = newestFirst ? "Newest First ↓" : "Oldest First ↑";
+        personalSortButton.setAttribute(
+          "aria-label",
+          newestFirst ? "Sort logbook oldest first" : "Sort logbook newest first"
+        );
 
         if (!sorted.length) {
           logbookEntries.className = "logbook-empty";
@@ -854,6 +888,11 @@
 
       function setPersonalLogbookView(view) {
         personalLogbookView = view === "category" ? "category" : "chronological";
+        renderLogbook(currentLogbookRecords);
+      }
+
+      function togglePersonalLogbookSort() {
+        personalLogbookSort = personalLogbookSort === "newest" ? "oldest" : "newest";
         renderLogbook(currentLogbookRecords);
       }
 
@@ -973,6 +1012,7 @@
       loadButton.addEventListener("click", loadCrewRecord);
       personalChronologicalButton.addEventListener("click", () => setPersonalLogbookView("chronological"));
       personalCategoryButton.addEventListener("click", () => setPersonalLogbookView("category"));
+      personalSortButton.addEventListener("click", togglePersonalLogbookSort);
       addressInput.addEventListener("keydown", event => {
         if (event.key === "Enter") loadCrewRecord();
       });
