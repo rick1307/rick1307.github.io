@@ -1246,9 +1246,19 @@
         try {
           const result = await request({ command: "server_state" });
           const ledger = result?.state?.validated_ledger || result?.state?.validatedLedger || {};
-          const candidate = ledger.reserve_inc_xrp ?? ledger.reserve_inc ?? result?.state?.reserve_inc_xrp;
-          const value = Number(candidate);
-          reserveIncrementXrp = Number.isFinite(value) ? value : null;
+
+          // server_state reports reserve_inc in drops, not XRP.
+          // Prefer an XRP-denominated field if a server provides one;
+          // otherwise convert drops to XRP (1 XRP = 1,000,000 drops).
+          const xrpCandidate = ledger.reserve_inc_xrp ?? result?.state?.reserve_inc_xrp;
+
+          if (xrpCandidate !== undefined && xrpCandidate !== null) {
+            const value = Number(xrpCandidate);
+            reserveIncrementXrp = Number.isFinite(value) ? value : null;
+          } else {
+            const drops = Number(ledger.reserve_inc);
+            reserveIncrementXrp = Number.isFinite(drops) ? drops / 1_000_000 : null;
+          }
         } catch {
           reserveIncrementXrp = null;
         }
