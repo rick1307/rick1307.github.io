@@ -1,0 +1,1489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="See your Sailing Frog's Leap crew record and validated LEAP history." />
+  <meta name="theme-color" content="#123b46" />
+  <title>Leapers Lair — Sailing Frog's Leap</title>
+
+  <style>
+    :root{
+      --ink:#17313a;
+      --deep:#0b2d36;
+      --rust:#b85a40;
+      --gold:#d7ae62;
+      --max:1060px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      font-family:Georgia,"Times New Roman",serif;
+      line-height:1.62;
+      min-height:100vh;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      opacity:.48;
+      background-image:
+        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+    }
+
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+
+    nav{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(226,235,230,.88);
+      backdrop-filter:blur(14px) saturate(120%);
+      border-bottom:1px solid rgba(18,59,70,.15);
+      box-shadow:0 8px 24px rgba(11,45,54,.05);
+    }
+
+    .nav-inner{
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:11px;
+      text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:850;
+    }
+
+    .brand img{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      object-fit:cover;
+      border:1px solid rgba(18,59,70,.16);
+      background:white;
+      box-shadow:0 4px 14px rgba(11,45,54,.09);
+    }
+
+    .nav-links a{
+      text-decoration:none;
+      color:#45636a;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.9rem;
+      font-weight:750;
+    }
+
+    .nav-links a:hover{color:var(--rust)}
+
+    header{
+      padding:54px 0 70px;
+      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+    }
+
+    .hero-grid{
+      display:block;
+      max-width:900px;
+    }
+
+    .crew-console{
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 92% 8%,rgba(215,174,98,.17),transparent 30%),
+        linear-gradient(145deg,rgba(9,39,48,.98),rgba(19,72,82,.96));
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:24px;
+      padding:24px;
+      color:white;
+      box-shadow:0 24px 52px rgba(11,45,54,.22);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .crew-console::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(115deg,rgba(255,255,255,.06),transparent 35%,transparent 72%,rgba(215,174,98,.05));
+    }
+
+    .crew-console > *{position:relative;z-index:1}
+
+    .console-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .console-title{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .console-title img{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      object-fit:cover;
+      background:white;
+      border:1px solid rgba(255,255,255,.28);
+      box-shadow:0 7px 20px rgba(0,0,0,.16);
+    }
+
+    .console-title b{
+      display:block;
+      font-size:1rem;
+      letter-spacing:.02em;
+    }
+
+    .console-title span{
+      display:block;
+      margin-top:1px;
+      color:rgba(255,255,255,.62);
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-weight:800;
+    }
+
+    .live-pill{
+      flex:0 0 auto;
+      padding:6px 9px;
+      border-radius:999px;
+      border:1px solid rgba(215,174,98,.34);
+      color:#f2d99f;
+      background:rgba(215,174,98,.08);
+      font-size:.68rem;
+      font-weight:900;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+
+    .record-wallet{
+      min-height:20px;
+      margin-bottom:11px;
+      color:rgba(255,255,255,.63);
+      font-size:.76rem;
+      letter-spacing:.03em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .record-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:9px;
+    }
+
+    .record-stat{
+      min-width:0;
+      padding:12px 10px;
+      border-radius:13px;
+      background:rgba(255,255,255,.065);
+      border:1px solid rgba(255,255,255,.1);
+    }
+
+    .record-stat b{
+      display:block;
+      color:rgba(255,255,255,.5);
+      font-size:.64rem;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      margin-bottom:4px;
+    }
+
+    .record-stat strong{
+      display:block;
+      color:white;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1.18rem;
+      line-height:1.05;
+      overflow-wrap:anywhere;
+    }
+
+    .record-stat small{
+      display:block;
+      margin-top:4px;
+      color:rgba(255,255,255,.54);
+      font-size:.66rem;
+      line-height:1.2;
+    }
+
+    .rank-progress{
+      margin-top:15px;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.11);
+    }
+
+    .rank-progress-copy{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      color:rgba(255,255,255,.66);
+      font-size:.72rem;
+      margin-bottom:7px;
+    }
+
+    .rank-progress-copy strong{
+      color:#f2d99f;
+      font-weight:800;
+    }
+
+    .progress-track{
+      height:7px;
+      border-radius:999px;
+      background:rgba(255,255,255,.11);
+      overflow:hidden;
+    }
+
+    .progress-fill{
+      height:100%;
+      width:0;
+      border-radius:inherit;
+      background:linear-gradient(90deg,var(--gold),#f1cf83);
+      transition:width .35s ease;
+    }
+
+    .crew-status{
+      min-height:20px;
+      margin:11px 0 0;
+      color:rgba(255,255,255,.65);
+      font-size:.76rem;
+    }
+
+    .crew-status.error{color:#ffd3ca}
+    .crew-status.success{color:#d7f0dc}
+
+    .crew-logbook{
+      margin-top:18px;
+      padding-top:17px;
+      border-top:1px solid rgba(255,255,255,.13);
+    }
+
+    .logbook-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:10px;
+    }
+
+    .logbook-head b{
+      color:white;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1.08rem;
+    }
+
+    .logbook-head span{
+      color:rgba(255,255,255,.48);
+      font-size:.64rem;
+      text-transform:uppercase;
+      letter-spacing:.11em;
+      font-weight:850;
+    }
+
+    .logbook-view-toggle{
+      display:flex;
+      gap:7px;
+      margin:0 0 8px;
+    }
+
+    .logbook-view-toggle button{
+      flex:1;
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:999px;
+      padding:7px 10px;
+      background:rgba(255,255,255,.05);
+      color:rgba(255,255,255,.58);
+      font:inherit;
+      font-size:.66rem;
+      font-weight:850;
+      cursor:pointer;
+    }
+
+    .logbook-view-toggle button[aria-pressed="true"]{
+      background:rgba(215,174,98,.16);
+      border-color:rgba(215,174,98,.5);
+      color:#f2d99f;
+    }
+
+    .logbook-sort-row{
+      display:flex;
+      justify-content:flex-end;
+      margin:0 0 8px;
+    }
+
+    .logbook-sort-row button{
+      border:0;
+      padding:5px 2px;
+      background:transparent;
+      color:#f2d99f;
+      font:inherit;
+      font-size:.64rem;
+      font-weight:850;
+      letter-spacing:.025em;
+      cursor:pointer;
+    }
+
+    .logbook-sort-row button:hover{color:white}
+
+    .logbook-category{padding-top:7px}
+
+    .logbook-category + .logbook-category{
+      margin-top:8px;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+
+    .logbook-category-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      padding:7px 0 3px;
+    }
+
+    .logbook-category-head b{
+      color:rgba(255,255,255,.7);
+      font-size:.62rem;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+    }
+
+    .logbook-category-head span{
+      color:rgba(255,255,255,.4);
+      font-size:.62rem;
+    }
+
+    .logbook-empty{
+      padding:12px 0 3px;
+      color:rgba(255,255,255,.53);
+      font-size:.76rem;
+      line-height:1.45;
+    }
+
+    .logbook-entry{
+      display:grid;
+      grid-template-columns:84px minmax(0,1fr);
+      gap:12px;
+      padding:12px 0;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+
+    .logbook-date{
+      color:#f2d99f;
+      font-size:.66rem;
+      font-weight:850;
+      line-height:1.35;
+      text-transform:uppercase;
+      letter-spacing:.035em;
+    }
+
+    .logbook-facts{display:grid;gap:8px}
+
+    .logbook-fact{
+      display:grid;
+      grid-template-columns:66px minmax(0,1fr);
+      gap:8px;
+      align-items:baseline;
+    }
+
+    .logbook-fact span{
+      color:rgba(255,255,255,.43);
+      font-size:.59rem;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .logbook-fact strong{
+      color:rgba(255,255,255,.9);
+      font-size:.76rem;
+      font-weight:750;
+      overflow-wrap:anywhere;
+    }
+
+    .discord-cta{
+      display:flex;
+      justify-content:center;
+      margin-top:20px;
+    }
+
+    .discord-cta button{
+      border:1px solid rgba(18,59,70,.16);
+      border-radius:12px;
+      padding:13px 22px;
+      background:var(--rust);
+      color:white;
+      font:inherit;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.9rem;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(11,45,54,.10);
+    }
+
+    .discord-cta button:hover:not(:disabled){
+      transform:translateY(-1px);
+      box-shadow:0 13px 28px rgba(11,45,54,.14);
+    }
+
+    .discord-cta button:disabled{
+      opacity:.48;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:0 7px 16px rgba(11,45,54,.07);
+    }
+
+    @media(max-width:600px){
+      header{padding-top:54px}
+      .crew-console{padding:18px;border-radius:20px}
+      .record-grid{grid-template-columns:1fr 1fr}
+      .logbook-entry{grid-template-columns:72px minmax(0,1fr)}
+      .logbook-fact{grid-template-columns:60px minmax(0,1fr)}
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html">
+        <img src="leap-logo.png" alt="LEAP logo">
+        <span>Sailing Frog's Leap</span>
+      </a>
+      <div class="nav-links"><a href="index.html">← Home</a></div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap hero-grid">
+      <aside class="crew-console" aria-label="Sailing Frog's Leap Leapers Lair">
+        <div class="console-head">
+          <div class="console-title">
+            <img src="leap-logo.png" alt="LEAP coin">
+            <div><b>Leapers Lair</b><span>Your crew record</span></div>
+          </div>
+          <div class="live-pill">Ledger Live</div>
+        </div>
+
+        <div class="record-wallet" id="recordWallet">Open your Crew Record from the LEAP home or Join page.</div>
+
+        <div class="record-grid">
+          <div class="record-stat"><b>LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
+          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small>from LEAP held</small></div>
+          <div class="record-stat"><b>Next</b><strong id="recordNext">—</strong><small id="recordNextNote">next rank</small></div>
+          <div class="record-stat"><b>Badges</b><strong id="recordBadges">—</strong><small id="recordBadgesNote">in your logbook</small></div>
+        </div>
+
+        <div class="rank-progress">
+          <div class="rank-progress-copy">
+            <span id="progressLabel">Rank progress</span>
+            <strong id="progressValue">—</strong>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <p class="crew-status" id="crewRecordStatus" role="status" aria-live="polite"></p>
+
+        <div class="crew-logbook" id="crewLogbook">
+          <div class="logbook-head">
+            <b>Your Logbook</b>
+            <span>Validated XRPL history</span>
+          </div>
+
+          <div class="logbook-view-toggle" aria-label="Personal logbook view">
+            <button id="personalChronologicalButton" type="button" aria-pressed="true">Timeline</button>
+            <button id="personalCategoryButton" type="button" aria-pressed="false">By Category</button>
+          </div>
+
+          <div class="logbook-sort-row">
+            <button id="personalSortButton" type="button" aria-label="Sort logbook oldest first">Newest First ↓</button>
+          </div>
+
+          <div id="logbookEntries" class="logbook-empty">
+            Your LEAP history will appear here after your Crew Record is opened through the LEAP flow.
+          </div>
+        </div>
+      </aside>
+
+      <div class="discord-cta">
+        <button
+          id="discordCrewButton"
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="Load a verified LEAP Crew Record to unlock Discord."
+        >Connect Discord →</button>
+      </div>
+    </div>
+  </header>
+
+  <script>
+    (() => {
+      const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
+      const LEAP_DISTRIBUTORS = new Set([
+        "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
+      ]);
+
+      const LEAP_NAMESPACE = "SFL-LEAP";
+      const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
+
+      const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
+      const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
+      const SFL_LEAP_SESSION_KEY = "sfl.leap.session";
+
+      const DISCORD_OAUTH_START_URL = "https://sfl-discord-auth.yjc26zd6c4.workers.dev/start";
+      const XRPL_WS = "wss://xrplcluster.com/";
+
+      const status = document.getElementById("crewRecordStatus");
+      const walletEl = document.getElementById("recordWallet");
+      const leapEl = document.getElementById("recordLeap");
+      const rankEl = document.getElementById("recordRank");
+      const nextEl = document.getElementById("recordNext");
+      const nextNoteEl = document.getElementById("recordNextNote");
+      const badgesEl = document.getElementById("recordBadges");
+      const badgesNoteEl = document.getElementById("recordBadgesNote");
+      const logbookEntries = document.getElementById("logbookEntries");
+      const personalChronologicalButton = document.getElementById("personalChronologicalButton");
+      const personalCategoryButton = document.getElementById("personalCategoryButton");
+      const personalSortButton = document.getElementById("personalSortButton");
+      const progressLabel = document.getElementById("progressLabel");
+      const progressValue = document.getElementById("progressValue");
+      const progressFill = document.getElementById("progressFill");
+      const discordCrewButton = document.getElementById("discordCrewButton");
+
+      const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+
+      let personalLogbookView = "chronological";
+      let personalLogbookSort = "newest";
+      let currentLogbookRecords = [];
+      let verifiedDiscordWallet = "";
+
+      function getRawActiveWallet() {
+        try {
+          return sessionStorage.getItem(SFL_ACTIVE_WALLET_KEY) || "";
+        } catch (_) {
+          return "";
+        }
+      }
+
+      function getActiveWallet() {
+        const value = getRawActiveWallet();
+        return value && classicAddressPattern.test(value) ? value : "";
+      }
+
+      function saveWallet(account) {
+        if (!classicAddressPattern.test(account)) return;
+
+        try {
+          localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
+        } catch (_) {}
+
+        try {
+          sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
+        } catch (_) {}
+      }
+
+      function clearActiveWallet() {
+        try {
+          sessionStorage.removeItem(SFL_ACTIVE_WALLET_KEY);
+        } catch (_) {}
+      }
+
+      function clearRememberedWallet() {
+        try {
+          localStorage.removeItem(SFL_WALLET_STORAGE_KEY);
+        } catch (_) {}
+      }
+
+      function saveLeapSession(account, balance) {
+        if (!classicAddressPattern.test(account) || !(balance >= 1)) return;
+
+        const crewRank = rankFor(balance);
+
+        const leapSession = {
+          wallet: account,
+          leapBalance: balance,
+          rank: crewRank.name,
+          verifiedAt: new Date().toISOString()
+        };
+
+        try {
+          localStorage.setItem(SFL_LEAP_SESSION_KEY, JSON.stringify(leapSession));
+        } catch (_) {}
+      }
+
+      function clearLeapSession() {
+        try {
+          localStorage.removeItem(SFL_LEAP_SESSION_KEY);
+        } catch (_) {}
+      }
+
+      function clearIdentityState({ forgetWallet = false } = {}) {
+        clearActiveWallet();
+        clearLeapSession();
+
+        if (forgetWallet) {
+          clearRememberedWallet();
+        }
+      }
+
+      function setDiscordAccess(isVerifiedHolder) {
+        if (!isVerifiedHolder) {
+          verifiedDiscordWallet = "";
+        }
+
+        discordCrewButton.disabled = !isVerifiedHolder;
+        discordCrewButton.setAttribute("aria-disabled", String(!isVerifiedHolder));
+        discordCrewButton.title = isVerifiedHolder
+          ? "Connect this verified LEAP Crew Record to Discord."
+          : "Load a verified LEAP Crew Record to unlock Discord.";
+      }
+
+      function setStatus(message, kind = "") {
+        status.textContent = message;
+        status.className = "crew-status" + (kind ? " " + kind : "");
+      }
+
+      function resetLogbook(message = "Your LEAP history will appear here after your Crew Record is opened through the LEAP flow.") {
+        currentLogbookRecords = [];
+        badgesEl.textContent = "—";
+        badgesNoteEl.textContent = "in your logbook";
+        logbookEntries.className = "logbook-empty";
+        logbookEntries.textContent = message;
+      }
+
+      function resetRecord(message = "Open your Crew Record from the LEAP home or Join page.") {
+        walletEl.textContent = message;
+        walletEl.removeAttribute("title");
+
+        leapEl.textContent = "—";
+        rankEl.textContent = "—";
+        nextEl.textContent = "—";
+        nextNoteEl.textContent = "next rank";
+
+        progressLabel.textContent = "Rank progress";
+        progressValue.textContent = "—";
+        progressFill.style.width = "0%";
+
+        resetLogbook();
+      }
+
+      function decodeHexCurrency(code) {
+        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
+
+        try {
+          let text = "";
+
+          for (let i = 0; i < code.length; i += 2) {
+            const n = parseInt(code.slice(i, i + 2), 16);
+            if (n === 0) break;
+            text += String.fromCharCode(n);
+          }
+
+          return text;
+        } catch (_) {
+          return code;
+        }
+      }
+
+      function isLeapLine(line) {
+        if (!line || line.account !== LEAP_ISSUER) return false;
+
+        const currency = decodeHexCurrency(String(line.currency || "")).toUpperCase();
+        return currency === "LEAP" || currency.startsWith("LEAP");
+      }
+
+      function queryAccountLines(account) {
+        return new Promise((resolve, reject) => {
+          const ws = new WebSocket(XRPL_WS);
+
+          const timer = setTimeout(() => {
+            try { ws.close(); } catch (_) {}
+            reject(new Error("The XRPL server took too long to respond."));
+          }, 12000);
+
+          ws.addEventListener("open", () => {
+            ws.send(JSON.stringify({
+              id: "crew-record",
+              command: "account_lines",
+              account,
+              peer: LEAP_ISSUER,
+              ledger_index: "validated",
+              limit: 400,
+              api_version: 2
+            }));
+          });
+
+          ws.addEventListener("message", event => {
+            let response;
+
+            try {
+              response = JSON.parse(event.data);
+            } catch (_) {
+              return;
+            }
+
+            if (response.id !== "crew-record") return;
+
+            clearTimeout(timer);
+
+            try { ws.close(); } catch (_) {}
+
+            if (response.status === "error" || response.error || response.result?.error) {
+              reject(new Error(response.error || response.result?.error || "XRPL error"));
+              return;
+            }
+
+            resolve(response.result?.lines || []);
+          });
+
+          ws.addEventListener("error", () => {
+            clearTimeout(timer);
+            reject(new Error("Could not connect to the XRP Ledger."));
+          });
+        });
+      }
+
+      function hexToText(value) {
+        if (!value || typeof value !== "string") return "";
+        if (!/^[A-Fa-f0-9]+$/.test(value) || value.length % 2 !== 0) return value;
+
+        try {
+          const bytes = new Uint8Array(value.match(/.{2}/g).map(pair => parseInt(pair, 16)));
+          return new TextDecoder("utf-8", { fatal:false }).decode(bytes).replace(/\0+$/g, "");
+        } catch (_) {
+          return value;
+        }
+      }
+
+      function isLeapAmount(amount) {
+        if (!amount || typeof amount !== "object") return false;
+        if (amount.issuer !== LEAP_ISSUER) return false;
+
+        const currency = decodeHexCurrency(String(amount.currency || "")).toUpperCase();
+        return currency === "LEAP" || currency.startsWith("LEAP");
+      }
+
+      function parseStructuredMemoData(text) {
+        const facts = [];
+
+        if (!text) return facts;
+
+        for (const piece of text.split("|")) {
+          const equals = piece.indexOf("=");
+          if (equals <= 0) continue;
+
+          const key = piece.slice(0, equals).trim().toUpperCase();
+          const value = piece.slice(equals + 1).trim();
+
+          if (LEAP_HISTORY_KEYS.includes(key) && value) {
+            facts.push({ key, value });
+          }
+        }
+
+        return facts;
+      }
+
+      function parseCanonicalLeapMemo(text) {
+        const value = String(text || "").trim();
+        if (!value) return null;
+
+        const prefix = LEAP_NAMESPACE + "/";
+
+        if (!value.toUpperCase().startsWith(prefix)) {
+          return null;
+        }
+
+        const payload = value.slice(prefix.length);
+        const equals = payload.indexOf("=");
+
+        if (equals <= 0) return null;
+
+        const key = payload.slice(0, equals).trim().toUpperCase();
+        const factValue = payload.slice(equals + 1).trim();
+
+        if (!LEAP_HISTORY_KEYS.includes(key)) return null;
+        if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(factValue)) return null;
+
+        return { key, value:factValue };
+      }
+
+      function extractLeapFacts(tx) {
+        const facts = [];
+        const seen = new Set();
+        const memos = Array.isArray(tx?.Memos) ? tx.Memos : [];
+
+        function addFact(fact) {
+          if (!fact) return;
+
+          const signature = `${fact.key}=${fact.value}`;
+
+          if (seen.has(signature)) return;
+
+          seen.add(signature);
+          facts.push(fact);
+        }
+
+        for (const wrapper of memos) {
+          const memo = wrapper?.Memo || {};
+          const type = hexToText(memo.MemoType).trim();
+          const format = hexToText(memo.MemoFormat).trim();
+          const data = hexToText(memo.MemoData).trim();
+
+          addFact(parseCanonicalLeapMemo(data));
+          addFact(parseCanonicalLeapMemo(type));
+          addFact(parseCanonicalLeapMemo(format));
+
+          if (type.toUpperCase() === LEAP_NAMESPACE) {
+            for (const fact of parseStructuredMemoData(data)) {
+              addFact(fact);
+            }
+          }
+
+          const legacyPrefix = LEAP_NAMESPACE + "/";
+
+          if (type.toUpperCase().startsWith(legacyPrefix) && !type.includes("=")) {
+            const key = type.slice(legacyPrefix.length).trim().toUpperCase();
+
+            if (LEAP_HISTORY_KEYS.includes(key) && data) {
+              addFact({ key, value:data });
+            }
+          }
+        }
+
+        return facts;
+      }
+
+      function rippleTimeToIso(seconds) {
+        if (typeof seconds !== "number") return null;
+        return new Date(Date.UTC(2000, 0, 1) + seconds * 1000).toISOString();
+      }
+
+      function officialLeapHistoryRecord(entry, memberAccount) {
+        if (!entry || entry.validated === false) return null;
+
+        const tx = entry.tx_json || entry.tx || entry.transaction || {};
+        const meta = entry.meta || {};
+        const result = meta.TransactionResult ?? meta.transaction_result;
+
+        if (result && result !== "tesSUCCESS") return null;
+        if (!LEAP_DISTRIBUTORS.has(tx.Account)) return null;
+        if (tx.Destination !== memberAccount) return null;
+
+        let officialLeapAsset = false;
+
+        if (tx.TransactionType === "CheckCreate") {
+          officialLeapAsset = isLeapAmount(tx.SendMax);
+        } else if (tx.TransactionType === "Payment") {
+          const delivered = meta.delivered_amount;
+          const requested = tx.DeliverMax || tx.Amount;
+
+          officialLeapAsset = isLeapAmount(delivered) || isLeapAmount(requested);
+        } else {
+          return null;
+        }
+
+        if (!officialLeapAsset) return null;
+
+        const facts = extractLeapFacts(tx);
+
+        if (!facts.length) return null;
+
+        const time =
+          entry.close_time_iso ||
+          rippleTimeToIso(typeof entry.date === "number" ? entry.date : tx.date);
+
+        return {
+          hash: entry.hash || tx.hash || "",
+          ledger: entry.ledger_index || tx.ledger_index || null,
+          transactionIndex: meta.TransactionIndex ?? meta.transaction_index ?? null,
+          time,
+          facts
+        };
+      }
+
+      function queryAccountHistory(account) {
+        return new Promise((resolve, reject) => {
+          const ws = new WebSocket(XRPL_WS);
+          const records = [];
+
+          let marker;
+          let page = 0;
+          let settled = false;
+
+          const timer = setTimeout(() => {
+            if (settled) return;
+
+            settled = true;
+
+            try { ws.close(); } catch (_) {}
+
+            reject(new Error("The XRPL history request took too long to respond."));
+          }, 30000);
+
+          function finish(value, error) {
+            if (settled) return;
+
+            settled = true;
+            clearTimeout(timer);
+
+            try { ws.close(); } catch (_) {}
+
+            if (error) {
+              reject(error);
+            } else {
+              resolve(value);
+            }
+          }
+
+          function sendPage() {
+            const request = {
+              id: "crew-history-" + page,
+              command: "account_tx",
+              account,
+              ledger_index_min: -1,
+              ledger_index_max: -1,
+              binary: false,
+              forward: true,
+              limit: 400,
+              api_version: 2
+            };
+
+            if (marker !== undefined && marker !== null) {
+              request.marker = marker;
+            }
+
+            ws.send(JSON.stringify(request));
+          }
+
+          ws.addEventListener("open", sendPage);
+
+          ws.addEventListener("message", event => {
+            let response;
+
+            try {
+              response = JSON.parse(event.data);
+            } catch (_) {
+              return;
+            }
+
+            if (response.id !== "crew-history-" + page) return;
+
+            if (response.status === "error" || response.error || response.result?.error) {
+              finish(null, new Error(response.error || response.result?.error || "XRPL history error"));
+              return;
+            }
+
+            const result = response.result || {};
+            const txs = Array.isArray(result.transactions) ? result.transactions : [];
+
+            for (const entry of txs) {
+              const record = officialLeapHistoryRecord(entry, account);
+
+              if (record) {
+                records.push(record);
+              }
+            }
+
+            marker = result.marker;
+
+            if (marker !== undefined && marker !== null) {
+              page += 1;
+              sendPage();
+            } else {
+              finish(records);
+            }
+          });
+
+          ws.addEventListener("error", () => {
+            finish(null, new Error("Could not connect to the XRP Ledger for history."));
+          });
+        });
+      }
+
+      function displayValue(value) {
+        if (/^\d+$/.test(value)) return value;
+
+        const preservedWords = new Set(["LEAP", "XRPL", "SFL", "OG"]);
+
+        return String(value)
+          .split("-")
+          .filter(Boolean)
+          .map(word => {
+            const upper = word.toUpperCase();
+
+            if (preservedWords.has(upper)) return upper;
+            if (/^\d+$/.test(word)) return word;
+
+            const lower = word.toLowerCase();
+            return lower.charAt(0).toUpperCase() + lower.slice(1);
+          })
+          .join(" ");
+      }
+
+      function formatLogbookDate(iso) {
+        if (!iso) return "Date unavailable";
+
+        const date = new Date(iso);
+
+        if (Number.isNaN(date.getTime())) {
+          return "Date unavailable";
+        }
+
+        return new Intl.DateTimeFormat(undefined, {
+          month:"short",
+          day:"numeric",
+          year:"numeric"
+        }).format(date);
+      }
+
+      function sortLogbookRecords(records, direction = personalLogbookSort) {
+        const multiplier = direction === "oldest" ? 1 : -1;
+
+        return [...records].sort((a, b) => {
+          const ta = a.time ? new Date(a.time).getTime() : 0;
+          const tb = b.time ? new Date(b.time).getTime() : 0;
+
+          if (ta !== tb) return (ta - tb) * multiplier;
+
+          const la = Number(a.ledger || 0);
+          const lb = Number(b.ledger || 0);
+
+          if (la !== lb) return (la - lb) * multiplier;
+
+          const ia = Number(a.transactionIndex ?? -1);
+          const ib = Number(b.transactionIndex ?? -1);
+
+          if (ia !== ib) return (ia - ib) * multiplier;
+
+          return String(a.hash || "").localeCompare(String(b.hash || "")) * multiplier;
+        });
+      }
+
+      function makeLogbookEntry(record, factsToShow = record.facts) {
+        const row = document.createElement("div");
+        row.className = "logbook-entry";
+
+        const date = document.createElement("div");
+        date.className = "logbook-date";
+        date.textContent = formatLogbookDate(record.time);
+
+        const facts = document.createElement("div");
+        facts.className = "logbook-facts";
+
+        for (const fact of factsToShow) {
+          const factRow = document.createElement("div");
+          factRow.className = "logbook-fact";
+
+          const kind = document.createElement("span");
+          kind.textContent = fact.key;
+
+          const value = document.createElement("strong");
+          value.textContent = displayValue(fact.value);
+          value.title = fact.value;
+
+          factRow.append(kind, value);
+          facts.appendChild(factRow);
+        }
+
+        row.append(date, facts);
+
+        return row;
+      }
+
+      function renderPersonalChronological(sorted) {
+        for (const record of sorted) {
+          logbookEntries.appendChild(makeLogbookEntry(record));
+        }
+      }
+
+      function renderPersonalByCategory(sorted) {
+        const categories = [
+          ["BADGE", "Badges"],
+          ["EVENT", "Events"],
+          ["CHALLENGE", "Challenges"]
+        ];
+
+        for (const [key, label] of categories) {
+          const matches = [];
+
+          for (const record of sorted) {
+            const facts = record.facts.filter(fact => fact.key === key);
+
+            if (facts.length) {
+              matches.push({ record, facts });
+            }
+          }
+
+          const section = document.createElement("div");
+          section.className = "logbook-category";
+
+          const head = document.createElement("div");
+          head.className = "logbook-category-head";
+
+          const title = document.createElement("b");
+          title.textContent = label;
+
+          const count = document.createElement("span");
+          count.textContent = `${matches.length} record${matches.length === 1 ? "" : "s"}`;
+
+          head.append(title, count);
+          section.appendChild(head);
+
+          if (!matches.length) {
+            const empty = document.createElement("div");
+            empty.className = "logbook-empty";
+            empty.textContent = `No ${label.toLowerCase()} recorded yet.`;
+            section.appendChild(empty);
+          } else {
+            for (const match of matches) {
+              section.appendChild(makeLogbookEntry(match.record, match.facts));
+            }
+          }
+
+          logbookEntries.appendChild(section);
+        }
+      }
+
+      function renderLogbook(records = currentLogbookRecords) {
+        currentLogbookRecords = Array.isArray(records) ? records : [];
+
+        const sorted = sortLogbookRecords(currentLogbookRecords);
+        const uniqueBadges = new Set();
+
+        for (const record of sorted) {
+          for (const fact of record.facts) {
+            if (fact.key === "BADGE") {
+              uniqueBadges.add(fact.value);
+            }
+          }
+        }
+
+        badgesEl.textContent = uniqueBadges.size ? String(uniqueBadges.size) : "—";
+        badgesNoteEl.textContent =
+          uniqueBadges.size === 1
+            ? "badge in your logbook"
+            : "badges in your logbook";
+
+        logbookEntries.replaceChildren();
+
+        const chronological = personalLogbookView === "chronological";
+
+        personalChronologicalButton.setAttribute("aria-pressed", String(chronological));
+        personalCategoryButton.setAttribute("aria-pressed", String(!chronological));
+
+        const newestFirst = personalLogbookSort === "newest";
+
+        personalSortButton.textContent = newestFirst
+          ? "Newest First ↓"
+          : "Oldest First ↑";
+
+        personalSortButton.setAttribute(
+          "aria-label",
+          newestFirst
+            ? "Sort logbook oldest first"
+            : "Sort logbook newest first"
+        );
+
+        if (!sorted.length) {
+          logbookEntries.className = "logbook-empty";
+          logbookEntries.textContent =
+            "No official LEAP logbook entries are recorded for this wallet yet.";
+          return;
+        }
+
+        logbookEntries.className = "";
+
+        if (chronological) {
+          renderPersonalChronological(sorted);
+        } else {
+          renderPersonalByCategory(sorted);
+        }
+      }
+
+      function setPersonalLogbookView(view) {
+        personalLogbookView =
+          view === "category"
+            ? "category"
+            : "chronological";
+
+        renderLogbook(currentLogbookRecords);
+      }
+
+      function togglePersonalLogbookSort() {
+        personalLogbookSort =
+          personalLogbookSort === "newest"
+            ? "oldest"
+            : "newest";
+
+        renderLogbook(currentLogbookRecords);
+      }
+
+      function rankFor(balance) {
+        if (balance >= 51) {
+          return {
+            name:"Master of the Leap",
+            next:null,
+            threshold:null,
+            start:51
+          };
+        }
+
+        if (balance >= 25) {
+          return {
+            name:"First Mate",
+            next:"Master of the Leap",
+            threshold:51,
+            start:25
+          };
+        }
+
+        if (balance >= 10) {
+          return {
+            name:"Quartermaster",
+            next:"First Mate",
+            threshold:25,
+            start:10
+          };
+        }
+
+        if (balance >= 5) {
+          return {
+            name:"Bosun",
+            next:"Quartermaster",
+            threshold:10,
+            start:5
+          };
+        }
+
+        if (balance >= 1) {
+          return {
+            name:"Deckhand",
+            next:"Bosun",
+            threshold:5,
+            start:1
+          };
+        }
+
+        return {
+          name:"Not aboard",
+          next:"Deckhand",
+          threshold:1,
+          start:0
+        };
+      }
+
+      function shortAddress(account) {
+        return account.length > 20
+          ? `${account.slice(0,10)}…${account.slice(-8)}`
+          : account;
+      }
+
+      function renderRecord(account, balance) {
+        const rank = rankFor(balance);
+
+        walletEl.textContent = shortAddress(account);
+        walletEl.title = account;
+
+        leapEl.textContent = Number.isInteger(balance)
+          ? String(balance)
+          : String(Number(balance.toFixed(6)));
+
+        rankEl.textContent = rank.name;
+
+        if (rank.threshold === null) {
+          nextEl.textContent = "Top Rank";
+          nextNoteEl.textContent = "keep building history";
+          progressLabel.textContent = "Highest crew rank reached";
+          progressValue.textContent = `${balance} LEAP`;
+          progressFill.style.width = "100%";
+          return;
+        }
+
+        const remaining = Math.max(0, rank.threshold - balance);
+
+        nextEl.textContent = rank.next;
+        nextNoteEl.textContent = `${remaining} LEAP to go`;
+        progressLabel.textContent = `${rank.name} → ${rank.next}`;
+        progressValue.textContent = `${balance} / ${rank.threshold} LEAP`;
+        progressFill.style.width =
+          `${Math.max(0, Math.min(100, (balance / rank.threshold) * 100))}%`;
+      }
+
+      async function loadCrewRecord(account) {
+        if (!classicAddressPattern.test(account)) {
+          clearIdentityState({ forgetWallet:true });
+          setDiscordAccess(false);
+          resetRecord();
+          setStatus("Open your Crew Record from the LEAP home or Join page.", "error");
+          return;
+        }
+
+        setDiscordAccess(false);
+        resetRecord("Reading your Crew Record…");
+        setStatus("Reading your crew record from the XRP Ledger…");
+
+        try {
+          const [linesResult, historyResult] = await Promise.allSettled([
+            queryAccountLines(account),
+            queryAccountHistory(account)
+          ]);
+
+          if (linesResult.status === "rejected") {
+            throw linesResult.reason;
+          }
+
+          const lines = linesResult.value;
+          const leapLine = lines.find(isLeapLine);
+          const balance = leapLine ? Number(leapLine.balance) : 0;
+          const safeBalance = Number.isFinite(balance) ? balance : 0;
+
+          if (safeBalance < 1) {
+            clearIdentityState({ forgetWallet:true });
+            setDiscordAccess(false);
+            resetRecord();
+            setStatus(
+              "No current LEAP membership was found for this wallet. Return to Home or Join to start again.",
+              "error"
+            );
+            return;
+          }
+
+          renderRecord(account, safeBalance);
+          saveWallet(account);
+          saveLeapSession(account, safeBalance);
+          verifiedDiscordWallet = account;
+          setDiscordAccess(true);
+
+          if (historyResult.status === "fulfilled") {
+            renderLogbook(historyResult.value);
+            setStatus(
+              "Crew record and logbook loaded from the validated ledger.",
+              "success"
+            );
+          } else {
+            resetLogbook(
+              "Current balance loaded, but the logbook could not be read right now."
+            );
+
+            setStatus(
+              "Crew balance loaded. Logbook history is temporarily unavailable.",
+              "success"
+            );
+          }
+        } catch (error) {
+          const message = String(error?.message || "");
+
+          setDiscordAccess(false);
+          resetRecord();
+
+          if (message.includes("actNotFound")) {
+            clearIdentityState({ forgetWallet:true });
+
+            setStatus(
+              "That XRPL account was not found. Saved Crew Record information has been cleared.",
+              "error"
+            );
+          } else {
+            /*
+              Important:
+              A temporary XRP Ledger or network failure does NOT erase the
+              remembered wallet. We simply leave the record blank and ask
+              the member to try the normal Home/Join flow again.
+            */
+            setStatus(
+              "I couldn't load the XRP Ledger right now. Please try again from Home or Join.",
+              "error"
+            );
+          }
+        }
+      }
+
+      function beginDiscordOAuth() {
+        if (discordCrewButton.disabled) return;
+        if (!classicAddressPattern.test(verifiedDiscordWallet)) return;
+
+        /*
+          Submit the verified wallet in a POST body rather than placing it in
+          the Discord OAuth URL. The Worker independently checks LEAP again
+          before starting Discord authorization.
+        */
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = DISCORD_OAUTH_START_URL;
+        form.acceptCharset = "UTF-8";
+        form.style.display = "none";
+
+        const walletInput = document.createElement("input");
+        walletInput.type = "hidden";
+        walletInput.name = "wallet";
+        walletInput.value = verifiedDiscordWallet;
+
+        form.appendChild(walletInput);
+        document.body.appendChild(form);
+        form.submit();
+      }
+
+      discordCrewButton.addEventListener("click", beginDiscordOAuth);
+
+      personalChronologicalButton.addEventListener("click", () => {
+        setPersonalLogbookView("chronological");
+      });
+
+      personalCategoryButton.addEventListener("click", () => {
+        setPersonalLogbookView("category");
+      });
+
+      personalSortButton.addEventListener("click", togglePersonalLogbookSort);
+
+      /*
+        Crew Record entry rule:
+        - No arbitrary address lookup.
+        - No localStorage fallback.
+        - Only the active wallet handed off by index.html or join.html may load.
+      */
+      const rawActiveWallet = getRawActiveWallet();
+      const activeWallet = getActiveWallet();
+
+      if (activeWallet) {
+        loadCrewRecord(activeWallet);
+      } else {
+        if (rawActiveWallet) {
+          // A malformed active identity is stale identity state.
+          clearIdentityState({ forgetWallet:true });
+        } else {
+          // Direct/manual page load: no active identity. Do not touch the
+          // remembered wallet; index.html may still use it for returning crew.
+          clearLeapSession();
+        }
+
+        setDiscordAccess(false);
+        resetRecord();
+        setStatus("Open your Crew Record from the LEAP home or Join page.");
+      }
+    })();
+  </script>
+</body>
+</html>
