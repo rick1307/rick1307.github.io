@@ -551,9 +551,9 @@
 
     <p class="footnote">
       This page scans validated XRPL transaction history for the authorized LEAP distributor and extracts recognized
-      SFL-LEAP public memo records. Canceled Checks stay visible in Ledger History, are marked Canceled, and are excluded
-      from the active recognition totals. The Checkbook separately reads the distributor’s current Check ledger objects
-      and matches them to their originating CheckCreate transactions when available.
+      SFL-LEAP public memo records. Badges and Challenges are unique identifier registries; Events are dated occurrences.
+      Chronological History preserves Check lifecycle status, including cancellations. The Checkbook separately reads
+      the distributor’s current Check ledger objects and matches them to their originating CheckCreate transactions when available.
     </p>
   </main>
 
@@ -956,6 +956,47 @@
 
       function renderCategoryGroup(key) {
         const target = document.getElementById(key);
+        target.replaceChildren();
+
+        // BADGES and CHALLENGES are registries, not award/completion history.
+        // Show each identifier once, alphabetically, regardless of how many times it
+        // has been used or whether a particular Check carrying it was later canceled.
+        if (key === "BADGE" || key === "CHALLENGE") {
+          const identifiers = new Set();
+
+          for (const entry of historyEntries) {
+            for (const fact of entry.facts) {
+              if (fact.key === key && fact.value) identifiers.add(fact.value.trim());
+            }
+          }
+
+          const sortedIdentifiers = [...identifiers].sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: "base", numeric: true })
+          );
+
+          if (!sortedIdentifiers.length) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = "None found on the ledger yet.";
+            target.appendChild(empty);
+            return;
+          }
+
+          for (const identifier of sortedIdentifiers) {
+            const row = document.createElement("div");
+            row.className = "item";
+
+            const name = document.createElement("div");
+            name.className = "name";
+            name.textContent = identifier;
+
+            row.appendChild(name);
+            target.appendChild(row);
+          }
+          return;
+        }
+
+        // EVENTS are occurrences, so keep their ledger dates and lifecycle status.
         const occurrences = [];
 
         for (const entry of historyEntries) {
@@ -965,7 +1006,6 @@
         }
 
         occurrences.sort(sortNewestFirst);
-        target.replaceChildren();
 
         if (!occurrences.length) {
           const empty = document.createElement("div");
@@ -1219,13 +1259,27 @@
         const activeOccurrences = {};
         const canceledOccurrences = {};
 
-        for (const key of RECOGNIZED_KEYS) {
+        // Badges and challenges are registry counts: unique identifiers ever defined.
+        // Canceling one Check does not erase the identifier from either registry.
+        for (const key of ["BADGE", "CHALLENGE"]) {
+          const values = new Set();
+          for (const entry of historyEntries) {
+            for (const fact of entry.facts) {
+              if (fact.key === key && fact.value) values.add(fact.value.trim());
+            }
+          }
+          counts[key] = values.size;
+        }
+
+        // Events are dated occurrences. Canceled event Checks remain visible as history
+        // but do not count as active event occurrences.
+        {
           const activeValues = new Set();
           let active = 0;
           let canceled = 0;
 
           for (const entry of historyEntries) {
-            const matching = entry.facts.filter(fact => fact.key === key);
+            const matching = entry.facts.filter(fact => fact.key === "EVENT");
             if (!matching.length) continue;
 
             if (isCanceledEntry(entry)) {
@@ -1237,23 +1291,25 @@
             for (const fact of matching) activeValues.add(fact.value);
           }
 
-          counts[key] = activeValues.size;
-          activeOccurrences[key] = active;
-          canceledOccurrences[key] = canceled;
+          counts.EVENT = activeValues.size;
+          activeOccurrences.EVENT = active;
+          canceledOccurrences.EVENT = canceled;
         }
 
         document.getElementById("badgeTotal").textContent = counts.BADGE;
         document.getElementById("eventTotal").textContent = counts.EVENT;
         document.getElementById("challengeTotal").textContent = counts.CHALLENGE;
 
-        for (const key of RECOGNIZED_KEYS) {
-          const countId = key === "BADGE" ? "badgeCount" : key === "EVENT" ? "eventCount" : "challengeCount";
-          const canceledText = canceledOccurrences[key]
-            ? ` · ${canceledOccurrences[key]} canceled`
-            : "";
-          document.getElementById(countId).textContent =
-            `${counts[key]} unique · ${activeOccurrences[key]} active${canceledText}`;
-        }
+        document.getElementById("badgeCount").textContent =
+          `${counts.BADGE} unique`;
+        document.getElementById("challengeCount").textContent =
+          `${counts.CHALLENGE} unique`;
+
+        const eventCanceledText = canceledOccurrences.EVENT
+          ? ` · ${canceledOccurrences.EVENT} canceled`
+          : "";
+        document.getElementById("eventCount").textContent =
+          `${counts.EVENT} unique · ${activeOccurrences.EVENT} active${eventCanceledText}`;
 
         scanText.textContent = historyLoaded
           ? `${scannedTransactions.toLocaleString()} distributor-account transactions scanned`
