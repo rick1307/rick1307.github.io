@@ -500,7 +500,7 @@
         <h3>Open Clubhouse, Verified Crew</h3>
         <p><strong>Leaper's Lair is the open clubhouse. LEAP is the crew credential.</strong></p>
         <p>People do not need LEAP to enter Leaper's Lair. The server can remain discoverable and welcoming to anyone who wants to follow the community.</p>
-        <p>LEAP verification changes what a member can do, not whether they are allowed through the door. A verified member can receive a visible LEAP role and current rank, participate in LEAP challenges, earn badges and recognition, and build permanent Crew Record history.</p>
+        <p>LEAP verification changes what a member can do, not whether they are allowed through the door. A verified member can receive a visible current rank, participate in LEAP challenges, earn badges and recognition, and build permanent Crew Record history.</p>
         <p>Unverified members can still be part of the community, see challenges unfold, talk with the crew, and decide later whether they want to join the LEAP system. Challenge spaces can remain visible so newcomers can see the game being played; LEAP-specific submissions, claims, awards, rank progression, and Logbook history belong to verified Leapers.</p>
         <p>This creates discovery naturally: someone can enter the clubhouse first, see the game being played, and decide later that they want to become part of the crew.</p>
         <p><strong>Discord membership is open. LEAP participation is verified.</strong></p>
@@ -513,56 +513,38 @@
   <div class="wrap step">
     <div class="num">02</div>
     <div>
-      <h2>Build Leaper's Lair before the bridge.</h2>
-      <p class="lead">The Leaper's Lair server should work even if there is not one line of blockchain integration yet.</p>
-      <p>
-        That gives us a chance to learn what Leapers actually use before we automate anything. Keep the first server small enough that a new person can understand it in a minute.
-      </p>
+      <h2>Keep the server small and obvious.</h2>
+      <p class="lead">Three permanent text rooms and two voice spaces are enough. Use threads for specific conversations instead of multiplying channels.</p>
 
       <div class="server-map">
         <div class="category">
-          <h3>👋 Start Here</h3>
-          <ul>
-            <li><strong>#welcome-aboard</strong> — what this community is</li>
-            <li><strong>#how-leap-works</strong> — short explanation of LEAP and the Logbook</li>
-            <li><strong>#rules-and-safety</strong> — simple community rules</li>
-            <li><strong>#announcements</strong> — episodes, challenges, important updates</li>
-          </ul>
+          <h3>Mess Deck</h3>
+          <p>Open to everyone, including members with no LEAP rank. Anyone can read, post, reply, react, and ask questions. Members with no LEAP rank cannot start new threads.</p>
         </div>
 
         <div class="category">
-          <h3>⛵ The Crew</h3>
-          <ul>
-            <li><strong>#general</strong> — the main conversation</li>
-            <li><strong>#episode-chat</strong> — talk about the current episode</li>
-            <li><strong>#ask-rick</strong> — questions worth surfacing</li>
-            <li><strong>#photos-from-the-crew</strong> — leaps, boats, travel, community life</li>
-          </ul>
+          <h3>Chief's Mess</h3>
+          <p>Open to <strong>Bosun and above</strong>. Bosuns can read, post, reply, and participate in existing threads. <strong>Quartermaster and above</strong> can also start new threads here.</p>
         </div>
 
         <div class="category">
-          <h3>🧭 Play Along</h3>
-          <ul>
-            <li><strong>#challenge-board</strong> — current LEAP challenge</li>
-            <li><strong>#crew-polls</strong> — decisions and questions</li>
-            <li><strong>#events</strong> — upcoming gatherings, live chats, bonfires, meetups</li>
-            <li><strong>Cockpit voice room</strong> — informal crew conversation</li>
-          </ul>
+          <h3>Ward Room</h3>
+          <p>Open to <strong>First Mate and above</strong>. First Mates can read, post, reply, and participate in existing threads. <strong>Master of the Leap</strong> can also start new threads here.</p>
         </div>
 
         <div class="category">
-          <h3>🔧 Behind the Bulkhead</h3>
-          <ul>
-            <li><strong>#mod-log</strong> — private moderation history</li>
-            <li><strong>#bot-testing</strong> — test commands before they reach the crew</li>
-            <li><strong>#ideas</strong> — internal community experiments</li>
-            <li><strong>#integration-status</strong> — private notes when automation is added</li>
-          </ul>
+          <h3>Crew Voice</h3>
+          <p>Open conversation for everyone. Ranked and unranked members can join and talk without the LEAP hierarchy controlling ordinary voice participation.</p>
+        </div>
+
+        <div class="category">
+          <h3>Live Stage</h3>
+          <p>The dedicated place for Rick's live sessions. Members always know where a live event will happen, while Rick controls the stage and who is speaking.</p>
         </div>
       </div>
 
       <div class="decision">
-        <strong>Design rule:</strong> if a channel is quiet and does not have a clear job, remove it. The server should feel like a boat with a useful place for everything, not a marina full of empty slips.
+        <strong>Thread rule:</strong> Deckhand unlocks thread creation in the Mess Deck. Quartermaster unlocks thread creation in the Chief's Mess. Master of the Leap unlocks thread creation in the Ward Room. Privileges are cumulative, and owner/admin permissions remain separate from LEAP rank.
       </div>
     </div>
   </div>
@@ -596,19 +578,23 @@
   <div class="wrap step">
     <div class="num">04</div>
     <div>
-      <h2>Keep the role system simple.</h2>
-      <p class="lead">A Discord role should answer a current question, not become a museum of everything someone has ever done.</p>
+      <h2>Make rank visible without turning it into authority.</h2>
+      <p class="lead">Discord keeps exactly one current LEAP rank role. Having a rank already implies LEAP verification; there is no separate “LEAP Verified” role.</p>
 
       <div class="role-table">
-        <div class="role-row"><b>Leaper</b><span>Base community identity. This can be broad and welcoming.</span></div>
-        <div class="role-row"><b>LEAP Verified</b><span>Wallet has been linked and current LEAP membership can be checked.</span></div>
-        <div class="role-row"><b>Deckhand / Bosun / Quartermaster / First Mate / Master of the Leap</b><span>Exactly one current rank role, calculated from current LEAP holdings.</span></div>
-        <div class="role-row"><b>Moderator / Crew Staff</b><span>Administrative responsibility. Never derive this from LEAP balance.</span></div>
-        <div class="role-row"><b>Badges / Events / Challenges</b><span>Display from the Logbook in profiles, bot responses, recognition posts, or special moments. Do not create hundreds of permanent roles.</span></div>
+        <div class="role-row"><b>No LEAP rank</b><span>Mess Deck access: read, post, reply, react, and join existing threads. Cannot create new threads. No access to Chief's Mess or Ward Room.</span></div>
+        <div class="role-row"><b>Deckhand</b><span>Everything above, plus the ability to create threads in the Mess Deck.</span></div>
+        <div class="role-row"><b>Bosun</b><span>Everything above, plus access to Chief's Mess. Can read, post, reply, and join existing threads there.</span></div>
+        <div class="role-row"><b>Quartermaster</b><span>Everything above, plus the ability to create threads in Chief's Mess.</span></div>
+        <div class="role-row"><b>First Mate</b><span>Everything above, plus access to the Ward Room. Can read, post, reply, and join existing threads there.</span></div>
+        <div class="role-row"><b>Master of the Leap</b><span>Everything above, plus the ability to create threads in the Ward Room.</span></div>
       </div>
 
       <div class="decision">
-        Discord also supports <strong>Linked Roles</strong> through external app connections. That could eventually make “LEAP Verified” a native-looking credential. But Linked Roles are opt-in and have some gating limits, so the cleaner first build is a LEAP app that assigns ordinary rank roles after verification. Linked Roles can be an enhancement later, not a dependency.
+        <p><strong>Privileges are cumulative.</strong> Each rank adds one clear piece of access or conversation-shaping ability.</p>
+        <p><strong>Rank is status, not authority.</strong> LEAP rank never grants moderation, kick/ban, Manage Roles, Manage Server, or other administrative powers. Moderator/admin roles remain completely separate.</p>
+        <p><strong>Discord remembers status, not holdings.</strong> The Worker may temporarily read the XRPL address and LEAP balance to calculate rank, but the Discord integration retains only the resulting rank role. It does not retain the LEAP amount or a permanent wallet-to-Discord identity mapping.</p>
+        <p><strong>Reverification replaces rank.</strong> When a member verifies again, the Worker removes any old LEAP rank role and assigns the current one. A member should never accumulate multiple LEAP rank roles.</p>
       </div>
     </div>
   </div>
@@ -655,35 +641,35 @@
   <div class="wrap step">
     <div class="num">06</div>
     <div>
-      <h2>Then build the LEAP bridge.</h2>
-      <p class="lead">This is the point where Leaper's Lair stops being just a Discord server and becomes an interface into the LEAP Logbook.</p>
+      <h2>Use the bridge to assign the current rank.</h2>
+      <p class="lead">The bridge already proves the member's current LEAP state. The next job is to turn that result into exactly one Discord rank role.</p>
 
       <div class="bridge">
-        <h3>The one-time verification flow</h3>
+        <h3>The verification + role flow</h3>
         <p>
-          A member asks Discord to connect their LEAP identity. The LEAP app links that Discord user to an XRP Ledger address, proves control of that address, reads the public ledger, and then applies the current membership and rank rules.
+          A member starts from their verified Crew Record and authorizes Discord. During that handoff, the Worker temporarily has the Discord user identity and the XRPL account context at the same time. It re-checks the current LEAP balance, calculates the current rank, assigns exactly one Discord rank role, clears the temporary bridge data, and redirects the member into Leaper's Lair.
         </p>
         <p>
-          With Xaman, wallet control can be proven with a <strong>SignIn</strong> request. It is a signature-only pseudo-transaction and is not submitted to the XRP Ledger. No private key or recovery phrase is shared.
+          The handoff is temporary by design. The Discord integration does not keep a wallet-to-Discord lookup table and does not store the member's LEAP balance. The only lasting LEAP state in Discord is the current rank role.
         </p>
 
         <div class="command-grid">
-          <div class="command"><code>/verify</code><div>Start wallet verification and connect Discord to the member's XRPL address.</div></div>
-          <div class="command"><code>/rank</code><div>Show current LEAP balance and Sailing Frog's Leap crew rank.</div></div>
-          <div class="command"><code>/logbook</code><div>Show permanent badges, events, and completed challenges.</div></div>
+          <div class="command"><code>/verify</code><div>Start a fresh LEAP verification and refresh the member's current Discord rank.</div></div>
+          <div class="command"><code>/rank</code><div>Show the member's current Discord LEAP rank without exposing or storing the LEAP balance.</div></div>
+          <div class="command"><code>/crew-record</code><div>Open the Crew Record experience on the website rather than turning Discord into the permanent history store.</div></div>
           <div class="command"><code>/challenge</code><div>Show the current LEAP challenge and how to participate.</div></div>
-          <div class="command"><code>/badges</code><div>Display the member's badge history without making every badge a Discord role.</div></div>
-          <div class="command"><code>/resync</code><div>Re-read the ledger if a member's LEAP balance or rank has changed.</div></div>
+          <div class="command"><code>/badges</code><div>Point members to their badge history in the Crew Record instead of creating badge roles.</div></div>
+          <div class="command"><code>/resync</code><div>Run fresh verification when a member wants Discord to recalculate and replace the current rank role.</div></div>
         </div>
       </div>
 
       <div class="grid3">
-        <div class="card"><span class="tag">Bridge</span><h3>Discord identity</h3><p>OAuth tells the application which Discord member is asking to connect.</p></div>
-        <div class="card"><span class="tag">Bridge</span><h3>Wallet proof</h3><p>A harmless signature proves control of the XRPL address without moving funds.</p></div>
-        <div class="card"><span class="tag">Bridge</span><h3>Ledger reader</h3><p>The app reads LEAP holdings and the SFL-LEAP memo history directly from public XRPL data.</p></div>
-        <div class="card"><span class="tag">Rules</span><h3>Membership engine</h3><p>Current balance determines membership/access and exactly one current rank.</p></div>
-        <div class="card"><span class="tag">History</span><h3>Logbook parser</h3><p>BADGE, EVENT, CHALLENGE, and PROTOCOL records become a human-readable member history.</p></div>
-        <div class="card"><span class="tag">Discord</span><h3>Role + experience sync</h3><p>The app updates roles, answers commands, opens access, and can post recognition moments.</p></div>
+        <div class="card"><span class="tag">Bridge</span><h3>Discord identity</h3><p>OAuth identifies the Discord member for the current verification callback.</p></div>
+        <div class="card"><span class="tag">Bridge</span><h3>Temporary account context</h3><p>The verified XRPL account is carried through the signed bridge only long enough to complete the check.</p></div>
+        <div class="card"><span class="tag">XRPL</span><h3>Balance check</h3><p>The Worker reads the current LEAP balance from public XRPL data and uses it as an input, not stored Discord data.</p></div>
+        <div class="card"><span class="tag">Rules</span><h3>Rank engine</h3><p>Current LEAP balance resolves to exactly one rank: Deckhand, Bosun, Quartermaster, First Mate, or Master of the Leap.</p></div>
+        <div class="card"><span class="tag">Privacy</span><h3>Discard the bridge</h3><p>After role assignment, the temporary wallet/Discord pairing and balance are not retained by the integration.</p></div>
+        <div class="card"><span class="tag">Discord</span><h3>Role sync</h3><p>Remove any old LEAP rank role, assign the current one, then let Discord's native channel permissions enforce the room and thread rules.</p></div>
       </div>
     </div>
   </div>
