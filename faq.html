@@ -108,6 +108,12 @@
       font-size:1rem;
     }
     .row span{color:#58666c}
+    .faq-subhead{
+      margin:26px 0 10px;color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:1.12rem;font-weight:850;letter-spacing:-.01em;
+    }
+    .technical-note{margin:0 0 18px;color:#58666c;max-width:820px}
 
     .simple{
       background:var(--navy);color:white;
@@ -152,121 +158,207 @@
 
     @media(max-width:800px){
       .row{grid-template-columns:1fr;gap:7px}
-      .nav-links a:nth-child(n+4){display:none}
+      
     }
-  </style>
+  
+
+    /* Site-wide navigation: mirrored from ranks.html */
+    nav{position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+    .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
+    .nav-links a:hover{color:var(--rust)}
+
+    @media(max-width:850px){
+      .nav-links a{display:inline !important}
+      .nav-links a:nth-child(2){display:none !important}
+    }
+  
+
+    /* Site-wide visual system: derived from next.html */
+    :root{
+      --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
+      --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
+      --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
+      --card:rgba(250,252,247,.80);
+    }
+    body{
+      margin:0;color:var(--ink);
+      background:
+        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background-size:auto;
+      font-family:Georgia,"Times New Roman",serif;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
+      background-image:
+        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+    }
+    nav{
+      background:rgba(226,235,230,.88);backdrop-filter:blur(14px) saturate(120%);
+      border-bottom:1px solid rgba(18,59,70,.15);box-shadow:0 8px 24px rgba(11,45,54,.05)
+    }
+    .brand img{border:1px solid rgba(18,59,70,.16);box-shadow:0 4px 14px rgba(11,45,54,.09)}
+    .nav-links a{color:#45636a}.nav-links a:hover{color:var(--rust)}
+    header{
+      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      border-bottom:1px solid rgba(18,59,70,.08)
+    }
+    .kicker{color:var(--rust)}
+    h1,h2{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .lede{color:#3f5a61}
+    main{position:relative}
+    section:nth-of-type(even){background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))}
+    .section-title p{color:#526a70}
+    .button{background:var(--rust);box-shadow:0 8px 20px rgba(184,90,64,.16)}
+    .button.secondary{background:transparent;color:var(--deep);border:1px solid rgba(18,59,70,.18);box-shadow:none}
+    footer{color:#49636a}
+    .foot{border-top:1px solid rgba(18,59,70,.16)}
+
+    .hero-note{
+      background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.52));
+      color:#3f5960;border-radius:0 14px 14px 0;box-shadow:0 12px 28px rgba(11,45,54,.06)
+    }
+    .category{color:var(--rust)}
+    .faq{
+      border:1px solid rgba(18,59,70,.15);border-top:3px solid var(--sea);border-radius:20px;
+      overflow:hidden;background:rgba(250,252,247,.70);backdrop-filter:blur(9px);
+      box-shadow:0 14px 32px rgba(11,45,54,.055)
+    }
+    .row{padding:21px 22px;border-bottom-color:rgba(18,59,70,.12)}
+    .row:last-child{border-bottom:0}
+    .row b,.faq-subhead{color:var(--deep)}
+    .row span,.technical-note{color:#526970}
+    .simple{
+      background:linear-gradient(135deg,var(--deep),#184d58 68%,#235f69);
+      border:1px solid rgba(255,255,255,.12);box-shadow:0 22px 46px rgba(11,45,54,.18)
+    }
+    .safety{
+      background:linear-gradient(135deg,rgba(255,247,233,.90),rgba(237,242,231,.76));
+      border-color:rgba(215,174,98,.45);box-shadow:0 14px 30px rgba(11,45,54,.055)
+    }
+    .cta{
+      background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+      border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 22px 46px rgba(11,45,54,.18)
+    }
+    .cta h3{color:white}.cta p{color:rgba(255,255,255,.82)}
+
+</style>
 </head>
 
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="index.html">
-        <img src="leap-logo.png" alt="LEAP logo">
-        <span>Sailing Frog's Leap</span>
-      </a>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="join.html">Join</a>
-        <a href="ranks.html">Ranks</a>
-        <a href="badges.html">Badges</a>
-        <a href="stateMachine.html">State machine</a>
-      </div>
+      <a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a>
+      <div class="nav-links"><a href="index.html">← Home</a></div>
     </div>
   </nav>
 
   <header>
     <div class="wrap">
       <div class="kicker">LEAP Frequently Asked Questions</div>
-      <h1>Questions? Start here</h1>
+      <h1>FAQ</h1>
       <p class="lede">
         You do not need to be a crypto expert to join the Sailing Frog's Leap crew.
-        Here are simple answers to the questions new crew members are most likely to have.
+        Here are simple answers to the questions new Sailing Frog's Leap crew members are most likely to have.
       </p>
-      <div class="hero-note">
-        The short version: use Xaman Wallet, keep a small amount of XRP in it,
-        give us your public XRP Ledger account address — the address you see in Xaman — and cash the LEAP Checks we send you.
-      </div>
     </div>
   </header>
 
   <main>
     <section>
       <div class="wrap">
-        <div class="simple">
-          <p><strong>You earn LEAP.</strong></p>
-          <p><strong>We send a LEAP Check to your Xaman Wallet.</strong></p>
-          <p><strong>You cash it in Xaman.</strong></p>
-          <p><strong>The XRP Ledger keeps the record.</strong></p>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap">
         <span class="category">Getting started</span>
-        <h2>Joining the crew</h2>
+        <h2>The basics</h2>
         <div class="faq">
           <div class="row">
-            <b>What do I need to join?</b>
+            <b>How do I request my first LEAP?</b>
             <span>
-              Start with Xaman Wallet on your mobile device. You also need a small amount of XRP in the wallet.
-              Then send Sailing Frog's Leap your public XRP Ledger account address — the address you see in Xaman.
+              Go to the Join page, enter the public XRP Ledger address for the Xaman account you want to use, and tap <strong>Request My First LEAP</strong>.
+              The site checks the public XRP Ledger before sending a new-member request. If the address is eligible, your request is sent to Sailing Frog's Leap and your first LEAP Check is usually sent within 24 hours.
             </span>
           </div>
+
           <div class="row">
-            <b>Why Xaman?</b>
+            <b>What if I already have LEAP or already received my first Check?</b>
             <span>
-              Xaman is a mobile wallet made for the XRP Ledger. It is the wallet we are using for the LEAP pilot.
+              The Join page checks that before sending a new request. If the address already holds LEAP, it can take you to your Crew Record.
+              If an active new-member Check is already waiting, the page tells you to open Xaman. If that address has already redeemed its one-time new-member Check, another first-LEAP request is not sent.
             </span>
           </div>
-          <div class="row">
-            <b>What makes me a Deckhand?</b>
-            <span>
-              Cash your first official LEAP Check. When the 1 LEAP reaches your wallet, you are a Deckhand.
-            </span>
-          </div>
+
           <div class="row">
             <b>Do I have to buy LEAP?</b>
             <span>
-              No. LEAP is being used as a crew membership and recognition system.
-              If you earn LEAP, Sailing Frog's Leap can send it to you by Check.
+              No. LEAP is a crew membership and recognition token.
+              When you earn LEAP, Sailing Frog's Leap can send it to you by Check.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>What is the Leapers Lair?</b>
+            <span>
+              The Leapers Lair is the home base for LEAP holders inside Sailing Frog's Leap.
+              It brings your LEAP balance, crew rank, badges, and crew history together in one place.
+              Discord is the social side of the Lair.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Why Xaman?</b>
+            <span>
+              We use Xaman because it supports the XRP Ledger Check system we use to distribute LEAP.
+              Xaman gives you a clear way to receive and cash a LEAP Check and handles the LEAP trust-line setup when needed.
+              Using one wallet also lets us give every new Sailing Frog's Leap crew member the same instructions.
             </span>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section>
-      <div class="wrap">
-        <span class="category">XRP and network costs</span>
-        <h2>Why do I need XRP?</h2>
+        <h3 class="faq-subhead">The XRP You Need</h3>
         <div class="faq">
           <div class="row">
-            <b>Do I need XRP to use LEAP?</b>
+            <b>Why do I need XRP?</b>
             <span>
-              Yes. Keep a small amount of XRP in your Xaman Wallet.
-              XRP is used for the XRP Ledger's very small network fees and for the wallet's reserve requirement.
+              When you use Xaman, you control an account on the XRP Ledger. That account needs a small amount of XRP to operate.
+              XRP provides the reserve required by the ledger and pays the tiny network fees when you sign transactions.
             </span>
           </div>
+
           <div class="row">
-            <b>How much XRP do I need?</b>
+            <b>How much XRP do I actually need for LEAP?</b>
             <span>
-              You do not need much, but the XRP Ledger's requirements can change.
-              Keep a small amount available in Xaman so you can use the network and cash your LEAP Checks.
+              Not much. For LEAP, <strong>a few XRP is plenty.</strong>
+              You do not need to put a meaningful amount of money into the wallet.
             </span>
           </div>
+
+          <div class="row">
+            <b>Are XRP transaction fees expensive?</b>
+            <span>
+              No. At the XRP Ledger's current standard base fee, an ordinary transaction costs about <code>0.00001 XRP</code>.
+              At that rate, <code>0.01 XRP</code> could cover roughly 1,000 ordinary transactions.
+              Most of the XRP in the wallet is there to satisfy ledger reserve requirements, not because LEAP transactions are expensive.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Am I being asked to invest in XRP?</b>
+            <span>
+              No. You do not need to speculate on XRP or become a crypto investor to join the Sailing Frog's Leap crew.
+              For LEAP, XRP is simply the native asset that keeps your XRP Ledger account operating.
+            </span>
+          </div>
+
           <div class="row">
             <b>Is XRP the same as LEAP?</b>
             <span>
-              No. XRP is the native asset used by the XRP Ledger.
+              No. XRP is the native asset of the XRP Ledger.
               LEAP is the Sailing Frog's Leap crew token that lives on the XRP Ledger.
-            </span>
-          </div>
-          <div class="row">
-            <b>Is the network fee large?</b>
-            <span>
-              XRP Ledger transaction fees are normally very small.
-              The important point is simply that your wallet needs some XRP available to use the network.
             </span>
           </div>
         </div>
@@ -276,47 +368,52 @@
     <section>
       <div class="wrap">
         <span class="category">LEAP Checks</span>
-        <h2>How the Checks work</h2>
+        <h2>About the Checks</h2>
         <div class="faq">
           <div class="row">
             <b>What is a LEAP Check?</b>
             <span>
-              It is an XRP Ledger tool that lets Sailing Frog's Leap offer LEAP to your Xaman Wallet.
-              You decide whether to cash it.
+              A LEAP Check is a payment feature built into the XRP Ledger.
+              We use it to offer you LEAP without simply pushing tokens into your wallet.
+              You choose whether to cash the Check and accept the LEAP.
             </span>
           </div>
+
           <div class="row">
             <b>Why use Checks instead of just sending LEAP?</b>
             <span>
-              A Check lets you choose to accept each LEAP award.
-              It also gives each award a clear record on the XRP Ledger.
+              Checks let you choose whether to accept each LEAP award.
+              They also let Xaman handle the trust-line setup when needed and give each award its own record on the XRP Ledger.
             </span>
           </div>
+
           <div class="row">
-            <b>Do I need to set up LEAP first?</b>
+            <b>Do I need to set up LEAP before I receive a Check?</b>
             <span>
-              No separate LEAP setup is needed for the Check onboarding path.
-              In the onboarding flow we use, Xaman handles the needed LEAP trust line when you accept and cash the Check, so you do not need to create one manually first.
+              No separate LEAP setup is required before we send the Check.
+              Xaman guides you through what is needed when you cash it.
             </span>
           </div>
+
           <div class="row">
             <b>Do I have to cash a Check?</b>
             <span>
               No. It is your wallet. You choose whether to accept the Check.
             </span>
           </div>
+
           <div class="row">
-            <b>How do I get more LEAP?</b>
+            <b>What if my first LEAP Check expires before I cash it?</b>
             <span>
-              Take part in the crew. If you earn more LEAP, Sailing Frog's Leap sends another Check to your Xaman Wallet.
+              An expired, unredeemed new-member Check does not count as your one-time first LEAP. You can return to the Join page and request another first LEAP Check.
             </span>
           </div>
+
           <div class="row">
-            <b>Can a Check say why I earned it?</b>
+            <b>Can a LEAP Check record why I earned it?</b>
             <span>
-              Yes. Each official LEAP Check can carry one public memo that records why it was awarded.
-              For example: <code>SFL-LEAP/BADGE=LEAP-OG</code> or <code>SFL-LEAP/CHALLENGE=LEAP-001</code>.
-              One Check records one LEAP award and one reason.
+              Yes. The <code>CheckCreate</code> transaction can use the XRP Ledger's standard <code>Memos</code> field.
+              A first-member Check uses <code>SFL-LEAP/NEW-MEMBER</code> as its memo type. Other LEAP records can use types such as <code>SFL-LEAP/BADGE</code>, <code>SFL-LEAP/CHALLENGE</code>, or <code>SFL-LEAP/EVENT</code>, with memo data when needed.
             </span>
           </div>
         </div>
@@ -325,38 +422,41 @@
 
     <section>
       <div class="wrap">
-        <span class="category">Ranks and badges</span>
-        <h2>What happens after I join?</h2>
+        <span class="category">Badges</span>
+        <h2>How badges work</h2>
         <div class="faq">
-          <div class="row">
-            <b>What is my rank?</b>
-            <span>
-              Your rank is based on how much LEAP you currently hold.
-              Your first LEAP makes you a Deckhand.
-            </span>
-          </div>
-          <div class="row">
-            <b>Can my rank change?</b>
-            <span>
-              Yes. If your LEAP balance changes, your current rank can change too.
-            </span>
-          </div>
           <div class="row">
             <b>What is a badge?</b>
             <span>
-              A badge records something that happened: a voyage, a place, a milestone, a useful contribution, or another crew event.
+              A badge records something you did, experienced, or contributed with Sailing Frog's Leap — a voyage, a place, a milestone, a useful contribution, or another meaningful crew event.
             </span>
           </div>
+
           <div class="row">
-            <b>What is the difference between rank and badges?</b>
+            <b>What's the difference between a rank and a badge?</b>
             <span>
-              Rank tells where you stand now. Badges tell where you have been and what happened along the way.
+              Your rank reflects how much LEAP you currently hold. A badge records something you did, experienced, or contributed. Your rank can change; your badge history records your Sailing Frog's Leap story.
             </span>
           </div>
+
           <div class="row">
-            <b>Can a Deckhand have a rare badge?</b>
+            <b>How do I earn a badge?</b>
             <span>
-              Yes. Rank and badges are separate. A new Deckhand could have a special badge that another high-ranking member does not have.
+              Badges recognize specific things you do, experience, or contribute with Sailing Frog's Leap. Some may mark voyages or places, while others recognize participation, contributions, milestones, or special moments. You do not collect them by buying them; they are awarded when something worth remembering happens.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Does earning a badge always mean more LEAP?</b>
+            <span>
+              Not necessarily. The LEAP amount associated with a badge can be small and symbolic. The important part is the recognition and the history it records.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Who decides when a badge is earned?</b>
+            <span>
+              During the pilot, Sailing Frog's Leap defines the badge rules and awards recognition. If the system grows, some recognitions could later be automated.
             </span>
           </div>
         </div>
@@ -365,81 +465,174 @@
 
     <section>
       <div class="wrap">
-        <span class="category">Wallet safety and privacy</span>
-        <h2>Keep control of your wallet</h2>
+        <span class="category">Technical details</span>
+        <h2>Under the hood</h2>
+        <p class="technical-note">
+          You do not need to understand any of this to use LEAP. This section is for anyone interested in how LEAP uses the XRP Ledger under the hood.
+        </p>
 
-        <div class="safety">
-          <h3>Never share your wallet secrets.</h3>
-          <p>
-            Sailing Frog's Leap only needs your public XRP Ledger account address — the address you see in Xaman.
-          </p>
-          <p>
-            Never send us your secret words, private key, family seed, or recovery phrase.
-          </p>
-          <p>
-            If anyone asks you for those things, do not give them out.
-          </p>
-        </div>
-
-        <div class="faq" style="margin-top:24px">
+        <h3 class="faq-subhead">Memos &amp; Transactions</h3>
+        <div class="faq">
           <div class="row">
-            <b>Is my wallet address private?</b>
+            <b>Where does the memo actually live?</b>
             <span>
-              No. Your XRP Ledger account address and its public transaction history can be seen on the public ledger.
-              We recommend sending your address to Sailing Frog's Leap by direct message rather than posting it in a public YouTube comment.
+              The memo belongs to the <code>CheckCreate</code> transaction that creates the Check. It does not belong to an individual LEAP token or to the Check object itself. When the recipient later cashes the Check, that is a separate <code>CheckCash</code> transaction. The original memo remains in the public history of the <code>CheckCreate</code> transaction.
             </span>
           </div>
+
+          <div class="row">
+            <b>Does the memo travel with one specific LEAP coin?</b>
+            <span>
+              No. LEAP is fungible. The memo belongs to the transaction record, not to one individually serialized LEAP unit.
+            </span>
+          </div>
+        </div>
+
+        <h3 class="faq-subhead">LEAP Naming Convention</h3>
+        <div class="faq">
+          <div class="row">
+            <b>Why do LEAP records use <code>SFL-LEAP/...</code>?</b>
+            <span>
+              <code>SFL-LEAP/</code> is the namespace we use to identify records that belong to the Sailing Frog's Leap system. The part after the slash identifies the kind of record, such as <code>NEW-MEMBER</code>, <code>BADGE</code>, <code>CHALLENGE</code>, or <code>EVENT</code>.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Does the XRP Ledger understand what <code>SFL-LEAP/</code> means?</b>
+            <span>
+              No. The XRP Ledger stores the memo. <code>SFL-LEAP/</code> is a convention we use so our software can recognize and organize LEAP records consistently.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>What does that convention let us do later?</b>
+            <span>
+              Software can read public transaction history, identify <code>SFL-LEAP/...</code> records, and organize them into things such as your Crew Record, badge history, challenges, events, and other parts of the LEAP system.
+            </span>
+          </div>
+        </div>
+
+        <h3 class="faq-subhead">Badges on the Ledger</h3>
+        <div class="faq">
+          <div class="row">
+            <b>How is a badge actually recorded on the ledger?</b>
+            <span>
+              When Sailing Frog's Leap awards a badge through a LEAP Check, we record the recognition in the <code>Memos</code> field of the <code>CheckCreate</code> transaction. A badge uses the memo type <code>SFL-LEAP/BADGE</code>, with memo data such as <code>PANAMA-CREW</code>.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>What does the badge memo do?</b>
+            <span>
+              It gives the recognition a consistent, machine-readable name so software can identify and classify that event later from the public ledger history.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Does that badge record remain on the XRP Ledger?</b>
+            <span>
+              Yes. Once the <code>CheckCreate</code> transaction is validated, it remains part of the public XRP Ledger history. Cashing the Check later is a separate <code>CheckCash</code> transaction; it does not remove or replace the original badge record.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>How could these records become a Sailing Frog's Leap crew logbook later?</b>
+            <span>
+              Software can retrieve the public transaction history, identify the standardized LEAP records, and organize them into a human-friendly profile showing badges, voyages, milestones, and links back to the underlying ledger records.
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <span class="category">About LEAP</span>
+        <h2>What LEAP Is — and Isn’t</h2>
+        <div class="faq">
+          <div class="row">
+            <b>Is LEAP an investment?</b>
+            <span>
+              LEAP is being created as a crew membership and recognition system, not as an investment product.
+              Sailing Frog's Leap does not promise that LEAP will increase in value, become liquid, or develop a market.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Is Sailing Frog's Leap creating a market for LEAP?</b>
+            <span>
+              No. Sailing Frog's Leap is not creating or funding an AMM, liquidity pool, or other trading market for LEAP.
+              Our purpose in issuing LEAP is to build the crew membership and recognition system described on this site.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Could someone else create a market for LEAP someday?</b>
+            <span>
+              Potentially. The XRP Ledger supports decentralized trading and AMMs for compatible issued tokens.
+              Depending on LEAP's ledger settings, third parties who hold LEAP may be able to create offers or provide liquidity without Sailing Frog's Leap creating or operating that market.
+              If that happens, it would be a third-party market — not the purpose of the LEAP membership program.
+            </span>
+          </div>
+        </div>
+
+        <p style="margin-top:20px;color:#58666c">
+          Want to explore the Sailing Frog's Leap crew system? See the <a href="ranks.html">crew ranks</a> or <a href="badges.html">badges</a>.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <span class="category">Wallet Safety</span>
+        <h2>Protecting Your Wallet</h2>
+
+        <div class="faq">
+          <div class="row">
+            <b>What information does Sailing Frog's Leap need from me?</b>
+            <span>
+              Only the public XRP Ledger address for the Xaman account you use for LEAP.
+              We never need your private keys, recovery words, or other wallet secrets.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Where do I give Sailing Frog's Leap my XRP Ledger address?</b>
+            <span>
+              Enter it directly on the Join page. The request is handled in the background; you do not need to post the address publicly or send it by direct message.
+            </span>
+          </div>
+
+          <div class="row">
+            <b>Is my XRP Ledger address private?</b>
+            <span>
+              No. Your address and its transaction history are public on the XRP Ledger.
+              That is one reason we recommend using a separate Xaman account for LEAP and other public community activity.
+            </span>
+          </div>
+
           <div class="row">
             <b>Can Sailing Frog's Leap move my XRP or LEAP?</b>
             <span>
-              No.
-              You control the wallet with your private keys.
+              No. You control the keys used to authorize transactions from your account.
+              Sailing Frog's Leap cannot move assets from it.
             </span>
           </div>
+
           <div class="row">
-            <b>Should I use my main crypto wallet?</b>
+            <b>Should I use my main crypto wallet for LEAP?</b>
             <span>
-              For LEAP, use a Xaman Wallet account. Our LEAP Check process is built around Xaman's support for XRP Ledger Checks.
-              Other wallets may support the XRP Ledger, but we are using Xaman for LEAP onboarding so the process stays simple and consistent.
-              You may use an existing Xaman account or create a separate Xaman account for LEAP and other public community activity.
+              <strong>We recommend that you don't.</strong>
+              A separate Xaman account keeps your public LEAP activity separate from your primary crypto holdings.
             </span>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section>
-      <div class="wrap">
-        <span class="category">The bigger idea</span>
-        <h2>Why put this on a blockchain?</h2>
-        <div class="faq">
-          <div class="row">
-            <b>Why not just keep a list on a website?</b>
-            <span>
-              A website list belongs to the website. The XRP Ledger gives the membership and transaction history a shared public record.
-            </span>
-          </div>
-          <div class="row">
-            <b>What is the crew logbook?</b>
-            <span>
-              Your crew logbook is the permanent history of official LEAP recognitions recorded on the XRP Ledger.
-              Your Crew Record combines that history with your current LEAP balance and rank.
-            </span>
-          </div>
-          <div class="row">
-            <b>How could AI use this later?</b>
-            <span>
-              Software or AI can read public ledger data.
-              It could help check rank, find badges, show your history, or unlock a Discord role without someone reading every transaction by hand.
-            </span>
-          </div>
-          <div class="row">
-            <b>Is LEAP an investment promise?</b>
-            <span>
-              No. LEAP is being introduced as a crew membership and recognition system.
-              It is not a promise of profit or future monetary value.
-            </span>
-          </div>
+        <div class="safety" style="margin-top:24px">
+          <h3>Never share your wallet secrets.</h3>
+          <p>
+            Sailing Frog's Leap will never ask for your recovery words, private key, family seed, recovery phrase, or other secret credentials.
+          </p>
         </div>
       </div>
     </section>
@@ -449,9 +642,9 @@
         <div class="cta">
           <h3>Ready to come aboard?</h3>
           <p>
-            The joining page walks you through the process from Xaman Wallet to your first LEAP.
+            We'll walk you through it step by step.
           </p>
-          <a class="button" href="join.html">Join the crew →</a>
+          <a class="button" href="join.html">Join the Crew →</a>
         </div>
       </div>
     </section>
@@ -460,14 +653,13 @@
   <footer>
     <div class="wrap foot">
       <div>Sailing Frog's Leap • LEAP FAQ</div>
-      <div>
-        <a href="index.html">Home</a> •
-        <a href="join.html">Join</a> •
-        <a href="ranks.html">Ranks</a> •
-        <a href="badges.html">Badges</a> •
-        <a href="stateMachine.html">State machine</a>
-      </div>
     </div>
   </footer>
+
+  <script>
+    try {
+      sessionStorage.removeItem("sfl.xrpl.activeWallet");
+    } catch (_) {}
+  </script>
 </body>
 </html>
