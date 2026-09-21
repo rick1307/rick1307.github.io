@@ -258,6 +258,58 @@
     .step p{margin:0;color:#58666c}
     .step p+p{margin-top:9px}
 
+    .leap-request-form{
+      margin-top:14px;
+    }
+    .leap-request-form label{
+      display:block;
+      margin-bottom:7px;
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.9rem;
+      font-weight:800;
+    }
+    .leap-request-row{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+    }
+    .leap-request-form input{
+      flex:1;
+      min-width:0;
+      padding:13px 14px;
+      border-radius:8px;
+      border:1px solid rgba(26,37,44,.22);
+      background:#fff;
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:1rem;
+      outline:none;
+    }
+    .leap-request-form input:focus{
+      border-color:var(--sea);
+      box-shadow:0 0 0 3px rgba(47,116,129,.14);
+    }
+    .leap-request-form .button{
+      margin-top:0;
+      border:0;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .leap-request-message{
+      margin-top:10px;
+      color:#356a53;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.95rem;
+      font-weight:800;
+    }
+    .leap-request-message.error{color:var(--rust)}
+
+    @media(max-width:650px){
+      .leap-request-row{flex-direction:column}
+      .leap-request-form .button{width:100%}
+    }
+
     .official-address{
       margin-top:14px;
       padding:16px 18px;
@@ -649,24 +701,43 @@
           <div class="step">
             <div class="step-num">3</div>
             <div>
-              <h3>Send us your public XRP Ledger address</h3>
-              <p>
-                Send Sailing Frog's Leap a DM on Instagram and tell us you want to join the Sailing Frog's Leap crew.
-              </p>
-              <p>
-                In Xaman, copy the public address for the XRP Ledger account you want to use for LEAP and include it in the DM.
-                You do not need to post your address publicly.
-              </p>
+              <h3>Your XRP Ledger address</h3>
+
+              <form
+                class="leap-request-form"
+                id="firstLeapRequestForm"
+                action="https://usebasin.com/f/93034286b67b"
+                method="POST"
+                data-basin-form
+                data-basin-success-action="render"
+              >
+                <div class="leap-request-row">
+                  <input
+                    id="firstLeapXrplAddress"
+                    name="xrpl_address"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="r..."
+                    aria-label="Your XRP Ledger address"
+                    pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}"
+                    title="Enter a valid XRP Ledger address beginning with r."
+                    required
+                  >
+                  <button class="button" type="submit">Request My First LEAP</button>
+                </div>
+
+                <div class="w-form-done leap-request-message" style="display:none;" role="status">
+                  Request sent.
+                </div>
+                <div class="w-form-fail leap-request-message error" style="display:none;" role="alert">
+                  Could not send request. Please try again.
+                </div>
+              </form>
             </div>
           </div>
-          </div>
-
-          <div class="optional-ritual">
-            <b>Optional crew ritual: Take your first LEAP</b>
-            <p>
-              Want to have some fun with it? Take a picture of yourself leaping into the air, post it on Instagram,
-              and tag <strong>Sailing Frog's Leap</strong>. It is not required to join, but it can become part of your Sailing Frog's Leap crew story and badge history.
-            </p>
           </div>
 
           <div class="safety-strip">
@@ -690,7 +761,7 @@
             <div>
               <h3>We send your first LEAP Check</h3>
               <p>
-                When you send us your public XRP Ledger address by DM, we'll send your first LEAP Check to that address.
+                When we receive your request, we'll send your first LEAP Check to that XRP Ledger address.
               </p>
               <p>
                 Your first Check is for 1 LEAP.
@@ -761,6 +832,8 @@
       <div>Sailing Frog's Leap • Join the LEAP Crew</div>
     </div>
   </footer>
+
+  <script src="https://js.usebasin.com/v2.11.1.min.js" defer></script>
 
   <script>
     (() => {
