@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEAP Next Build Priorities</title>
+  <style>
+    :root{
+      --bg:#eef3f7;
+      --panel:#ffffff;
+      --ink:#10243a;
+      --muted:#627488;
+      --line:#d9e3ec;
+      --blue:#0b5fa5;
+      --blue-soft:#eaf4fc;
+      --green:#1f6f52;
+      --green-soft:#eaf7f1;
+      --amber:#8b6200;
+      --amber-soft:#fff7db;
+      --shadow:0 10px 28px rgba(20,50,70,.08);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.58;
+    }
+
+    .wrap{
+      width:min(94%,920px);
+      margin:34px auto 70px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,#0b3558,#0c659f);
+      color:white;
+      border-radius:20px;
+      padding:30px 28px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+
+    .eyebrow{
+      font-size:.76rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      opacity:.8;
+      margin-bottom:7px;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(2rem,5vw,3rem);
+      line-height:1.08;
+    }
+
+    .hero p{
+      margin:0;
+      color:#e7f2fb;
+      max-width:760px;
+    }
+
+    .goal{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:17px;
+      padding:24px;
+      margin-bottom:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .goal-head{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:10px;
+    }
+
+    .num{
+      flex:0 0 auto;
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:var(--blue);
+      color:white;
+      font-weight:900;
+      font-size:1.05rem;
+    }
+
+    h2{
+      margin:0 0 4px;
+      font-size:1.42rem;
+      line-height:1.2;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:.95rem;
+    }
+
+    .goal p{
+      margin:.65em 0;
+    }
+
+    .flow{
+      margin:16px 0;
+      border:1px dashed #b9c9d6;
+      background:#f8fbfd;
+      border-radius:12px;
+      padding:14px 16px;
+      text-align:center;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      color:#29465f;
+      line-height:1.8;
+    }
+
+    .note{
+      margin:14px 0 0;
+      border-left:5px solid var(--blue);
+      background:var(--blue-soft);
+      padding:13px 14px;
+      border-radius:10px;
+    }
+
+    .decision{
+      margin:14px 0 0;
+      border-left:5px solid var(--green);
+      background:var(--green-soft);
+      padding:13px 14px;
+      border-radius:10px;
+    }
+
+    .open{
+      margin:14px 0 0;
+      border-left:5px solid #d09a00;
+      background:var(--amber-soft);
+      padding:13px 14px;
+      border-radius:10px;
+    }
+
+    .label{
+      display:block;
+      font-size:.72rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:4px;
+    }
+
+    .note .label{color:var(--blue)}
+    .decision .label{color:var(--green)}
+    .open .label{color:var(--amber)}
+
+    ul{
+      padding-left:1.2rem;
+      margin:.65em 0;
+    }
+
+    li{
+      margin:.38em 0;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin:14px 0;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      background:#f8fafc;
+      border-radius:12px;
+      padding:14px;
+    }
+
+    .card strong{
+      display:block;
+      margin-bottom:4px;
+      color:var(--blue);
+    }
+
+    .big-idea{
+      font-size:1.06rem;
+      font-weight:750;
+      color:#1d3850;
+      margin-top:10px;
+    }
+
+    .tomorrow{
+      background:#10243a;
+      color:white;
+      border-radius:17px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .tomorrow h2{
+      margin-bottom:10px;
+    }
+
+    .tomorrow p{
+      color:#d8e6f2;
+      margin:.5em 0;
+    }
+
+    .tomorrow ol{
+      margin:.6em 0 0;
+      padding-left:1.25rem;
+    }
+
+    .tomorrow li{
+      margin:.45em 0;
+    }
+
+    code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      background:#edf2f6;
+      padding:.1em .32em;
+      border-radius:5px;
+      font-size:.9em;
+    }
+
+    @media(max-width:650px){
+      .wrap{width:min(96%,920px);margin-top:18px}
+      .hero,.goal,.tomorrow{border-radius:14px}
+      .hero{padding:24px 20px}
+      .goal{padding:20px 16px}
+      .two-col{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <header class="hero">
+      <div class="eyebrow">Sailing Frog's Leap — Next Build Plan</div>
+      <h1>Three Objectives</h1>
+      <p>
+        These are the next three LEAP development goals, in the order we intend to tackle them.
+        The first two extend the machine we already built. The third begins defining how Leapers use the machine with each other in the real world.
+      </p>
+    </header>
+
+    <section class="goal">
+      <div class="goal-head">
+        <div class="num">→</div>
+        <div>
+          <h2>Why These Three Belong Together</h2>
+          <div class="subtitle">Finish the operating loop first, then expose the social value of the system.</div>
+        </div>
+      </div>
+
+      <p>
+        These are not three unrelated features. They complete one progression.
+        First, LEAP Checks need a clean life cycle. Second, new members need a clean way to enter that life cycle.
+        Third, once the system reliably creates and records membership history, that history should become useful when Leapers meet each other.
+      </p>
+
+      <div class="flow">
+        Reliable issuance → clean intake → visible shared identity
+      </div>
+
+      <div class="decision">
+        <span class="label">Strategic conclusion</span>
+        Build the infrastructure in the same order that a member experiences it.
+        Make LEAP dependable first, make joining easy second, and only then turn the record into a social identity that members can share face-to-face.
+      </div>
+    </section>
+
+    <section class="goal">
+      <div class="goal-head">
+        <div class="num">1</div>
+        <div>
+          <h2>30-Day Check Issuance</h2>
+          <div class="subtitle">Make expiration part of every new LEAP Check by design.</div>
+        </div>
+      </div>
+
+      <p>
+        Crew Record and Ledger History already understand an XRPL Check's actual <code>Expiration</code> field.
+        The missing piece is the issuance side: Xaman's normal Create Check screen does not expose an obvious expiration control.
+      </p>
+
+      <div class="flow">
+        Manager tool → Create LEAP Check → 30-day expiration automatically added → Xaman signs → Check goes on-ledger
+      </div>
+
+      <div class="decision">
+        <span class="label">Goal</span>
+        Build a simple LEAP Check creation flow that automatically sets expiration to 30 days while still using Xaman to sign the transaction.
+      </div>
+
+      <ul>
+        <li>Destination wallet</li>
+        <li>1 LEAP SendMax</li>
+        <li>Canonical public memo</li>
+        <li>Expiration = 30 days from creation</li>
+        <li>Xaman remains the signing wallet</li>
+      </ul>
+
+      <div class="note">
+        <span class="label">Why first</span>
+        Every later workflow depends on issuing LEAP cleanly. A 30-day expiration keeps the distributor account from accumulating open Checks indefinitely and makes the Checkbook's countdown and cleanup states operationally meaningful.
+      </div>
+
+      <div class="decision">
+        <span class="label">Done when</span>
+        Rick can create a canonical LEAP Check from one simple manager flow, the transaction already contains the 30-day expiration and memo, and Xaman is used only to review and sign it.
+      </div>
+    </section>
+
+    <section class="goal">
+      <div class="goal-head">
+        <div class="num">2</div>
+        <div>
+          <h2>Join → Waiting for LEAP</h2>
+          <div class="subtitle">Replace Instagram DM with a direct public-address submission.</div>
+        </div>
+      </div>
+
+      <p>
+        Step 3 of <code>join.html</code> should stop asking a new member to send the public XRPL address through Instagram.
+        Instead, the page should provide a text box and Submit button.
+      </p>
+
+      <div class="flow">
+        Join page → submit public XRPL address → small persistent queue → Waiting for LEAP → Rick issues Check
+      </div>
+
+      <div class="decision">
+        <span class="label">Minimal storage</span>
+        Store only what the workflow needs: XRPL public address, submission timestamp, and status.
+      </div>
+
+      <p>
+        The likely implementation is the existing Cloudflare Worker plus a very small persistent store.
+        Ledger History can then show a manager-side <strong>Waiting for LEAP</strong> queue.
+      </p>
+
+      <p>
+        Once an official outstanding LEAP Check exists for that destination, the manager view can eventually recognize that the person has moved out of the intake queue and into the pending-Check stage.
+      </p>
+
+      <div class="note">
+        <span class="label">Why second</span>
+        Today the process leaves the website and depends on an Instagram DM. Bringing the public XRPL address submission into the LEAP site removes ambiguity, reduces manual searching, and gives the manager a visible work queue.
+      </div>
+
+      <div class="decision">
+        <span class="label">Done when</span>
+        A prospective member can submit a valid public XRPL address on the Join page, Rick can see it under <strong>Waiting for LEAP</strong>, and issuing a Check moves that person naturally into the existing Check workflow.
+      </div>
+    </section>
+
+    <section class="goal">
+      <div class="goal-head">
+        <div class="num">3</div>
+        <div>
+          <h2>Crew Profile / QR Identity</h2>
+          <div class="subtitle">Turn the permanent LEAP record into something Leapers can use when they meet each other.</div>
+        </div>
+      </div>
+
+      <p class="big-idea">
+        The mental model is the military ribbon rack: a fast visual read of where someone has been, what they have done, and how they fit into the crew.
+      </p>
+
+      <p>
+        This is not another administrative feature. It is the social layer of LEAP. A Leaper meeting another Leaper in a marina, anchorage, event, or port should be able to exchange identities in seconds and immediately see the other person's LEAP story.
+      </p>
+
+      <div class="two-col">
+        <div class="card">
+          <strong>Share My Crew Profile</strong>
+          Shows my personal QR code so another Leaper can scan me.
+        </div>
+
+        <div class="card">
+          <strong>Get Crew Profile</strong>
+          Opens the phone camera / QR scanner so I can scan another Leaper.
+        </div>
+      </div>
+
+      <div class="flow">
+        Leaper A: Share My Crew Profile<br>
+        ↓<br>
+        QR code<br>
+        ↓<br>
+        Leaper B: Get Crew Profile / scan<br>
+        ↓<br>
+        Live XRPL Crew Profile opens
+      </div>
+
+      <h3>What the scanned profile should show</h3>
+      <ul>
+        <li>Current rank — Deckhand, Bosun, Quartermaster, First Mate, or Master Of The Leap</li>
+        <li>Current LEAP balance</li>
+        <li>Badges</li>
+        <li>Events</li>
+        <li>Challenges</li>
+        <li>Permanent XRPL history behind those recognitions</li>
+      </ul>
+
+      <div class="note">
+        <span class="label">Important distinction</span>
+        <strong>Leaper Card</strong> is the member's own portable identity view. <strong>Crew Profile</strong> is the profile another person sees after scanning.
+        We may ultimately use one page for both jobs, but the concepts are different.
+      </div>
+
+      <div class="decision">
+        <span class="label">Preferred QR design</span>
+        The QR should probably contain a website URL carrying the member's public XRPL address, rather than only the raw address.
+        That lets an ordinary phone camera open the Crew Profile directly without requiring a special LEAP app.
+      </div>
+
+      <div class="open">
+        <span class="label">Still abstract / to design</span>
+        We have not yet decided the final page name, visual language, ribbon/pennant system, exact QR URL format, privacy/display options, or whether the member can choose a public nickname or call sign.
+        These are intentionally open. The purpose of this document is to preserve the concept before implementation begins.
+      </div>
+
+      <h3>Real-world use case</h3>
+      <p>
+        Two Leapers meet in a marina. One says, “You hold LEAP?” The other opens their profile and shows the QR.
+        After the scan, the other person can immediately see that this is a Bosun who earned specific badges, completed certain challenges,
+        or shared an event with Sailing Frog's Leap. The ledger record becomes a conversation starter and a visible history of belonging.
+      </p>
+
+      <div class="decision">
+        <span class="label">Why this matters</span>
+        LEAP stops being only a membership token and becomes a shared social identity.
+        The permanent record is not merely stored — it becomes useful when members meet each other.
+      </div>
+
+      <div class="note">
+        <span class="label">Why third</span>
+        The QR/profile idea is powerful precisely because it does not invent a new record. It reveals the record that already exists.
+        By waiting until issuance and intake are dependable, the social layer can remain simple: scan a public address, query XRPL, and display the member's real LEAP history.
+      </div>
+
+      <div class="decision">
+        <span class="label">Done when</span>
+        Any Leaper can tap <strong>Share My Crew Profile</strong> to show a QR code, another Leaper can tap <strong>Get Crew Profile</strong> to scan it, and the resulting page immediately shows the scanned member's current rank and permanent LEAP history.
+      </div>
+    </section>
+
+    <section class="tomorrow">
+      <h2>The Build Order</h2>
+      <p>
+        The sequence is deliberate. Each step removes friction from the step that follows it.
+      </p>
+      <ol>
+        <li><strong>30-day Check issuance:</strong> make LEAP distribution operationally clean.</li>
+        <li><strong>Join → Waiting for LEAP:</strong> make entry into that distribution system simple and visible.</li>
+        <li><strong>Crew Profile / QR identity:</strong> turn the resulting permanent record into something Leapers can use with each other.</li>
+      </ol>
+      <p>
+        The end state is a complete loop: someone joins, receives LEAP, builds a permanent record, and can later carry that record into the real world as a recognizable crew identity.
+      </p>
+    </section>
+
+  </main>
+</body>
+</html>
