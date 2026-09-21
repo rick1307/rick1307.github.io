@@ -304,6 +304,41 @@
       font-weight:800;
     }
     .leap-request-message.error{color:var(--rust)}
+    .leap-request-form .button:disabled{
+      opacity:.68;
+      cursor:wait;
+    }
+    .request-result{
+      margin-top:16px;
+      padding:22px;
+      border-radius:16px;
+      border:1px solid rgba(47,116,129,.24);
+      background:linear-gradient(135deg,rgba(219,236,232,.95),rgba(255,250,240,.98));
+      box-shadow:0 10px 24px rgba(11,45,54,.08);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .request-result .result-mark{
+      width:48px;height:48px;border-radius:50%;
+      display:grid;place-items:center;
+      margin-bottom:12px;
+      background:var(--sea);color:white;
+      font-size:1.65rem;font-weight:900;
+    }
+    .request-result h4{
+      margin:0 0 8px;
+      color:var(--navy);
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1.55rem;
+      line-height:1.15;
+    }
+    .request-result p{margin:0;color:#4f6066}
+    .request-result p+p{margin-top:8px}
+    .request-result .button{margin-top:16px}
+    .request-result.already{
+      border-color:rgba(210,163,79,.45);
+      background:linear-gradient(135deg,rgba(255,247,225,.98),rgba(219,236,232,.9));
+    }
+    .request-result.already .result-mark{background:var(--gold);color:var(--navy)}
 
     @media(max-width:650px){
       .leap-request-row{flex-direction:column}
@@ -710,6 +745,8 @@
                 method="POST"
                 data-basin-form
                 data-basin-success-action="render"
+                data-basin-success-id="firstLeapSuccess"
+                data-basin-error-id="firstLeapError"
               >
                 <div class="leap-request-row">
                   <input
@@ -729,13 +766,40 @@
                   <button class="button" type="submit">Request My First LEAP</button>
                 </div>
 
-                <div class="w-form-done leap-request-message" style="display:none;" role="status">
-                  Request sent.
-                </div>
-                <div class="w-form-fail leap-request-message error" style="display:none;" role="alert">
-                  Could not send request. Please try again.
-                </div>
               </form>
+
+              <div id="firstLeapSuccess" class="request-result" style="display:none;" role="status" aria-live="polite">
+                <div class="result-mark">✓</div>
+                <h4>Request received. You're on your way.</h4>
+                <p>We received your request for your first LEAP.</p>
+                <p>Your first LEAP Check will be sent to this XRP Ledger address, usually within 24 hours.</p>
+                <p><strong>Nothing else is needed right now.</strong></p>
+              </div>
+
+              <div id="firstLeapError" class="leap-request-message error" style="display:none;" role="alert">
+                Could not send request. Please try again.
+              </div>
+
+              <div id="alreadyCrewMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
+                <div class="result-mark">✓</div>
+                <h4>You're already aboard.</h4>
+                <p>LEAP was found at this XRP Ledger address.</p>
+                <a class="button" id="openCrewRecordButton" href="crewRecord.html">Open My Crew Record →</a>
+              </div>
+
+              <div id="checkWaitingMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
+                <div class="result-mark">✓</div>
+                <h4>Your first LEAP Check is already waiting.</h4>
+                <p>An active new-member LEAP Check has already been sent to this XRP Ledger address.</p>
+                <p><strong>Open Xaman to review and cash your Check.</strong></p>
+              </div>
+
+              <div id="firstLeapAlreadyClaimedMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
+                <div class="result-mark">✓</div>
+                <h4>Your first LEAP has already been claimed.</h4>
+                <p>This XRP Ledger address has already redeemed its one-time new-member LEAP Check.</p>
+                <p>Another first-LEAP request was not sent.</p>
+              </div>
             </div>
           </div>
           </div>
@@ -838,6 +902,9 @@
   <script>
     (() => {
       const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
+      const LEAP_DISTRIBUTOR = "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU";
+      const NEW_MEMBER_MEMO = "SFL-LEAP/NEW-MEMBER";
+      const RIPPLE_EPOCH_OFFSET = 946684800;
       const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
       const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
       const XRPL_WS = "wss://xrplcluster.com/";
@@ -850,6 +917,14 @@
       const addressInput = document.getElementById("xrplAddress");
       const checkButton = document.getElementById("checkLeapButton");
       const status = document.getElementById("walletStatus");
+      const firstLeapForm = document.getElementById("firstLeapRequestForm");
+      const firstLeapInput = document.getElementById("firstLeapXrplAddress");
+      const firstLeapButton = firstLeapForm?.querySelector('button[type="submit"]');
+      const firstLeapFail = document.getElementById("firstLeapError");
+      const alreadyCrewMessage = document.getElementById("alreadyCrewMessage");
+      const checkWaitingMessage = document.getElementById("checkWaitingMessage");
+      const firstLeapAlreadyClaimedMessage = document.getElementById("firstLeapAlreadyClaimedMessage");
+      let allowBasinSubmit = false;
 
       // Classic XRPL addresses begin with r and use the XRP Ledger base58 alphabet.
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -872,6 +947,58 @@
         } catch (_) {
           return code;
         }
+      }
+
+      function decodeHexText(value) {
+        const text = String(value || "");
+        if (!text || text.length % 2 !== 0 || !/^[A-Fa-f0-9]+$/.test(text)) return text;
+        try {
+          let decoded = "";
+          for (let i = 0; i < text.length; i += 2) {
+            decoded += String.fromCharCode(parseInt(text.slice(i, i + 2), 16));
+          }
+          return decoded.replace(/\0+$/g, "");
+        } catch (_) {
+          return text;
+        }
+      }
+
+      function isLeapAmount(amount) {
+        if (!amount || typeof amount !== "object") return false;
+        if (amount.issuer !== LEAP_ISSUER) return false;
+        const currency = decodeHexCurrency(String(amount.currency || "")).toUpperCase();
+        return currency === "LEAP" || currency.startsWith("LEAP");
+      }
+
+      function hasNewMemberMemo(tx) {
+        const memos = Array.isArray(tx?.Memos) ? tx.Memos : [];
+        return memos.some(entry => {
+          const memo = entry?.Memo || {};
+          const type = decodeHexText(memo.MemoType).toUpperCase();
+          return type === NEW_MEMBER_MEMO;
+        });
+      }
+
+      function isSuccessfulMeta(meta) {
+        return meta && typeof meta === "object" && meta.TransactionResult === "tesSUCCESS";
+      }
+
+      function rippleTimeNow() {
+        return Math.floor(Date.now() / 1000) - RIPPLE_EPOCH_OFFSET;
+      }
+
+      function isUnexpiredCheck(check) {
+        if (!check?.Expiration) return true;
+        return Number(check.Expiration) > rippleTimeNow();
+      }
+
+      function isOfficialLeapCheck(check, account) {
+        return Boolean(
+          check &&
+          check.Account === LEAP_DISTRIBUTOR &&
+          check.Destination === account &&
+          isLeapAmount(check.SendMax)
+        );
       }
 
       function isLeapLine(line) {
@@ -923,6 +1050,225 @@
             reject(new Error("Could not connect to the XRP Ledger."));
           });
         });
+      }
+
+      function xrplRequest(command, params = {}, timeoutMs = 15000) {
+        return new Promise((resolve, reject) => {
+          const ws = new WebSocket(XRPL_WS);
+          const requestId = `sfl-${command}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          const timer = setTimeout(() => {
+            try { ws.close(); } catch (_) {}
+            reject(new Error("The XRPL server took too long to respond."));
+          }, timeoutMs);
+
+          ws.addEventListener("open", () => {
+            ws.send(JSON.stringify({
+              id: requestId,
+              command,
+              ...params,
+              api_version: 2
+            }));
+          });
+
+          ws.addEventListener("message", event => {
+            let response;
+            try { response = JSON.parse(event.data); }
+            catch (_) { return; }
+            if (response.id !== requestId) return;
+
+            clearTimeout(timer);
+            try { ws.close(); } catch (_) {}
+
+            if (response.status === "error" || response.error || response.result?.error) {
+              const code = response.error || response.result?.error || "XRPL error";
+              reject(new Error(code));
+              return;
+            }
+
+            resolve(response.result || {});
+          });
+
+          ws.addEventListener("error", () => {
+            clearTimeout(timer);
+            reject(new Error("Could not connect to the XRP Ledger."));
+          });
+        });
+      }
+
+      async function fetchTransaction(hash) {
+        if (!hash) throw new Error("Missing CheckCreate transaction hash.");
+        const result = await xrplRequest("tx", {
+          transaction: hash,
+          binary: false
+        });
+        return result.tx_json || result.tx || result;
+      }
+
+      async function isNewMemberCheckCreate(hash, account) {
+        const tx = await fetchTransaction(hash);
+        return Boolean(
+          tx &&
+          tx.TransactionType === "CheckCreate" &&
+          tx.Account === LEAP_DISTRIBUTOR &&
+          tx.Destination === account &&
+          isLeapAmount(tx.SendMax) &&
+          hasNewMemberMemo(tx)
+        );
+      }
+
+      async function getAllCheckObjects(account) {
+        const checks = [];
+        let marker;
+
+        do {
+          const result = await xrplRequest("account_objects", {
+            account,
+            ledger_index: "validated",
+            type: "check",
+            limit: 400,
+            ...(marker ? { marker } : {})
+          });
+
+          checks.push(...(result.account_objects || []));
+          marker = result.marker;
+        } while (marker);
+
+        return checks;
+      }
+
+      async function hasActiveNewMemberCheck(account) {
+        const checks = await getAllCheckObjects(account);
+
+        for (const check of checks) {
+          if (!isOfficialLeapCheck(check, account)) continue;
+          if (!isUnexpiredCheck(check)) continue;
+          if (await isNewMemberCheckCreate(check.PreviousTxnID, account)) return true;
+        }
+
+        return false;
+      }
+
+      function getDeletedChecks(meta) {
+        if (!meta || typeof meta !== "object" || !Array.isArray(meta.AffectedNodes)) return [];
+        return meta.AffectedNodes
+          .map(node => node?.DeletedNode)
+          .filter(node => node?.LedgerEntryType === "Check")
+          .map(node => node.FinalFields)
+          .filter(Boolean);
+      }
+
+      async function hasRedeemedNewMemberCheck(account) {
+        let marker;
+
+        do {
+          const result = await xrplRequest("account_tx", {
+            account,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            binary: false,
+            forward: false,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          }, 20000);
+
+          for (const entry of result.transactions || []) {
+            const tx = entry.tx_json || entry.tx || {};
+            const meta = entry.meta;
+
+            if (!entry.validated || tx.TransactionType !== "CheckCash" || !isSuccessfulMeta(meta)) continue;
+
+            const matchingChecks = getDeletedChecks(meta).filter(check => isOfficialLeapCheck(check, account));
+            for (const check of matchingChecks) {
+              if (await isNewMemberCheckCreate(check.PreviousTxnID, account)) return true;
+            }
+          }
+
+          marker = result.marker;
+        } while (marker);
+
+        return false;
+      }
+
+      function hideFirstLeapResults() {
+        if (firstLeapFail) firstLeapFail.style.display = "none";
+        if (alreadyCrewMessage) alreadyCrewMessage.style.display = "none";
+        if (checkWaitingMessage) checkWaitingMessage.style.display = "none";
+        if (firstLeapAlreadyClaimedMessage) firstLeapAlreadyClaimedMessage.style.display = "none";
+      }
+
+      function showFirstLeapResult(element) {
+        firstLeapForm.style.display = "none";
+        if (element) {
+          element.style.display = "block";
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+
+      async function screenFirstLeapRequest(event) {
+        if (allowBasinSubmit) {
+          allowBasinSubmit = false;
+          return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const account = firstLeapInput.value.trim();
+
+        if (!classicAddressPattern.test(account)) {
+          firstLeapInput.setCustomValidity("Enter a valid XRP Ledger address beginning with r.");
+          firstLeapInput.reportValidity();
+          firstLeapInput.setCustomValidity("");
+          return;
+        }
+
+        firstLeapButton.disabled = true;
+        firstLeapButton.textContent = "Checking eligibility…";
+        hideFirstLeapResults();
+
+        try {
+          const lines = await queryAccountLines(account);
+          const leapLine = lines.find(isLeapLine);
+          const balance = leapLine ? Number(leapLine.balance) : 0;
+
+          if (Number.isFinite(balance) && balance > 0) {
+            try {
+              localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
+              sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
+            } catch (_) {}
+
+            showFirstLeapResult(alreadyCrewMessage);
+            return;
+          }
+
+          if (await hasActiveNewMemberCheck(account)) {
+            showFirstLeapResult(checkWaitingMessage);
+            return;
+          }
+
+          if (await hasRedeemedNewMemberCheck(account)) {
+            showFirstLeapResult(firstLeapAlreadyClaimedMessage);
+            return;
+          }
+
+          allowBasinSubmit = true;
+          firstLeapForm.requestSubmit();
+        } catch (error) {
+          const message = String(error?.message || "");
+          if (firstLeapFail) {
+            firstLeapFail.textContent = message.includes("actNotFound")
+              ? "That XRP Ledger account was not found. Please check the address and try again."
+              : "We couldn't check the XRP Ledger right now. Please try again.";
+            firstLeapFail.style.display = "block";
+          }
+        } finally {
+          firstLeapButton.disabled = false;
+          firstLeapButton.textContent = "Request My First LEAP";
+        }
+      }
+
+      if (firstLeapForm) {
+        firstLeapForm.addEventListener("submit", screenFirstLeapRequest);
       }
 
       async function checkLeap() {
