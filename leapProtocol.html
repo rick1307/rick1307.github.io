@@ -260,10 +260,10 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
     <div class="meta">
-      <span class="pill">Working Draft 0.6</span>
+      <span class="pill">Working Draft 0.7</span>
       <span class="pill">XRPL Mainnet</span>
       <span class="pill">Internal / Unlinked</span>
-      <span class="pill">Last revised: 2026-09-19</span>
+      <span class="pill">Last revised: 2026-09-20</span>
     </div>
   </header>
 
@@ -562,6 +562,48 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           use transaction metadata rather than assuming the requested amount equals the delivered amount.
           The Check workflow remains the current onboarding and recognition standard.
         </p>
+
+        <h3>7.5 Xaman Check cleanup procedure</h3>
+        <p>
+          Xaman separates the historical transaction from the live Check ledger object. The <strong>All</strong> tab in Events
+          shows the historical <code>CheckCreate</code> transaction. The actionable open Check is found under <strong>Planned</strong>.
+        </p>
+
+        <div class="flow">
+          LEAP Distributor wallet<br>
+          ↓<br>
+          Xaman → Events<br>
+          ↓<br>
+          Planned<br>
+          ↓<br>
+          Open the Check object<br>
+          ↓<br>
+          Cancel Check
+        </div>
+
+        <div class="rule">
+          <div class="tag">LEAP Operating Procedure</div>
+          <div>
+            When the manager Checkbook identifies an expired or otherwise unwanted outstanding Check, open the LEAP Distributor
+            wallet in Xaman and use <strong>Events → Planned → Check → Cancel Check</strong>. After the <code>CheckCancel</code>
+            transaction validates, the Check ledger object is removed and the XRP owner reserve associated with that Check is released.
+          </div>
+        </div>
+
+        <div class="fact">
+          <div class="tag">Current XRPL / Xaman State</div>
+          <div>
+            At this revision, each open Check created by the distributor increases its owner reserve by <strong>0.2 XRP</strong>.
+            Xaman displays that reserve directly on the live Check object. The manager Checkbook should read the network's current
+            reserve value rather than assume that 0.2 XRP will remain permanent.
+          </div>
+        </div>
+
+        <div class="note">
+          <strong>Expiration and cancellation are different.</strong> An expired Check can no longer be cashed, but expiration alone
+          does not remove the Check ledger object or free the distributor's reserve. The object remains until a valid
+          <code>CheckCancel</code> removes it. This is why expired Checks remain visible as <strong>Ready for Cleanup</strong> in the manager Checkbook.
+        </div>
       </section>
 
       <section id="membership">
@@ -804,6 +846,7 @@ AND decoded public memo = SFL-LEAP/BADGE=registered badge ID</code></pre>
           <tr><td>0.4</td><td>2026-09-17</td><td>Simplified the recognition model to <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. OG-style historical recognition is handled as a badge rather than a separate record type.</td></tr>
           <tr><td>0.5</td><td>2026-09-19</td><td>Adopted the Xaman-friendly canonical public memo <code>SFL-LEAP/CATEGORY=VALUE</code>; established one Check / one LEAP / one reason; standardized challenge IDs as <code>LEAP-NNN</code>; confirmed <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> as the current recognition categories; excluded <code>ORIGIN</code> and <code>PROTOCOL</code> from member recognition.</td></tr>
           <tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
+          <tr><td>0.7</td><td>2026-09-20</td><td>Added the Xaman operational cleanup path for outstanding Checks: <strong>Events → Planned → Check → Cancel Check</strong>; documented the distinction between historical <code>CheckCreate</code> entries in All and actionable Check objects in Planned; recorded the current 0.2 XRP owner reserve per open Check; clarified that expiration does not itself remove the Check object or release reserve.</td></tr>
         </table>
       </section>
 
@@ -832,6 +875,7 @@ AND decoded public memo = SFL-LEAP/BADGE=registered badge ID</code></pre>
           <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_objects">account_objects</a></li>
           <li><a href="https://xrpl.org/docs/references/protocol/ledger-data/ledger-entry-types/check">Check ledger object</a></li>
           <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcash">CheckCash</a></li>
+          <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcancel">CheckCancel</a></li>
           <li><a href="https://xrpl.org/docs/tutorials/payments/send-a-check">Send a Check</a></li>
         </ul>
       </section>
