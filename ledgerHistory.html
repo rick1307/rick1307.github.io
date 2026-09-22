@@ -56,43 +56,81 @@
       font-weight: 700;
     }
 
+    .crew-total {
+      display: grid;
+      place-items: center;
+      gap: 4px;
+      margin-bottom: 10px;
+      padding: 20px 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .crew-total strong {
+      font-size: clamp(38px, 8vw, 58px);
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .crew-total span {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .crew-total small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .statusbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       margin-bottom: 18px;
-      padding: 12px 14px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
+      padding: 7px 10px;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #8a97a5;
+      flex: 0 0 auto;
     }
 
     .dot.live { background: var(--green); }
     .dot.error { background: var(--red); }
 
-    #statusText { font-weight: 700; }
-
-    #scanText, #updatedText {
+    #statusText {
+      font-weight: 700;
       color: var(--muted);
-      font-size: 14px;
+    }
+
+    #updatedText {
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .refresh {
       margin-left: auto;
-      border: 0;
-      border-radius: 8px;
-      background: var(--blue);
-      color: white;
-      padding: 9px 13px;
-      font-weight: 700;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--blue);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
       cursor: pointer;
     }
 
@@ -477,7 +515,6 @@
         width: 100%;
         padding: 10px 6px;
       }
-      .refresh { margin-left: 0; }
       .check-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -489,10 +526,15 @@
       <a class="back" href="manager.html">Manager</a>
     </div>
 
-    <div class="statusbar">
+    <div class="crew-total">
+      <strong id="crewTotal">0</strong>
+      <span>Total Crew Members</span>
+      <small>Successfully cashed NEW-MEMBER Checks</small>
+    </div>
+
+    <div class="statusbar" aria-label="XRPL connection status">
       <span id="statusDot" class="dot"></span>
       <span id="statusText">Connecting to XRPL…</span>
-      <span id="scanText"></span>
       <span id="updatedText"></span>
       <button id="refreshButton" class="refresh" type="button">Refresh</button>
     </div>
@@ -609,8 +651,8 @@
 
       const statusDot = document.getElementById("statusDot");
       const statusText = document.getElementById("statusText");
-      const scanText = document.getElementById("scanText");
       const updatedText = document.getElementById("updatedText");
+      const crewTotal = document.getElementById("crewTotal");
       const errorBox = document.getElementById("errorBox");
       const historySummary = document.getElementById("historySummary");
       const checkbookSummary = document.getElementById("checkbookSummary");
@@ -633,7 +675,7 @@
       function showError(message) {
         errorBox.style.display = "block";
         errorBox.textContent = message;
-        setStatus("XRPL connection problem", "error");
+        setStatus("XRPL: connection problem", "error");
       }
 
       function clearError() {
@@ -756,7 +798,14 @@
           const legacyPrefix = NAMESPACE + "/";
           if (type.toUpperCase().startsWith(legacyPrefix) && !type.includes("=")) {
             const legacyKey = type.slice(legacyPrefix.length).trim().toUpperCase();
-            if (RECOGNIZED_KEYS.includes(legacyKey) && data) addFact({ key: legacyKey, value: data });
+            if (RECOGNIZED_KEYS.includes(legacyKey) && data) {
+              addFact({ key: legacyKey, value: data });
+            } else if (legacyKey === "NEW-MEMBER") {
+              // Historical onboarding form. Treat it as the NEW-MEMBER badge
+              // when reading old ledger records; new Checks use the one-line
+              // SFL-LEAP/BADGE=NEW-MEMBER syntax.
+              addFact({ key: "BADGE", value: "NEW-MEMBER" });
+            }
           }
         }
 
@@ -829,6 +878,24 @@
 
       function isCanceledEntry(entry) {
         return resolutionForEntry(entry)?.status === "canceled";
+      }
+
+      function isNewMemberCheck(create) {
+        return !!create?.facts?.some(fact =>
+          fact.key === "BADGE" &&
+          String(fact.value || "").trim().toUpperCase() === "NEW-MEMBER"
+        );
+      }
+
+      function totalCrewMembers() {
+        let total = 0;
+
+        for (const [checkId, create] of checkCreatesById.entries()) {
+          if (!isNewMemberCheck(create)) continue;
+          if (checkResolutionsById.get(checkId)?.status === "cashed") total += 1;
+        }
+
+        return total;
       }
 
       function historyStatusNode(entry) {
@@ -1293,12 +1360,10 @@
         document.getElementById("eventCount").textContent =
           `${counts.EVENT} unique · ${activeOccurrences.EVENT} active${eventCanceledText}`;
 
-        scanText.textContent = historyLoaded
-          ? `${scannedTransactions.toLocaleString()} distributor-account transactions scanned`
-          : scannedTransactions ? `${scannedTransactions.toLocaleString()} transactions scanned…` : "";
+        crewTotal.textContent = totalCrewMembers().toLocaleString();
 
         updatedText.textContent = historyLoaded
-          ? `Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}`
+          ? `· Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
           : "";
 
         setHistoryView(historyView);
@@ -1320,7 +1385,7 @@
       function connect() {
         return new Promise((resolve, reject) => {
           clearError();
-          setStatus("Connecting to XRPL…");
+          setStatus("XRPL: connecting…");
           socket = new WebSocket(XRPL_SERVER);
 
           const timeout = setTimeout(() => {
@@ -1330,7 +1395,7 @@
 
           socket.addEventListener("open", () => {
             clearTimeout(timeout);
-            setStatus("Connected — loading validated history…", "live");
+            setStatus("XRPL: loading…", "live");
             resolve();
           }, { once: true });
 
@@ -1360,7 +1425,7 @@
           });
 
           socket.addEventListener("close", () => {
-            if (historyLoaded) setStatus("Disconnected — press Refresh to reconnect", "error");
+            if (historyLoaded) setStatus("XRPL: disconnected", "error");
           });
         });
       }
@@ -1474,7 +1539,7 @@
 
           historyLoaded = true;
           await subscribeLive();
-          setStatus("Live — validated history loaded", "live");
+          setStatus("XRPL: live", "live");
           render();
         } catch (error) {
           showError(error?.message || String(error));
