@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="A practical roadmap for making the Leaper's Lair Discord server the social side of the Sailing Frog's Leap LEAP experience." />
+  <meta name="description" content="A practical roadmap for making the Leaper Lounge Discord server the social side of the Sailing Frog's Leap LEAP experience." />
   <meta name="theme-color" content="#241b46" />
-  <title>Leaper's Lair Discord Integration — Sailing Frog's Leap</title>
+  <title>Leaper Lounge Discord Integration — Sailing Frog's Leap</title>
 
   <style>
     :root{
@@ -443,21 +443,21 @@
 
 <header>
   <div class="wrap">
-    <div class="eyebrow">Leapers Lair • Discord Integration</div>
-    <h1>Leaper's Lair</h1>
+    <div class="eyebrow">Leaper Lounge • Discord Integration</div>
+    <h1>Leaper Lounge</h1>
     <p class="hero-copy">
       The logbook can remember who is in the crew, where they stand now, and what they have done.
-      Leapers Lair gives that state a home. Its Discord server is <strong>Leaper's Lair</strong> — the social side of the experience, where conversation, access, recognition, events, challenges, and community come together.
+      Leaper Lounge gives that state a home. Its Discord server is <strong>Leaper Lounge</strong> — the social side of the experience, where conversation, access, recognition, events, challenges, and community come together.
     </p>
     <div class="hero-thesis">
-      The goal is not to move LEAP into Discord. The goal is to let Leaper's Lair read the LEAP Logbook and turn that state into a living crew experience.
+      The goal is not to move LEAP into Discord. The goal is to let Leaper Lounge read the LEAP Logbook and turn that state into a living crew experience.
     </div>
     <div class="flowline" aria-label="LEAP architecture flow">
       <div class="flow-chip">LEAP Protocol</div>
       <div class="flow-arrow">→</div>
       <div class="flow-chip">LEAP Logbook</div>
       <div class="flow-arrow">→</div>
-      <div class="flow-chip">Leaper's Lair Discord</div>
+      <div class="flow-chip">Leaper Lounge Discord</div>
     </div>
   </div>
 </header>
@@ -469,7 +469,7 @@
     <div class="num">01</div>
     <div>
       <h2>Give Discord one job.</h2>
-      <p class="lead">The Leaper's Lair Discord server is the social side of the broader Leapers Lair experience. It is not the ledger.</p>
+      <p class="lead">The Leaper Lounge Discord server is the social side of the broader Leaper Lounge experience. It is not the ledger.</p>
       <p>
         The XRP Ledger remains the durable record underneath LEAP. Discord should consume that record and make it useful to people.
         If Discord disappears someday, the member's LEAP balance and permanent logbook history should still exist.
@@ -482,7 +482,7 @@
         <div class="card mint">
           <span class="tag green">Current state</span>
           <h3>Membership / Access</h3>
-          <p>Leaper's Lair can recognize a verified LEAP holder and open the social spaces intended for crew.</p>
+          <p>Leaper Lounge can recognize a verified LEAP holder and open the social spaces intended for crew.</p>
         </div>
         <div class="card mint">
           <span class="tag green">Current state</span>
@@ -498,8 +498,8 @@
 
       <div class="decision">
         <h3>Open Clubhouse, Verified Crew</h3>
-        <p><strong>Leaper's Lair is the open clubhouse. LEAP is the crew credential.</strong></p>
-        <p>People do not need LEAP to enter Leaper's Lair. The server can remain discoverable and welcoming to anyone who wants to follow the community.</p>
+        <p><strong>Leaper Lounge is the open clubhouse. LEAP is the crew credential.</strong></p>
+        <p>People do not need LEAP to enter Leaper Lounge. The server can remain discoverable and welcoming to anyone who wants to follow the community.</p>
         <p>LEAP verification changes what a member can do, not whether they are allowed through the door. A verified member can receive a visible current rank, participate in LEAP challenges, earn badges and recognition, and build permanent Crew Record history.</p>
         <p>Unverified members can still be part of the community, see challenges unfold, talk with the crew, and decide later whether they want to join the LEAP system. Challenge spaces can remain visible so newcomers can see the game being played; LEAP-specific submissions, claims, awards, rank progression, and Logbook history belong to verified Leapers.</p>
         <p>This creates discovery naturally: someone can enter the clubhouse first, see the game being played, and decide later that they want to become part of the crew.</p>
@@ -647,7 +647,7 @@
       <div class="bridge">
         <h3>The verification + role flow</h3>
         <p>
-          A member starts from their verified Crew Record and authorizes Discord. During that handoff, the Worker temporarily has the Discord user identity and the XRPL account context at the same time. It re-checks the current LEAP balance, calculates the current rank, assigns exactly one Discord rank role, clears the temporary bridge data, and redirects the member into Leaper's Lair.
+          A member starts from their verified Crew Record and authorizes Discord. During that handoff, the Worker temporarily has the Discord user identity and the XRPL account context at the same time. It re-checks the current LEAP balance, calculates the current rank, assigns exactly one Discord rank role, clears the temporary bridge data, and redirects the member into Leaper Lounge.
         </p>
         <p>
           The handoff is temporary by design. The Discord integration does not keep a wallet-to-Discord lookup table and does not store the member's LEAP balance. The only lasting LEAP state in Discord is the current rank role.
@@ -685,14 +685,14 @@
       <div class="loop">
         <div class="loop-card"><b>1. Episode</b><span>A new Sailing Frog's Leap episode creates the moment.</span></div>
         <div class="loop-card"><b>2. Challenge</b><span>A clear action gives viewers a reason to participate.</span></div>
-        <div class="loop-card"><b>3. Community</b><span>Leaper's Lair gives the challenge a place to live and people a place to react.</span></div>
+        <div class="loop-card"><b>3. Community</b><span>Leaper Lounge gives the challenge a place to live and people a place to react.</span></div>
         <div class="loop-card"><b>4. Recognition</b><span>LEAP or a permanent record recognizes the participation.</span></div>
         <div class="loop-card"><b>5. Logbook</b><span>The member's history becomes cumulative rather than disposable.</span></div>
         <div class="loop-card"><b>6. Return</b><span>The next episode arrives with history, rank, and identity already attached.</span></div>
       </div>
 
       <div class="decision">
-        This is where the phrase <strong>“turn my adventure into their game”</strong> becomes software. Leaper's Lair provides the place to play. The Logbook makes participation persist.
+        This is where the phrase <strong>“turn my adventure into their game”</strong> becomes software. Leaper Lounge provides the place to play. The Logbook makes participation persist.
       </div>
     </div>
   </div>
@@ -708,7 +708,7 @@
       <div class="timeline">
         <div class="phase">
           <div class="phase-label">Phase 0 — Now</div>
-          <h3>Learn how people use Leaper's Lair.</h3>
+          <h3>Learn how people use Leaper Lounge.</h3>
           <p>Create the server, roles, simple channels, rules, voice room, and a place for episode discussion. Invite a few trusted people. Learn the rhythm before adding machinery.</p>
         </div>
 
@@ -738,8 +738,8 @@
 
         <div class="phase">
           <div class="phase-label">Phase 5 — The big finish</div>
-          <h3>Leaper's Lair becomes a live cockpit for the LEAP Logbook.</h3>
-          <p>A member can enter Leapers Lair, join the Leaper's Lair Discord server, verify once, see current rank, open their permanent history, find the current challenge, join events, participate in polls, and receive recognition — while the source of truth remains outside Discord on the ledger.</p>
+          <h3>Leaper Lounge becomes a live cockpit for the LEAP Logbook.</h3>
+          <p>A member can enter Leaper Lounge, join the Leaper Lounge Discord server, verify once, see current rank, open their permanent history, find the current challenge, join events, participate in polls, and receive recognition — while the source of truth remains outside Discord on the ledger.</p>
         </div>
       </div>
 
@@ -788,7 +788,7 @@
 <footer>
   <div class="wrap foot">
     <div>Sailing Frog's Leap • Discord Integration</div>
-    <div>The Logbook remembers. Leaper's Lair makes it social.</div>
+    <div>The Logbook remembers. Leaper Lounge makes it social.</div>
   </div>
 </footer>
 

@@ -875,13 +875,13 @@
           <h2>Welcome Aboard</h2>
           <p>
             Once you've cashed your first LEAP Check, you're part of the Sailing Frog's Leap crew.
-            Enter your XRP Ledger address below to open <strong>Leapers Lair</strong> and see your LEAP, crew rank, badges, and history.
+            Enter your XRP Ledger address below to open <strong>Leaper Lounge</strong> and see your LEAP, crew rank, badges, and history.
           </p>
 
           <div class="wallet-check">
             <div class="wallet-check-row">
               <input id="xrplAddress" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter your XRPL wallet address" aria-label="XRPL wallet address">
-              <button class="button" id="checkLeapButton" type="button">Enter Leapers Lair →</button>
+              <button class="button" id="checkLeapButton" type="button">Enter Leaper Lounge →</button>
             </div>
             <p class="wallet-status" id="walletStatus" role="status" aria-live="polite"></p>
           </div>
@@ -1294,7 +1294,7 @@
               localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
               sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
             } catch (_) {}
-            setStatus(`LEAP found: ${balance}. Opening Leapers Lair…`, "success");
+            setStatus(`LEAP found: ${balance}. Opening Leaper Lounge…`, "success");
             setTimeout(() => { window.location.href = NEXT_PAGE; }, 450);
           } else {
             setStatus("No LEAP found for this wallet yet. Join the crew to earn your first LEAP.", "error");
@@ -1308,7 +1308,7 @@
           }
         } finally {
           checkButton.disabled = false;
-          checkButton.textContent = "Enter Leapers Lair →";
+          checkButton.textContent = "Enter Leaper Lounge →";
         }
       }
 
