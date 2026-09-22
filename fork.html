@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Choose Your LEAP Experience</title>
+
+  <style>
+    :root{
+      --navy:#071d2b;
+      --navy-2:#0b2a3b;
+      --teal:#1d6c78;
+      --teal-2:#4ba4ad;
+      --cream:#f6efdF;
+      --gold:#d6ae58;
+      --gold-2:#f0cf84;
+      --white:#ffffff;
+      --muted:#b9c8cf;
+      --shadow:0 18px 50px rgba(0,0,0,.30);
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(45,112,125,.28), transparent 42%),
+        linear-gradient(180deg, #0a2a3a 0%, #071d2b 48%, #04141e 100%);
+      color:var(--cream);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:
+        max(28px, env(safe-area-inset-top))
+        18px
+        max(28px, env(safe-area-inset-bottom));
+      overflow-x:hidden;
+    }
+
+    .page{
+      width:min(760px,100%);
+      text-align:center;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      margin-bottom:16px;
+      color:var(--gold-2);
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after{
+      content:"";
+      width:26px;
+      height:1px;
+      background:rgba(240,207,132,.55);
+    }
+
+    h1{
+      margin:0;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(2.15rem,8vw,4.3rem);
+      line-height:.98;
+      letter-spacing:-.035em;
+      font-weight:700;
+    }
+
+    .intro{
+      max-width:570px;
+      margin:20px auto 0;
+      color:#d9e2e6;
+      font-size:clamp(1rem,3.7vw,1.18rem);
+      line-height:1.55;
+    }
+
+    .route{
+      position:relative;
+      width:min(500px,92%);
+      height:45px;
+      margin:28px auto 24px;
+    }
+
+    .route::before{
+      content:"";
+      position:absolute;
+      top:21px;
+      left:7%;
+      right:7%;
+      border-top:2px dashed rgba(214,174,88,.52);
+    }
+
+    .boat{
+      position:absolute;
+      top:4px;
+      left:50%;
+      transform:translateX(-50%);
+      width:34px;
+      height:34px;
+      border:1px solid rgba(214,174,88,.65);
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:var(--navy);
+      color:var(--gold-2);
+      font-size:18px;
+      box-shadow:0 0 0 6px rgba(7,29,43,.92);
+    }
+
+    .choice-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:8px;
+    }
+
+    .choice{
+      position:relative;
+      overflow:hidden;
+      min-height:245px;
+      padding:28px 24px 24px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:24px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+    }
+
+    .choice::after{
+      content:"";
+      position:absolute;
+      inset:auto -45px -70px auto;
+      width:155px;
+      height:155px;
+      border-radius:50%;
+      background:rgba(75,164,173,.08);
+    }
+
+    .icon{
+      width:62px;
+      height:62px;
+      margin:0 auto 18px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      background:linear-gradient(145deg, rgba(214,174,88,.18), rgba(214,174,88,.06));
+      border:1px solid rgba(214,174,88,.42);
+      color:var(--gold-2);
+      font-size:29px;
+    }
+
+    .choice h2{
+      margin:0;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1.55rem;
+      color:var(--white);
+    }
+
+    .choice p{
+      min-height:52px;
+      margin:10px auto 20px;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:.98rem;
+    }
+
+    .btn{
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      min-height:54px;
+      padding:14px 18px;
+      border-radius:14px;
+      text-decoration:none;
+      font-size:1rem;
+      font-weight:800;
+      transition:transform .16s ease, filter .16s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .btn:active{transform:scale(.985)}
+
+    .btn-app{
+      color:#08212d;
+      background:linear-gradient(180deg,var(--gold-2),var(--gold));
+      box-shadow:0 8px 20px rgba(214,174,88,.20);
+    }
+
+    .btn-web{
+      color:var(--white);
+      background:linear-gradient(180deg,#247985,#195d68);
+      box-shadow:0 8px 20px rgba(29,108,120,.22);
+    }
+
+    .same{
+      margin:22px 0 0;
+      color:#93aab4;
+      font-size:.88rem;
+      line-height:1.45;
+    }
+
+    .same strong{color:#d8e2e6}
+
+    .wake{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      margin-top:32px;
+      color:var(--gold-2);
+      font-family:Georgia,"Times New Roman",serif;
+      font-style:italic;
+      font-size:.95rem;
+      opacity:.95;
+    }
+
+    .wake span{
+      opacity:.5;
+      font-style:normal;
+    }
+
+    @media (max-width:620px){
+      body{align-items:flex-start}
+      .page{padding-top:18px}
+      .choice-grid{grid-template-columns:1fr}
+      .choice{min-height:auto}
+      .choice p{min-height:0}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *{scroll-behavior:auto!important;transition:none!important}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="eyebrow">Leaper's Lair</div>
+
+    <h1>Choose Your<br>LEAP Experience</h1>
+
+    <p class="intro">
+      You're aboard. Now choose how you'd like to enter the Leaper's Lair.
+    </p>
+
+    <div class="route" aria-hidden="true">
+      <div class="boat">⛵</div>
+    </div>
+
+    <section class="choice-grid" aria-label="Choose how to open Discord">
+      <article class="choice">
+        <div class="icon" aria-hidden="true">↗</div>
+        <h2>Discord App</h2>
+        <p>Open the Leaper's Lair in the Discord app on this device.</p>
+        <a class="btn btn-app" href="#" id="openApp">Open Discord App</a>
+      </article>
+
+      <article class="choice">
+        <div class="icon" aria-hidden="true">◎</div>
+        <h2>Web Browser</h2>
+        <p>Stay right here and continue into Discord in your browser.</p>
+        <a class="btn btn-web" href="#" id="openWeb">Continue in Browser</a>
+      </article>
+    </section>
+
+    <p class="same">
+      <strong>Same crew. Same rank.</strong><br>
+      You're only choosing how you want to enter.
+    </p>
+
+    <div class="wake">
+      Come Aboard <span>•</span> Show Up <span>•</span> Leave a Wake
+    </div>
+  </main>
+
+  <script>
+    /*
+      ============================================================
+      FORK PAGE — ONLY THESE VALUES NEED TO BE FILLED IN LATER.
+      ============================================================
+
+      We can replace these placeholders with the exact Leaper's
+      Lair server/channel destination once the Discord setup is
+      finalized.
+    */
+
+    const DISCORD_WEB_URL = "https://discord.com/channels/YOUR_SERVER_ID";
+    const DISCORD_APP_URL = "discord://-/channels/YOUR_SERVER_ID";
+
+    document.getElementById("openWeb").href = DISCORD_WEB_URL;
+
+    document.getElementById("openApp").addEventListener("click", function (event) {
+      event.preventDefault();
+
+      // Ask the phone to hand the destination to Discord.
+      window.location.href = DISCORD_APP_URL;
+
+      // If the app does not open, fall back to Discord on the web.
+      setTimeout(function () {
+        window.location.href = DISCORD_WEB_URL;
+      }, 1400);
+    });
+  </script>
+</body>
+</html>
