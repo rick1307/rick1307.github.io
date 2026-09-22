@@ -466,7 +466,7 @@
       .timeline-entry { grid-template-columns: 1fr; gap: 7px; }
       .timeline-fact { grid-template-columns: 78px minmax(0, 1fr); }
       .view-toggle { justify-content: stretch; }
-      .view-toggle button { flex: 1 1 30%; }
+      .view-toggle button { flex: 1 1 45%; }
       .refresh { margin-left: 0; }
       .check-grid { grid-template-columns: 1fr; }
     }
@@ -500,35 +500,41 @@
       <div class="summary-card"><strong id="reserveTotal">—</strong><span>Reserve Tied Up</span><small id="reserveRateText">current owner reserve</small></div>
     </div>
 
-    <div class="view-toggle" aria-label="Ledger history view">
-      <button id="chronologicalViewButton" type="button" aria-pressed="false">Chronological</button>
-      <button id="categoryViewButton" type="button" aria-pressed="true">By Category</button>
+    <div class="view-toggle" aria-label="LEAP ledger reference view">
+      <button id="badgesViewButton" type="button" aria-pressed="true">Badges in Use</button>
+      <button id="challengesViewButton" type="button" aria-pressed="false">Past Challenges</button>
+      <button id="eventsViewButton" type="button" aria-pressed="false">Past Events</button>
       <button id="checkbookViewButton" type="button" aria-pressed="false">Checkbook</button>
     </div>
 
     <section class="ledger">
-      <div id="chronologicalView" class="history-view" hidden>
+      <div id="badgesView" class="history-view">
         <div class="group">
           <div class="group-head">
-            <h2>Chronological History</h2>
-            <span id="chronologicalCount" class="group-count"></span>
+            <h2>Badges in Use</h2>
+            <span id="badgeCount" class="group-count"></span>
           </div>
-          <div id="chronologicalHistory"></div>
+          <div id="BADGE"></div>
         </div>
       </div>
 
-      <div id="categoryView" class="history-view">
+      <div id="challengesView" class="history-view" hidden>
         <div class="group">
-          <div class="group-head"><h2>Badges</h2><span id="badgeCount" class="group-count"></span></div>
-          <div id="BADGE"></div>
-        </div>
-        <div class="group">
-          <div class="group-head"><h2>Events</h2><span id="eventCount" class="group-count"></span></div>
-          <div id="EVENT"></div>
-        </div>
-        <div class="group">
-          <div class="group-head"><h2>Challenges</h2><span id="challengeCount" class="group-count"></span></div>
+          <div class="group-head">
+            <h2>Past Challenges</h2>
+            <span id="challengeCount" class="group-count"></span>
+          </div>
           <div id="CHALLENGE"></div>
+        </div>
+      </div>
+
+      <div id="eventsView" class="history-view" hidden>
+        <div class="group">
+          <div class="group-head">
+            <h2>Past Events</h2>
+            <span id="eventCount" class="group-count"></span>
+          </div>
+          <div id="EVENT"></div>
         </div>
       </div>
 
@@ -551,9 +557,9 @@
 
     <p class="footnote">
       This page scans validated XRPL transaction history for the authorized LEAP distributor and extracts recognized
-      SFL-LEAP public memo records. Badges and Challenges are unique identifier registries; Events are dated occurrences.
-      Chronological History preserves Check lifecycle status, including cancellations. The Checkbook separately reads
-      the distributor’s current Check ledger objects and matches them to their originating CheckCreate transactions when available.
+      SFL-LEAP public memo records. Badges in Use is the unique badge-name registry. Past Challenges is the serialized
+      challenge registry. Past Events is the dated event record. The Checkbook separately reads the distributor’s current
+      Check ledger objects and matches them to their originating CheckCreate transactions when available.
     </p>
   </main>
 
@@ -582,7 +588,7 @@
       let checkResolutionsById = new Map();
       let checkbookObjects = [];
       let reserveIncrementXrp = null;
-      let historyView = "category";
+      let historyView = "badges";
 
       let socket = null;
       let requestCounter = 0;
@@ -598,14 +604,14 @@
       const errorBox = document.getElementById("errorBox");
       const historySummary = document.getElementById("historySummary");
       const checkbookSummary = document.getElementById("checkbookSummary");
-      const chronologicalView = document.getElementById("chronologicalView");
-      const categoryView = document.getElementById("categoryView");
+      const badgesView = document.getElementById("badgesView");
+      const challengesView = document.getElementById("challengesView");
+      const eventsView = document.getElementById("eventsView");
       const checkbookView = document.getElementById("checkbookView");
-      const chronologicalViewButton = document.getElementById("chronologicalViewButton");
-      const categoryViewButton = document.getElementById("categoryViewButton");
+      const badgesViewButton = document.getElementById("badgesViewButton");
+      const challengesViewButton = document.getElementById("challengesViewButton");
+      const eventsViewButton = document.getElementById("eventsViewButton");
       const checkbookViewButton = document.getElementById("checkbookViewButton");
-      const chronologicalHistory = document.getElementById("chronologicalHistory");
-      const chronologicalCount = document.getElementById("chronologicalCount");
       const checkbookList = document.getElementById("checkbookList");
       const checkbookCount = document.getElementById("checkbookCount");
 
@@ -970,9 +976,17 @@
             }
           }
 
-          const sortedIdentifiers = [...identifiers].sort((a, b) =>
-            a.localeCompare(b, undefined, { sensitivity: "base", numeric: true })
-          );
+          const sortedIdentifiers = [...identifiers].sort((a, b) => {
+            if (key === "CHALLENGE") {
+              const aMatch = a.match(/(\d+)$/);
+              const bMatch = b.match(/(\d+)$/);
+              if (aMatch && bMatch) {
+                const delta = Number(aMatch[1]) - Number(bMatch[1]);
+                if (delta !== 0) return delta;
+              }
+            }
+            return a.localeCompare(b, undefined, { sensitivity: "base", numeric: true });
+          });
 
           if (!sortedIdentifiers.length) {
             const empty = document.createElement("div");
@@ -1039,54 +1053,6 @@
             row.append(name, meta);
             target.appendChild(row);
           }
-        }
-      }
-
-      function renderChronological() {
-        const sorted = [...historyEntries].sort(sortNewestFirst);
-        chronologicalHistory.replaceChildren();
-        chronologicalCount.textContent = `${sorted.length} record${sorted.length === 1 ? "" : "s"}`;
-
-        if (!sorted.length) {
-          const empty = document.createElement("div");
-          empty.className = "empty";
-          empty.textContent = "No encoded LEAP history found on the ledger yet.";
-          chronologicalHistory.appendChild(empty);
-          return;
-        }
-
-        for (const entry of sorted) {
-          const resolution = resolutionForEntry(entry);
-
-          const row = document.createElement("div");
-          row.className = "timeline-entry" + (resolution?.status === "canceled" ? " canceled" : "");
-
-          const date = document.createElement("div");
-          date.className = "timeline-date";
-
-          const created = document.createElement("div");
-          created.textContent = prettyDate(entry.time);
-          date.appendChild(created);
-
-          const status = historyStatusNode(entry);
-          if (status) date.appendChild(status);
-
-          const facts = document.createElement("div");
-          facts.className = "timeline-facts";
-
-          for (const fact of entry.facts) {
-            const factRow = document.createElement("div");
-            factRow.className = "timeline-fact";
-            const kind = document.createElement("span");
-            kind.textContent = fact.key;
-            const value = document.createElement("strong");
-            value.textContent = fact.value;
-            factRow.append(kind, value);
-            facts.appendChild(factRow);
-          }
-
-          row.append(date, facts);
-          chronologicalHistory.appendChild(row);
         }
       }
 
@@ -1239,20 +1205,26 @@
       }
 
       function setHistoryView(view) {
-        historyView = ["chronological", "category", "checkbook"].includes(view) ? view : "category";
-        chronologicalView.hidden = historyView !== "chronological";
-        categoryView.hidden = historyView !== "category";
+        historyView = ["badges", "challenges", "events", "checkbook"].includes(view) ? view : "badges";
+
+        badgesView.hidden = historyView !== "badges";
+        challengesView.hidden = historyView !== "challenges";
+        eventsView.hidden = historyView !== "events";
         checkbookView.hidden = historyView !== "checkbook";
+
         historySummary.hidden = historyView === "checkbook";
         checkbookSummary.hidden = historyView !== "checkbook";
-        chronologicalViewButton.setAttribute("aria-pressed", String(historyView === "chronological"));
-        categoryViewButton.setAttribute("aria-pressed", String(historyView === "category"));
+
+        badgesViewButton.setAttribute("aria-pressed", String(historyView === "badges"));
+        challengesViewButton.setAttribute("aria-pressed", String(historyView === "challenges"));
+        eventsViewButton.setAttribute("aria-pressed", String(historyView === "events"));
         checkbookViewButton.setAttribute("aria-pressed", String(historyView === "checkbook"));
       }
 
       function render() {
-        for (const key of RECOGNIZED_KEYS) renderCategoryGroup(key);
-        renderChronological();
+        renderCategoryGroup("BADGE");
+        renderCategoryGroup("CHALLENGE");
+        renderCategoryGroup("EVENT");
         renderCheckbook();
 
         const counts = {};
@@ -1500,8 +1472,9 @@
       }
 
       document.getElementById("refreshButton").addEventListener("click", start);
-      chronologicalViewButton.addEventListener("click", () => setHistoryView("chronological"));
-      categoryViewButton.addEventListener("click", () => setHistoryView("category"));
+      badgesViewButton.addEventListener("click", () => setHistoryView("badges"));
+      challengesViewButton.addEventListener("click", () => setHistoryView("challenges"));
+      eventsViewButton.addEventListener("click", () => setHistoryView("events"));
       checkbookViewButton.addEventListener("click", () => setHistoryView("checkbook"));
 
       setInterval(() => {
