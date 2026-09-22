@@ -1549,6 +1549,9 @@
 
             if (LEAP_HISTORY_KEYS.includes(key) && data) {
               addFact({ key, value:data });
+            } else if (key === "NEW-MEMBER") {
+              // Historical onboarding form. Read it as the NEW-MEMBER badge.
+              addFact({ key:"BADGE", value:"NEW-MEMBER" });
             }
           }
         }
@@ -1561,7 +1564,23 @@
         return new Date(Date.UTC(2000, 0, 1) + seconds * 1000).toISOString();
       }
 
-      function officialLeapHistoryRecord(entry, memberAccount) {
+      function extractCreatedCheckId(meta) {
+        const nodes = meta?.AffectedNodes || meta?.affected_nodes || [];
+
+        for (const wrapper of nodes) {
+          const node = wrapper?.CreatedNode || wrapper?.created_node;
+          if (!node) continue;
+
+          const type = node.LedgerEntryType || node.ledger_entry_type;
+          if (type !== "Check") continue;
+
+          return node.LedgerIndex || node.ledger_index || "";
+        }
+
+        return "";
+      }
+
+      function officialLeapHistoryRecord(entry, memberAccount, cashedCheckIds) {
         if (!entry || entry.validated === false) return null;
 
         const tx = entry.tx_json || entry.tx || entry.transaction || {};
@@ -1573,9 +1592,16 @@
         if (tx.Destination !== memberAccount) return null;
 
         let officialLeapAsset = false;
+        let checkId = "";
 
         if (tx.TransactionType === "CheckCreate") {
           officialLeapAsset = isLeapAmount(tx.SendMax);
+          checkId = extractCreatedCheckId(meta);
+
+          // A CheckCreate is only an earned Crew Record item after that exact
+          // Check has been successfully cashed. Pending and canceled Checks
+          // therefore never become personal logbook recognitions.
+          if (!checkId || !cashedCheckIds?.has(checkId)) return null;
         } else if (tx.TransactionType === "Payment") {
           const delivered = meta.delivered_amount;
           const requested = tx.DeliverMax || tx.Amount;
@@ -1597,6 +1623,7 @@
 
         return {
           hash: entry.hash || tx.hash || "",
+          checkId,
           ledger: entry.ledger_index || tx.ledger_index || null,
           transactionIndex: meta.TransactionIndex ?? meta.transaction_index ?? null,
           time,
@@ -1607,7 +1634,7 @@
       function queryAccountHistory(account) {
         return new Promise((resolve, reject) => {
           const ws = new WebSocket(XRPL_WS);
-          const records = [];
+          const entries = [];
 
           let marker;
           let page = 0;
@@ -1678,14 +1705,7 @@
 
             const result = response.result || {};
             const txs = Array.isArray(result.transactions) ? result.transactions : [];
-
-            for (const entry of txs) {
-              const record = officialLeapHistoryRecord(entry, account);
-
-              if (record) {
-                records.push(record);
-              }
-            }
+            entries.push(...txs);
 
             marker = result.marker;
 
@@ -1693,6 +1713,44 @@
               page += 1;
               sendPage();
             } else {
+              const cashedCheckIds = new Set();
+
+              for (const historyEntry of entries) {
+                if (!historyEntry || historyEntry.validated === false) continue;
+
+                const historyTx =
+                  historyEntry.tx_json ||
+                  historyEntry.tx ||
+                  historyEntry.transaction ||
+                  {};
+
+                const historyMeta = historyEntry.meta || {};
+                const historyResult =
+                  historyMeta.TransactionResult ??
+                  historyMeta.transaction_result;
+
+                if (historyResult && historyResult !== "tesSUCCESS") continue;
+
+                if (
+                  historyTx.TransactionType === "CheckCash" &&
+                  historyTx.CheckID
+                ) {
+                  cashedCheckIds.add(String(historyTx.CheckID));
+                }
+              }
+
+              const records = [];
+
+              for (const historyEntry of entries) {
+                const record = officialLeapHistoryRecord(
+                  historyEntry,
+                  account,
+                  cashedCheckIds
+                );
+
+                if (record) records.push(record);
+              }
+
               finish(records);
             }
           });
@@ -1766,9 +1824,13 @@
         const row = document.createElement("div");
         row.className = "logbook-entry";
 
+        const badgeOnly =
+          factsToShow.length > 0 &&
+          factsToShow.every(fact => fact.key === "BADGE");
+
         const date = document.createElement("div");
         date.className = "logbook-date";
-        date.textContent = formatLogbookDate(record.time);
+        date.textContent = badgeOnly ? "" : formatLogbookDate(record.time);
 
         const facts = document.createElement("div");
         facts.className = "logbook-facts";
@@ -1794,8 +1856,24 @@
       }
 
       function renderPersonalChronological(sorted) {
+        const seenBadges = new Set();
+
         for (const record of sorted) {
-          logbookEntries.appendChild(makeLogbookEntry(record));
+          const factsToShow = [];
+
+          for (const fact of record.facts) {
+            if (fact.key === "BADGE") {
+              const badgeKey = String(fact.value || "").trim().toUpperCase();
+              if (!badgeKey || seenBadges.has(badgeKey)) continue;
+              seenBadges.add(badgeKey);
+            }
+
+            factsToShow.push(fact);
+          }
+
+          if (factsToShow.length) {
+            logbookEntries.appendChild(makeLogbookEntry(record, factsToShow));
+          }
         }
       }
 
@@ -1807,6 +1885,57 @@
         ];
 
         for (const [key, label] of categories) {
+          const section = document.createElement("div");
+          section.className = "logbook-category";
+
+          const head = document.createElement("div");
+          head.className = "logbook-category-head";
+
+          const title = document.createElement("b");
+          title.textContent = label;
+
+          head.appendChild(title);
+          section.appendChild(head);
+
+          if (key === "BADGE") {
+            const badgeValues = new Set();
+
+            for (const record of sorted) {
+              for (const fact of record.facts) {
+                if (fact.key === "BADGE" && fact.value) {
+                  badgeValues.add(fact.value.trim());
+                }
+              }
+            }
+
+            const badges = [...badgeValues].sort((a, b) =>
+              a.localeCompare(b, undefined, { sensitivity:"base" })
+            );
+
+            const count = document.createElement("span");
+            count.textContent = `${badges.length} badge${badges.length === 1 ? "" : "s"}`;
+            head.appendChild(count);
+
+            if (!badges.length) {
+              const empty = document.createElement("div");
+              empty.className = "logbook-empty";
+              empty.textContent = "No badges recorded yet.";
+              section.appendChild(empty);
+            } else {
+              for (const badge of badges) {
+                section.appendChild(
+                  makeLogbookEntry(
+                    { time:null, facts:[{ key:"BADGE", value:badge }] },
+                    [{ key:"BADGE", value:badge }]
+                  )
+                );
+              }
+            }
+
+            logbookEntries.appendChild(section);
+            continue;
+          }
+
           const matches = [];
 
           for (const record of sorted) {
@@ -1817,20 +1946,9 @@
             }
           }
 
-          const section = document.createElement("div");
-          section.className = "logbook-category";
-
-          const head = document.createElement("div");
-          head.className = "logbook-category-head";
-
-          const title = document.createElement("b");
-          title.textContent = label;
-
           const count = document.createElement("span");
           count.textContent = `${matches.length} record${matches.length === 1 ? "" : "s"}`;
-
-          head.append(title, count);
-          section.appendChild(head);
+          head.appendChild(count);
 
           if (!matches.length) {
             const empty = document.createElement("div");
@@ -1861,7 +1979,7 @@
           }
         }
 
-        badgesEl.textContent = uniqueBadges.size ? String(uniqueBadges.size) : "—";
+        badgesEl.textContent = String(uniqueBadges.size);
         badgesNoteEl.textContent =
           uniqueBadges.size === 1
             ? "badge in your logbook"
