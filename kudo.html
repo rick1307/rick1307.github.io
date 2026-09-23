@@ -214,6 +214,40 @@
       border: 1px solid var(--line);
     }
 
+
+    .layer-stack {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .layer {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      background: #fbfcfe;
+    }
+
+    .layer b {
+      display: block;
+      font-size: 1.06rem;
+      margin-bottom: 4px;
+      color: var(--dark);
+    }
+
+    .future-note {
+      border-left: 5px solid var(--success);
+      background: #f4fbf8;
+    }
+
+    .quote-line {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      line-height: 1.25;
+      font-weight: 850;
+      color: var(--dark);
+      margin: 0;
+    }
+
     footer {
       text-align: center;
       color: var(--muted);
@@ -349,6 +383,136 @@ Possible automatic actions:
       </p>
     </section>
 
+
+    <section class="wide future-note">
+      <h2>Current Architectural Direction — LEAP Is the First Layer</h2>
+      <p>
+        The original KUDO concept explored the possibility that KUDO itself could combine membership and peer recognition.
+        Preserve that idea. The newer direction is broader: <strong>LEAP can remain the base membership and history layer,
+        while KUDO becomes a separate behavior and game layer.</strong>
+      </p>
+      <p>
+        This is not a rejection of the earlier thinking. It is an expansion of it. The important idea is that one token
+        does not have to carry every function in the community.
+      </p>
+    </section>
+
+    <section class="wide">
+      <h2>The Layer Model</h2>
+      <p>
+        In crypto, different layers can do different jobs. The same way of thinking can apply to the Sailing Frog's Leap
+        community.
+      </p>
+
+      <div class="layer-stack">
+        <div class="layer">
+          <b>LEAP — Membership / Identity / History Layer</b>
+          Membership, rank, badges, events, challenges, and the durable record of participation.
+        </div>
+        <div class="layer">
+          <b>KUDO — Behavior / Recognition / Game Layer</b>
+          A scarce monthly resource designed to create a specific behavior: giving recognition, meeting people,
+          talking about the community, and helping the network expand.
+        </div>
+        <div class="layer">
+          <b>Future Layers — Unknown by Design</b>
+          Additional tokens or mechanisms may eventually exist if they create a useful behavior and strengthen LEAP
+          rather than compete with it.
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <p class="quote-line">Do not make LEAP carry every future idea.</p>
+    </section>
+
+    <section class="wide">
+      <h2>KUDO as a Monthly Game</h2>
+      <p>
+        One possible model is that every member receives a limited monthly KUDO allocation — for example, 10 KUDOs.
+        The goal is not to hoard them. The goal is to give them away.
+      </p>
+      <p>
+        A limited KUDO can carry more meaning than an unlimited thumbs-up because giving one uses part of a scarce
+        monthly allocation. The giver is choosing where to spend attention and recognition.
+      </p>
+
+      <div class="flow">
+        <div class="step">Receive a limited monthly KUDO allocation</div>
+        <div class="step">Give KUDOs through real community interaction</div>
+        <div class="step">Monthly results feed back into LEAP</div>
+      </div>
+    </section>
+
+    <section class="wide">
+      <h2>The Monthly Objective</h2>
+      <p>
+        The broad game is to finish the month having successfully given away as much of the monthly KUDO allocation as
+        possible. The member who most effectively gives KUDOs is doing what the system wants: participating, recognizing
+        people, explaining the community, and helping the network grow.
+      </p>
+      <p>
+        A monthly winner could receive a meaningful LEAP award — perhaps 10 LEAP, 25 LEAP, or another amount chosen later.
+        KUDO becomes a scorekeeper for a specific behavior. LEAP remains the permanent result.
+      </p>
+    </section>
+
+    <section class="wide">
+      <h2>The Score Cannot Be Just Wallet Balance</h2>
+      <p>
+        The implementation will need logic. A member may give KUDOs and also receive KUDOs. People could potentially
+        transfer KUDOs back and forth. So the monthly score should eventually measure the behavior the system actually
+        cares about, not merely the number of KUDOs currently sitting in a wallet.
+      </p>
+      <p>
+        A likely principle is to measure <strong>qualified outbound KUDO gifts</strong>. The visible game can still be
+        explained simply as “give your KUDOs away,” while the ledger logic underneath prevents obvious gaming.
+      </p>
+    </section>
+
+    <section class="wide">
+      <h2>In-Person Recognition May Be the Point</h2>
+      <p>
+        KUDO may become more valuable if a valid gift requires some form of real-world interaction — for example,
+        an in-person QR exchange or another simple proof that two people actually met.
+      </p>
+      <p>
+        That friction would not necessarily be a flaw. It could be the mechanism that turns KUDO into a network-growth
+        tool by encouraging members to meet people, show them the community, and create new participation.
+      </p>
+    </section>
+
+    <section class="wide">
+      <h2>Everything Ultimately Feeds LEAP</h2>
+      <p class="big-line">LEAP remains the center of gravity.</p>
+      <p>
+        If additional tokens ever exist, they should have narrow jobs. They should create behaviors, interactions,
+        incentives, or games that ultimately strengthen the LEAP membership system.
+      </p>
+      <p>
+        <strong>LEAP answers:</strong> What have you done here?<br />
+        <strong>KUDO can answer:</strong> What useful behavior did you create this month?
+      </p>
+    </section>
+
+    <section class="wide">
+      <h2>The Possibilities Curve</h2>
+      <p>
+        The technological ingredients do not have to be completely new. A membership system could be built with SQL,
+        CloudKit, or many other databases. What matters is the design space that opens once the first implementation
+        becomes real.
+      </p>
+      <p>
+        It is difficult to explain something that does not exist. Once LEAP works and people can see it, the next layer
+        no longer has to be explained from imagination alone. The first implementation pushes out the possibilities curve
+        by showing what can actually be done.
+      </p>
+    </section>
+
+    <section class="callout">
+      <p class="quote-line">Build the first layer. Prove it. Then build the mountain.</p>
+    </section>
+
     <section class="wide open">
       <h2>Chain Decision — Intentionally Open</h2>
       <p>
@@ -397,6 +561,20 @@ Possible automatic actions:
       <strong>Current concept in one sentence:</strong><br />
       KUDO is a membership and peer-recognition system where people give transferable KUDOs to say “Well Done!”,
       while the system preserves the lifetime history of who has given and received recognition.
+    </section>
+
+
+    <section class="wide open">
+      <h2>Ideas, Not Commitments</h2>
+      <p>
+        KUDO remains a future concept. Do not let it distract from finishing LEAP. Preserve the thinking, but defer
+        decisions about supply, monthly reset rules, anti-gaming logic, in-person verification, award size, chain,
+        and exact memo grammar until the LEAP layer is working with real people.
+      </p>
+      <p>
+        The thought to preserve is larger than any one KUDO mechanic:
+        <strong>LEAP is not necessarily the only coin. LEAP is the first useful layer.</strong>
+      </p>
     </section>
 
     <footer>
