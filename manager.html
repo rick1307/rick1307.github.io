@@ -152,30 +152,6 @@
       color: rgba(255, 255, 255, 0.78);
     }
 
-    .state-machine-wrap {
-      margin-top: 6px;
-    }
-
-    .state-machine-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .state-machine-row a {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 158px;
-    }
-
-    .compare-note {
-      margin: 0 4px 12px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--muted);
-    }
 
     @media (max-width: 560px) {
       body {
@@ -200,13 +176,6 @@
         font-size: 23px;
       }
 
-      .state-machine-row {
-        grid-template-columns: 1fr;
-      }
-
-      .state-machine-row a {
-        min-height: unset;
-      }
     }
   </style>
 </head>
@@ -217,19 +186,12 @@
       <div class="eyebrow">Project Manager</div>
       <h1>Sailing Frog’s Leap Pages</h1>
       <p>
-        A clean starting point for the working documents behind LEAP, the logbook,
-        the marketing story, and the broader state-machine idea.
+        Operations, system documentation, and strategy for the LEAP project.
       </p>
     </div>
 
-    <div class="section-label">Core Pages</div>
+    <div class="section-label">Operations</div>
     <div class="menu">
-      <a href="leapProtocol.html">
-        <span class="link-title">LEAP Protocol</span>
-        <span class="link-subtitle">Memo namespaces, record structure, and the rules behind the system.</span>
-        <span class="link-file">leapProtocol.html</span>
-      </a>
-
       <a href="managerCheckbook.html">
         <span class="link-title">Checkbook</span>
         <span class="link-subtitle">Outstanding LEAP Checks, expiration status, reserve tied up, and Check creation.</span>
@@ -241,35 +203,47 @@
         <span class="link-subtitle">How the ledger preserves participation and turns moments into permanent history.</span>
         <span class="link-file">ledgerHistory.html</span>
       </a>
-
-      <a href="marketing.html">
-        <span class="link-title">Marketing</span>
-        <span class="link-subtitle">Positioning, messaging, and the outward-facing explanation of the LEAP idea.</span>
-        <span class="link-file">marketing.html</span>
-      </a>
     </div>
 
-    <div class="section-label state-machine-wrap">Compare These Two</div>
-    <p class="compare-note">The broad infrastructure idea sits next to the local Sailing Frog’s Leap use case.</p>
+    <div class="section-label">System Documentation</div>
     <div class="menu">
-      <div class="state-machine-row">
-        <a href="globalStateMachine.html">
-          <span class="link-title">Global State Machine</span>
-          <span class="link-subtitle">The bigger secular thesis: blockspace as shared global state capacity.</span>
-          <span class="link-file">globalStateMachine.html</span>
-        </a>
+      <a href="leapProtocol.html">
+        <span class="link-title">LEAP Protocol</span>
+        <span class="link-subtitle">Memo namespaces, record structure, and the rules behind the system.</span>
+        <span class="link-file">leapProtocol.html</span>
+      </a>
 
-        <a href="stateMachine.html">
-          <span class="link-title">LEAP Logbook</span>
-          <span class="link-subtitle">How the Sailing Frog’s Leap community uses ledger state as a living logbook.</span>
-          <span class="link-file">stateMachine.html</span>
-        </a>
-      </div>
+      <a href="stateMachine.html">
+        <span class="link-title">LEAP Logbook</span>
+        <span class="link-subtitle">How the Sailing Frog’s Leap community uses ledger state as a living logbook.</span>
+        <span class="link-file">stateMachine.html</span>
+      </a>
 
       <a href="discordIntegration.html">
         <span class="link-title">Discord Integration</span>
         <span class="link-subtitle">How community tools and Discord can connect to the LEAP system over time.</span>
         <span class="link-file">discordIntegration.html</span>
+      </a>
+    </div>
+
+    <div class="section-label">Strategy</div>
+    <div class="menu">
+      <a href="marketing.html">
+        <span class="link-title">Marketing</span>
+        <span class="link-subtitle">Positioning, messaging, and the outward-facing explanation of the LEAP idea.</span>
+        <span class="link-file">marketing.html</span>
+      </a>
+
+      <a href="kudo.html">
+        <span class="link-title">KUDO</span>
+        <span class="link-subtitle">Future-layer concept: a behavior and recognition game that ultimately feeds back into LEAP.</span>
+        <span class="link-file">kudo.html</span>
+      </a>
+
+      <a href="globalStateMachine.html">
+        <span class="link-title">Global State Machine</span>
+        <span class="link-subtitle">The bigger secular thesis: blockspace as shared global state capacity.</span>
+        <span class="link-file">globalStateMachine.html</span>
       </a>
     </div>
   </div>
