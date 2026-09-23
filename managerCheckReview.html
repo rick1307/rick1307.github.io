@@ -24,7 +24,7 @@
     .raw-wrap{border-top:1px solid var(--line);padding:14px}.raw-note{margin:0 0 10px;color:var(--muted);font-size:11px;line-height:1.45}
     pre{margin:0;padding:14px;border-radius:10px;background:#101b27;color:#e8f0f7;overflow:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
     .hex-note{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);font-size:11px;line-height:1.4}.hex-note code{color:var(--ink);overflow-wrap:anywhere}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.btn{min-height:50px;border-radius:11px;font-size:16px;font-weight:900;cursor:pointer}.edit{border:1px solid #c9d5df;background:#fff;color:var(--blue)}.xaman{border:0;background:#162536;color:#fff;opacity:.48;cursor:not-allowed}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.btn{min-height:50px;border-radius:11px;font-size:16px;font-weight:900;cursor:pointer}.edit{border:1px solid #c9d5df;background:#fff;color:var(--blue)}.xaman{border:0;background:#162536;color:#fff}.xaman:disabled{opacity:.48;cursor:not-allowed}.xaman:not(:disabled){opacity:1;cursor:pointer}
     .note{text-align:center;margin:10px 0 0;color:var(--muted);font-size:11px;line-height:1.4}.error{display:none;margin-top:14px;padding:12px 14px;border:1px solid #e5bebe;border-radius:11px;background:var(--red-soft);color:#7c2929;font-size:13px;line-height:1.45}
     @media(max-width:560px){.wrap{width:min(94%,760px);margin-top:22px}.panel-head,.body{padding-left:17px;padding-right:17px}.row{grid-template-columns:92px minmax(0,1fr)}.actions{grid-template-columns:1fr}}
   </style>
@@ -33,7 +33,7 @@
 <main class="wrap">
   <div class="top"><h1>Review LEAP Check</h1><a class="back" href="managerCheckbook.html">Checkbook →</a></div>
   <p class="intro">Final confirmation of the friendly details and the exact unsigned XRPL transaction template.</p>
-  <div class="prototype"><strong>Engine mockup.</strong> The raw transaction below is real transaction structure, but this page still has no submit or signing capability. Nothing can reach XRPL or Xaman.</div>
+  <div class="prototype"><strong>Final review.</strong> Confirm the Check below, then hand the exact unsigned transaction template to Xaman for signing. Opening Xaman does not submit anything to XRPL.</div>
   <section class="panel">
     <div class="panel-head"><h2>Check details</h2><p>Confirm the destination, recognition, LEAP amount, expiration, and exact public memo.</p></div>
     <div class="body">
@@ -56,9 +56,9 @@
 
       <div class="actions">
         <button id="editButton" class="btn edit" type="button">← Edit Check</button>
-        <button class="btn xaman" type="button" disabled>Create Check in Xaman</button>
+        <button id="xamanButton" class="btn xaman" type="button" disabled>Create Check in Xaman</button>
       </div>
-      <p class="note">Next build: hand this reviewed template to Xaman and verify the validated result on XRPL.</p>
+      <p class="note">Xaman will still require you to create the payload, review it, sign it, and submit the signed transaction.</p>
       <div id="error" class="error"></div>
     </div>
   </section>
@@ -81,6 +81,8 @@
   }
   const RIPPLE_EPOCH_OFFSET = 946684800;
   const error = document.getElementById("error");
+  const xamanButton = document.getElementById("xamanButton");
+  let transactionTemplate = null;
 
   function textToHex(text) {
     const bytes = new TextEncoder().encode(String(text || ""));
@@ -146,8 +148,10 @@
 
     try {
       const tx = buildTransaction(draft);
+      transactionTemplate = tx;
       document.getElementById("rawTransaction").textContent = JSON.stringify(tx, null, 2);
       document.getElementById("memoHex").textContent = tx.Memos[0].Memo.MemoData;
+      xamanButton.disabled = false;
     } catch (e) {
       error.style.display = "block";
       error.textContent = e?.message || String(e);
@@ -156,6 +160,17 @@
 
   document.getElementById("editButton").addEventListener("click", () => {
     window.location.href = "managerCheckCreate.html";
+  });
+
+  xamanButton.addEventListener("click", () => {
+    if (!transactionTemplate) {
+      error.style.display = "block";
+      error.textContent = "The Check transaction is not ready. Return to Create LEAP Check and rebuild it.";
+      return;
+    }
+
+    const payload = encodeURIComponent(JSON.stringify(transactionTemplate));
+    window.location.href = "https://xumm.dev/signing-tool?payload=" + payload;
   });
 })();
 </script>
