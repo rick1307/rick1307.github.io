@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Checkbook</title>
+  <style>
+    :root {
+      --ink:#10243a; --muted:#66788b; --line:#dbe4ec; --soft:#f4f7fa; --panel:#fff;
+      --blue:#0b5fa5; --green:#20734d; --amber:#b46a13; --red:#a13a3a;
+      --dark:#0f1824; --dark-line:#29425a; --dark-text:#e7edf5; --dark-muted:#8ea5ba;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:var(--soft);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+    .wrap{width:min(94%,1020px);margin:34px auto 70px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:8px}
+    h1{margin:0;font-size:clamp(28px,5vw,40px)}
+    .back{flex:0 0 auto;text-decoration:none;color:var(--blue);font-weight:800}
+    .intro{margin:0 0 18px;color:var(--muted);line-height:1.5;font-size:14px}
+    .statusbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;color:var(--muted);font-size:12px}
+    .dot{width:8px;height:8px;border-radius:50%;background:#8a97a5;flex:0 0 auto}.dot.live{background:var(--green)}.dot.error{background:var(--red)}
+    #statusText{font-weight:800}.refresh{margin-left:auto;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--blue);padding:6px 11px;font-size:12px;font-weight:800;cursor:pointer}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+    .summary-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center}
+    .summary-card strong{display:block;font-size:25px;margin-bottom:3px}.summary-card span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.summary-card small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.35}
+    .toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+    .tool{width:100%;min-width:0;display:flex;align-items:center;justify-content:center;min-height:43px;border:1px solid #c9d6e1;border-radius:999px;background:#fff;color:var(--muted);padding:9px 8px;font-weight:800;font-size:13px;text-decoration:none;cursor:pointer;white-space:nowrap}
+    .tool[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}.tool.create{background:#162536;border-color:#162536;color:#fff}
+    .ledger{background:var(--dark);color:var(--dark-text);border:1px solid var(--dark-line);border-radius:18px;padding:24px;box-shadow:0 10px 30px rgba(16,36,58,.12)}
+    .ledger-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:16px}.ledger-head h2{margin:0;font-size:22px}.ledger-head span{color:var(--dark-muted);font-size:12px;font-weight:800}
+    .check-list{display:grid;gap:12px}.check-card{position:relative;overflow:hidden;background:#162536;border:1px solid #2a4258;border-radius:14px;padding:16px 16px 14px 19px}.check-card::before{content:"";position:absolute;top:0;bottom:0;left:0;width:4px;background:var(--green)}.check-card.soon::before{background:var(--amber)}.check-card.urgent::before,.check-card.expired::before{background:var(--red)}.check-card.expired{border-color:#61363b;background:#241b21}
+    .check-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.check-amount{font-size:21px;font-weight:900;color:#fff}.check-reason{margin-top:4px;color:#a9bfd2;font-size:13px;overflow-wrap:anywhere}.check-status{flex:0 0 auto;border:1px solid #3c5b75;border-radius:999px;padding:5px 8px;color:#b9cfdf;font-size:11px;font-weight:900}.check-card.soon .check-status{border-color:#9c681f;color:#ffd99e}.check-card.urgent .check-status,.check-card.expired .check-status{border-color:#8a474e;color:#ffb8bd}
+    .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.check-fact{min-width:0;border-top:1px solid #29425a;padding-top:9px}.check-fact span{display:block;color:#7f98ad;font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:900}.check-fact strong{display:block;margin-top:4px;color:#e7edf5;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+    .check-countdown{margin-top:13px;padding:10px 11px;border-radius:9px;background:#101c28;color:#a9bfd2;font-size:12px;line-height:1.45}.check-countdown b{color:#fff}.check-card.expired .check-countdown b{color:#ffd2d2}.check-id{margin-top:9px;color:#68849d;font-size:10px;overflow-wrap:anywhere}
+    .empty{padding:26px 18px;border:1px dashed #3a536b;border-radius:12px;text-align:center;color:#8ea5ba}.error{display:none;margin-bottom:14px;padding:12px 14px;border:1px solid #e0b2b2;border-radius:11px;background:#fff0f0;color:#7d2929;font-size:13px;line-height:1.4}
+    .footnote{margin:13px 3px 0;color:var(--muted);font-size:11px;line-height:1.45}
+    @media(max-width:700px){.summary{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr}.ledger{padding:17px}.check-grid{grid-template-columns:1fr}}
+    @media(max-width:440px){.wrap{margin-top:22px}.top{align-items:flex-start}.summary{grid-template-columns:1fr 1fr}.tool{font-size:12px}.check-top{display:block}.check-status{display:inline-block;margin-top:10px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top"><h1>Manager Checkbook</h1><a class="back" href="manager.html">Manager →</a></div>
+  <p class="intro">The working view of every outstanding official LEAP Check. Cashed and canceled Checks disappear automatically because they are no longer open ledger objects.</p>
+
+  <div class="statusbar">
+    <span id="statusDot" class="dot"></span><span id="statusText">XRPL: starting…</span><span id="updatedText"></span>
+    <button id="refreshButton" class="refresh" type="button">Refresh</button>
+  </div>
+  <div id="errorBox" class="error"></div>
+
+  <section class="summary">
+    <div class="summary-card"><strong id="openCheckTotal">0</strong><span>Open Checks</span><small>current official LEAP Checks</small></div>
+    <div class="summary-card"><strong id="expiringCheckTotal">0</strong><span>Expiring Soon</span><small>7 days or less</small></div>
+    <div class="summary-card"><strong id="expiredCheckTotal">0</strong><span>Expired</span><small>still open until cleanup</small></div>
+    <div class="summary-card"><strong id="reserveTotal">—</strong><span>Reserve Tied Up</span><small id="reserveRateText">current owner reserve</small></div>
+  </section>
+
+  <nav class="toolbar" aria-label="Checkbook controls">
+    <button id="allButton" class="tool" type="button" aria-pressed="true">All Outstanding</button>
+    <button id="soonButton" class="tool" type="button" aria-pressed="false">Expiring Soon</button>
+    <button id="expiredButton" class="tool" type="button" aria-pressed="false">Expired</button>
+    <a class="tool create" href="managerCheckCreate.html">Create Check</a>
+  </nav>
+
+  <section class="ledger">
+    <div class="ledger-head"><h2>Outstanding Checks</h2><span id="checkbookCount">Loading…</span></div>
+    <div id="checkbookList" class="check-list"></div>
+  </section>
+  <p class="footnote">This page is read-only. Cancel Check will be added later as its own deliberate management action.</p>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const XRPL_SERVER = "wss://xrplcluster.com/";
+  const AUTHORIZED_DISTRIBUTORS = ["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"];
+  const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
+  const NAMESPACE = "SFL-LEAP";
+  const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
+  const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
+  const SOON_MS = 7 * 24 * 60 * 60 * 1000;
+  const URGENT_MS = 48 * 60 * 60 * 1000;
+
+  let socket = null;
+  let requestCounter = 0;
+  let pending = new Map();
+  let checkCreatesById = new Map();
+  let checkCreatesByHash = new Map();
+  let checkbookObjects = [];
+  let reserveIncrementXrp = null;
+  let currentFilter = "all";
+  let loaded = false;
+  let liveRefreshTimer = null;
+
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const updatedText = document.getElementById("updatedText");
+  const errorBox = document.getElementById("errorBox");
+  const checkbookList = document.getElementById("checkbookList");
+  const checkbookCount = document.getElementById("checkbookCount");
+  const allButton = document.getElementById("allButton");
+  const soonButton = document.getElementById("soonButton");
+  const expiredButton = document.getElementById("expiredButton");
+
+  function setStatus(text, state="") { statusText.textContent=text; statusDot.className="dot"+(state?" "+state:""); }
+  function showError(message){ errorBox.style.display="block"; errorBox.textContent=message; setStatus("XRPL: connection problem","error"); }
+  function clearError(){ errorBox.style.display="none"; errorBox.textContent=""; }
+  function rippleTimeToIso(seconds){ return typeof seconds === "number" ? new Date(RIPPLE_EPOCH_MS + seconds*1000).toISOString() : null; }
+  function cleanIso(value){ if(value===null||value===undefined||value==="")return null; if(typeof value==="number")return rippleTimeToIso(value); const d=new Date(value); return Number.isNaN(d.getTime())?null:d.toISOString(); }
+
+  function hexToText(value){
+    if(!value||typeof value!=="string")return "";
+    if(!/^[A-Fa-f0-9]+$/.test(value)||value.length%2!==0)return value;
+    try{const bytes=new Uint8Array(value.match(/.{2}/g).map(pair=>parseInt(pair,16)));return new TextDecoder("utf-8",{fatal:false}).decode(bytes).replace(/\0+$/g,"");}catch{return value;}
+  }
+  function decodeCurrency(value){
+    const code=String(value||""); if(!/^[A-Fa-f0-9]{40}$/.test(code))return code;
+    try{let out="";for(let i=0;i<code.length;i+=2){const n=parseInt(code.slice(i,i+2),16);if(n===0)break;out+=String.fromCharCode(n);}return out;}catch{return code;}
+  }
+  function isLeapAmount(amount){return !!amount&&typeof amount==="object"&&amount.issuer===LEAP_ISSUER&&decodeCurrency(amount.currency).toUpperCase()==="LEAP";}
+  function normalizeTx(entry){return entry?.tx_json||entry?.tx||entry?.transaction||entry||{};}
+  function transactionSucceeded(meta){if(!meta||typeof meta!=="object")return true;const result=meta.TransactionResult??meta.transaction_result;return !result||result==="tesSUCCESS";}
+
+  function parseStructuredData(text){
+    const out={}; if(!text)return out;
+    for(const piece of text.split("|")){const equals=piece.indexOf("=");if(equals<=0)continue;const key=piece.slice(0,equals).trim().toUpperCase();const value=piece.slice(equals+1).trim();if(RECOGNIZED_KEYS.includes(key)&&value)out[key]=value;}
+    return out;
+  }
+  function parseCanonicalLeapMemo(text){
+    const value=String(text||"").trim(); if(!value)return null; const prefix=NAMESPACE+"/";
+    if(!value.toUpperCase().startsWith(prefix))return null; const payload=value.slice(prefix.length); const equals=payload.indexOf("="); if(equals<=0)return null;
+    const key=payload.slice(0,equals).trim().toUpperCase(); const factValue=payload.slice(equals+1).trim();
+    if(!RECOGNIZED_KEYS.includes(key)||!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(factValue))return null; return {key,value:factValue};
+  }
+  function extractFacts(tx){
+    const facts=[]; const seen=new Set(); const memos=Array.isArray(tx.Memos)?tx.Memos:[];
+    const add=f=>{if(!f)return;const sig=`${f.key}=${f.value}`;if(seen.has(sig))return;seen.add(sig);facts.push(f);};
+    for(const wrapper of memos){const memo=wrapper?.Memo||{};const type=hexToText(memo.MemoType).trim();const format=hexToText(memo.MemoFormat).trim();const data=hexToText(memo.MemoData).trim();add(parseCanonicalLeapMemo(data));add(parseCanonicalLeapMemo(type));add(parseCanonicalLeapMemo(format));
+      if(type.toUpperCase()===NAMESPACE){const parsed=parseStructuredData(data);for(const key of RECOGNIZED_KEYS)if(parsed[key])add({key,value:parsed[key]});}
+      const legacyPrefix=NAMESPACE+"/"; if(type.toUpperCase().startsWith(legacyPrefix)&&!type.includes("=")){const legacyKey=type.slice(legacyPrefix.length).trim().toUpperCase();if(RECOGNIZED_KEYS.includes(legacyKey)&&data)add({key:legacyKey,value:data});else if(legacyKey==="NEW-MEMBER")add({key:"BADGE",value:"NEW-MEMBER"});}
+    }
+    return facts;
+  }
+  function extractCreatedCheckId(meta){
+    const nodes=meta?.AffectedNodes||meta?.affected_nodes||[]; for(const wrapper of nodes){const node=wrapper?.CreatedNode||wrapper?.created_node;if(!node)continue;const type=node.LedgerEntryType||node.ledger_entry_type;if(type!=="Check")continue;return node.LedgerIndex||node.ledger_index||null;} return null;
+  }
+  function rememberCheckCreate(tx,meta,info){
+    if(tx.TransactionType!=="CheckCreate"||!AUTHORIZED_DISTRIBUTORS.includes(tx.Account)||!isLeapAmount(tx.SendMax))return;
+    const checkId=extractCreatedCheckId(meta); const record={hash:info.hash||tx.hash||"",checkId:checkId||"",time:cleanIso(info.time),destination:tx.Destination||"",amount:tx.SendMax,expiration:typeof tx.Expiration==="number"?tx.Expiration:null,facts:extractFacts(tx)};
+    if(record.hash)checkCreatesByHash.set(record.hash,record); if(checkId)checkCreatesById.set(checkId,record);
+  }
+  function processHistoryEntry(entry){
+    if(entry?.validated===false)return; const tx=normalizeTx(entry); const meta=entry?.meta||tx?.meta; if(!transactionSucceeded(meta))return;
+    const info={time:entry?.close_time_iso||entry?.date||tx?.date||null,hash:entry?.hash||tx?.hash||null}; rememberCheckCreate(tx,meta,info);
+  }
+
+  function checkObjectId(object){return object?.index||object?.LedgerIndex||object?.ledger_index||"";}
+  function checkCreateFor(object){const id=checkObjectId(object);if(id&&checkCreatesById.has(id))return checkCreatesById.get(id);const previous=object?.PreviousTxnID||object?.previous_txn_id||"";if(previous&&checkCreatesByHash.has(previous))return checkCreatesByHash.get(previous);return null;}
+  function expirationIso(object,create){const seconds=typeof object?.Expiration==="number"?object.Expiration:(typeof create?.expiration==="number"?create.expiration:null);return seconds===null?null:rippleTimeToIso(seconds);}
+  function prettyDateTime(iso){if(!iso)return "No expiration set";return new Intl.DateTimeFormat(undefined,{year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(iso));}
+  function timeRemaining(ms){const totalHours=Math.max(0,Math.ceil(ms/3600000));if(totalHours<48)return `${totalHours} hour${totalHours===1?"":"s"} left`;const days=Math.ceil(totalHours/24);return `${days} days left`;}
+  function checkState(object,create){
+    const iso=expirationIso(object,create); if(!iso)return {css:"",label:"Active",text:"No expiration set"}; const remaining=new Date(iso).getTime()-Date.now();
+    if(remaining<=0)return {css:"expired",label:"Expired",text:`Expired ${prettyDateTime(iso)}`}; if(remaining<=URGENT_MS)return {css:"urgent",label:"Urgent",text:timeRemaining(remaining)}; if(remaining<=SOON_MS)return {css:"soon",label:"Expiring Soon",text:timeRemaining(remaining)}; return {css:"",label:"Active",text:timeRemaining(remaining)};
+  }
+  function formatReason(create){const fact=create?.facts?.[0];if(!fact)return "LEAP Check";const label=fact.key.charAt(0)+fact.key.slice(1).toLowerCase();return `${label} · ${fact.value}`;}
+
+  function rowsForRender(){
+    const rows=checkbookObjects.filter(o=>isLeapAmount(o.SendMax)).map(object=>({object,create:checkCreateFor(object)}));
+    rows.sort((a,b)=>{const ta=a.create?.time?new Date(a.create.time).getTime():0;const tb=b.create?.time?new Date(b.create.time).getTime():0;return tb-ta;});
+    return rows;
+  }
+  function setFilter(filter){
+    currentFilter=filter; allButton.setAttribute("aria-pressed",String(filter==="all")); soonButton.setAttribute("aria-pressed",String(filter==="soon")); expiredButton.setAttribute("aria-pressed",String(filter==="expired")); renderCheckbook();
+  }
+  function renderCheckbook(){
+    const allRows=rowsForRender(); const states=allRows.map(r=>checkState(r.object,r.create)); const expiredCount=states.filter(s=>s.css==="expired").length; const soonCount=states.filter(s=>s.css==="soon"||s.css==="urgent").length;
+    document.getElementById("openCheckTotal").textContent=allRows.length; document.getElementById("expiringCheckTotal").textContent=soonCount; document.getElementById("expiredCheckTotal").textContent=expiredCount;
+    if(typeof reserveIncrementXrp==="number"){document.getElementById("reserveTotal").textContent=`${(allRows.length*reserveIncrementXrp).toFixed(2)} XRP`;document.getElementById("reserveRateText").textContent=`${reserveIncrementXrp} XRP per Check`;}else{document.getElementById("reserveTotal").textContent="—";document.getElementById("reserveRateText").textContent="reserve rate unavailable";}
+    let rows=allRows;
+    if(currentFilter==="soon")rows=allRows.filter(r=>{const s=checkState(r.object,r.create);return s.css==="soon"||s.css==="urgent";});
+    if(currentFilter==="expired")rows=allRows.filter(r=>checkState(r.object,r.create).css==="expired");
+    const label=currentFilter==="all"?"open":(currentFilter==="soon"?"expiring":"expired"); checkbookCount.textContent=`${rows.length} ${label} Check${rows.length===1?"":"s"}`;
+    checkbookList.replaceChildren();
+    if(!rows.length){const empty=document.createElement("div");empty.className="empty";empty.textContent=currentFilter==="all"?"No outstanding official LEAP Checks found.":"No Checks match this view.";checkbookList.appendChild(empty);return;}
+    for(const {object,create} of rows){
+      const state=checkState(object,create); const card=document.createElement("article"); card.className="check-card"+(state.css?` ${state.css}`:"");
+      const top=document.createElement("div");top.className="check-top";const left=document.createElement("div");const amount=document.createElement("div");amount.className="check-amount";amount.textContent=`${object.SendMax?.value??create?.amount?.value??"?"} LEAP`;const reason=document.createElement("div");reason.className="check-reason";reason.textContent=formatReason(create);left.append(amount,reason);const badge=document.createElement("div");badge.className="check-status";badge.textContent=state.label;top.append(left,badge);
+      const grid=document.createElement("div");grid.className="check-grid";const facts=[["Recipient",object.Destination||create?.destination||"Unavailable"],["Created",create?.time?prettyDateTime(create.time):"Unavailable"],["Expiration",expirationIso(object,create)?prettyDateTime(expirationIso(object,create)):"No expiration set"],["Status",state.text]];
+      for(const [label,value] of facts){const cell=document.createElement("div");cell.className="check-fact";const l=document.createElement("span");l.textContent=label;const v=document.createElement("strong");v.textContent=value;cell.append(l,v);grid.appendChild(cell);}
+      const countdown=document.createElement("div");countdown.className="check-countdown";if(state.css==="expired")countdown.innerHTML="<b>Cleanup needed.</b> This Check can no longer be cashed, but it still occupies owner reserve until it is canceled.";else if(!expirationIso(object,create))countdown.innerHTML="<b>No expiration set.</b> This Check stays cashable until it is cashed or canceled.";else countdown.innerHTML=`<b>${state.text}.</b> It disappears from this Checkbook when it is cashed or canceled.`;
+      const id=document.createElement("div");id.className="check-id";id.textContent=`Check ID: ${checkObjectId(object)||"unavailable"}`;card.append(top,grid,countdown,id);checkbookList.appendChild(card);
+    }
+  }
+
+  function connect(){
+    return new Promise((resolve,reject)=>{clearError();setStatus("XRPL: connecting…");socket=new WebSocket(XRPL_SERVER);const timeout=setTimeout(()=>{reject(new Error("Timed out connecting to XRPL."));try{socket.close();}catch{}},15000);
+      socket.addEventListener("open",()=>{clearTimeout(timeout);setStatus("XRPL: loading…","live");resolve();},{once:true});
+      socket.addEventListener("error",()=>{clearTimeout(timeout);reject(new Error("Could not connect to the XRPL public full-history server."));},{once:true});
+      socket.addEventListener("message",event=>{let message;try{message=JSON.parse(event.data);}catch{return;}if(message.id&&pending.has(message.id)){const handlers=pending.get(message.id);pending.delete(message.id);if(message.status==="error"||message.error||message.result?.error)handlers.reject(new Error(message.error_message||message.result?.error_message||message.error||message.result?.error||"XRPL request failed."));else handlers.resolve(message.result||message);return;}
+        if(message.type==="transaction"&&["CheckCreate","CheckCash","CheckCancel"].includes(message.transaction?.TransactionType)){clearTimeout(liveRefreshTimer);liveRefreshTimer=setTimeout(()=>start(),900);}
+      });
+      socket.addEventListener("close",()=>{if(loaded)setStatus("XRPL: disconnected","error");});
+    });
+  }
+  function request(command){return new Promise((resolve,reject)=>{if(!socket||socket.readyState!==WebSocket.OPEN){reject(new Error("XRPL connection is not open."));return;}const id="leap-checkbook-"+(++requestCounter);pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,api_version:2,...command}));setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(new Error("XRPL request timed out."));}},30000);});}
+  async function loadAccountHistory(account){let marker;do{const command={command:"account_tx",account,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};if(marker!==undefined)command.marker=marker;const result=await request(command);for(const entry of Array.isArray(result.transactions)?result.transactions:[])processHistoryEntry(entry);marker=result.marker;}while(marker!==undefined&&marker!==null);}
+  async function loadCheckbook(){const objects=[];for(const account of AUTHORIZED_DISTRIBUTORS){let marker;do{const command={command:"account_objects",account,type:"check",ledger_index:"validated",limit:400};if(marker!==undefined)command.marker=marker;const result=await request(command);const page=Array.isArray(result.account_objects)?result.account_objects:[];objects.push(...page.filter(object=>object.Account===account&&isLeapAmount(object.SendMax)));marker=result.marker;}while(marker!==undefined&&marker!==null);}checkbookObjects=objects;}
+  async function loadReserveIncrement(){try{const result=await request({command:"server_state"});const ledger=result?.state?.validated_ledger||result?.state?.validatedLedger||{};const xrpCandidate=ledger.reserve_inc_xrp??result?.state?.reserve_inc_xrp;if(xrpCandidate!==undefined&&xrpCandidate!==null){const value=Number(xrpCandidate);reserveIncrementXrp=Number.isFinite(value)?value:null;}else{const drops=Number(ledger.reserve_inc);reserveIncrementXrp=Number.isFinite(drops)?drops/1_000_000:null;}}catch{reserveIncrementXrp=null;}}
+  async function subscribeLive(){await request({command:"subscribe",accounts:AUTHORIZED_DISTRIBUTORS});}
+  async function start(){
+    try{if(socket){try{socket.close();}catch{}}pending.clear();checkCreatesById=new Map();checkCreatesByHash=new Map();checkbookObjects=[];reserveIncrementXrp=null;loaded=false;renderCheckbook();await connect();for(const account of AUTHORIZED_DISTRIBUTORS)await loadAccountHistory(account);await Promise.all([loadCheckbook(),loadReserveIncrement()]);loaded=true;await subscribeLive();setStatus("XRPL: live","live");updatedText.textContent=`· Updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`;renderCheckbook();}catch(error){showError(error?.message||String(error));}
+  }
+
+  document.getElementById("refreshButton").addEventListener("click",start); allButton.addEventListener("click",()=>setFilter("all")); soonButton.addEventListener("click",()=>setFilter("soon")); expiredButton.addEventListener("click",()=>setFilter("expired"));
+  setInterval(renderCheckbook,60000); renderCheckbook(); start();
+})();
+</script>
+</body>
+</html>
