@@ -179,7 +179,7 @@
 
     .view-toggle {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin: 0 0 14px;
       width: 100%;
@@ -500,7 +500,21 @@
 
     @media (max-width: 680px) {
       .wrap { width: min(96%, 980px); margin-top: 20px; }
-      .summary { grid-template-columns: 1fr; }
+      .summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .summary-card {
+        padding: 10px 4px;
+      }
+      .summary-card strong {
+        font-size: 23px;
+      }
+      .summary-card span {
+        font-size: 11px;
+        letter-spacing: .04em;
+      }
       .summary.checkbook-summary { grid-template-columns: 1fr 1fr; }
       .ledger { padding: 19px 16px; }
       .item { grid-template-columns: 1fr; }
@@ -508,12 +522,13 @@
       .timeline-entry { grid-template-columns: 1fr; gap: 7px; }
       .timeline-fact { grid-template-columns: 78px minmax(0, 1fr); }
       .view-toggle {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
       }
       .view-toggle button {
         width: 100%;
-        padding: 10px 6px;
+        padding: 10px 4px;
+        font-size: 12px;
       }
       .check-grid { grid-template-columns: 1fr; }
     }
@@ -541,8 +556,8 @@
 
     <div id="historySummary" class="summary">
       <div class="summary-card"><strong id="badgeTotal">0</strong><span>Badges</span></div>
-      <div class="summary-card"><strong id="eventTotal">0</strong><span>Events</span></div>
       <div class="summary-card"><strong id="challengeTotal">0</strong><span>Challenges</span></div>
+      <div class="summary-card"><strong id="eventTotal">0</strong><span>Events</span></div>
     </div>
 
     <div class="view-toggle" aria-label="LEAP ledger reference view">
