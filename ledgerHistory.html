@@ -545,18 +545,10 @@
       <div class="summary-card"><strong id="challengeTotal">0</strong><span>Challenges</span></div>
     </div>
 
-    <div id="checkbookSummary" class="summary checkbook-summary" hidden>
-      <div class="summary-card"><strong id="openCheckTotal">0</strong><span>Open Checks</span><small>still on the ledger</small></div>
-      <div class="summary-card"><strong id="expiringCheckTotal">0</strong><span>Expiring Soon</span><small>7 days or less</small></div>
-      <div class="summary-card"><strong id="expiredCheckTotal">0</strong><span>Expired</span><small>ready for cleanup</small></div>
-      <div class="summary-card"><strong id="reserveTotal">—</strong><span>Reserve Tied Up</span><small id="reserveRateText">current owner reserve</small></div>
-    </div>
-
     <div class="view-toggle" aria-label="LEAP ledger reference view">
       <button id="badgesViewButton" type="button" aria-pressed="true">Badges in Use</button>
       <button id="challengesViewButton" type="button" aria-pressed="false">Past Challenges</button>
       <button id="eventsViewButton" type="button" aria-pressed="false">Past Events</button>
-      <button id="checkbookViewButton" type="button" aria-pressed="false">Checkbook</button>
     </div>
 
     <section class="ledger">
@@ -589,20 +581,6 @@
           <div id="EVENT"></div>
         </div>
       </div>
-
-      <div id="checkbookView" class="history-view" hidden>
-        <div class="group">
-          <div class="group-head">
-            <h2>Issuer Checkbook</h2>
-            <span id="checkbookCount" class="group-count"></span>
-          </div>
-          <p class="checkbook-intro">
-            Outstanding official LEAP Checks only. Cashed and canceled Checks disappear automatically.
-            Expired Checks stay here until you cancel them on the XRP Ledger.
-          </p>
-          <div id="checkbookList" class="check-list"></div>
-        </div>
-      </div>
     </section>
 
     <div id="errorBox" class="errorbox"></div>
@@ -610,8 +588,7 @@
     <p class="footnote">
       This page scans validated XRPL transaction history for the authorized LEAP distributor and extracts recognized
       SFL-LEAP public memo records. Badges in Use is the unique badge-name registry. Past Challenges is the serialized
-      challenge registry. Past Events is the dated event record. The Checkbook separately reads the distributor’s current
-      Check ledger objects and matches them to their originating CheckCreate transactions when available.
+      challenge registry. Past Events is the dated event record.
     </p>
   </main>
 
@@ -625,8 +602,6 @@
       const NAMESPACE = "SFL-LEAP";
       const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
       const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
-      const SOON_MS = 7 * 24 * 60 * 60 * 1000;
-      const URGENT_MS = 48 * 60 * 60 * 1000;
 
       const records = {
         BADGE: new Map(),
@@ -638,8 +613,6 @@
       let checkCreatesById = new Map();
       let checkCreatesByHash = new Map();
       let checkResolutionsById = new Map();
-      let checkbookObjects = [];
-      let reserveIncrementXrp = null;
       let historyView = "badges";
 
       let socket = null;
@@ -647,7 +620,6 @@
       let pending = new Map();
       let scannedTransactions = 0;
       let historyLoaded = false;
-      let liveRefreshTimer = null;
 
       const statusDot = document.getElementById("statusDot");
       const statusText = document.getElementById("statusText");
@@ -655,17 +627,12 @@
       const crewTotal = document.getElementById("crewTotal");
       const errorBox = document.getElementById("errorBox");
       const historySummary = document.getElementById("historySummary");
-      const checkbookSummary = document.getElementById("checkbookSummary");
       const badgesView = document.getElementById("badgesView");
       const challengesView = document.getElementById("challengesView");
       const eventsView = document.getElementById("eventsView");
-      const checkbookView = document.getElementById("checkbookView");
       const badgesViewButton = document.getElementById("badgesViewButton");
       const challengesViewButton = document.getElementById("challengesViewButton");
       const eventsViewButton = document.getElementById("eventsViewButton");
-      const checkbookViewButton = document.getElementById("checkbookViewButton");
-      const checkbookList = document.getElementById("checkbookList");
-      const checkbookCount = document.getElementById("checkbookCount");
 
       function setStatus(text, state = "") {
         statusText.textContent = text;
@@ -976,16 +943,6 @@
         const tx = message?.transaction || message?.tx_json || {};
         if (message?.validated === false) return;
 
-        if (["CheckCreate", "CheckCash", "CheckCancel"].includes(tx.TransactionType)) {
-          clearTimeout(liveRefreshTimer);
-          liveRefreshTimer = setTimeout(async () => {
-            try {
-              await loadCheckbook();
-              render();
-            } catch {}
-          }, 800);
-        }
-
         const meta = message?.meta;
         if (!transactionSucceeded(meta)) return;
 
@@ -1133,176 +1090,22 @@
         }
       }
 
-      function checkObjectId(object) {
-        return object?.index || object?.LedgerIndex || object?.ledger_index || "";
-      }
-
-      function checkCreateFor(object) {
-        const id = checkObjectId(object);
-        if (id && checkCreatesById.has(id)) return checkCreatesById.get(id);
-        const previous = object?.PreviousTxnID || object?.previous_txn_id || "";
-        if (previous && checkCreatesByHash.has(previous)) return checkCreatesByHash.get(previous);
-        return null;
-      }
-
-      function expirationIso(object, create) {
-        const seconds = typeof object?.Expiration === "number"
-          ? object.Expiration
-          : (typeof create?.expiration === "number" ? create.expiration : null);
-        return seconds === null ? null : rippleTimeToIso(seconds);
-      }
-
-      function checkState(object, create) {
-        const iso = expirationIso(object, create);
-        if (!iso) return { css: "", label: "Active", text: "No expiration set" };
-
-        const remaining = new Date(iso).getTime() - Date.now();
-        if (remaining <= 0) return { css: "expired", label: "Expired", text: `Expired ${prettyDateTime(iso)}` };
-        if (remaining <= URGENT_MS) return { css: "urgent", label: "Urgent", text: timeRemaining(remaining) };
-        if (remaining <= SOON_MS) return { css: "soon", label: "Expiring Soon", text: timeRemaining(remaining) };
-        return { css: "", label: "Active", text: timeRemaining(remaining) };
-      }
-
-      function timeRemaining(ms) {
-        const totalHours = Math.max(0, Math.ceil(ms / 3600000));
-        if (totalHours < 48) return `${totalHours} hour${totalHours === 1 ? "" : "s"} left`;
-        const days = Math.ceil(totalHours / 24);
-        return `${days} days left`;
-      }
-
-      function formatReason(create) {
-        const fact = create?.facts?.[0];
-        if (!fact) return "LEAP Check";
-        const label = fact.key.charAt(0) + fact.key.slice(1).toLowerCase();
-        return `${label} · ${fact.value}`;
-      }
-
-      function renderCheckbook() {
-        const official = checkbookObjects.filter(object => isLeapAmount(object.SendMax));
-        const rows = official.map(object => ({ object, create: checkCreateFor(object) }));
-
-        rows.sort((a, b) => {
-          const sa = checkState(a.object, a.create);
-          const sb = checkState(b.object, b.create);
-          const rank = { expired: 0, urgent: 1, soon: 2, "": 3 };
-          const byState = rank[sa.css] - rank[sb.css];
-          if (byState) return byState;
-          const ta = a.create?.time ? new Date(a.create.time).getTime() : 0;
-          const tb = b.create?.time ? new Date(b.create.time).getTime() : 0;
-          return tb - ta;
-        });
-
-        const states = rows.map(row => checkState(row.object, row.create));
-        const expired = states.filter(state => state.css === "expired").length;
-        const expiringSoon = states.filter(state => state.css === "soon" || state.css === "urgent").length;
-
-        document.getElementById("openCheckTotal").textContent = rows.length;
-        document.getElementById("expiringCheckTotal").textContent = expiringSoon;
-        document.getElementById("expiredCheckTotal").textContent = expired;
-        checkbookCount.textContent = `${rows.length} open Check${rows.length === 1 ? "" : "s"}`;
-
-        if (typeof reserveIncrementXrp === "number") {
-          document.getElementById("reserveTotal").textContent = `${(rows.length * reserveIncrementXrp).toFixed(2)} XRP`;
-          document.getElementById("reserveRateText").textContent = `${reserveIncrementXrp} XRP per Check`;
-        } else {
-          document.getElementById("reserveTotal").textContent = "—";
-          document.getElementById("reserveRateText").textContent = "reserve rate unavailable";
-        }
-
-        checkbookList.replaceChildren();
-
-        if (!rows.length) {
-          const empty = document.createElement("div");
-          empty.className = "empty";
-          empty.textContent = "No outstanding official LEAP Checks found.";
-          checkbookList.appendChild(empty);
-          return;
-        }
-
-        for (const { object, create } of rows) {
-          const state = checkState(object, create);
-          const card = document.createElement("article");
-          card.className = "check-card" + (state.css ? ` ${state.css}` : "");
-
-          const top = document.createElement("div");
-          top.className = "check-top";
-
-          const left = document.createElement("div");
-          const amount = document.createElement("div");
-          amount.className = "check-amount";
-          amount.textContent = `${object.SendMax?.value ?? create?.amount?.value ?? "?"} LEAP`;
-          const reason = document.createElement("div");
-          reason.className = "check-reason";
-          reason.textContent = formatReason(create);
-          left.append(amount, reason);
-
-          const badge = document.createElement("div");
-          badge.className = "check-status";
-          badge.textContent = state.label;
-          top.append(left, badge);
-
-          const grid = document.createElement("div");
-          grid.className = "check-grid";
-
-          const facts = [
-            ["Recipient", object.Destination || create?.destination || "Unavailable"],
-            ["Created", create?.time ? prettyDateTime(create.time) : "Unavailable"],
-            ["Expiration", expirationIso(object, create) ? prettyDateTime(expirationIso(object, create)) : "No expiration set"],
-            ["Status", state.text]
-          ];
-
-          for (const [label, value] of facts) {
-            const cell = document.createElement("div");
-            cell.className = "check-fact";
-            const labelNode = document.createElement("span");
-            labelNode.textContent = label;
-            const valueNode = document.createElement("strong");
-            valueNode.textContent = value;
-            cell.append(labelNode, valueNode);
-            grid.appendChild(cell);
-          }
-
-          const countdown = document.createElement("div");
-          countdown.className = "check-countdown";
-          if (state.css === "expired") {
-            countdown.innerHTML = "<b>Cleanup needed.</b> This Check can no longer be cashed, but it still occupies owner reserve until you cancel it.";
-          } else if (!expirationIso(object, create)) {
-            countdown.innerHTML = "<b>No expiration set.</b> This Check stays cashable until it is cashed or canceled.";
-          } else {
-            countdown.innerHTML = `<b>${state.text}.</b> The Check disappears from this Checkbook when it is cashed or canceled.`;
-          }
-
-          const id = document.createElement("div");
-          id.className = "check-id";
-          id.textContent = `Check ID: ${checkObjectId(object) || "unavailable"}`;
-
-          card.append(top, grid, countdown, id);
-          checkbookList.appendChild(card);
-        }
-      }
-
       function setHistoryView(view) {
-        historyView = ["badges", "challenges", "events", "checkbook"].includes(view) ? view : "badges";
+        historyView = ["badges", "challenges", "events"].includes(view) ? view : "badges";
 
         badgesView.hidden = historyView !== "badges";
         challengesView.hidden = historyView !== "challenges";
         eventsView.hidden = historyView !== "events";
-        checkbookView.hidden = historyView !== "checkbook";
-
-        historySummary.hidden = historyView === "checkbook";
-        checkbookSummary.hidden = historyView !== "checkbook";
 
         badgesViewButton.setAttribute("aria-pressed", String(historyView === "badges"));
         challengesViewButton.setAttribute("aria-pressed", String(historyView === "challenges"));
         eventsViewButton.setAttribute("aria-pressed", String(historyView === "events"));
-        checkbookViewButton.setAttribute("aria-pressed", String(historyView === "checkbook"));
       }
 
       function render() {
         renderCategoryGroup("BADGE");
         renderCategoryGroup("CHALLENGE");
         renderCategoryGroup("EVENT");
-        renderCheckbook();
 
         const counts = {};
         const activeOccurrences = {};
@@ -1375,8 +1178,6 @@
         checkCreatesById = new Map();
         checkCreatesByHash = new Map();
         checkResolutionsById = new Map();
-        checkbookObjects = [];
-        reserveIncrementXrp = null;
         scannedTransactions = 0;
         historyLoaded = false;
         render();
@@ -1473,53 +1274,6 @@
         } while (marker !== undefined && marker !== null);
       }
 
-      async function loadCheckbook() {
-        const objects = [];
-
-        for (const account of AUTHORIZED_DISTRIBUTORS) {
-          let marker;
-          do {
-            const command = {
-              command: "account_objects",
-              account,
-              type: "check",
-              ledger_index: "validated",
-              limit: 400
-            };
-            if (marker !== undefined) command.marker = marker;
-
-            const result = await request(command);
-            const page = Array.isArray(result.account_objects) ? result.account_objects : [];
-            objects.push(...page.filter(object => object.Account === account && isLeapAmount(object.SendMax)));
-            marker = result.marker;
-          } while (marker !== undefined && marker !== null);
-        }
-
-        checkbookObjects = objects;
-      }
-
-      async function loadReserveIncrement() {
-        try {
-          const result = await request({ command: "server_state" });
-          const ledger = result?.state?.validated_ledger || result?.state?.validatedLedger || {};
-
-          // server_state reports reserve_inc in drops, not XRP.
-          // Prefer an XRP-denominated field if a server provides one;
-          // otherwise convert drops to XRP (1 XRP = 1,000,000 drops).
-          const xrpCandidate = ledger.reserve_inc_xrp ?? result?.state?.reserve_inc_xrp;
-
-          if (xrpCandidate !== undefined && xrpCandidate !== null) {
-            const value = Number(xrpCandidate);
-            reserveIncrementXrp = Number.isFinite(value) ? value : null;
-          } else {
-            const drops = Number(ledger.reserve_inc);
-            reserveIncrementXrp = Number.isFinite(drops) ? drops / 1_000_000 : null;
-          }
-        } catch {
-          reserveIncrementXrp = null;
-        }
-      }
-
       async function subscribeLive() {
         await request({ command: "subscribe", accounts: AUTHORIZED_DISTRIBUTORS });
       }
@@ -1535,8 +1289,6 @@
           await connect();
 
           for (const account of AUTHORIZED_DISTRIBUTORS) await loadAccountHistory(account);
-          await Promise.all([loadCheckbook(), loadReserveIncrement()]);
-
           historyLoaded = true;
           await subscribeLive();
           setStatus("XRPL: live", "live");
@@ -1550,11 +1302,6 @@
       badgesViewButton.addEventListener("click", () => setHistoryView("badges"));
       challengesViewButton.addEventListener("click", () => setHistoryView("challenges"));
       eventsViewButton.addEventListener("click", () => setHistoryView("events"));
-      checkbookViewButton.addEventListener("click", () => setHistoryView("checkbook"));
-
-      setInterval(() => {
-        if (historyView === "checkbook") renderCheckbook();
-      }, 60000);
 
       render();
       start();
