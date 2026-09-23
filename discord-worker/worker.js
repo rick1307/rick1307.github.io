@@ -3,14 +3,27 @@ const REDIRECT_URI = "https://sfl-discord-auth.yjc26zd6c4.workers.dev/callback";
 const DISCORD_AUTHORIZE_URL = "https://discord.com/oauth2/authorize";
 const DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
 const DISCORD_ME_URL = "https://discord.com/api/users/@me";
+const DISCORD_API_BASE = "https://discord.com/api/v10";
+const DISCORD_GUILD_ID = "970431174579204156";
+const LEAPER_LOUNGE_URL = "https://discord.com/channels/970431174579204156/970431175099293730";
 
-const XRPL_RPC_URL = "https://xrplcluster.com/";
+const DISCORD_ROLE_IDS = Object.freeze({
+  "Deckhand": "1550946675223437383",
+  "Bosun": "1550947420731473930",
+  "Quartermaster": "1550947517900783666",
+  "First Mate": "1550947598959902871",
+  "Master of the Leap": "1550948160061308960"
+});
+
+const ALL_LEAP_ROLE_IDS = Object.freeze(Object.values(DISCORD_ROLE_IDS));
+
+const XRPL_RPC_URL = "http://s1.ripple.com:51234/";
 const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
 
 const STATE_COOKIE = "sfl_oauth_state";
 const BRIDGE_COOKIE = "sfl_oauth_bridge";
 const COOKIE_MAX_AGE_SECONDS = 600;
-const EXPECTED_SITE_ORIGIN = "https://rick1307.github.io";
+const EXPECTED_SITE_ORIGIN = "https://sailingfrogsleap.com";
 
 const CLASSIC_ADDRESS_PATTERN = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 
@@ -48,6 +61,14 @@ async function startDiscordOAuth(request, env) {
     return htmlResponse(
       "Discord connection failed",
       "<p>The Discord OAuth secret is not configured on the Worker.</p>",
+      500
+    );
+  }
+
+  if (!env.DISCORD_BOT_TOKEN) {
+    return htmlResponse(
+      "Discord connection failed",
+      "<p>The Discord bot token is not configured on the Worker.</p>",
       500
     );
   }
@@ -179,6 +200,15 @@ async function handleDiscordCallback(request, url, env) {
     );
   }
 
+  if (!env.DISCORD_BOT_TOKEN) {
+    return htmlResponse(
+      "Discord connection failed",
+      "<p>The Discord bot token is not configured on the Worker.</p>",
+      500,
+      clearCookies
+    );
+  }
+
   const bridge = await verifySignedBridgeValue(rawBridgeCookie, env.DISCORD_OAUTH_SECRET);
 
   if (!bridge) {
@@ -273,22 +303,31 @@ async function handleDiscordCallback(request, url, env) {
     const user = await userResponse.json();
     const displayName = user.global_name || user.username || "Discord member";
     const rank = rankFor(currentBalance);
+    const desiredRoleId = DISCORD_ROLE_IDS[rank];
 
-    return htmlResponse(
-      "Discord identity linked",
-      `
-        <p><strong>${escapeHtml(displayName)}</strong> is authenticated with Discord.</p>
-        <p>Discord user ID: <code>${escapeHtml(user.id || "unknown")}</code></p>
-        <p>Verified LEAP Crew Record: <code>${escapeHtml(shortAddress(bridge.wallet))}</code></p>
-        <p>Current LEAP balance: <strong>${escapeHtml(formatBalance(currentBalance))}</strong></p>
-        <p>Current rank: <strong>${escapeHtml(rank)}</strong></p>
-        <p class="note">The Worker independently checked the wallet on the XRP Ledger before and after Discord authorization. This establishes the website-to-Discord identity handoff; it is not cryptographic proof that the Discord user controls the XRPL wallet.</p>
-      `,
-      200,
-      clearCookies
-    );
+    if (!user.id || !desiredRoleId) {
+      return htmlResponse(
+        "Discord connection failed",
+        "<p>The Worker could not determine the Discord member or LEAP rank role.</p>",
+        500,
+        clearCookies
+      );
+    }
+
+    await syncDiscordRankRole(user.id, desiredRoleId, env.DISCORD_BOT_TOKEN);
+
+    return redirectResponse(LEAPER_LOUNGE_URL, clearCookies);
   } catch (err) {
     console.error("Discord OAuth callback error", err);
+
+    if (err?.code === "NOT_IN_GUILD") {
+      return htmlResponse(
+        "Join Leaper Lounge first",
+        "<p>Discord recognized your account, but that account is not currently in Leaper Lounge. Join the server, then return to your Crew Record and connect Discord again.</p>",
+        409,
+        clearCookies
+      );
+    }
 
     return htmlResponse(
       "Discord connection failed",
@@ -297,6 +336,59 @@ async function handleDiscordCallback(request, url, env) {
       clearCookies
     );
   }
+}
+
+async function syncDiscordRankRole(userId, desiredRoleId, botToken) {
+  const memberResponse = await fetch(
+    `${DISCORD_API_BASE}/guilds/${DISCORD_GUILD_ID}/members/${userId}`,
+    {
+      headers: {
+        "authorization": `Bot ${botToken}`
+      }
+    }
+  );
+
+  if (memberResponse.status === 404) {
+    const error = new Error("Discord member is not in Leaper Lounge");
+    error.code = "NOT_IN_GUILD";
+    throw error;
+  }
+
+  if (!memberResponse.ok) {
+    const details = await memberResponse.text();
+    console.error("Discord member lookup failed", memberResponse.status, details);
+    throw new Error(`Discord member lookup failed with HTTP ${memberResponse.status}`);
+  }
+
+  const member = await memberResponse.json();
+  const currentRoles = new Set(Array.isArray(member.roles) ? member.roles : []);
+
+  for (const roleId of ALL_LEAP_ROLE_IDS) {
+    if (roleId === desiredRoleId || !currentRoles.has(roleId)) continue;
+    await changeDiscordRole(userId, roleId, "DELETE", botToken);
+  }
+
+  if (!currentRoles.has(desiredRoleId)) {
+    await changeDiscordRole(userId, desiredRoleId, "PUT", botToken);
+  }
+}
+
+async function changeDiscordRole(userId, roleId, method, botToken) {
+  const response = await fetch(
+    `${DISCORD_API_BASE}/guilds/${DISCORD_GUILD_ID}/members/${userId}/roles/${roleId}`,
+    {
+      method,
+      headers: {
+        "authorization": `Bot ${botToken}`
+      }
+    }
+  );
+
+  if (response.status === 204) return;
+
+  const details = await response.text();
+  console.error("Discord role change failed", method, roleId, response.status, details);
+  throw new Error(`Discord role change failed with HTTP ${response.status}`);
 }
 
 async function queryLeapBalance(account) {
@@ -447,7 +539,7 @@ function rankFor(balance) {
 
 function shortAddress(account) {
   return account.length > 20
-    ? `${account.slice(0,10)}…${account.slice(-8)}`
+    ? `${account.slice(0,10)}â€¦${account.slice(-8)}`
     : account;
 }
 
@@ -455,6 +547,22 @@ function formatBalance(balance) {
   return Number.isInteger(balance)
     ? String(balance)
     : String(Number(balance.toFixed(6)));
+}
+
+function redirectResponse(location, setCookies = []) {
+  const headers = new Headers({
+    "location": location,
+    "cache-control": "no-store"
+  });
+
+  for (const cookie of setCookies) {
+    headers.append("set-cookie", cookie);
+  }
+
+  return new Response(null, {
+    status: 303,
+    headers
+  });
 }
 
 function htmlResponse(title, body, status = 200, setCookies = []) {
