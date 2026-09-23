@@ -113,36 +113,6 @@
       cursor: pointer;
     }
 
-    .registry-summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .registry-card {
-      padding: 10px 8px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      background: #fff;
-      text-align: center;
-    }
-
-    .registry-card strong {
-      display: block;
-      font-size: 20px;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .registry-card span {
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -375,7 +345,6 @@
       .wrap { width: min(94%, 680px); margin-top: 22px; }
       .top { align-items: flex-start; }
       .panel-head, .form-body { padding-left: 17px; padding-right: 17px; }
-      .registry-summary { gap: 6px; }
       .fixed-grid { grid-template-columns: 1fr; }
       .review-row { grid-template-columns: 88px minmax(0, 1fr); }
     }
@@ -401,12 +370,6 @@
       <span id="statusText">XRPL: waiting…</span>
       <span id="updatedText"></span>
       <button id="refreshButton" class="refresh" type="button">Refresh</button>
-    </div>
-
-    <div class="registry-summary" aria-label="Recognition registry counts">
-      <div class="registry-card"><strong id="badgeCount">—</strong><span>Badges</span></div>
-      <div class="registry-card"><strong id="eventCount">—</strong><span>Events</span></div>
-      <div class="registry-card"><strong id="challengeCount">—</strong><span>Challenges</span></div>
     </div>
 
     <section class="panel">
@@ -508,9 +471,6 @@
       const updatedText = document.getElementById("updatedText");
       const refreshButton = document.getElementById("refreshButton");
       const errorBox = document.getElementById("errorBox");
-      const badgeCount = document.getElementById("badgeCount");
-      const eventCount = document.getElementById("eventCount");
-      const challengeCount = document.getElementById("challengeCount");
       const form = document.getElementById("checkForm");
       const destination = document.getElementById("destination");
       const reason = document.getElementById("reason");
@@ -722,14 +682,20 @@
         });
       }
 
-      function renderCounts() {
-        badgeCount.textContent = registry.BADGE.size;
-        eventCount.textContent = registry.EVENT.size;
-        challengeCount.textContent = registry.CHALLENGE.size;
-      }
-
       function reasonWord(key) {
         return key === "BADGE" ? "badge" : key === "EVENT" ? "event" : key === "CHALLENGE" ? "challenge" : "recognition";
+      }
+
+      function prettyRecognition(value) {
+        return String(value || "")
+          .split("-")
+          .filter(Boolean)
+          .map(part => {
+            if (/^\d+$/.test(part)) return part;
+            if (part === "LEAP" || part === "OG") return part;
+            return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+          })
+          .join(" ");
       }
 
       function renderRecognitionChoices() {
@@ -763,7 +729,7 @@
         const suppressed = allValues.length - values.length;
 
         recognition.append(new Option("Choose a " + word, ""));
-        for (const value of values) recognition.append(new Option(value, value));
+        for (const value of values) recognition.append(new Option(prettyRecognition(value), value));
         recognition.disabled = values.length === 0;
 
         if (allValues.length === 0) {
@@ -894,7 +860,6 @@
           const result = await request(command);
           const txs = Array.isArray(result.transactions) ? result.transactions : [];
           for (const entry of txs) addEntry(entry);
-          renderCounts();
           marker = result.marker;
         } while (marker !== undefined && marker !== null);
       }
@@ -904,7 +869,6 @@
         issues.length = 0;
         resolutions.clear();
         canonicalLeapCurrency = "";
-        renderCounts();
         renderRecognitionChoices();
       }
 
@@ -947,7 +911,6 @@
             minute: "2-digit"
           }).format(new Date());
 
-          renderCounts();
           renderRecognitionChoices();
           restoreDraft();
         } catch (error) {
@@ -1018,7 +981,6 @@
       recognition.addEventListener("change", updatePreview);
       refreshButton.addEventListener("click", start);
 
-      renderCounts();
       start();
     })();
   </script>

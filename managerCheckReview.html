@@ -68,6 +68,17 @@
   "use strict";
 
   const reasonNames = { BADGE:"Badge", EVENT:"Event", CHALLENGE:"Challenge" };
+  function prettyRecognition(value) {
+    return String(value || "")
+      .split("-")
+      .filter(Boolean)
+      .map(part => {
+        if (/^\d+$/.test(part)) return part;
+        if (part === "LEAP" || part === "OG") return part;
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      })
+      .join(" ");
+  }
   const RIPPLE_EPOCH_OFFSET = 946684800;
   const error = document.getElementById("error");
 
@@ -123,7 +134,7 @@
   } else {
     document.getElementById("destination").textContent = draft.destination || "—";
     document.getElementById("reason").textContent = reasonNames[draft.reason] || draft.reason || "—";
-    document.getElementById("recognition").textContent = draft.recognition || "—";
+    document.getElementById("recognition").textContent = prettyRecognition(draft.recognition) || "—";
     document.getElementById("amount").textContent = (draft.amount || "—") + " LEAP";
     document.getElementById("expiration").textContent = draft.expirationDays + " " + (Number(draft.expirationDays) === 1 ? "day (24 hours)" : "days (" + (Number(draft.expirationDays) * 24) + " hours)");
 
