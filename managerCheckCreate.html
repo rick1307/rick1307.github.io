@@ -877,7 +877,9 @@
         try { draft = JSON.parse(sessionStorage.getItem("leapCheckDraft") || "null"); } catch {}
         if (!draft) return;
 
-        destination.value = draft.destination || "";
+        // Manager safety rule: the destination is never restored or auto-populated.
+        // It may only be entered manually by typing or pasting on this page.
+        destination.value = "";
         amount.value = draft.amount || "";
         expiration.value = String(draft.expirationDays || "");
         reason.value = CATEGORIES.includes(draft.reason) ? draft.reason : "";
@@ -981,6 +983,13 @@
       recognition.addEventListener("change", updatePreview);
       refreshButton.addEventListener("click", start);
 
+      // Also clear browser-restored values when returning via back/forward cache.
+      window.addEventListener("pageshow", () => {
+        destination.value = "";
+        renderRecognitionChoices();
+      });
+
+      destination.value = "";
       start();
     })();
   </script>
