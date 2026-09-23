@@ -32,6 +32,7 @@
     .check-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.check-amount{font-size:21px;font-weight:900;color:#fff}.check-reason{margin-top:4px;color:#a9bfd2;font-size:13px;overflow-wrap:anywhere}.check-status{flex:0 0 auto;border:1px solid #3c5b75;border-radius:999px;padding:5px 8px;color:#b9cfdf;font-size:11px;font-weight:900}.check-card.soon .check-status{border-color:#9c681f;color:#ffd99e}.check-card.urgent .check-status,.check-card.expired .check-status{border-color:#8a474e;color:#ffb8bd}
     .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.check-fact{min-width:0;border-top:1px solid #29425a;padding-top:9px}.check-fact span{display:block;color:#7f98ad;font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:900}.check-fact strong{display:block;margin-top:4px;color:#e7edf5;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
     .check-countdown{margin-top:13px;padding:10px 11px;border-radius:9px;background:#101c28;color:#a9bfd2;font-size:12px;line-height:1.45}.check-countdown b{color:#fff}.check-card.expired .check-countdown b{color:#ffd2d2}.check-id{margin-top:9px;color:#68849d;font-size:10px;overflow-wrap:anywhere}
+    .check-actions{display:flex;justify-content:flex-end;margin-top:12px}.cancel-check{border:1px solid #7f4650;border-radius:999px;background:#2a1c22;color:#ffd4d8;padding:8px 13px;font-size:12px;font-weight:900;cursor:pointer}.cancel-check:hover{background:#3a232a}.cancel-check:focus-visible{outline:3px solid rgba(255,212,216,.28);outline-offset:2px}
     .empty{padding:26px 18px;border:1px dashed #3a536b;border-radius:12px;text-align:center;color:#8ea5ba}.error{display:none;margin-bottom:14px;padding:12px 14px;border:1px solid #e0b2b2;border-radius:11px;background:#fff0f0;color:#7d2929;font-size:13px;line-height:1.4}
     .footnote{margin:13px 3px 0;color:var(--muted);font-size:11px;line-height:1.45}
     @media(max-width:700px){.summary{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr}.ledger{padding:17px}.check-grid{grid-template-columns:1fr}}
@@ -67,7 +68,7 @@
     <div class="ledger-head"><h2>Outstanding Checks</h2><span id="checkbookCount">Loading…</span></div>
     <div id="checkbookList" class="check-list"></div>
   </section>
-  <p class="footnote">This page is read-only. Cancel Check will be added later as its own deliberate management action.</p>
+  <p class="footnote">Cancel Check opens Xaman's Signing Tool with the exact <code>CheckCancel</code> template for that ledger object. Nothing is canceled until you sign and submit the transaction.</p>
 </main>
 
 <script>
@@ -167,6 +168,23 @@
   }
   function formatReason(create){const fact=create?.facts?.[0];if(!fact)return "LEAP Check";const label=fact.key.charAt(0)+fact.key.slice(1).toLowerCase();return `${label} · ${fact.value}`;}
 
+  function prepareCancel(object,create){
+    const checkId=checkObjectId(object);
+    if(!/^[A-Fa-f0-9]{64}$/.test(checkId)){
+      showError("This Check does not have a valid Check ID, so a cancellation request cannot be prepared.");
+      return;
+    }
+    const amount=`${object.SendMax?.value??create?.amount?.value??"?"} LEAP`;
+    const reason=formatReason(create);
+    const confirmed=window.confirm(`Prepare cancellation for ${amount} — ${reason}?\n\nThis only opens Xaman's Signing Tool. Nothing is canceled until you sign and submit.`);
+    if(!confirmed)return;
+
+    const tx={TransactionType:"CheckCancel",CheckID:checkId};
+    const payload=btoa(JSON.stringify(tx));
+    const url=`https://xumm.dev/signing-tool?payload=${encodeURIComponent(payload)}`;
+    window.open(url,"_blank","noopener,noreferrer");
+  }
+
   function rowsForRender(){
     const rows=checkbookObjects.filter(o=>isLeapAmount(o.SendMax)).map(object=>({object,create:checkCreateFor(object)}));
     rows.sort((a,b)=>{const ta=a.create?.time?new Date(a.create.time).getTime():0;const tb=b.create?.time?new Date(b.create.time).getTime():0;return tb-ta;});
@@ -191,7 +209,9 @@
       const grid=document.createElement("div");grid.className="check-grid";const facts=[["Recipient",object.Destination||create?.destination||"Unavailable"],["Created",create?.time?prettyDateTime(create.time):"Unavailable"],["Expiration",expirationIso(object,create)?prettyDateTime(expirationIso(object,create)):"No expiration set"],["Status",state.text]];
       for(const [label,value] of facts){const cell=document.createElement("div");cell.className="check-fact";const l=document.createElement("span");l.textContent=label;const v=document.createElement("strong");v.textContent=value;cell.append(l,v);grid.appendChild(cell);}
       const countdown=document.createElement("div");countdown.className="check-countdown";if(state.css==="expired")countdown.innerHTML="<b>Cleanup needed.</b> This Check can no longer be cashed, but it still occupies owner reserve until it is canceled.";else if(!expirationIso(object,create))countdown.innerHTML="<b>No expiration set.</b> This Check stays cashable until it is cashed or canceled.";else countdown.innerHTML=`<b>${state.text}.</b> It disappears from this Checkbook when it is cashed or canceled.`;
-      const id=document.createElement("div");id.className="check-id";id.textContent=`Check ID: ${checkObjectId(object)||"unavailable"}`;card.append(top,grid,countdown,id);checkbookList.appendChild(card);
+      const id=document.createElement("div");id.className="check-id";id.textContent=`Check ID: ${checkObjectId(object)||"unavailable"}`;
+      const actions=document.createElement("div");actions.className="check-actions";const cancelButton=document.createElement("button");cancelButton.className="cancel-check";cancelButton.type="button";cancelButton.textContent="Cancel Check";cancelButton.addEventListener("click",()=>prepareCancel(object,create));actions.appendChild(cancelButton);
+      card.append(top,grid,countdown,id,actions);checkbookList.appendChild(card);
     }
   }
 
