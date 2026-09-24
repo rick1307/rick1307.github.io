@@ -217,34 +217,6 @@
       margin:0;
     }
 
-    .bottom-link-menu{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      margin-top:18px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      overflow:hidden;
-      background:rgba(255,250,240,.32);
-    }
-
-    .bottom-link-menu a{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:58px;
-      padding:10px 12px;
-      text-decoration:none;
-      color:var(--navy);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.94rem;
-      font-weight:850;
-      text-align:center;
-      border-right:1px solid var(--line);
-    }
-
-    .bottom-link-menu a:last-child{border-right:0}
-    .bottom-link-menu a:hover{background:rgba(47,116,129,.08);color:var(--rust)}
-
     .button{
       display:inline-flex;align-items:center;justify-content:center;
       padding:12px 18px;
@@ -331,6 +303,23 @@
     }
 
     section{padding:48px 0}
+
+    .story-section{padding-top:18px}
+
+    .story-panel{
+      margin:0 auto;
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:0 18px 38px rgba(26,37,44,.12);
+      border:1px solid rgba(26,37,44,.12);
+      background:var(--card);
+    }
+
+    .story-panel img{
+      display:block;
+      width:100%;
+      height:auto;
+    }
 
     .paired-feature-grid{
       display:grid;
@@ -425,6 +414,25 @@
     .card h3{margin:0 0 7px;color:var(--navy);font-size:1.34rem}
     .card p{margin:0;color:#58666c}
 
+    .card-topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+    }
+    .card-topline b{margin:0}
+    .card-more{
+      flex:0 0 auto;
+      text-decoration:none;
+      color:var(--sea);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.8rem;
+      font-weight:850;
+      white-space:nowrap;
+    }
+    .card-more:hover{color:var(--rust)}
+
     .ranks{border-top:2px solid var(--navy)}
 
     .rank{
@@ -474,6 +482,14 @@
     .deep-dive h3{margin:0 0 8px;color:var(--navy);font-size:1.55rem}
     .deep-dive p{margin:0;color:#58666c}
     .deep-dive .button{margin-top:18px}
+
+    .cta-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+    .cta-links .button{margin:0}
 
     .logbook{
       padding:44px 24px;
@@ -575,6 +591,8 @@
       .hero{padding-top:54px}
       .hero-intro{grid-template-columns:1fr}
       .hero-intro > .hero-copy{display:block}
+      .story-section{padding-top:10px}
+      .story-panel{border-radius:24px}
       .paired-feature-grid{grid-template-columns:1fr}
       .hero-card{
         max-width:none;
@@ -600,6 +618,9 @@
       .rank .meaning{grid-column:1/-1}
       .manifesto{padding:28px}
       .button.secondary{margin-left:0;margin-top:10px}
+      .cta-links{display:grid;grid-template-columns:1fr 1fr}
+      .cta-links .button{margin:0}
+      .cta-links .button:first-child{grid-column:1/-1}
       .returning-crew-row{grid-template-columns:1fr}
       .returning-crew button{min-height:43px}
       .returning-crew-head{display:block}
@@ -800,24 +821,10 @@
   </header>
 
   <main>
-        <section id="idea" class="paired-feature-section">
+        <section id="idea" class="story-section">
       <div class="wrap">
-        <div class="paired-feature-grid">
-          <aside class="hero-card">
-          <div class="hero-card-inner">
-            <img class="hero-cycle-asset" src="leap-cycle.png" alt="The LEAP participation cycle: Watch, Engage, Earn, Build History, then back to Watch">
-            <h3>The LEAP Cycle</h3>
-            <p>Watch. Engage. Earn. Build history. Then keep the cycle going.</p>
-          </div>
-        </aside>
-          <div class="manifesto">
-          <p>
-            We use LEAP — a digital crew token on the XRP Ledger.
-            The idea is straightforward, even if the technology behind it isn’t yet.
-            LEAP lets us turn participation in Sailing Frog’s Leap into a durable digital record: who joined, what they earned, where they’ve been, and what they contributed.
-            As you participate, the LEAP you earn advances your crew rank, while badges preserve the moments and contributions that make your history unique.
-          </p>
-        </div>
+        <div class="story-panel">
+          <img src="images/leap-story-logbook.png" alt="Crew members on a sailboat at sunset with a logbook in the foreground and the message: The blockchain is just the logbook. The point is the crew." loading="lazy">
         </div>
       </div>
     </section>
@@ -857,19 +864,6 @@
       </div>
     </section>
 
-    <section>
-      <div class="wrap">
-        <div class="deep-dive">
-          <h3>Ready to come aboard?</h3>
-          <p>
-            Joining takes a few steps, and we'll walk you through each one.
-          </p>
-          <a class="button" href="join.html">Join the crew →</a>
-          <a class="button secondary" href="faq.html">Questions? Read the FAQ →</a>
-        </div>
-      </div>
-    </section>
-
     <section id="participation">
       <div class="wrap">
         <div class="section-title">
@@ -881,7 +875,10 @@
 
         <div class="three">
           <article class="card">
-            <b>Badges</b>
+            <div class="card-topline">
+              <b>Badges</b>
+              <a class="card-more" href="badges.html">Learn More →</a>
+            </div>
             <h3>Recognition that stays with your story</h3>
             <p>
               Badges recognize meaningful things about your crew history. Some are standard and always available. Others are limited to a particular time or moment.
@@ -889,7 +886,10 @@
           </article>
 
           <article class="card">
-            <b>Challenges</b>
+            <div class="card-topline">
+              <b>Challenges</b>
+              <a class="card-more" href="challenges.html">Learn More →</a>
+            </div>
             <h3>Something to go do</h3>
             <p>
               Challenges give Leapers a clear objective. Some can stay open for months. Smaller challenges may appear for a much shorter window.
@@ -897,27 +897,31 @@
           </article>
 
           <article class="card">
-            <b>Events</b>
+            <div class="card-topline">
+              <b>Events</b>
+              <a class="card-more" href="events.html">Learn More →</a>
+            </div>
             <h3>Be there when it happens</h3>
             <p>
               Events are shared moments in the Sailing Frog's Leap story. Take part in an announced event and that moment can become part of your LEAP history.
             </p>
           </article>
         </div>
-
       </div>
     </section>
 
     <section>
       <div class="wrap">
         <div class="deep-dive">
-          <h3>Want to know more?</h3>
-          <nav class="bottom-link-menu" aria-label="Learn more about LEAP">
-            <a href="ranks.html">Crew Ranks →</a>
-            <a href="badges.html">Badges →</a>
-            <a href="challenges.html">Challenges →</a>
-            <a href="events.html">Events →</a>
-          </nav>
+          <h3>Ready to come aboard?</h3>
+          <p>
+            Joining takes a few steps, and we'll walk you through each one.
+          </p>
+          <div class="cta-links">
+            <a class="button" href="join.html">Join the Crew →</a>
+            <a class="button secondary" href="ranks.html">Learn About the Ranks →</a>
+            <a class="button secondary" href="faq.html">FAQs →</a>
+          </div>
         </div>
       </div>
     </section>
