@@ -156,7 +156,7 @@
       letter-spacing:.02em;
     }
 
-    .console-title span{
+    .trustline-row{
       display:flex;
       align-items:center;
       gap:6px;
@@ -168,7 +168,7 @@
       font-weight:800;
     }
 
-    .console-title span::before{
+    .trustline-row::before{
       content:"";
       width:7px;
       height:7px;
@@ -178,31 +178,51 @@
       flex:0 0 auto;
     }
 
-    .console-title span.trustline-good{
+    .trustline-row.trustline-good{
       color:#7ee2a8;
     }
 
-    .console-title span.trustline-good::before{
+    .trustline-row.trustline-good::before{
       background:#63d893;
       box-shadow:0 0 0 2px rgba(99,216,147,.13),0 0 10px rgba(99,216,147,.26);
     }
 
-    .console-title span.trustline-warn{
+    .trustline-row.trustline-warn{
       color:#f0c76b;
     }
 
-    .console-title span.trustline-warn::before{
+    .trustline-row.trustline-warn::before{
       background:#e9b94f;
       box-shadow:0 0 0 2px rgba(233,185,79,.13),0 0 10px rgba(233,185,79,.24);
     }
 
-    .console-title span.trustline-bad{
+    .trustline-row.trustline-bad{
       color:#ff9a8c;
     }
 
-    .console-title span.trustline-bad::before{
+    .trustline-row.trustline-bad::before{
       background:#f06f5d;
       box-shadow:0 0 0 2px rgba(240,111,93,.13),0 0 10px rgba(240,111,93,.24);
+    }
+
+    .trustline-create{
+      border:1px solid rgba(255,154,140,.52);
+      border-radius:999px;
+      padding:2px 7px;
+      background:rgba(255,255,255,.08);
+      color:#ffd2cb;
+      font:inherit;
+      font-size:.56rem;
+      font-weight:900;
+      letter-spacing:.08em;
+      line-height:1.35;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+
+    .trustline-create:hover{
+      background:rgba(255,255,255,.14);
+      border-color:rgba(255,154,140,.78);
     }
 
     .live-pill{
@@ -722,8 +742,21 @@
       font:inherit;
       font-size:.68rem;
       font-weight:900;
+      cursor:pointer;
+      opacity:1;
+      box-shadow:0 8px 18px rgba(4,18,22,.14);
+    }
+
+    .transfer-enable button:hover:not(:disabled){
+      filter:brightness(1.05);
+      transform:translateY(-1px);
+    }
+
+    .transfer-enable button:disabled{
       cursor:not-allowed;
-      opacity:.72;
+      opacity:.48;
+      box-shadow:none;
+      transform:none;
     }
 
     .discord-cta{
@@ -804,7 +837,13 @@
         <div class="console-head">
           <div class="console-title">
             <img src="leap-logo.png" alt="LEAP coin">
-            <div><b>Crew Record</b><span id="trustlineStatus">Checking Trustline…</span></div>
+            <div>
+              <b>Crew Record</b>
+              <div class="trustline-row" id="trustlineStatus">
+                <span id="trustlineStatusText">Checking Trustline…</span>
+                <button class="trustline-create" id="trustlineCreateButton" type="button" hidden>Create</button>
+              </div>
+            </div>
           </div>
           <div class="live-pill">Ledger Live</div>
         </div>
@@ -890,6 +929,8 @@
   <script>
     (() => {
       const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
+      const LEAP_CURRENCY = "4C45415000000000000000000000000000000000";
+      const LEAP_TRANSFER_LIMIT = "1000000";
       const LEAP_DISTRIBUTORS = new Set([
         "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
       ]);
@@ -908,6 +949,8 @@
 
       const status = document.getElementById("crewRecordStatus");
       const trustlineStatus = document.getElementById("trustlineStatus");
+      const trustlineStatusText = document.getElementById("trustlineStatusText");
+      const trustlineCreateButton = document.getElementById("trustlineCreateButton");
       const walletEl = document.getElementById("recordWallet");
       const leapEl = document.getElementById("recordLeap");
       const rankEl = document.getElementById("recordRank");
@@ -1027,34 +1070,38 @@
 
       function resetTransferEnablement() {
         transferEnable.classList.remove("show");
+        transferEnableButton.disabled = true;
+        transferEnableButton.title = "This wallet already has a positive LEAP receiving limit.";
       }
 
       function setTrustlineStatus(leapLine, state = "loaded") {
-        if (!trustlineStatus) return;
+        if (!trustlineStatus || !trustlineStatusText) return;
 
         trustlineStatus.classList.remove(
           "trustline-good",
           "trustline-warn",
           "trustline-bad"
         );
+        trustlineCreateButton.hidden = true;
 
         if (state === "checking") {
-          trustlineStatus.textContent = "Checking Trustline…";
+          trustlineStatusText.textContent = "Checking Trustline…";
           return;
         }
 
         if (state === "unavailable") {
-          trustlineStatus.textContent = "Trustline Status Unavailable";
+          trustlineStatusText.textContent = "Trustline Status Unavailable";
           trustlineStatus.classList.add("trustline-warn");
           return;
         }
 
         if (leapLine) {
-          trustlineStatus.textContent = "Trustline Exists";
+          trustlineStatusText.textContent = "Trustline Exists";
           trustlineStatus.classList.add("trustline-good");
         } else {
-          trustlineStatus.textContent = "Trustline Does Not Exist";
+          trustlineStatusText.textContent = "Trustline Does Not Exist";
           trustlineStatus.classList.add("trustline-bad");
+          trustlineCreateButton.hidden = false;
         }
       }
 
@@ -1067,7 +1114,30 @@
 
         if (Number.isFinite(limit) && limit === 0) {
           transferEnable.classList.add("show");
+          transferEnableButton.disabled = false;
+          transferEnableButton.title = "Set this wallet's LEAP receiving limit to 1,000,000.";
         }
+      }
+
+      function prepareLeapTrustline() {
+        const confirmed = window.confirm(
+          `Set this wallet's LEAP receiving limit to ${Number(LEAP_TRANSFER_LIMIT).toLocaleString()} LEAP?\n\nThis opens Xaman's Signing Tool. Nothing changes until you review, sign, and submit.`
+        );
+
+        if (!confirmed) return;
+
+        const tx = {
+          TransactionType:"TrustSet",
+          LimitAmount:{
+            currency:LEAP_CURRENCY,
+            issuer:LEAP_ISSUER,
+            value:LEAP_TRANSFER_LIMIT
+          }
+        };
+
+        const payload = btoa(JSON.stringify(tx));
+        const url = `https://xumm.dev/signing-tool?payload=${encodeURIComponent(payload)}`;
+        window.open(url, "_blank", "noopener,noreferrer");
       }
 
       function resetLogbook(message = "Your LEAP history will appear here after your Crew Record is opened through the LEAP flow.") {
@@ -2522,6 +2592,8 @@
           if (safeBalance < 1) {
             setDiscordAccess(false);
             resetRecord();
+            setTrustlineStatus(leapLine);
+            renderTransferEnablement(leapLine);
 
             if (pending.length) {
               walletEl.textContent = shortAddress(account);
@@ -2655,6 +2727,9 @@
           renderPendingChecks(currentPendingLeapChecks);
         }
       }, 60000);
+
+      trustlineCreateButton.addEventListener("click", prepareLeapTrustline);
+      transferEnableButton.addEventListener("click", prepareLeapTrustline);
 
       discordCrewButton.addEventListener("click", beginDiscordOAuth);
 
