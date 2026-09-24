@@ -423,76 +423,34 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:5px;
+      gap:4px;
       min-width:0;
-      padding:2px 4px;
+      padding:0 2px;
       text-align:center;
     }
 
-    .pending-check-deadline-kicker{
-      color:rgba(255,255,255,.58);
-      font-size:.53rem;
+    .pending-check-deadline-image{
+      display:block;
+      width:112px;
+      height:112px;
+      object-fit:contain;
+      filter:drop-shadow(0 10px 14px rgba(4,18,22,.22));
+    }
+
+    .pending-check-deadline-copy{
+      color:rgba(255,255,255,.8);
+      font-size:.61rem;
       font-weight:900;
-      letter-spacing:.16em;
+      letter-spacing:.09em;
       line-height:1.1;
       text-transform:uppercase;
     }
 
-    .pending-check-deadline-value{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:82px;
-      height:82px;
-      margin:0;
-      border-radius:50%;
-      border:2px solid rgba(242,217,159,.45);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.23), rgba(255,255,255,0) 32%),
-        radial-gradient(circle at 50% 50%, rgba(255,236,185,.18), rgba(15,42,50,.8) 72%);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.18),
-        0 10px 20px rgba(4,18,22,.18),
-        0 0 0 4px rgba(255,255,255,.035);
-      color:#fff3ce;
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:2.55rem;
-      font-weight:700;
-      line-height:1;
-      text-shadow:0 1px 0 rgba(0,0,0,.24);
-    }
-
-    .pending-check-deadline-copy{
-      max-width:110px;
-      color:rgba(255,255,255,.76);
-      font-size:.58rem;
-      font-weight:850;
-      line-height:1.2;
+    .pending-check-deadline-fallback{
+      color:rgba(255,255,255,.72);
+      font-size:.74rem;
+      font-weight:900;
       text-transform:uppercase;
-    }
-
-    .pending-check-card.warning .pending-check-deadline-value,
-    .pending-check-card.no-expiration .pending-check-deadline-value{
-      border-color:rgba(242,184,73,.58);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.24), rgba(255,255,255,0) 32%),
-        radial-gradient(circle at 50% 50%, rgba(255,221,148,.22), rgba(82,49,8,.86) 72%);
-    }
-
-    .pending-check-card.safe .pending-check-deadline-value{
-      border-color:rgba(92,210,149,.48);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.24), rgba(255,255,255,0) 32%),
-        radial-gradient(circle at 50% 50%, rgba(178,255,207,.2), rgba(13,62,42,.84) 72%);
-    }
-
-    .pending-check-card.urgent .pending-check-deadline-value,
-    .pending-check-card.expired .pending-check-deadline-value{
-      border-color:rgba(244,104,81,.56);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), rgba(255,255,255,0) 32%),
-        radial-gradient(circle at 50% 50%, rgba(255,203,195,.18), rgba(91,21,14,.86) 72%);
-      color:#ffd8d0;
     }
 
     .pending-check-action{
@@ -724,15 +682,11 @@
           "action action";
         gap:12px 10px;
       }
-      .pending-check-deadline{
-        padding:2px 0;
+      .pending-check-deadline{padding:0}
+      .pending-check-deadline-image{
+        width:92px;
+        height:92px;
       }
-      .pending-check-deadline-value{
-        width:72px;
-        height:72px;
-        font-size:2.1rem;
-      }
-      .pending-check-deadline-copy{max-width:90px}
       .pending-check-action{justify-content:stretch;text-align:left}
       .pending-check-action button{width:100%}
       .logbook-entry{grid-template-columns:72px minmax(0,1fr)}
@@ -1142,36 +1096,22 @@
 
       function pendingCheckDeadlineDisplay(timing) {
         const label = String(timing?.label || "").trim();
+        const match = label.match(/^(\d+)\s+day(?:s)?\s+left$/i);
 
-        let match = label.match(/^(\d+)\s+day(?:s)?\s+left$/i);
         if (match) {
-          const value = match[1];
+          const days = Math.max(1, Math.min(7, Number(match[1])));
           return {
-            kicker:"You have",
-            value,
-            copy:value === "1" ? "day left to cash" : "days left to cash"
+            image:`images/leap-days-${days}.png`,
+            alt:`${days} day${days === 1 ? "" : "s"} left`,
+            copy:"Days Left"
           };
-        }
-
-        match = label.match(/^(\d+)\s+hours?\s+left$/i);
-        if (match) {
-          const value = match[1];
-          return {
-            kicker:"You have",
-            value,
-            copy:value === "1" ? "hour left to cash" : "hours left to cash"
-          };
-        }
-
-        if (/^less than 1 hour left$/i.test(label)) {
-          return { kicker:"You have", value:"<1", copy:"hour left to cash" };
         }
 
         if (timing?.state === "expired") {
-          return { kicker:"Check", value:"—", copy:"expired" };
+          return { image:"", alt:"", copy:"Expired" };
         }
 
-        return { kicker:"Ready", value:"—", copy:"to cash" };
+        return { image:"", alt:"", copy:"Days Left" };
       }
 
       function renderPendingChecks(checks = currentPendingLeapChecks) {
@@ -1274,19 +1214,23 @@
 
           const deadlineDisplay = pendingCheckDeadlineDisplay(timing);
 
-          const deadlineKicker = document.createElement("span");
-          deadlineKicker.className = "pending-check-deadline-kicker";
-          deadlineKicker.textContent = deadlineDisplay.kicker;
-
-          const deadlineValue = document.createElement("strong");
-          deadlineValue.className = "pending-check-deadline-value";
-          deadlineValue.textContent = deadlineDisplay.value;
+          if (deadlineDisplay.image) {
+            const deadlineImage = document.createElement("img");
+            deadlineImage.className = "pending-check-deadline-image";
+            deadlineImage.src = deadlineDisplay.image;
+            deadlineImage.alt = deadlineDisplay.alt;
+            deadlineImage.width = 112;
+            deadlineImage.height = 112;
+            deadline.appendChild(deadlineImage);
+          }
 
           const deadlineCopy = document.createElement("span");
-          deadlineCopy.className = "pending-check-deadline-copy";
+          deadlineCopy.className = deadlineDisplay.image
+            ? "pending-check-deadline-copy"
+            : "pending-check-deadline-fallback";
           deadlineCopy.textContent = deadlineDisplay.copy;
 
-          deadline.append(deadlineKicker, deadlineValue, deadlineCopy);
+          deadline.appendChild(deadlineCopy);
 
           const action = document.createElement("div");
           action.className = "pending-check-action";
