@@ -2680,10 +2680,25 @@
               clearIdentityState({ forgetWallet:true });
             }
 
-            setStatus(
-              "No current LEAP membership was found for this wallet. If you’ve already joined and received a LEAP Check, open Xaman and look in the Events tab for the Check, then cash it. Your Crew Record will appear once the LEAP reaches your wallet.",
-              "error"
-            );
+            if (pending.length) {
+              setStatus(
+                "Your first LEAP is waiting in Xaman. Cash the LEAP Check to bring it aboard. New LEAP from Sailing Frog's Leap starts with a Check so its history is recorded. After that, LEAP can move directly between Leapers.",
+                "success"
+              );
+            } else if (!leapLine) {
+              setStatus(
+                "Ready for LEAP in the wild? Create your trustline above so this wallet can receive LEAP directly from other Leapers. Sailing Frog's Leap issues new LEAP by Check to record its history; once issued, it can move wallet-to-wallet."
+              );
+            } else if (Number(leapLine.limit) === 0) {
+              setStatus(
+                "Your LEAP trustline exists, but direct transfers are currently disabled. Enable LEAP Transfers above so LEAP already in the wild can come straight to this wallet. New LEAP from Sailing Frog's Leap still starts with a Check."
+              );
+            } else {
+              setStatus(
+                "This wallet is ready for LEAP in the wild. Sailing Frog's Leap issues new LEAP by Check to record its history; LEAP already issued can come directly from other Leapers.",
+                "success"
+              );
+            }
             return;
           }
 
