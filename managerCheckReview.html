@@ -41,7 +41,7 @@
       <div class="row"><span>Reason</span><strong id="reason">—</strong></div>
       <div class="row"><span>Recognition</span><strong id="recognition">—</strong></div>
       <div class="row"><span>Amount</span><strong id="amount">—</strong></div>
-      <div class="row"><span>Cleanup flag</span><strong>7 days after creation</strong></div>
+      <div class="row"><span>Cleanup flag</span><strong id="cleanupFlag">—</strong></div>
       <div class="memo"><span class="memo-label">Canonical public memo</span><code id="memo">—</code></div>
 
       <details open>
@@ -49,7 +49,7 @@
         <div class="raw-wrap">
           <p class="raw-note">Unsigned <strong>CheckCreate</strong> template. <code>Fee</code>, <code>Sequence</code>, and signing fields are intentionally omitted; those belong to the later Xaman signing step.</p>
           <pre id="rawTransaction">No draft loaded.</pre>
-          <div class="hex-note">MemoData is the canonical public memo encoded as UTF-8 hexadecimal:<br><code id="memoHex">—</code></div>
+          <div class="hex-note">The first MemoData is the canonical recognition memo. The second stores the selected cleanup flag on-ledger as public metadata.<br>Recognition memo hex: <code id="memoHex">—</code></div>
         </div>
       </details>
 
@@ -91,11 +91,16 @@
     return /^[1-9]\d{0,14}$/.test(String(value || "").trim());
   }
 
+  function validCleanupDays(value) {
+    return [1, 2, 3, 7, 15, 30].includes(Number(value));
+  }
+
   function buildTransaction(draft) {
     if (!draft.distributor || !draft.destination || !draft.leapIssuer || !draft.leapCurrency || !draft.memo) {
       throw new Error("The Check draft is missing transaction data. Return to Create LEAP Check and rebuild it.");
     }
     if (!validWholeLeap(draft.amount)) throw new Error("LEAP amount must be a positive whole number.");
+    if (!validCleanupDays(draft.cleanupDays)) throw new Error("Choose a valid cleanup flag before reviewing the Check.");
 
     return {
       TransactionType: "CheckCreate",
@@ -110,6 +115,11 @@
         {
           Memo: {
             MemoData: textToHex(draft.memo)
+          }
+        },
+        {
+          Memo: {
+            MemoData: textToHex("SFL-LEAP/CLEANUP=" + String(draft.cleanupDays))
           }
         }
       ]
@@ -127,6 +137,9 @@
     document.getElementById("reason").textContent = reasonNames[draft.reason] || draft.reason || "—";
     document.getElementById("recognition").textContent = prettyRecognition(draft.recognition) || "—";
     document.getElementById("amount").textContent = (draft.amount || "—") + " LEAP";
+    document.getElementById("cleanupFlag").textContent = validCleanupDays(draft.cleanupDays)
+      ? `${draft.cleanupDays} day${Number(draft.cleanupDays) === 1 ? "" : "s"} after creation`
+      : "—";
     document.getElementById("memo").textContent = draft.memo || "—";
 
     try {

@@ -68,7 +68,7 @@
     <div class="ledger-head"><h2>Outstanding Checks</h2><span id="checkbookCount">Loading…</span></div>
     <div id="checkbookList" class="check-list"></div>
   </section>
-  <p class="footnote">New Checks have no ledger expiration. The Checkbook turns them red after 7 days so you can clean them up with Cancel Check. Cancel Check opens Xaman's Signing Tool with the exact <code>CheckCancel</code> template; nothing is canceled until you sign and submit.</p>
+  <p class="footnote">New Checks have no ledger expiration. Each Check carries its selected cleanup flag (1, 2, 3, 7, 15, or 30 days); the Checkbook turns it red when that flag is reached so you can clean it up with Cancel Check. Cancel Check opens Xaman's Signing Tool with the exact <code>CheckCancel</code> template; nothing is canceled until you sign and submit.</p>
 </main>
 
 <script>
@@ -83,7 +83,8 @@
   const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
   const SOON_MS = 7 * 24 * 60 * 60 * 1000;
   const URGENT_MS = 48 * 60 * 60 * 1000;
-  const CLEANUP_MS = 7 * 24 * 60 * 60 * 1000;
+  const DEFAULT_CLEANUP_DAYS = 7;
+  const VALID_CLEANUP_DAYS = new Set([1, 2, 3, 7, 15, 30]);
 
   let socket = null;
   let requestCounter = 0;
@@ -145,12 +146,29 @@
     }
     return facts;
   }
+  function cleanupDaysFromText(text){
+    const match=/^SFL-LEAP\/CLEANUP=(\d+)$/i.exec(String(text||"").trim());
+    if(!match)return null;
+    const days=Number(match[1]);
+    return VALID_CLEANUP_DAYS.has(days)?days:null;
+  }
+  function extractCleanupDays(tx){
+    const memos=Array.isArray(tx?.Memos)?tx.Memos:[];
+    for(const wrapper of memos){
+      const memo=wrapper?.Memo||{};
+      for(const raw of [memo.MemoData,memo.MemoType,memo.MemoFormat]){
+        const days=cleanupDaysFromText(hexToText(raw).trim());
+        if(days)return days;
+      }
+    }
+    return null;
+  }
   function extractCreatedCheckId(meta){
     const nodes=meta?.AffectedNodes||meta?.affected_nodes||[]; for(const wrapper of nodes){const node=wrapper?.CreatedNode||wrapper?.created_node;if(!node)continue;const type=node.LedgerEntryType||node.ledger_entry_type;if(type!=="Check")continue;return node.LedgerIndex||node.ledger_index||null;} return null;
   }
   function rememberCheckCreate(tx,meta,info){
     if(tx.TransactionType!=="CheckCreate"||!AUTHORIZED_DISTRIBUTORS.includes(tx.Account)||!isLeapAmount(tx.SendMax))return;
-    const checkId=extractCreatedCheckId(meta); const record={hash:info.hash||tx.hash||"",checkId:checkId||"",time:cleanIso(info.time),destination:tx.Destination||"",amount:tx.SendMax,expiration:typeof tx.Expiration==="number"?tx.Expiration:null,facts:extractFacts(tx)};
+    const checkId=extractCreatedCheckId(meta); const record={hash:info.hash||tx.hash||"",checkId:checkId||"",time:cleanIso(info.time),destination:tx.Destination||"",amount:tx.SendMax,expiration:typeof tx.Expiration==="number"?tx.Expiration:null,cleanupDays:extractCleanupDays(tx),facts:extractFacts(tx)};
     if(record.hash)checkCreatesByHash.set(record.hash,record); if(checkId)checkCreatesById.set(checkId,record);
   }
   function processHistoryEntry(entry){
@@ -177,8 +195,10 @@
     if(Number.isFinite(createdMs)){
       const age=Math.max(0,Date.now()-createdMs);
       const days=Math.floor(age/(24*60*60*1000));
-      if(age>=CLEANUP_MS)return {css:"expired",label:"Cleanup Due",text:`Open ${days} day${days===1?"":"s"}`,kind:"age"};
-      const remaining=CLEANUP_MS-age;
+      const cleanupDays=VALID_CLEANUP_DAYS.has(Number(create?.cleanupDays))?Number(create.cleanupDays):DEFAULT_CLEANUP_DAYS;
+      const cleanupMs=cleanupDays*24*60*60*1000;
+      if(age>=cleanupMs)return {css:"expired",label:"Cleanup Due",text:`Open ${days} day${days===1?"":"s"} · ${cleanupDays}-day flag reached`,kind:"age",cleanupDays};
+      const remaining=cleanupMs-age;
       const hours=Math.max(1,Math.ceil(remaining/3600000));
       const untilCleanup=hours<48?`${hours} hour${hours===1?"":"s"} until cleanup flag`:`${Math.ceil(hours/24)} days until cleanup flag`;
       return {css:"",label:"Active",text:untilCleanup,kind:"age"};
@@ -226,13 +246,13 @@
     for(const {object,create} of rows){
       const state=checkState(object,create); const card=document.createElement("article"); card.className="check-card"+(state.css?` ${state.css}`:"");
       const top=document.createElement("div");top.className="check-top";const left=document.createElement("div");const amount=document.createElement("div");amount.className="check-amount";amount.textContent=`${object.SendMax?.value??create?.amount?.value??"?"} LEAP`;const reason=document.createElement("div");reason.className="check-reason";reason.textContent=formatReason(create);left.append(amount,reason);const badge=document.createElement("div");badge.className="check-status";badge.textContent=state.label;top.append(left,badge);
-      const grid=document.createElement("div");grid.className="check-grid";const facts=[["Recipient",object.Destination||create?.destination||"Unavailable"],["Created",create?.time?prettyDateTime(create.time):"Unavailable"],["Expiration",expirationIso(object,create)?prettyDateTime(expirationIso(object,create)):"No expiration set"],["Status",state.text]];
+      const grid=document.createElement("div");grid.className="check-grid";const cleanupDays=VALID_CLEANUP_DAYS.has(Number(create?.cleanupDays))?Number(create.cleanupDays):DEFAULT_CLEANUP_DAYS;const timingLabel=expirationIso(object,create)?"Expiration":"Cleanup flag";const timingValue=expirationIso(object,create)?prettyDateTime(expirationIso(object,create)):`${cleanupDays} day${cleanupDays===1?"":"s"} after creation`;const facts=[["Recipient",object.Destination||create?.destination||"Unavailable"],["Created",create?.time?prettyDateTime(create.time):"Unavailable"],[timingLabel,timingValue],["Status",state.text]];
       for(const [label,value] of facts){const cell=document.createElement("div");cell.className="check-fact";const l=document.createElement("span");l.textContent=label;const v=document.createElement("strong");v.textContent=value;cell.append(l,v);grid.appendChild(cell);}
       const countdown=document.createElement("div");countdown.className="check-countdown";
       if(state.kind==="expired")countdown.innerHTML="<b>Cleanup needed.</b> This Check's ledger expiration has passed, but it still occupies owner reserve until it is canceled.";
-      else if(state.kind==="age"&&state.css==="expired")countdown.innerHTML="<b>Cleanup due.</b> This Check is still cashable because no ledger expiration was set. It has been open at least 7 days; cancel it when you are ready to clean it up.";
+      else if(state.kind==="age"&&state.css==="expired")countdown.innerHTML=`<b>Cleanup due.</b> The ${state.cleanupDays || DEFAULT_CLEANUP_DAYS}-day Crew Record flag has been reached. This Check is still cashable on XRPL until you cancel it.`;
       else if(state.kind==="age")countdown.innerHTML=`<b>${state.text}.</b> No ledger expiration is set; the Check stays cashable until it is cashed or canceled.`;
-      else if(!expirationIso(object,create))countdown.innerHTML="<b>No expiration set.</b> Creation time is unavailable, so the 7-day cleanup age cannot be calculated.";
+      else if(!expirationIso(object,create))countdown.innerHTML=`<b>No expiration set.</b> Creation time is unavailable, so the ${DEFAULT_CLEANUP_DAYS}-day fallback cleanup age cannot be calculated.`;
       else countdown.innerHTML=`<b>${state.text}.</b> It disappears from this Checkbook when it is cashed or canceled.`;
       const id=document.createElement("div");id.className="check-id";id.textContent=`Check ID: ${checkObjectId(object)||"unavailable"}`;
       const actions=document.createElement("div");actions.className="check-actions";const cancelButton=document.createElement("button");cancelButton.className="cancel-check";cancelButton.type="button";cancelButton.textContent="Cancel Check";cancelButton.addEventListener("click",()=>prepareCancel(object,create));actions.appendChild(cancelButton);
