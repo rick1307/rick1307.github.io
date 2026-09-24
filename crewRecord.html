@@ -935,8 +935,8 @@
             <div>
               <b>Crew Record</b>
               <div class="trustline-row" id="trustlineStatus">
-                <span id="trustlineStatusText">Checking Trustline…</span>
-                <button class="trustline-create" id="trustlineCreateButton" type="button" hidden>Create Trust Line Now</button>
+                <span id="trustlineStatusText">Checking transfers…</span>
+                <button class="trustline-create" id="trustlineCreateButton" type="button" hidden>Enable LEAP Transfers</button>
               </div>
             </div>
           </div>
@@ -966,8 +966,7 @@
         <section class="transfer-enable" id="transferEnable" aria-live="polite">
           <div class="transfer-enable-head">
             <div class="transfer-enable-copy">
-              <b>LEAP transfers are currently disabled</b>
-              <span>Your LEAP trustline currently has a receiving limit of 0. Enable transfers so other LEAP holders can send LEAP directly to your wallet without using a LEAP Check.<br><br><strong>Your new receiving limit will be 1,000,000 LEAP.</strong></span>
+              <span>Enable transfers so other LEAP holders can send LEAP directly to your wallet.</span>
             </div>
             <button id="transferEnableButton" type="button" disabled title="Transfer setup will be connected to Xaman in the next step.">Enable LEAP Transfers</button>
           </div>
@@ -1178,9 +1177,11 @@
 
         if (kind) crewStateMessage.classList.add(kind);
 
-        const heading = document.createElement("strong");
-        heading.textContent = title;
-        crewStateMessage.appendChild(heading);
+        if (title) {
+          const heading = document.createElement("strong");
+          heading.textContent = title;
+          crewStateMessage.appendChild(heading);
+        }
 
         if (body) {
           const copy = document.createElement("span");
@@ -1195,7 +1196,7 @@
       function resetTransferEnablement() {
         transferEnable.classList.remove("show");
         transferEnableButton.disabled = true;
-        transferEnableButton.title = "This wallet already has a positive LEAP receiving limit.";
+        transferEnableButton.title = "LEAP transfers are already enabled for this wallet.";
       }
 
       function setTrustlineStatus(leapLine, state = "loaded") {
@@ -1209,12 +1210,12 @@
         trustlineCreateButton.hidden = true;
 
         if (state === "checking") {
-          trustlineStatusText.textContent = "Checking Trustline…";
+          trustlineStatusText.textContent = "Checking transfers…";
           return;
         }
 
         if (state === "unavailable") {
-          trustlineStatusText.textContent = "Trustline Status Unavailable";
+          trustlineStatusText.textContent = "Transfer status unavailable";
           trustlineStatus.classList.add("trustline-warn");
           return;
         }
@@ -1223,14 +1224,14 @@
           const limit = Number(leapLine.limit);
 
           if (Number.isFinite(limit) && limit === 0) {
-            trustlineStatusText.textContent = "Trustline Transfers Disabled";
+            trustlineStatusText.textContent = "Transfers currently disabled";
             trustlineStatus.classList.add("trustline-warn");
           } else {
-            trustlineStatusText.textContent = "Trustline Exists";
+            trustlineStatusText.textContent = "Transfers enabled";
             trustlineStatus.classList.add("trustline-good");
           }
         } else {
-          trustlineStatusText.textContent = "Trustline Does Not Exist";
+          trustlineStatusText.textContent = "Transfers currently disabled";
           trustlineStatus.classList.add("trustline-bad");
           trustlineCreateButton.hidden = false;
         }
@@ -1246,13 +1247,13 @@
         if (Number.isFinite(limit) && limit === 0) {
           transferEnable.classList.add("show");
           transferEnableButton.disabled = false;
-          transferEnableButton.title = "Set this wallet's LEAP receiving limit to 1,000,000.";
+          transferEnableButton.title = "Enable direct LEAP transfers for this wallet.";
         }
       }
 
       function prepareLeapTrustline() {
         const confirmed = window.confirm(
-          `Set this wallet's LEAP receiving limit to ${Number(LEAP_TRANSFER_LIMIT).toLocaleString()} LEAP?\n\nThis opens Xaman's Signing Tool. Nothing changes until you review, sign, and submit.`
+          `Enable direct LEAP transfers for this wallet?\n\nThis opens Xaman's Signing Tool. Nothing changes until you review, sign, and submit.`
         );
 
         if (!confirmed) return;
@@ -2772,14 +2773,14 @@
               );
             } else if (!leapLine) {
               setStateMessage(
-                "Ready for LEAP in the wild?",
-                "Create your trustline above so this wallet can receive LEAP directly from other Leapers. Sailing Frog's Leap issues new LEAP by Check to record its history; once issued, it can move wallet-to-wallet.",
+                "",
+                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet.",
                 "action"
               );
             } else if (Number(leapLine.limit) === 0) {
               setStateMessage(
-                "Your trustline is ready, but direct transfers are off.",
-                "Enable LEAP Transfers so LEAP already in the wild can come straight to this wallet.",
+                "",
+                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet.",
                 "warn"
               );
             } else {
@@ -2795,8 +2796,8 @@
 
           if (Number(leapLine?.limit) === 0) {
             setStateMessage(
-              "Your trustline is ready, but direct transfers are off.",
-              "Enable LEAP Transfers so LEAP already in the wild can come straight to this wallet.",
+              "",
+              "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet.",
               "warn"
             );
           } else {
