@@ -169,32 +169,21 @@
     }
 
     .trustline-row::before{
-      content:"";
-      width:7px;
-      height:7px;
-      border-radius:50%;
-      background:rgba(255,255,255,.42);
-      box-shadow:0 0 0 2px rgba(255,255,255,.06);
-      flex:0 0 auto;
+      display:none;
+      content:none;
     }
 
     .trustline-row.trustline-good{
       color:#7ee2a8;
     }
 
-    .trustline-row.trustline-good::before{
-      background:#63d893;
-      box-shadow:0 0 0 2px rgba(99,216,147,.13),0 0 10px rgba(99,216,147,.26);
-    }
+    .trustline-row.trustline-good::before{display:none}
 
     .trustline-row.trustline-warn{
       color:#f0c76b;
     }
 
-    .trustline-row.trustline-warn::before{
-      background:#e9b94f;
-      box-shadow:0 0 0 2px rgba(233,185,79,.13),0 0 10px rgba(233,185,79,.24);
-    }
+    .trustline-row.trustline-warn::before{display:none}
 
 
     .trustline-row.trustline-bad{
@@ -245,6 +234,8 @@
       font-size:.68rem;
       font-weight:900;
       letter-spacing:.1em;
+      line-height:1.25;
+      text-align:center;
       text-transform:uppercase;
     }
 
