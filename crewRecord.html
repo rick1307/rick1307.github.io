@@ -239,15 +239,50 @@
       text-transform:uppercase;
     }
 
-    .record-wallet{
-      min-height:20px;
-      margin-bottom:11px;
-      color:rgba(255,255,255,.63);
+    .record-wallet{display:none}
+
+    .crew-state-message{
+      display:none;
+      margin:0 0 14px;
+      padding:13px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.055);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+      color:rgba(255,255,255,.76);
       font-size:.76rem;
-      letter-spacing:.03em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      line-height:1.5;
+    }
+
+    .crew-state-message.show{display:block}
+
+    .crew-state-message strong{
+      display:block;
+      margin-bottom:3px;
+      color:white;
+      font-size:.84rem;
+      line-height:1.3;
+    }
+
+    .crew-state-message.action{
+      border-color:rgba(255,154,140,.28);
+      background:rgba(255,154,140,.065);
+    }
+
+    .crew-state-message.warn{
+      border-color:rgba(240,199,107,.30);
+      background:rgba(240,199,107,.065);
+    }
+
+    .crew-state-message.success{
+      border-color:rgba(160,222,173,.25);
+      background:rgba(160,222,173,.055);
+    }
+
+    .crew-state-message.error{
+      border-color:rgba(255,154,140,.30);
+      background:rgba(255,154,140,.07);
+      color:#ffd3ca;
     }
 
     .record-grid{
@@ -331,6 +366,8 @@
       color:rgba(255,255,255,.65);
       font-size:.76rem;
     }
+
+    .crew-status:empty{display:none}
 
     .crew-status.error{color:#ffd3ca}
     .crew-status.success{color:#d7f0dc}
@@ -906,7 +943,8 @@
           <div class="live-pill">Ledger<br>Live</div>
         </div>
 
-        <div class="record-wallet" id="recordWallet">Open your Crew Record from the LEAP home or Join page.</div>
+        <div class="crew-state-message" id="crewStateMessage" role="status" aria-live="polite"></div>
+        <div class="record-wallet" id="recordWallet" hidden></div>
 
         <div class="record-grid">
           <div class="record-stat"><b>LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
@@ -1006,6 +1044,7 @@
       const XRPL_WS = "wss://s1.ripple.com/";
 
       const status = document.getElementById("crewRecordStatus");
+      const crewStateMessage = document.getElementById("crewStateMessage");
       const trustlineStatus = document.getElementById("trustlineStatus");
       const trustlineStatusText = document.getElementById("trustlineStatusText");
       const trustlineCreateButton = document.getElementById("trustlineCreateButton");
@@ -1126,6 +1165,33 @@
         status.className = "crew-status" + (kind ? " " + kind : "");
       }
 
+      function setStateMessage(title = "", body = "", kind = "") {
+        if (!crewStateMessage) return;
+
+        crewStateMessage.textContent = "";
+        crewStateMessage.className = "crew-state-message";
+
+        if (!title && !body) {
+          crewStateMessage.hidden = true;
+          return;
+        }
+
+        if (kind) crewStateMessage.classList.add(kind);
+
+        const heading = document.createElement("strong");
+        heading.textContent = title;
+        crewStateMessage.appendChild(heading);
+
+        if (body) {
+          const copy = document.createElement("span");
+          copy.textContent = body;
+          crewStateMessage.appendChild(copy);
+        }
+
+        crewStateMessage.hidden = false;
+        crewStateMessage.classList.add("show");
+      }
+
       function resetTransferEnablement() {
         transferEnable.classList.remove("show");
         transferEnableButton.disabled = true;
@@ -1154,8 +1220,15 @@
         }
 
         if (leapLine) {
-          trustlineStatusText.textContent = "Trustline Exists";
-          trustlineStatus.classList.add("trustline-good");
+          const limit = Number(leapLine.limit);
+
+          if (Number.isFinite(limit) && limit === 0) {
+            trustlineStatusText.textContent = "Trustline Transfers Disabled";
+            trustlineStatus.classList.add("trustline-warn");
+          } else {
+            trustlineStatusText.textContent = "Trustline Exists";
+            trustlineStatus.classList.add("trustline-good");
+          }
         } else {
           trustlineStatusText.textContent = "Trustline Does Not Exist";
           trustlineStatus.classList.add("trustline-bad");
@@ -1598,9 +1671,10 @@
         renderPendingChecks(currentPendingLeapChecks);
       }
 
-      function resetRecord(message = "Open your Crew Record from the LEAP home or Join page.") {
-        walletEl.textContent = message;
+      function resetRecord() {
+        walletEl.textContent = "";
         walletEl.removeAttribute("title");
+        setStateMessage();
 
         leapEl.textContent = "—";
         rankEl.textContent = "—";
@@ -2635,14 +2709,24 @@
           clearIdentityState({ forgetWallet:true });
           setDiscordAccess(false);
           resetRecord();
-          setStatus("Open your Crew Record from the LEAP home or Join page.", "error");
+          setTrustlineStatus(null, "unavailable");
+          setStateMessage(
+            "Open your Crew Record from LEAP Home or Join.",
+            "Choose a wallet through the normal LEAP flow, then come back here.",
+            "warn"
+          );
+          setStatus("");
           return;
         }
 
         setDiscordAccess(false);
-        resetRecord("Reading your Crew Record…");
+        resetRecord();
         setTrustlineStatus(null, "checking");
-        setStatus("Reading your crew record from the XRP Ledger…");
+        setStateMessage(
+          "Reading your Crew Record…",
+          "Checking the validated XRP Ledger."
+        );
+        setStatus("");
 
         try {
           const [linesResult, historyResult, checksResult] = await Promise.allSettled([
@@ -2681,29 +2765,44 @@
             }
 
             if (pending.length) {
-              setStatus(
-                "Your first LEAP is waiting in Xaman. Cash the LEAP Check to bring it aboard. New LEAP from Sailing Frog's Leap starts with a Check so its history is recorded. After that, LEAP can move directly between Leapers.",
+              setStateMessage(
+                "Your first LEAP is waiting in Xaman.",
+                "Cash the LEAP Check to bring it aboard. New LEAP from Sailing Frog's Leap starts with a Check so its history is recorded. After that, LEAP can move directly between Leapers.",
                 "success"
               );
             } else if (!leapLine) {
-              setStatus(
-                "Ready for LEAP in the wild? Create your trustline above so this wallet can receive LEAP directly from other Leapers. Sailing Frog's Leap issues new LEAP by Check to record its history; once issued, it can move wallet-to-wallet."
+              setStateMessage(
+                "Ready for LEAP in the wild?",
+                "Create your trustline above so this wallet can receive LEAP directly from other Leapers. Sailing Frog's Leap issues new LEAP by Check to record its history; once issued, it can move wallet-to-wallet.",
+                "action"
               );
             } else if (Number(leapLine.limit) === 0) {
-              setStatus(
-                "Your LEAP trustline exists, but direct transfers are currently disabled. Enable LEAP Transfers above so LEAP already in the wild can come straight to this wallet. New LEAP from Sailing Frog's Leap still starts with a Check."
+              setStateMessage(
+                "Your trustline is ready, but direct transfers are off.",
+                "Enable LEAP Transfers so LEAP already in the wild can come straight to this wallet.",
+                "warn"
               );
             } else {
-              setStatus(
-                "This wallet is ready for LEAP in the wild. Sailing Frog's Leap issues new LEAP by Check to record its history; LEAP already issued can come directly from other Leapers.",
-                "success"
-              );
+              setStateMessage();
             }
+
+            setStatus("");
             return;
           }
 
           renderRecord(account, safeBalance);
           renderTransferEnablement(leapLine);
+
+          if (Number(leapLine?.limit) === 0) {
+            setStateMessage(
+              "Your trustline is ready, but direct transfers are off.",
+              "Enable LEAP Transfers so LEAP already in the wild can come straight to this wallet.",
+              "warn"
+            );
+          } else {
+            setStateMessage();
+          }
+
           saveWallet(account);
           saveLeapSession(account, safeBalance);
           verifiedDiscordWallet = account;
@@ -2727,25 +2826,13 @@
           }
 
           if (historyLoaded && checksLoaded) {
-            setStatus(
-              "Crew record, pending Checks, and logbook loaded from the validated ledger.",
-              "success"
-            );
+            setStatus("");
           } else if (historyLoaded) {
-            setStatus(
-              "Crew record and logbook loaded. Pending Check status is temporarily unavailable.",
-              "success"
-            );
+            setStatus("Pending Check status is temporarily unavailable.", "error");
           } else if (checksLoaded) {
-            setStatus(
-              "Crew balance and pending Checks loaded. Logbook history is temporarily unavailable.",
-              "success"
-            );
+            setStatus("Logbook history is temporarily unavailable.", "error");
           } else {
-            setStatus(
-              "Crew balance loaded. Logbook and pending Check status are temporarily unavailable.",
-              "success"
-            );
+            setStatus("Logbook and pending Check status are temporarily unavailable.", "error");
           }
         } catch (error) {
           const message = String(error?.message || "");
@@ -2756,10 +2843,12 @@
           if (message.includes("actNotFound")) {
             clearIdentityState({ forgetWallet:true });
 
-            setStatus(
-              "That XRPL account was not found. Saved Crew Record information has been cleared.",
+            setStateMessage(
+              "That XRPL account was not found.",
+              "Saved Crew Record information has been cleared.",
               "error"
             );
+            setStatus("");
           } else {
             /*
               Important:
@@ -2767,10 +2856,12 @@
               remembered wallet. We simply leave the record blank and ask
               the member to try the normal Home/Join flow again.
             */
-            setStatus(
-              "I couldn't load the XRP Ledger right now. Please try again from Home or Join.",
-              "error"
+            setStateMessage(
+              "Crew Record is temporarily unavailable.",
+              "I couldn't load the XRP Ledger right now. Please try again in a moment.",
+              "warn"
             );
+            setStatus("");
           }
         }
       }
@@ -2857,7 +2948,13 @@
 
         setDiscordAccess(false);
         resetRecord();
-        setStatus("Open your Crew Record from the LEAP home or Join page.");
+        setTrustlineStatus(null, "unavailable");
+        setStateMessage(
+          "Open your Crew Record from LEAP Home or Join.",
+          "Choose a wallet through the normal LEAP flow, then come back here.",
+          "warn"
+        );
+        setStatus("");
       }
     })();
   </script>
