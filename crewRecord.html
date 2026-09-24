@@ -152,7 +152,7 @@
 
     .console-title b{
       display:block;
-      font-size:1rem;
+      font-size:1.12rem;
       letter-spacing:.02em;
     }
 
@@ -196,13 +196,23 @@
       box-shadow:0 0 0 2px rgba(233,185,79,.13),0 0 10px rgba(233,185,79,.24);
     }
 
+
     .trustline-row.trustline-bad{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:5px;
       color:#ff9a8c;
+      white-space:nowrap;
+      letter-spacing:.08em;
     }
 
     .trustline-row.trustline-bad::before{
-      background:#f06f5d;
-      box-shadow:0 0 0 2px rgba(240,111,93,.13),0 0 10px rgba(240,111,93,.24);
+      display:none;
+    }
+
+    .trustline-row.trustline-bad .trustline-create{
+      justify-self:start;
+      margin-top:1px;
     }
 
     .trustline-create{
