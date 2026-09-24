@@ -169,8 +169,8 @@
       return;
     }
 
-    const payload = encodeURIComponent(JSON.stringify(transactionTemplate));
-    window.location.href = "https://xumm.dev/signing-tool?payload=" + payload;
+    const payload = btoa(JSON.stringify(transactionTemplate));
+    window.location.href = "https://xumm.dev/signing-tool?payload=" + encodeURIComponent(payload);
   });
 })();
 </script>
