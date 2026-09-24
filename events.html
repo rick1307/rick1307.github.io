@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Explore LEAP badges: permanent recognition for voyages, milestones, participation, contribution, and shared history in the Sailing Frog's Leap crew." />
+  <meta name="description" content="Learn how LEAP events work: shared Sailing Frog's Leap moments that crew members can attend, take part in, and add to their crew history." />
   <meta name="theme-color" content="#efe8d8" />
-  <title>Badges — Sailing Frog's Leap</title>
+  <title>Events — Sailing Frog's Leap</title>
 
   <style>
     :root{
@@ -186,6 +186,25 @@
       }
     }
 </style>
+
+<style>
+  .status-box{
+    background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.58));
+    border:1px solid rgba(18,59,70,.15);
+    border-left:4px solid var(--gold);
+    border-radius:0 18px 18px 0;
+    padding:24px 26px;
+    box-shadow:0 14px 32px rgba(11,45,54,.055);
+  }
+  .status-box h3{margin:0 0 8px;color:var(--deep);font-size:1.4rem}
+  .status-box p{margin:0;color:#526970}
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .flow-step{background:rgba(250,252,247,.78);border:1px solid rgba(18,59,70,.15);border-radius:18px;padding:20px;box-shadow:0 12px 28px rgba(11,45,54,.055)}
+  .flow-step b{display:block;margin-bottom:7px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.74rem}
+  .flow-step h3{margin:0 0 7px;color:var(--deep);font-size:1.18rem}
+  .flow-step p{margin:0;color:#526970}
+  @media(max-width:850px){.flow{grid-template-columns:1fr}}
+</style>
 </head>
 
 <body>
@@ -201,12 +220,9 @@
 
   <header>
     <div class="wrap">
-      <div class="kicker">LEAP Badges & Crew Logbook</div>
-      <h1>Badges</h1>
-      <p class="lede">
-        LEAP badges recognize the moments, contributions, voyages, places, milestones, and shared experiences
-        that make one Sailing Frog's Leap crew member's history different from another's.
-      </p>
+      <div class="kicker">LEAP Events</div>
+      <h1>Events</h1>
+      <p class="lede">Events are the shared moments where the LEAP community meets the real Sailing Frog's Leap story. Show up, take part, and the moment can become part of your crew history.</p>
     </div>
   </header>
 
@@ -214,91 +230,26 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>Three ideas define the badge system</h2>
-          <p>Badges work best when they are meaningful, scarce enough to matter, and easy to understand.</p>
+          <h2>What an event is</h2>
+          <p>An event is a shared moment in the Sailing Frog's Leap story. It has a time, a place or setting, and a clear way to take part.</p>
         </div>
 
         <div class="principles">
           <div class="principle">
             <b>Idea one</b>
-            <h3>Badges recognize meaningful things</h3>
-            <p>
-              A badge should mean something actually happened: a passage, a contribution, a milestone, a useful act, a role, or a shared moment.
-            </p>
+            <h3>Be there</h3>
+            <p>Events recognize participation in something that actually happened — a meetup, boat day, gathering, project, passage moment, or another announced crew experience.</p>
           </div>
-
           <div class="principle">
             <b>Idea two</b>
-            <h3>Badges preserve history</h3>
-            <p>
-              Unlike rank, a badge is not meant to change just because the member's current LEAP balance changes.
-            </p>
+            <h3>Know the details</h3>
+            <p>Each event should say when and where it happens and what counts as taking part. If an online event counts, the announcement will say so.</p>
           </div>
-
           <div class="principle">
             <b>Idea three</b>
-            <h3>Badges create identity</h3>
-            <p>
-              Two Quartermasters may hold the same amount of LEAP but have completely different badge histories—and therefore completely different stories.
-            </p>
+            <h3>Remember the moment</h3>
+            <p>When participation is recognized, that Event can become part of a member's LEAP history — separate from a Badge or Challenge.</p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="current-badges">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Badges you can earn</h2>
-          <p>
-            Some badges are part of the standard LEAP system. Others are limited to a particular chapter in the story.
-          </p>
-        </div>
-
-        <div class="badge-grid">
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🛠️</div>
-              <div><h3>Crew</h3><p>Standard badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>You showed up and helped in a real way — on the boat, with a project, with logistics, with local help, or wherever an extra hand mattered.</p>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">⛵</div>
-              <div><h3>Shipmate</h3><p>Standard badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>You were actually aboard Frog's Leap. It marks a real connection to the boat and a shared piece of the Sailing Frog's Leap story.</p>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🌊</div>
-              <div><h3>First Wake</h3><p>Standard badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>Your first meaningful contribution after joining — helping someone, contributing something useful, participating in a real way, or otherwise leaving a wake.</p>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🐸</div>
-              <div><h3>LEAP OG</h3><p>Limited badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>You were part of LEAP at the beginning. Unlike the standard badges, LEAP OG will only belong to the original early crew.</p>
-            </div>
-          </article>
         </div>
       </div>
     </section>
@@ -306,112 +257,40 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>Types of badges</h2>
-          <p>The system can grow over time, but these categories give LEAP a strong starting structure.</p>
+          <h2>How events work</h2>
+          <p>The details will vary, but the basic idea stays simple.</p>
         </div>
+        <div class="flow">
+          <div class="flow-step"><b>1</b><h3>An event is announced</h3><p>The time, place, and participation details are posted.</p></div>
+          <div class="flow-step"><b>2</b><h3>You show up</h3><p>You take part in the event according to the announced details.</p></div>
+          <div class="flow-step"><b>3</b><h3>The moment is recognized</h3><p>Sailing Frog's Leap records who took part and what event it was.</p></div>
+          <div class="flow-step"><b>4</b><h3>It joins your history</h3><p>The Event can then appear as part of your LEAP crew record.</p></div>
+        </div>
+      </div>
+    </section>
 
-        <div class="badge-grid">
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">⚓</div>
-              <div><h3>Voyage & Passage Badges</h3><p>“I was part of this chapter.”</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Important passages, cruising regions, canal transits, crossings, or voyage milestones connected to the channel.</p>
-              <ul class="examples">
-                <li>Panama Canal</li>
-                <li>Mexican Riviera</li>
-                <li>San Francisco Departure</li>
-                <li>Caribbean Passage</li>
-              </ul>
-            </div>
-          </article>
+    <section id="upcoming-events">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Upcoming events</h2>
+          <p>This is where announced LEAP events will live once the time and place are set.</p>
+        </div>
+        <div class="status-box">
+          <h3>No event has been announced yet.</h3>
+          <p>When an event is ready, this page can show the date, location, what to expect, and exactly what counts as participation.</p>
+        </div>
+      </div>
+    </section>
 
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">📍</div>
-              <div><h3>Port & Place Badges</h3><p>“This place is in my logbook.”</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Specific ports, anchorages, marinas, regions, or memorable locations in the Sailing Frog's Leap story.</p>
-              <ul class="examples">
-                <li>Shelter Bay</li>
-                <li>Golfito</li>
-                <li>Bahía del Sol</li>
-                <li>La Cruz</li>
-              </ul>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🧭</div>
-              <div><h3>Participation Badges</h3><p>“I showed up and took part.”</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Sailing Frog's Leap community participation that matters: livestreams, polls, special events, recurring involvement, or helping shape a channel decision.</p>
-              <ul class="examples">
-                <li>Live Watch Crew</li>
-                <li>Poll Crew</li>
-                <li>Launch Day Crew</li>
-                <li>Watch Party Crew</li>
-              </ul>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🛠️</div>
-              <div><h3>Contribution Badges</h3><p>“I helped make something better.”</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Useful contributions to the Sailing Frog's Leap channel or community: information, problem-solving, technical help, ideas, research, or helping another crew member.</p>
-              <ul class="examples">
-                <li>Problem Solver</li>
-                <li>Chart Table Contributor</li>
-                <li>Crew Helper</li>
-                <li>Useful Intel</li>
-              </ul>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🏁</div>
-              <div><h3>Milestone Badges</h3><p>“I was here when it happened.”</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Moments in the history of Sailing Frog's Leap itself.</p>
-              <ul class="examples">
-                <li>LEAP Genesis</li>
-                <li>First Discord Crew</li>
-                <li>Channel Milestone</li>
-                <li>First LEAP Pilot</li>
-              </ul>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🐸</div>
-              <div><h3>Special Recognition Badges</h3><p>“This one has a story behind it.”</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Rare or one-off recognitions that do not need their own permanent category.</p>
-              <ul class="examples">
-                <li>Captain's Recognition</li>
-                <li>Above & Beyond</li>
-                <li>LEAP OG</li>
-                <li>Special Expedition Crew</li>
-              </ul>
-            </div>
-          </article>
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Past events</h2>
+          <p>After an event ends, it does not have to disappear. Past events can remain here as part of the public history of the crew.</p>
+        </div>
+        <div class="status-box">
+          <h3>The event log starts with the first gathering.</h3>
+          <p>Over time, this section can become a timeline of the real places and moments where Leapers showed up together.</p>
         </div>
       </div>
     </section>
@@ -419,11 +298,9 @@
     <section>
       <div class="wrap">
         <div class="return-box">
-          <h3>Badges make participation cumulative rather than disposable.</h3>
-          <p>
-            Your Sailing Frog's Leap crew history builds over time — one voyage, milestone, contribution, and shared moment at a time.
-          </p>
-          <a class="button" href="join.html">Join the Crew →</a>
+          <h3>Events are the “I was there” part of LEAP.</h3>
+          <p>The first one will appear here when the details are ready.</p>
+          <a class="button" href="index.html">Back to LEAP →</a>
         </div>
       </div>
     </section>
@@ -431,7 +308,7 @@
 
   <footer>
     <div class="wrap foot">
-      <div>Sailing Frog's Leap • LEAP Badges & Crew Logbook</div>
+      <div>Sailing Frog's Leap • LEAP Events</div>
     </div>
   </footer>
 

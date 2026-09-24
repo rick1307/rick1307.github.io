@@ -217,6 +217,34 @@
       margin:0;
     }
 
+    .bottom-link-menu{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      background:rgba(255,250,240,.32);
+    }
+
+    .bottom-link-menu a{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:58px;
+      padding:10px 12px;
+      text-decoration:none;
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.94rem;
+      font-weight:850;
+      text-align:center;
+      border-right:1px solid var(--line);
+    }
+
+    .bottom-link-menu a:last-child{border-right:0}
+    .bottom-link-menu a:hover{background:rgba(47,116,129,.08);color:var(--rust)}
+
     .button{
       display:inline-flex;align-items:center;justify-content:center;
       padding:12px 18px;
@@ -822,7 +850,7 @@
             <b>Leave a wake</b>
             <h3>Build a crew history</h3>
             <p>
-              Your LEAP balance advances your rank. Badges remember the moments, places, and contributions that made the journey yours too.
+              Your LEAP balance advances your rank. Badges, challenges, and events help turn the things you do into a crew history you can look back on.
             </p>
           </article>
         </div>
@@ -842,14 +870,59 @@
       </div>
     </section>
 
+    <section id="participation">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Badges, Challenges &amp; Events</h2>
+          <p>
+            Rank shows where you stand. These are the three ways LEAP records what you actually did along the way.
+          </p>
+        </div>
+
+        <div class="three">
+          <article class="card">
+            <b>Badges</b>
+            <h3>Recognition that stays with your story</h3>
+            <p>
+              Badges recognize meaningful things about your crew history. Some are standard and always available. Others are limited to a particular time or moment.
+            </p>
+          </article>
+
+          <article class="card">
+            <b>Challenges</b>
+            <h3>Something to go do</h3>
+            <p>
+              Challenges give Leapers a clear objective. Some can stay open for months. Smaller challenges may appear for a much shorter window.
+            </p>
+          </article>
+
+          <article class="card">
+            <b>Events</b>
+            <h3>Be there when it happens</h3>
+            <p>
+              Events are shared moments in the Sailing Frog's Leap story. Take part in an announced event and that moment can become part of your LEAP history.
+            </p>
+          </article>
+        </div>
+
+        <div class="learn-more-links">
+          <a class="button secondary" href="badges.html">Explore Badges →</a>
+          <a class="button secondary" href="challenges.html">Explore Challenges →</a>
+          <a class="button secondary" href="events.html">Explore Events →</a>
+        </div>
+      </div>
+    </section>
+
     <section>
       <div class="wrap">
         <div class="deep-dive">
           <h3>Want to know more?</h3>
-          <div class="learn-more-links">
-            <a class="button secondary" href="ranks.html">Explore Crew Ranks →</a>
-            <a class="button secondary" href="badges.html">Explore Badges →</a>
-          </div>
+          <nav class="bottom-link-menu" aria-label="Learn more about LEAP">
+            <a href="ranks.html">Crew Ranks →</a>
+            <a href="badges.html">Badges →</a>
+            <a href="challenges.html">Challenges →</a>
+            <a href="events.html">Events →</a>
+          </nav>
         </div>
       </div>
     </section>
