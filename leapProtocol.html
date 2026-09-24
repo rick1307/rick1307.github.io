@@ -260,7 +260,7 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
     <div class="meta">
-      <span class="pill">Working Draft 0.8</span>
+      <span class="pill">Working Draft 0.9</span>
       <span class="pill">XRPL Mainnet</span>
       <span class="pill">Internal / Unlinked</span>
       <span class="pill">Last revised: 2026-09-23</span>
@@ -344,7 +344,7 @@
           <div class="tag">Design Principle — Automatic Stabilizers</div>
           <div>
             LEAP should prefer rules that are enforced or naturally reinforced by the ledger itself rather than by a growing pile of manual administration.
-            Canonical identifiers reduce ambiguity; Check state prevents ordinary duplicate issuance; expiration limits how long an award can be claimed;
+            Canonical identifiers reduce ambiguity; Check state prevents ordinary duplicate issuance; the seven-day Manager cleanup policy limits how long an unattended Check normally remains open;
             validated history preserves the record; and owner reserve makes large numbers of open Checks consume real working capital.
             The reserve is not a fee or burn. It is temporary capital tied up while the ledger object remains open, which provides a useful anti-spam and discipline mechanism.
           </div>
@@ -571,7 +571,7 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           ↓<br>
           CheckCreate<br>
           ↓<br>
-          Destination + positive whole LEAP SendMax + explicit expiration + one canonical public memo<br>
+          Destination + positive whole LEAP SendMax + no on-ledger expiration + one canonical public memo<br>
           ↓<br>
           Member<br>
           ↓<br>
@@ -596,44 +596,49 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           <li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
           <li><code>SendMax.issuer</code> is the LEAP issuer</li>
           <li><code>SendMax.value</code> is a positive whole-number LEAP amount; fractional LEAP is not used by protocol policy</li>
-          <li>An expiration is explicitly chosen for the Check</li>
+          <li>The normal LEAP recognition Check omits the XRPL <code>Expiration</code> field</li>
           <li>Transaction is successful</li>
           <li>Transaction is in validated ledger history</li>
           <li>Exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> public memo records the recognition reason</li>
         </ul>
 
-        <h3>7.3 Issuance controls: amount and expiration</h3>
+        <h3>7.3 Issuance controls: amount, visibility, and cleanup</h3>
         <p>
-          Amount and expiration are delivery terms. They do not change the identity of the Badge, Event, or Challenge recorded by the canonical memo.
+          The recognition identity comes from the canonical memo. Delivery timing is handled operationally rather than by putting an expiration on the normal Check.
         </p>
         <table>
           <tr><th>Control</th><th>Protocol / interface rule</th></tr>
           <tr><td>LEAP amount</td><td>Positive whole numbers only. The normal form starts blank so the issuer must enter the amount deliberately. Zero is never submitted.</td></tr>
-          <tr><td>Expiration</td><td>No default. The issuer must deliberately choose <strong>30, 15, 7, 3, 2, or 1 day</strong>.</td></tr>
-          <tr><td>Meaning of a day</td><td>Each day is an exact 24-hour interval from creation of the Check transaction payload: 1 day = 24 hours, 2 days = 48 hours, and so on.</td></tr>
-          <tr><td>Calendar date</td><td>The interface may show the calculated date/time for review, but the issuer selects a relative duration rather than manually choosing a calendar date.</td></tr>
+          <tr><td>XRPL Expiration</td><td>The normal LEAP recognition Check sets <strong>no on-ledger expiration</strong>. The Check remains cashable until it is cashed or canceled.</td></tr>
+          <tr><td>Crew Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
+          <tr><td>Manager cleanup flag</td><td>The Manager Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is a Manager-side operating rule only; it does not change the ledger object.</td></tr>
+          <tr><td>Cleanup action</td><td>Rick decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
+          <tr><td>Legacy expirations</td><td>Readers remain compatible with older Checks that contain an XRPL <code>Expiration</code>. Those legacy Checks are interpreted according to their actual ledger expiration.</td></tr>
         </table>
+        <div class="note">
+          If the validated creation timestamp cannot be established, software must not invent a seven-day age. Crew Record may keep the notice visible and the Checkbook may report that cleanup age is unavailable until authoritative timing can be determined.
+        </div>
 
         <h3>7.4 Recognition uniqueness and duplicate suppression</h3>
         <p>
           Normal LEAP issuance treats the recipient address plus the exact canonical recognition as the duplicate key.
-          Amount and expiration do not create a different recognition.
+          Amount, age, and cleanup status do not create a different recognition.
         </p>
         <div class="rule">
           <div class="tag">LEAP Standard</div>
           <div>
             <strong>Same destination address + same exact canonical recognition = duplicate.</strong>
-            The normal Create Check interface should not offer a recognition that is already pending and still claimable for that recipient,
-            or a recognition that the recipient has already redeemed. If the earlier Check expired unredeemed or was canceled unredeemed,
-            the recognition becomes eligible for reissuance.
+            The normal Create Check interface should not offer a recognition while an open Check for that exact recognition still exists for the recipient,
+            even after the seven-day cleanup flag appears, or after the recipient has already redeemed it. A canceled unredeemed Check reopens the recognition.
+            A legacy Check that truly expired on-ledger may also reopen it.
           </div>
         </div>
         <table>
           <tr><th>Earlier state for same recipient + recognition</th><th>Normal Create Check behavior</th></tr>
-          <tr><td>Unexpired open Check</td><td>Suppress the recognition choice; do not create a second pending Check.</td></tr>
+          <tr><td>Open Check, including 7+ days old</td><td>Suppress the recognition choice; do not create a second pending Check while the original Check still exists.</td></tr>
           <tr><td>Successfully redeemed / cashed</td><td>Suppress the recognition choice; the exact recognition is already part of that recipient's history.</td></tr>
-          <tr><td>Expired and unredeemed</td><td>Recognition may be offered again. The stale Check should still be cleaned up separately if its object remains open.</td></tr>
           <tr><td>Canceled and unredeemed</td><td>Recognition may be offered again.</td></tr>
+          <tr><td>Legacy expired and unredeemed</td><td>Recognition may be offered again. If the expired Check object still exists, clean it up separately.</td></tr>
         </table>
         <div class="note">
           Deliberate duplicate or “plus-up” issuance is an exceptional manual action, not a normal software path.
@@ -690,7 +695,7 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
         <div class="rule">
           <div class="tag">LEAP Operating Procedure</div>
           <div>
-            When the manager Checkbook identifies an expired or otherwise unwanted outstanding Check, open the LEAP Distributor
+            When the manager Checkbook identifies a Cleanup Due, legacy-expired, or otherwise unwanted outstanding Check, open the LEAP Distributor
             wallet in Xaman and use <strong>Events → Planned → Check → Cancel Check</strong>. After the <code>CheckCancel</code>
             transaction validates, the Check ledger object is removed and the XRP owner reserve associated with that Check is released.
           </div>
@@ -706,9 +711,9 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
         </div>
 
         <div class="note">
-          <strong>Expiration and cancellation are different.</strong> An expired Check can no longer be cashed, but expiration alone
-          does not remove the Check ledger object or free the distributor's reserve. The object remains until a valid
-          <code>CheckCancel</code> removes it. This is why expired Checks remain visible as <strong>Ready for Cleanup</strong> in the manager Checkbook.
+          <strong>The seven-day cleanup rule is not expiration.</strong> A normal LEAP Check that is 7+ days old remains cashable because no XRPL expiration was set.
+          The Manager Checkbook merely marks it for cleanup so Rick can decide whether to cancel it. For older legacy Checks that do contain an expiration,
+          expiration and cancellation are still different: expiration stops cashing, but only a valid <code>CheckCancel</code> removes the ledger object and releases owner reserve.
         </div>
       </section>
 
@@ -859,7 +864,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
           <tr><td>Was a specific Check claimed?</td><td>Match Check ID to <code>CheckCash</code></td></tr>
           <tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
           <tr><td>Which Badge/Event/Challenge values exist?</td><td>Authorized distributor <code>account_tx</code> history + canonical memo validation</td></tr>
-          <tr><td>Should a recognition be offered to this recipient?</td><td>Recipient/distributor history + Check state: suppress pending or redeemed; reopen expired/canceled unredeemed</td></tr>
+          <tr><td>Should a recognition be offered to this recipient?</td><td>Recipient/distributor history + Check state: suppress open pending or redeemed; reopen canceled unredeemed and legacy expired unredeemed</td></tr>
         </table>
       </section>
 
@@ -964,6 +969,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
           <tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
           <tr><td>0.7</td><td>2026-09-20</td><td>Added the Xaman operational cleanup path for outstanding Checks: <strong>Events → Planned → Check → Cancel Check</strong>; documented the distinction between historical <code>CheckCreate</code> entries in All and actionable Check objects in Planned; recorded the current 0.2 XRP owner reserve per open Check; clarified that expiration does not itself remove the Check object or release reserve.</td></tr>
           <tr><td>0.8</td><td>2026-09-23</td><td>Expanded the issuance architecture: kept all recognition inside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>; confirmed <code>NEW-MEMBER</code> as a Badge; adopted broad-to-narrow canonical specificity for recurring recognitions; made the XRPL validated distributor history the working recognition vocabulary; allowed positive whole-number LEAP amounts rather than one LEAP only; standardized deliberate no-default expiration choices of 30/15/7/3/2/1 days; defined recipient + exact canonical recognition as the duplicate key; suppressed pending and redeemed duplicates while reopening expired/canceled unredeemed recognition; kept trust lines out of the issuer workflow; and documented owner reserve as a temporary working-capital automatic stabilizer rather than a fee.</td></tr>
+          <tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Crew Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
         </table>
       </section>
 
@@ -974,7 +980,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
           <li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
           <li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
           <li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
-          <li>Implement and verify the Create Check / Review Check writer against the rules in Sections 5–7, including whole-number amount, deliberate expiration selection, canonical memo preview, duplicate suppression, and Xaman signing.</li>
+          <li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
           <li>Verify the ledger-discovered Badge/Event/Challenge vocabulary and duplicate-state logic against live distributor history.</li>
           <li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier.</li>
         </ul>

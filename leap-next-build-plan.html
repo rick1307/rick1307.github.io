@@ -241,37 +241,37 @@
   <main class="wrap">
 
     <header class="hero">
-      <div class="eyebrow">Sailing Frog's Leap — Next Build Plan</div>
-      <h1>Three Objectives</h1>
+      <div class="eyebrow">Sailing Frog's Leap — Current Build Plan</div>
+      <h1>Close the LEAP Loop</h1>
       <p>
-        These are the next three LEAP development goals, in the order we intend to tackle them.
-        The first two extend the machine we already built. The third begins defining how Leapers use the machine with each other in the real world.
+        This plan reflects the system that exists now. Join intake, canonical Check creation, seven-day Manager cleanup,
+        Crew Record pending notices, the permanent logbook, and Discord gating are already in place. The next work is about
+        removing friction from cashing and proving the complete Check life cycle on a phone.
       </p>
     </header>
 
     <section class="goal">
       <div class="goal-head">
-        <div class="num">→</div>
+        <div class="num">✓</div>
         <div>
-          <h2>Why These Three Belong Together</h2>
-          <div class="subtitle">Finish the operating loop first, then expose the social value of the system.</div>
+          <h2>Current Foundation</h2>
+          <div class="subtitle">What is already part of the working LEAP system.</div>
         </div>
       </div>
 
-      <p>
-        These are not three unrelated features. They complete one progression.
-        First, LEAP Checks need a clean life cycle. Second, new members need a clean way to enter that life cycle.
-        Third, once the system reliably creates and records membership history, that history should become useful when Leapers meet each other.
-      </p>
-
-      <div class="flow">
-        Reliable issuance → clean intake → visible shared identity
-      </div>
+      <ul>
+        <li><strong>Join intake:</strong> a prospective member enters a public XRP Ledger address directly on <code>join.html</code>; Basin delivers the request without requiring an Instagram DM.</li>
+        <li><strong>Create Check:</strong> Manager builds canonical recognition Checks from Badge, Event, or Challenge history, uses positive whole-number LEAP amounts, suppresses ordinary duplicates, and creates the one canonical public memo.</li>
+        <li><strong>No normal ledger expiration:</strong> new LEAP recognition Checks omit the XRPL <code>Expiration</code> field.</li>
+        <li><strong>Seven-day Manager cleanup:</strong> an open no-expiration Check becomes <strong>Cleanup Due</strong> in the Manager Checkbook after seven days. The Check is still cashable until it is cashed or canceled.</li>
+        <li><strong>Seven-day Crew Record notice:</strong> a pending no-expiration Check is shown to the member for seven days from the validated <code>CheckCreate</code> timestamp, then the notice is hidden. The underlying Check remains on-ledger.</li>
+        <li><strong>Permanent recognition:</strong> a Check-based Badge, Event, or Challenge enters the personal logbook only after that exact Check has been successfully cashed.</li>
+        <li><strong>Discord:</strong> current LEAP membership can unlock the Discord connection flow and rank-based access.</li>
+      </ul>
 
       <div class="decision">
-        <span class="label">Strategic conclusion</span>
-        Build the infrastructure in the same order that a member experiences it.
-        Make LEAP dependable first, make joining easy second, and only then turn the record into a social identity that members can share face-to-face.
+        <span class="label">Current operating rule</span>
+        Seven days is a Manager/Crew Record operating window, not an XRPL expiration. Cashing or cancellation is what closes a normal LEAP Check.
       </div>
     </section>
 
@@ -279,41 +279,28 @@
       <div class="goal-head">
         <div class="num">1</div>
         <div>
-          <h2>30-Day Check Issuance</h2>
-          <div class="subtitle">Make expiration part of every new LEAP Check by design.</div>
+          <h2>Cash My LEAP</h2>
+          <div class="subtitle">Remove the biggest remaining member-side friction point.</div>
         </div>
       </div>
 
       <p>
-        Crew Record and Ledger History already understand an XRPL Check's actual <code>Expiration</code> field.
-        The missing piece is the issuance side: Xaman's normal Create Check screen does not expose an obvious expiration control.
+        Crew Record can already find a member's outstanding official LEAP Checks and show the amount, recognition reason, and seven-day notice window.
+        The next step is to let the member start cashing the exact Check directly from that card instead of hunting through Xaman's Events screens.
       </p>
 
       <div class="flow">
-        Manager tool → Create LEAP Check → 30-day expiration automatically added → Xaman signs → Check goes on-ledger
+        Crew Record pending Check → Cash My LEAP → exact CheckCash handoff → Xaman review/sign → validated ledger → Crew Record updates
       </div>
 
       <div class="decision">
-        <span class="label">Goal</span>
-        Build a simple LEAP Check creation flow that automatically sets expiration to 30 days while still using Xaman to sign the transaction.
-      </div>
-
-      <ul>
-        <li>Destination wallet</li>
-        <li>1 LEAP SendMax</li>
-        <li>Canonical public memo</li>
-        <li>Expiration = 30 days from creation</li>
-        <li>Xaman remains the signing wallet</li>
-      </ul>
-
-      <div class="note">
-        <span class="label">Why first</span>
-        Every later workflow depends on issuing LEAP cleanly. A 30-day expiration keeps the distributor account from accumulating open Checks indefinitely and makes the Checkbook's countdown and cleanup states operationally meaningful.
+        <span class="label">Safety boundary</span>
+        The website never receives a private key or signs for the member. It identifies the exact Check and hands the correct transaction to Xaman; the member reviews and signs there.
       </div>
 
       <div class="decision">
         <span class="label">Done when</span>
-        Rick can create a canonical LEAP Check from one simple manager flow, the transaction already contains the 30-day expiration and memo, and Xaman is used only to review and sign it.
+        A member with a pending LEAP Check can tap one obvious button on an iPhone, complete the cash in Xaman, return to Crew Record, and see the pending Check disappear and the resulting LEAP/history appear from validated XRPL data.
       </div>
     </section>
 
@@ -321,42 +308,43 @@
       <div class="goal-head">
         <div class="num">2</div>
         <div>
-          <h2>Join → Waiting for LEAP</h2>
-          <div class="subtitle">Replace Instagram DM with a direct public-address submission.</div>
+          <h2>Prove the Three Xaman Handoffs</h2>
+          <div class="subtitle">Create, Cash, and Cancel should all work predictably on the phone.</div>
         </div>
       </div>
 
       <p>
-        Step 3 of <code>join.html</code> should stop asking a new member to send the public XRPL address through Instagram.
-        Instead, the page should provide a text box and Submit button.
+        The Manager now builds unsigned transaction templates and can hand them to Xaman's Signing Tool. Before adding more system complexity,
+        the complete life cycle should be tested until the behavior is boring and repeatable.
       </p>
 
-      <div class="flow">
-        Join page → submit public XRPL address → small persistent queue → Waiting for LEAP → Rick issues Check
+      <div class="two-col">
+        <div class="card">
+          <strong>Create Check</strong>
+          Manager builds the canonical no-expiration <code>CheckCreate</code>; Xaman signs; the validated Check appears in the Checkbook and recipient Crew Record.
+        </div>
+        <div class="card">
+          <strong>Cash Check</strong>
+          Crew Record identifies the exact outstanding Check; Xaman signs the matching <code>CheckCash</code>; the member's balance and logbook update.
+        </div>
+        <div class="card">
+          <strong>Cancel Check</strong>
+          Checkbook identifies a stale or unwanted Check; Xaman signs the exact <code>CheckCancel</code>; the object disappears and owner reserve is released.
+        </div>
+        <div class="card">
+          <strong>Ledger confirmation</strong>
+          Success is determined from validated XRPL state, not from whether a wallet screen merely looked successful.
+        </div>
       </div>
-
-      <div class="decision">
-        <span class="label">Minimal storage</span>
-        Store only what the workflow needs: XRPL public address, submission timestamp, and status.
-      </div>
-
-      <p>
-        The likely implementation is the existing Cloudflare Worker plus a very small persistent store.
-        Ledger History can then show a manager-side <strong>Waiting for LEAP</strong> queue.
-      </p>
-
-      <p>
-        Once an official outstanding LEAP Check exists for that destination, the manager view can eventually recognize that the person has moved out of the intake queue and into the pending-Check stage.
-      </p>
 
       <div class="note">
-        <span class="label">Why second</span>
-        Today the process leaves the website and depends on an Instagram DM. Bringing the public XRPL address submission into the LEAP site removes ambiguity, reduces manual searching, and gives the manager a visible work queue.
+        <span class="label">Why this matters</span>
+        These three actions are the operating core of LEAP. Once they work cleanly, the system can grow without requiring members or the manager to understand XRPL mechanics.
       </div>
 
       <div class="decision">
         <span class="label">Done when</span>
-        A prospective member can submit a valid public XRPL address on the Join page, Rick can see it under <strong>Waiting for LEAP</strong>, and issuing a Check moves that person naturally into the existing Check workflow.
+        Create, Cash, and Cancel each produce the intended validated ledger result from the iPhone flow, and the Manager/Crew Record interfaces recognize the result correctly afterward.
       </div>
     </section>
 
@@ -365,105 +353,73 @@
         <div class="num">3</div>
         <div>
           <h2>Crew Profile / QR Identity</h2>
-          <div class="subtitle">Turn the permanent LEAP record into something Leapers can use when they meet each other.</div>
+          <div class="subtitle">Keep the social layer as the next larger expansion after the operating loop is smooth.</div>
         </div>
       </div>
 
       <p class="big-idea">
-        The mental model is the military ribbon rack: a fast visual read of where someone has been, what they have done, and how they fit into the crew.
+        The mental model remains the military ribbon rack: a fast visual read of where someone has been, what they have done, and how they fit into the crew.
       </p>
 
       <p>
-        This is not another administrative feature. It is the social layer of LEAP. A Leaper meeting another Leaper in a marina, anchorage, event, or port should be able to exchange identities in seconds and immediately see the other person's LEAP story.
+        A Leaper should eventually be able to show a QR code, let another person scan it, and open a live profile built from the member's public XRP Ledger address and validated LEAP history.
       </p>
 
       <div class="two-col">
         <div class="card">
           <strong>Share My Crew Profile</strong>
-          Shows my personal QR code so another Leaper can scan me.
+          Show a QR code that opens my public LEAP profile.
         </div>
-
         <div class="card">
           <strong>Get Crew Profile</strong>
-          Opens the phone camera / QR scanner so I can scan another Leaper.
+          Scan another Leaper and open their live XRPL-backed profile.
         </div>
       </div>
 
       <div class="flow">
-        Leaper A: Share My Crew Profile<br>
-        ↓<br>
-        QR code<br>
-        ↓<br>
-        Leaper B: Get Crew Profile / scan<br>
-        ↓<br>
-        Live XRPL Crew Profile opens
-      </div>
-
-      <h3>What the scanned profile should show</h3>
-      <ul>
-        <li>Current rank — Deckhand, Bosun, Quartermaster, First Mate, or Master Of The Leap</li>
-        <li>Current LEAP balance</li>
-        <li>Badges</li>
-        <li>Events</li>
-        <li>Challenges</li>
-        <li>Permanent XRPL history behind those recognitions</li>
-      </ul>
-
-      <div class="note">
-        <span class="label">Important distinction</span>
-        <strong>Leaper Card</strong> is the member's own portable identity view. <strong>Crew Profile</strong> is the profile another person sees after scanning.
-        We may ultimately use one page for both jobs, but the concepts are different.
-      </div>
-
-      <div class="decision">
-        <span class="label">Preferred QR design</span>
-        The QR should probably contain a website URL carrying the member's public XRPL address, rather than only the raw address.
-        That lets an ordinary phone camera open the Crew Profile directly without requiring a special LEAP app.
+        Share QR → scan → public XRP Ledger address → live Crew Profile → rank + Badges + Events + Challenges
       </div>
 
       <div class="open">
-        <span class="label">Still abstract / to design</span>
-        We have not yet decided the final page name, visual language, ribbon/pennant system, exact QR URL format, privacy/display options, or whether the member can choose a public nickname or call sign.
-        These are intentionally open. The purpose of this document is to preserve the concept before implementation begins.
+        <span class="label">Intentionally deferred</span>
+        Final page name, nickname/call-sign rules, visual ribbon language, privacy/display choices, and exact QR URL format remain open. Do not let these decisions distract from finishing the Check life cycle first.
+      </div>
+    </section>
+
+    <section class="goal">
+      <div class="goal-head">
+        <div class="num">+</div>
+        <div>
+          <h2>Measurement After the Cash Flow Works</h2>
+          <div class="subtitle">Measure whether LEAP creates repeat participation rather than only first-time curiosity.</div>
+        </div>
       </div>
 
-      <h3>Real-world use case</h3>
+      <div class="flow">
+        Visit → request first LEAP → Check issued → Check cashed → earns a second recognition
+      </div>
+
       <p>
-        Two Leapers meet in a marina. One says, “You hold LEAP?” The other opens their profile and shows the QR.
-        After the scan, the other person can immediately see that this is a Bosun who earned specific badges, completed certain challenges,
-        or shared an event with Sailing Frog's Leap. The ledger record becomes a conversation starter and a visible history of belonging.
+        The most useful early business signal is not simply how many people request LEAP. It is how many successfully cash it and later return to earn another Badge, Event, or Challenge.
+        That is the point where LEAP begins to demonstrate retention rather than novelty.
       </p>
 
-      <div class="decision">
-        <span class="label">Why this matters</span>
-        LEAP stops being only a membership token and becomes a shared social identity.
-        The permanent record is not merely stored — it becomes useful when members meet each other.
-      </div>
-
       <div class="note">
-        <span class="label">Why third</span>
-        The QR/profile idea is powerful precisely because it does not invent a new record. It reveals the record that already exists.
-        By waiting until issuance and intake are dependable, the social layer can remain simple: scan a public address, query XRPL, and display the member's real LEAP history.
-      </div>
-
-      <div class="decision">
-        <span class="label">Done when</span>
-        Any Leaper can tap <strong>Share My Crew Profile</strong> to show a QR code, another Leaper can tap <strong>Get Crew Profile</strong> to scan it, and the resulting page immediately shows the scanned member's current rank and permanent LEAP history.
+        <span class="label">Do not overbuild this yet</span>
+        First make the member journey work. Then add only enough measurement to see where people fall out of the funnel and whether they come back.
       </div>
     </section>
 
     <section class="tomorrow">
-      <h2>The Build Order</h2>
-      <p>
-        The sequence is deliberate. Each step removes friction from the step that follows it.
-      </p>
+      <h2>The Current Build Order</h2>
       <ol>
-        <li><strong>30-day Check issuance:</strong> make LEAP distribution operationally clean.</li>
-        <li><strong>Join → Waiting for LEAP:</strong> make entry into that distribution system simple and visible.</li>
-        <li><strong>Crew Profile / QR identity:</strong> turn the resulting permanent record into something Leapers can use with each other.</li>
+        <li><strong>Cash My LEAP:</strong> make a pending Check easy for a member to cash from Crew Record.</li>
+        <li><strong>Validate the complete Check life cycle:</strong> Create, Cash, and Cancel from the iPhone/Xaman flow and confirm each result on-ledger.</li>
+        <li><strong>Add lightweight funnel measurement:</strong> request → issued → cashed → second recognition.</li>
+        <li><strong>Then return to Crew Profile / QR identity:</strong> expose the permanent record as a social identity once the core operating loop is dependable.</li>
       </ol>
       <p>
-        The end state is a complete loop: someone joins, receives LEAP, builds a permanent record, and can later carry that record into the real world as a recognizable crew identity.
+        The guiding rule is simple: reduce friction before adding surface area. The machine should be easy to join, easy to operate, and easy to understand before it becomes bigger.
       </p>
     </section>
 
