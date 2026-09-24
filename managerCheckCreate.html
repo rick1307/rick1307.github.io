@@ -403,25 +403,10 @@
           <span id="recognitionHint" class="hint">The choices are populated from existing authorized LEAP recognition records on XRPL.</span>
         </div>
 
-        <div class="fixed-grid">
-          <div class="field">
-            <label for="amount">LEAP amount</label>
-            <input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 1 or 5" />
-            <span class="hint">Positive whole LEAP only. Leave blank until you deliberately choose the award.</span>
-          </div>
-          <div class="field">
-            <label for="expiration">Expiration</label>
-            <select id="expiration" name="expiration">
-              <option value="">Choose expiration</option>
-              <option value="30">30 days</option>
-              <option value="15">15 days</option>
-              <option value="7">7 days</option>
-              <option value="3">3 days</option>
-              <option value="2">2 days</option>
-              <option value="1">1 day</option>
-            </select>
-            <span class="hint">Choose deliberately for each Check.</span>
-          </div>
+        <div class="field">
+          <label for="amount">LEAP amount</label>
+          <input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 1 or 5" />
+          <span class="hint">Positive whole LEAP only. New Checks do not expire on-ledger; the Manager Checkbook flags them red for cleanup after 7 days.</span>
         </div>
 
         <div class="field">
@@ -479,7 +464,6 @@
       const recognitionHint = document.getElementById("recognitionHint");
       const memoPreview = document.getElementById("memoPreview");
       const amount = document.getElementById("amount");
-      const expiration = document.getElementById("expiration");
       const reviewButton = document.getElementById("reviewButton");
 
       function setStatus(text, state = "") {
@@ -773,8 +757,7 @@
         reviewButton.disabled = !(
           looksLikeClassicAddress(destination.value) &&
           memo &&
-          validLeapAmount(amount.value) &&
-          expiration.value
+          validLeapAmount(amount.value)
         );
       }
 
@@ -881,7 +864,6 @@
         // It may only be entered manually by typing or pasting on this page.
         destination.value = "";
         amount.value = draft.amount || "";
-        expiration.value = String(draft.expirationDays || "");
         reason.value = CATEGORIES.includes(draft.reason) ? draft.reason : "";
         renderRecognitionChoices();
 
@@ -930,7 +912,6 @@
         const address = destination.value.trim();
         const memo = currentMemo();
         const leapAmount = amount.value.trim();
-        const expirationDays = Number(expiration.value);
 
         if (!looksLikeClassicAddress(address)) {
           showError("Enter a valid XRP Ledger classic address before reviewing the Check.");
@@ -949,21 +930,12 @@
           return;
         }
 
-        if (![30, 15, 7, 3, 2, 1].includes(expirationDays)) {
-          showError("Choose an expiration period.");
-          expiration.focus();
-          return;
-        }
-
-        const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
         const draft = {
           destination: address,
           reason: reason.value,
           recognition: recognition.value,
           memo,
           amount: leapAmount,
-          expirationDays,
-          expiresAt: expiresAt.toISOString(),
           createdAt: new Date().toISOString(),
           distributor: AUTHORIZED_DISTRIBUTORS[0],
           leapIssuer: LEAP_ISSUER,
@@ -978,7 +950,6 @@
         renderRecognitionChoices();
       });
       amount.addEventListener("input", updatePreview);
-      expiration.addEventListener("change", updatePreview);
       reason.addEventListener("change", renderRecognitionChoices);
       recognition.addEventListener("change", updatePreview);
       refreshButton.addEventListener("click", start);

@@ -35,14 +35,13 @@
   <p class="intro">Final confirmation of the friendly details and the exact unsigned XRPL transaction template.</p>
   <div class="prototype"><strong>Final review.</strong> Confirm the Check below, then hand the exact unsigned transaction template to Xaman for signing. Opening Xaman does not submit anything to XRPL.</div>
   <section class="panel">
-    <div class="panel-head"><h2>Check details</h2><p>Confirm the destination, recognition, LEAP amount, expiration, and exact public memo.</p></div>
+    <div class="panel-head"><h2>Check details</h2><p>Confirm the destination, recognition, LEAP amount, and exact public memo.</p></div>
     <div class="body">
       <div class="row"><span>Destination</span><strong id="destination">—</strong></div>
       <div class="row"><span>Reason</span><strong id="reason">—</strong></div>
       <div class="row"><span>Recognition</span><strong id="recognition">—</strong></div>
       <div class="row"><span>Amount</span><strong id="amount">—</strong></div>
-      <div class="row"><span>Expiration</span><strong id="expiration">—</strong></div>
-      <div class="row"><span>Expires</span><strong id="expiresAt">—</strong></div>
+      <div class="row"><span>Cleanup flag</span><strong>7 days after creation</strong></div>
       <div class="memo"><span class="memo-label">Canonical public memo</span><code id="memo">—</code></div>
 
       <details open>
@@ -58,7 +57,7 @@
         <button id="editButton" class="btn edit" type="button">← Edit Check</button>
         <button id="xamanButton" class="btn xaman" type="button" disabled>Create Check in Xaman</button>
       </div>
-      <p class="note">Xaman will still require you to create the payload, review it, sign it, and submit the signed transaction.</p>
+      <p class="note">Xaman will still require you to create the payload, review it, sign it, and submit the signed transaction. The Check remains open until it is cashed or canceled.</p>
       <div id="error" class="error"></div>
     </div>
   </section>
@@ -79,7 +78,6 @@
       })
       .join(" ");
   }
-  const RIPPLE_EPOCH_OFFSET = 946684800;
   const error = document.getElementById("error");
   const xamanButton = document.getElementById("xamanButton");
   let transactionTemplate = null;
@@ -89,23 +87,15 @@
     return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
   }
 
-  function rippleTime(isoString) {
-    const ms = Date.parse(isoString);
-    if (!Number.isFinite(ms)) return null;
-    return Math.floor(ms / 1000) - RIPPLE_EPOCH_OFFSET;
-  }
-
   function validWholeLeap(value) {
     return /^[1-9]\d{0,14}$/.test(String(value || "").trim());
   }
 
   function buildTransaction(draft) {
-    const expiration = rippleTime(draft.expiresAt);
     if (!draft.distributor || !draft.destination || !draft.leapIssuer || !draft.leapCurrency || !draft.memo) {
       throw new Error("The Check draft is missing transaction data. Return to Create LEAP Check and rebuild it.");
     }
     if (!validWholeLeap(draft.amount)) throw new Error("LEAP amount must be a positive whole number.");
-    if (!Number.isInteger(expiration) || expiration <= 0) throw new Error("The expiration could not be converted to XRP Ledger time.");
 
     return {
       TransactionType: "CheckCreate",
@@ -116,7 +106,6 @@
         issuer: draft.leapIssuer,
         value: String(draft.amount)
       },
-      Expiration: expiration,
       Memos: [
         {
           Memo: {
@@ -138,12 +127,6 @@
     document.getElementById("reason").textContent = reasonNames[draft.reason] || draft.reason || "—";
     document.getElementById("recognition").textContent = prettyRecognition(draft.recognition) || "—";
     document.getElementById("amount").textContent = (draft.amount || "—") + " LEAP";
-    document.getElementById("expiration").textContent = draft.expirationDays + " " + (Number(draft.expirationDays) === 1 ? "day (24 hours)" : "days (" + (Number(draft.expirationDays) * 24) + " hours)");
-
-    const d = new Date(draft.expiresAt);
-    document.getElementById("expiresAt").textContent = Number.isNaN(d.getTime()) ? "—" : new Intl.DateTimeFormat(undefined, {
-      year:"numeric", month:"short", day:"numeric", hour:"numeric", minute:"2-digit", second:"2-digit"
-    }).format(d);
     document.getElementById("memo").textContent = draft.memo || "—";
 
     try {
