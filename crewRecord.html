@@ -903,7 +903,7 @@
         pendingCheckCount.textContent = "0 Waiting";
         pendingChecksTitle.textContent = "LEAP Waiting for You";
         pendingChecksCopy.textContent =
-          "Open Xaman → Events and cash these Checks while they are waiting for you.";
+          "Open Xaman → Events and cash these Checks before they expire.";
       }
 
       function checkObjectId(check) {
@@ -919,87 +919,15 @@
         ].join(":");
       }
 
-      const VALID_CLEANUP_DAYS = new Set([1, 2, 3, 7, 15, 30]);
-      const DEFAULT_CLEANUP_DAYS = 7;
-
-      function cleanupDaysFromText(text) {
-        const match = /^SFL-LEAP\/CLEANUP=(\d+)$/i.exec(String(text || "").trim());
-        if (!match) return null;
-        const days = Number(match[1]);
-        return VALID_CLEANUP_DAYS.has(days) ? days : null;
-      }
-
-      function extractCleanupDays(tx) {
-        const memos = Array.isArray(tx?.Memos) ? tx.Memos : [];
-        for (const wrapper of memos) {
-          const memo = wrapper?.Memo || {};
-          for (const raw of [memo.MemoData, memo.MemoType, memo.MemoFormat]) {
-            const days = cleanupDaysFromText(hexToText(raw).trim());
-            if (days) return days;
-          }
-        }
-        return null;
-      }
-
-      function txCreatedMs(tx) {
-        const iso = tx?.close_time_iso || tx?._closeTimeIso || "";
-        const isoMs = iso ? new Date(iso).getTime() : NaN;
-        if (Number.isFinite(isoMs)) return isoMs;
-
-        const rippleSeconds = Number(tx?.date);
-        if (Number.isFinite(rippleSeconds) && rippleSeconds > 0) {
-          return Date.UTC(2000, 0, 1) + rippleSeconds * 1000;
-        }
-        return null;
-      }
-
       function checkExpirationInfo(check) {
         const expiration = Number(check?.Expiration || 0);
 
         if (!Number.isFinite(expiration) || expiration <= 0) {
-          const cleanupDays = VALID_CLEANUP_DAYS.has(Number(check?._cleanupDays))
-            ? Number(check._cleanupDays)
-            : DEFAULT_CLEANUP_DAYS;
-          const createdMs = Number(check?._createdMs);
-
-          if (Number.isFinite(createdMs) && createdMs > 0) {
-            const cleanupAtMs = createdMs + cleanupDays * 86400000;
-            const remainingMs = cleanupAtMs - Date.now();
-            const formattedDate = new Intl.DateTimeFormat(undefined, {
-              month:"short",
-              day:"numeric",
-              year:"numeric"
-            }).format(new Date(cleanupAtMs));
-
-            if (remainingMs <= 0) {
-              return {
-                state:"cleanup-hidden",
-                label:"Cleanup flag reached",
-                detail:`Crew Record reminder ended ${formattedDate}`,
-                expirationMs:cleanupAtMs,
-                hidden:true
-              };
-            }
-
-            const hoursLeft = Math.ceil(remainingMs / 3600000);
-            const daysLeft = Math.ceil(remainingMs / 86400000);
-            return {
-              state:hoursLeft <= 48 ? "urgent" : "safe",
-              label:hoursLeft <= 48
-                ? (hoursLeft <= 1 ? "Less than 1 hour left here" : `${hoursLeft} hours left here`)
-                : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left here`,
-              detail:`Crew Record reminder ends ${formattedDate}`,
-              expirationMs:cleanupAtMs,
-              hidden:false
-            };
-          }
-
           return {
             state:"no-expiration",
-            label:"Waiting",
+            label:"No expiration set",
             detail:"This Check will remain waiting until it is cashed or canceled.",
-            expirationMs:null,
-            hidden:false
+            expirationMs:null
           };
         }
 
@@ -1094,10 +1022,6 @@
           const timing = checkExpirationInfo(check);
           const id = checkObjectId(check);
 
-          if (timing.hidden) {
-            continue;
-          }
-
           if (timing.state === "expired" && dismissed.has(id)) {
             continue;
           }
@@ -1124,7 +1048,7 @@
           pendingCheckCount.textContent = parts.join(" • ");
 
           pendingChecksCopy.textContent =
-            "Open Xaman → Events and cash these Checks while they are waiting for you. Your Crew Record updates after the LEAP reaches your wallet.";
+            "Open Xaman → Events and cash these Checks before they expire. Your Crew Record updates after the LEAP reaches your wallet.";
         } else {
           pendingChecksTitle.textContent =
             expiredCount === 1 ? "Expired LEAP Check" : "Expired LEAP Checks";
@@ -1490,10 +1414,7 @@
               return;
             }
 
-            const tx = result.tx_json || result;
-            if (result.date !== undefined && tx.date === undefined) tx.date = result.date;
-            if (result.close_time_iso && !tx.close_time_iso) tx.close_time_iso = result.close_time_iso;
-            resolve(tx);
+            resolve(result.tx_json || result);
           });
 
           ws.addEventListener("error", () => {
@@ -1528,14 +1449,12 @@
 
             return {
               ...check,
-              _leapFacts:extractLeapFacts(tx),
-              _cleanupDays:extractCleanupDays(tx) || DEFAULT_CLEANUP_DAYS,
-              _createdMs:txCreatedMs(tx)
+              _leapFacts:extractLeapFacts(tx)
             };
           } catch (_) {
             /*
               Memo enrichment is optional. If an originating transaction cannot
-              be read, keep the Check visible with its amount and any ledger expiration.
+              be read, keep the Check visible with its amount and expiration.
             */
             return { ...check, _leapFacts:[] };
           }

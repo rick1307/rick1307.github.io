@@ -362,7 +362,7 @@
     </p>
 
     <div class="prototype">
-      <strong>Create Check engine.</strong> This page reads live XRPL history, suppresses normal duplicate recognitions for the destination, and builds the Check draft for final review and Xaman signing.
+      <strong>Create Check engine — evaluation build.</strong> This page reads live XRPL history, suppresses normal duplicate recognitions for the destination, and builds the Check draft. Nothing can be submitted yet.
     </div>
 
     <div class="statusbar">
@@ -406,20 +406,7 @@
         <div class="field">
           <label for="amount">LEAP amount</label>
           <input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 1 or 5" />
-          <span class="hint">Positive whole LEAP only. New Checks do not expire on-ledger.</span>
-        </div>
-
-        <div class="field">
-          <label for="cleanupDays">Cleanup flag</label>
-          <select id="cleanupDays" name="cleanupDays">
-            <option value="1">1 day</option>
-            <option value="2">2 days</option>
-            <option value="3">3 days</option>
-            <option value="7" selected>7 days</option>
-            <option value="15">15 days</option>
-            <option value="30">30 days</option>
-          </select>
-          <span class="hint">This is a Manager/Crew Record flag, not an XRPL expiration. At the flag, Crew Record stops showing the pending Check and Manager marks it Cleanup Due until you cancel it.</span>
+          <span class="hint">Positive whole LEAP only. New Checks do not expire on-ledger; the Manager Checkbook flags them red for cleanup after 7 days.</span>
         </div>
 
         <div class="field">
@@ -477,7 +464,6 @@
       const recognitionHint = document.getElementById("recognitionHint");
       const memoPreview = document.getElementById("memoPreview");
       const amount = document.getElementById("amount");
-      const cleanupDays = document.getElementById("cleanupDays");
       const reviewButton = document.getElementById("reviewButton");
 
       function setStatus(text, state = "") {
@@ -878,7 +864,6 @@
         // It may only be entered manually by typing or pasting on this page.
         destination.value = "";
         amount.value = draft.amount || "";
-        cleanupDays.value = ["1","2","3","7","15","30"].includes(String(draft.cleanupDays || "")) ? String(draft.cleanupDays) : "7";
         reason.value = CATEGORIES.includes(draft.reason) ? draft.reason : "";
         renderRecognitionChoices();
 
@@ -945,20 +930,12 @@
           return;
         }
 
-        const cleanup = Number(cleanupDays.value);
-        if (![1, 2, 3, 7, 15, 30].includes(cleanup)) {
-          showError("Choose a valid cleanup flag.");
-          cleanupDays.focus();
-          return;
-        }
-
         const draft = {
           destination: address,
           reason: reason.value,
           recognition: recognition.value,
           memo,
           amount: leapAmount,
-          cleanupDays: cleanup,
           createdAt: new Date().toISOString(),
           distributor: AUTHORIZED_DISTRIBUTORS[0],
           leapIssuer: LEAP_ISSUER,
