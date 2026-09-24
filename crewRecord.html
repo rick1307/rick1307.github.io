@@ -187,9 +187,6 @@
 
 
     .trustline-row.trustline-bad{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:5px;
       color:#ff9a8c;
       white-space:nowrap;
       letter-spacing:.08em;
@@ -197,31 +194,6 @@
 
     .trustline-row.trustline-bad::before{
       display:none;
-    }
-
-    .trustline-row.trustline-bad .trustline-create{
-      justify-self:start;
-      margin-top:1px;
-    }
-
-    .trustline-create{
-      border:1px solid rgba(255,154,140,.52);
-      border-radius:999px;
-      padding:2px 7px;
-      background:rgba(255,255,255,.08);
-      color:#ffd2cb;
-      font:inherit;
-      font-size:.56rem;
-      font-weight:900;
-      letter-spacing:.08em;
-      line-height:1.35;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-
-    .trustline-create:hover{
-      background:rgba(255,255,255,.14);
-      border-color:rgba(255,154,140,.78);
     }
 
     .live-pill{
@@ -283,6 +255,26 @@
       border-color:rgba(255,154,140,.30);
       background:rgba(255,154,140,.07);
       color:#ffd3ca;
+    }
+
+    .crew-state-action{
+      display:block;
+      margin-top:10px;
+      border:1px solid rgba(215,174,98,.78);
+      border-radius:10px;
+      padding:9px 12px;
+      background:#d7ae62;
+      color:#17313a;
+      font:inherit;
+      font-size:.68rem;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 8px 18px rgba(4,18,22,.14);
+    }
+
+    .crew-state-action:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
     }
 
     .record-grid{
@@ -750,67 +742,6 @@
       overflow-wrap:anywhere;
     }
 
-    .transfer-enable{
-      display:none;
-      margin-top:16px;
-      padding:14px;
-      border:1px solid rgba(215,174,98,.34);
-      border-radius:14px;
-      background:rgba(215,174,98,.08);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-    }
-
-    .transfer-enable.show{display:block}
-
-    .transfer-enable-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-
-    .transfer-enable-copy b{
-      display:block;
-      color:#f2d99f;
-      font-size:.78rem;
-      letter-spacing:.03em;
-    }
-
-    .transfer-enable-copy span{
-      display:block;
-      margin-top:4px;
-      color:rgba(255,255,255,.68);
-      font-size:.7rem;
-      line-height:1.45;
-    }
-
-    .transfer-enable button{
-      flex:0 0 auto;
-      border:1px solid rgba(215,174,98,.78);
-      border-radius:10px;
-      padding:9px 12px;
-      background:#d7ae62;
-      color:#17313a;
-      font:inherit;
-      font-size:.68rem;
-      font-weight:900;
-      cursor:pointer;
-      opacity:1;
-      box-shadow:0 8px 18px rgba(4,18,22,.14);
-    }
-
-    .transfer-enable button:hover:not(:disabled){
-      filter:brightness(1.05);
-      transform:translateY(-1px);
-    }
-
-    .transfer-enable button:disabled{
-      cursor:not-allowed;
-      opacity:.48;
-      box-shadow:none;
-      transform:none;
-    }
-
     .discord-cta{
       display:flex;
       justify-content:center;
@@ -861,11 +792,7 @@
       }
       .pending-check-action{justify-content:stretch;text-align:left}
       .pending-check-action button{width:100%}
-      .transfer-enable-head{
-        align-items:stretch;
-        flex-direction:column;
-      }
-      .transfer-enable button{width:100%}
+      .crew-state-action{width:100%}
       .logbook-entry{grid-template-columns:72px minmax(0,1fr)}
       .logbook-fact{grid-template-columns:60px minmax(0,1fr)}
     }
@@ -936,7 +863,6 @@
               <b>Crew Record</b>
               <div class="trustline-row" id="trustlineStatus">
                 <span id="trustlineStatusText">Checking transfers…</span>
-                <button class="trustline-create" id="trustlineCreateButton" type="button" hidden>Enable LEAP Transfers</button>
               </div>
             </div>
           </div>
@@ -962,15 +888,6 @@
         </div>
 
         <p class="crew-status" id="crewRecordStatus" role="status" aria-live="polite"></p>
-
-        <section class="transfer-enable" id="transferEnable" aria-live="polite">
-          <div class="transfer-enable-head">
-            <div class="transfer-enable-copy">
-              <span>Enable transfers so other LEAP holders can send LEAP directly to your wallet.</span>
-            </div>
-            <button id="transferEnableButton" type="button" disabled title="Transfer setup will be connected to Xaman in the next step.">Enable LEAP Transfers</button>
-          </div>
-        </section>
 
         <section class="pending-checks" id="pendingChecks" aria-live="polite">
           <div class="pending-checks-head">
@@ -1046,7 +963,6 @@
       const crewStateMessage = document.getElementById("crewStateMessage");
       const trustlineStatus = document.getElementById("trustlineStatus");
       const trustlineStatusText = document.getElementById("trustlineStatusText");
-      const trustlineCreateButton = document.getElementById("trustlineCreateButton");
       const walletEl = document.getElementById("recordWallet");
       const leapEl = document.getElementById("recordLeap");
       const rankEl = document.getElementById("recordRank");
@@ -1066,8 +982,6 @@
       const pendingCheckCount = document.getElementById("pendingCheckCount");
       const pendingChecksCopy = document.getElementById("pendingChecksCopy");
       const pendingCheckList = document.getElementById("pendingCheckList");
-      const transferEnable = document.getElementById("transferEnable");
-      const transferEnableButton = document.getElementById("transferEnableButton");
       const discordCrewButton = document.getElementById("discordCrewButton");
 
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -1164,13 +1078,13 @@
         status.className = "crew-status" + (kind ? " " + kind : "");
       }
 
-      function setStateMessage(title = "", body = "", kind = "") {
+      function setStateMessage(title = "", body = "", kind = "", showTransferAction = false) {
         if (!crewStateMessage) return;
 
         crewStateMessage.textContent = "";
         crewStateMessage.className = "crew-state-message";
 
-        if (!title && !body) {
+        if (!title && !body && !showTransferAction) {
           crewStateMessage.hidden = true;
           return;
         }
@@ -1189,14 +1103,18 @@
           crewStateMessage.appendChild(copy);
         }
 
+        if (showTransferAction) {
+          const button = document.createElement("button");
+          button.className = "crew-state-action";
+          button.type = "button";
+          button.textContent = "Enable LEAP Transfers";
+          button.title = "Enable direct LEAP transfers for this wallet.";
+          button.addEventListener("click", prepareLeapTrustline);
+          crewStateMessage.appendChild(button);
+        }
+
         crewStateMessage.hidden = false;
         crewStateMessage.classList.add("show");
-      }
-
-      function resetTransferEnablement() {
-        transferEnable.classList.remove("show");
-        transferEnableButton.disabled = true;
-        transferEnableButton.title = "LEAP transfers are already enabled for this wallet.";
       }
 
       function setTrustlineStatus(leapLine, state = "loaded") {
@@ -1207,8 +1125,6 @@
           "trustline-warn",
           "trustline-bad"
         );
-        trustlineCreateButton.hidden = true;
-
         if (state === "checking") {
           trustlineStatusText.textContent = "Checking transfers…";
           return;
@@ -1233,21 +1149,6 @@
         } else {
           trustlineStatusText.textContent = "Transfers currently disabled";
           trustlineStatus.classList.add("trustline-bad");
-          trustlineCreateButton.hidden = false;
-        }
-      }
-
-      function renderTransferEnablement(leapLine) {
-        resetTransferEnablement();
-
-        if (!leapLine) return;
-
-        const limit = Number(leapLine.limit);
-
-        if (Number.isFinite(limit) && limit === 0) {
-          transferEnable.classList.add("show");
-          transferEnableButton.disabled = false;
-          transferEnableButton.title = "Enable direct LEAP transfers for this wallet.";
         }
       }
 
@@ -2745,6 +2646,7 @@
           setTrustlineStatus(leapLine);
           const balance = leapLine ? Number(leapLine.balance) : 0;
           const safeBalance = Number.isFinite(balance) ? balance : 0;
+          const transfersDisabled = !leapLine || Number(leapLine.limit) === 0;
 
           const pending = checksResult.status === "fulfilled"
             ? checksResult.value
@@ -2754,7 +2656,6 @@
             setDiscordAccess(false);
             resetRecord();
             setTrustlineStatus(leapLine);
-            renderTransferEnablement(leapLine);
 
             if (pending.length) {
               walletEl.textContent = shortAddress(account);
@@ -2769,19 +2670,22 @@
               setStateMessage(
                 "Your first LEAP is waiting in Xaman.",
                 "Cash the LEAP Check to bring it aboard. New LEAP from Sailing Frog's Leap starts with a Check so its history is recorded. After that, LEAP can move directly between Leapers.",
-                "success"
+                "success",
+                transfersDisabled
               );
             } else if (!leapLine) {
               setStateMessage(
                 "",
-                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet.",
-                "action"
+                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
+                "action",
+                true
               );
             } else if (Number(leapLine.limit) === 0) {
               setStateMessage(
                 "",
-                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet.",
-                "warn"
+                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
+                "warn",
+                true
               );
             } else {
               setStateMessage();
@@ -2792,13 +2696,13 @@
           }
 
           renderRecord(account, safeBalance);
-          renderTransferEnablement(leapLine);
 
           if (Number(leapLine?.limit) === 0) {
             setStateMessage(
               "",
-              "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet.",
-              "warn"
+              "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
+              "warn",
+              true
             );
           } else {
             setStateMessage();
@@ -2911,8 +2815,6 @@
         }
       }, 60000);
 
-      trustlineCreateButton.addEventListener("click", prepareLeapTrustline);
-      transferEnableButton.addEventListener("click", prepareLeapTrustline);
 
       discordCrewButton.addEventListener("click", beginDiscordOAuth);
 
