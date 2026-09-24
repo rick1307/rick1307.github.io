@@ -690,7 +690,7 @@
           </div>
 
           <p class="pending-checks-copy" id="pendingChecksCopy">
-            Open Xaman → Events and cash these Checks before they expire.
+            Open Xaman → Events and cash these Checks. New pending Checks are shown here for 7 days.
           </p>
 
           <div class="pending-check-list" id="pendingCheckList"></div>
@@ -743,6 +743,7 @@
       const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
       const SFL_LEAP_SESSION_KEY = "sfl.leap.session";
       const SFL_DISMISSED_EXPIRED_CHECKS_KEY = "sfl.leap.dismissedExpiredChecks";
+      const PENDING_CHECK_VISIBLE_MS = 7 * 24 * 60 * 60 * 1000;
 
       const DISCORD_OAUTH_START_URL = "https://sfl-discord-auth.yjc26zd6c4.workers.dev/start";
       const XRPL_WS = "wss://s1.ripple.com/";
@@ -903,7 +904,7 @@
         pendingCheckCount.textContent = "0 Waiting";
         pendingChecksTitle.textContent = "LEAP Waiting for You";
         pendingChecksCopy.textContent =
-          "Open Xaman → Events and cash these Checks before they expire.";
+          "Open Xaman → Events and cash these Checks. New pending Checks are shown here for 7 days.";
       }
 
       function checkObjectId(check) {
@@ -923,10 +924,35 @@
         const expiration = Number(check?.Expiration || 0);
 
         if (!Number.isFinite(expiration) || expiration <= 0) {
+          const createdAtMs = Number(check?._createdAtMs);
+
+          if (Number.isFinite(createdAtMs) && createdAtMs > 0) {
+            const displayUntilMs = createdAtMs + PENDING_CHECK_VISIBLE_MS;
+            const remainingMs = displayUntilMs - Date.now();
+
+            if (remainingMs <= 0) {
+              return {
+                state:"hidden",
+                label:"",
+                detail:"",
+                expirationMs:displayUntilMs
+              };
+            }
+
+            const daysLeft = Math.max(1, Math.ceil(remainingMs / 86400000));
+
+            return {
+              state:"no-expiration",
+              label:`${daysLeft} day${daysLeft === 1 ? "" : "s"} left here`,
+              detail:"This notice leaves Crew Record after 7 days. The Check remains available in Xaman until it is cashed or canceled.",
+              expirationMs:displayUntilMs
+            };
+          }
+
           return {
             state:"no-expiration",
-            label:"No expiration set",
-            detail:"This Check will remain waiting until it is cashed or canceled.",
+            label:"Waiting",
+            detail:"This Check remains available in Xaman until it is cashed or canceled.",
             expirationMs:null
           };
         }
@@ -1022,6 +1048,10 @@
           const timing = checkExpirationInfo(check);
           const id = checkObjectId(check);
 
+          if (timing.state === "hidden") {
+            continue;
+          }
+
           if (timing.state === "expired" && dismissed.has(id)) {
             continue;
           }
@@ -1048,7 +1078,7 @@
           pendingCheckCount.textContent = parts.join(" • ");
 
           pendingChecksCopy.textContent =
-            "Open Xaman → Events and cash these Checks before they expire. Your Crew Record updates after the LEAP reaches your wallet.";
+            "Open Xaman → Events and cash these Checks. New pending Checks are shown here for 7 days. Your Crew Record updates after the LEAP reaches your wallet.";
         } else {
           pendingChecksTitle.textContent =
             expiredCount === 1 ? "Expired LEAP Check" : "Expired LEAP Checks";
@@ -1414,7 +1444,7 @@
               return;
             }
 
-            resolve(result.tx_json || result);
+            resolve(result);
           });
 
           ws.addEventListener("error", () => {
@@ -1435,7 +1465,8 @@
           }
 
           try {
-            const tx = await queryTransactionByHash(originHash);
+            const txResult = await queryTransactionByHash(originHash);
+            const tx = txResult?.tx_json || txResult;
 
             const isMatchingCheck =
               tx?.TransactionType === "CheckCreate" &&
@@ -1444,19 +1475,34 @@
               isLeapAmount(tx?.SendMax);
 
             if (!isMatchingCheck) {
-              return { ...check, _leapFacts:[] };
+              return { ...check, _leapFacts:[], _createdAtMs:null };
+            }
+
+            let createdAtMs = null;
+
+            if (typeof txResult?.close_time_iso === "string") {
+              const parsed = Date.parse(txResult.close_time_iso);
+              if (Number.isFinite(parsed)) createdAtMs = parsed;
+            }
+
+            if (!Number.isFinite(createdAtMs)) {
+              const rippleDate = Number(txResult?.date ?? tx?.date);
+              if (Number.isFinite(rippleDate) && rippleDate > 0) {
+                createdAtMs = Date.UTC(2000, 0, 1) + rippleDate * 1000;
+              }
             }
 
             return {
               ...check,
-              _leapFacts:extractLeapFacts(tx)
+              _leapFacts:extractLeapFacts(tx),
+              _createdAtMs:createdAtMs
             };
           } catch (_) {
             /*
-              Memo enrichment is optional. If an originating transaction cannot
-              be read, keep the Check visible with its amount and expiration.
+              Origin enrichment is optional. If the originating transaction cannot
+              be read, keep the Check visible rather than hiding it incorrectly.
             */
-            return { ...check, _leapFacts:[] };
+            return { ...check, _leapFacts:[], _createdAtMs:null };
           }
         }));
       }
