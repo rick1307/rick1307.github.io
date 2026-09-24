@@ -1194,6 +1194,13 @@
           return;
         }
 
+        const timing = checkExpirationInfo(check);
+
+        if (timing.state === "expired" || timing.state === "hidden") {
+          setStatus("This LEAP Check is no longer available to cash from Crew Record.", "error");
+          return;
+        }
+
         const amount = {
           currency:String(check.SendMax.currency || ""),
           issuer:String(check.SendMax.issuer || ""),
@@ -1213,7 +1220,6 @@
 
         const tx = {
           TransactionType:"CheckCash",
-          Account:activeWallet,
           CheckID:checkId,
           Amount:amount
         };
