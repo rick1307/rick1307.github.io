@@ -81,7 +81,7 @@
 
     .welcome-head{
       display:grid;
-      grid-template-columns:minmax(0,1fr) auto;
+      grid-template-columns:minmax(0,1fr) minmax(132px,220px);
       gap:24px;
       align-items:center;
     }
@@ -96,6 +96,7 @@
       border:1px solid rgba(26,37,44,.14);
       box-shadow:0 12px 28px rgba(26,37,44,.12);
       display:block;
+      justify-self:center;
     }
 
     .hero-intro{
@@ -608,7 +609,7 @@
     @media(max-width:800px){
       .nav-links a:not(:last-child){display:none}
       .hero{padding-top:54px}
-      .welcome-head{gap:14px;align-items:center}
+      .welcome-head{grid-template-columns:minmax(0,1fr) 118px;gap:14px;align-items:center}
       .rick-portrait{width:96px;border-radius:16px}
       .hero-intro{grid-template-columns:1fr}
       .hero-intro > .hero-copy{display:block}
