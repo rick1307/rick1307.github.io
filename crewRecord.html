@@ -345,14 +345,17 @@
       position:relative;
       overflow:hidden;
       display:grid;
-      grid-template-columns:minmax(0,1fr) auto;
-      gap:12px;
+      grid-template-columns:minmax(0,1fr) 116px 104px;
+      grid-template-areas:"main deadline action";
+      gap:16px;
       align-items:center;
       padding:13px 14px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.15);
       background:rgba(255,255,255,.07);
     }
+
+    .pending-check-main{grid-area:main}
 
     .pending-check-card.safe{
       border-color:rgba(92,210,149,.55);
@@ -413,28 +416,65 @@
       line-height:1.35;
     }
 
-    .pending-check-action{
-      text-align:right;
-      min-width:92px;
+    .pending-check-deadline{
+      grid-area:deadline;
+      align-self:stretch;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-width:0;
+      padding:3px 12px;
+      text-align:center;
+      border-left:1px solid rgba(255,255,255,.12);
+      border-right:1px solid rgba(255,255,255,.12);
     }
 
-    .pending-check-countdown{
-      display:block;
+    .pending-check-deadline-kicker{
+      color:rgba(255,255,255,.5);
+      font-size:.56rem;
+      font-weight:900;
+      letter-spacing:.105em;
+      line-height:1.1;
+      text-transform:uppercase;
+    }
+
+    .pending-check-deadline-value{
+      margin:2px 0 1px;
       color:#fff1c7;
-      font-size:.72rem;
-      font-weight:950;
-      line-height:1.2;
-      white-space:nowrap;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:2.2rem;
+      font-weight:700;
+      line-height:.95;
     }
 
-    .pending-check-card.urgent .pending-check-countdown,
-    .pending-check-card.expired .pending-check-countdown{
+    .pending-check-deadline-copy{
+      color:rgba(255,255,255,.7);
+      font-size:.58rem;
+      font-weight:850;
+      line-height:1.2;
+      text-transform:uppercase;
+    }
+
+    .pending-check-card.urgent .pending-check-deadline-value,
+    .pending-check-card.expired .pending-check-deadline-value{
       color:#ffd3ca;
     }
 
+    .pending-check-action{
+      grid-area:action;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      min-width:0;
+      text-align:right;
+    }
+
+    .pending-check-action button{width:100%}
+
     .pending-check-cash,
     .pending-check-dismiss{
-      margin-top:7px;
+      margin-top:0;
       border-radius:9px;
       padding:7px 10px;
       font:inherit;
@@ -643,8 +683,20 @@
       header{padding-top:54px}
       .crew-console{padding:18px;border-radius:20px}
       .record-grid{grid-template-columns:1fr 1fr}
-      .pending-check-card{grid-template-columns:1fr}
-      .pending-check-action{text-align:left;min-width:0}
+      .pending-check-card{
+        grid-template-columns:minmax(0,1fr) 92px;
+        grid-template-areas:
+          "main deadline"
+          "action action";
+        gap:12px 10px;
+      }
+      .pending-check-deadline{
+        padding:3px 9px;
+        border-right:0;
+      }
+      .pending-check-deadline-value{font-size:2rem}
+      .pending-check-action{justify-content:stretch;text-align:left}
+      .pending-check-action button{width:100%}
       .logbook-entry{grid-template-columns:72px minmax(0,1fr)}
       .logbook-fact{grid-template-columns:60px minmax(0,1fr)}
     }
@@ -1050,6 +1102,40 @@
           .join(" • ");
       }
 
+      function pendingCheckDeadlineDisplay(timing) {
+        const label = String(timing?.label || "").trim();
+
+        let match = label.match(/^(\d+)\s+day(?:s)?\s+left$/i);
+        if (match) {
+          const value = match[1];
+          return {
+            kicker:"You have",
+            value,
+            copy:value === "1" ? "day left to cash" : "days left to cash"
+          };
+        }
+
+        match = label.match(/^(\d+)\s+hours?\s+left$/i);
+        if (match) {
+          const value = match[1];
+          return {
+            kicker:"You have",
+            value,
+            copy:value === "1" ? "hour left to cash" : "hours left to cash"
+          };
+        }
+
+        if (/^less than 1 hour left$/i.test(label)) {
+          return { kicker:"You have", value:"<1", copy:"hour left to cash" };
+        }
+
+        if (timing?.state === "expired") {
+          return { kicker:"Check", value:"—", copy:"expired" };
+        }
+
+        return { kicker:"Ready", value:"—", copy:"to cash" };
+      }
+
       function renderPendingChecks(checks = currentPendingLeapChecks) {
         currentPendingLeapChecks = Array.isArray(checks) ? checks : [];
 
@@ -1115,6 +1201,7 @@
           card.className = `pending-check-card ${timing.state}`;
 
           const main = document.createElement("div");
+          main.className = "pending-check-main";
 
           const amount = document.createElement("strong");
           amount.className = "pending-check-amount";
@@ -1144,14 +1231,27 @@
 
           main.append(cardStatus, expiry);
 
+          const deadline = document.createElement("div");
+          deadline.className = "pending-check-deadline";
+
+          const deadlineDisplay = pendingCheckDeadlineDisplay(timing);
+
+          const deadlineKicker = document.createElement("span");
+          deadlineKicker.className = "pending-check-deadline-kicker";
+          deadlineKicker.textContent = deadlineDisplay.kicker;
+
+          const deadlineValue = document.createElement("strong");
+          deadlineValue.className = "pending-check-deadline-value";
+          deadlineValue.textContent = deadlineDisplay.value;
+
+          const deadlineCopy = document.createElement("span");
+          deadlineCopy.className = "pending-check-deadline-copy";
+          deadlineCopy.textContent = deadlineDisplay.copy;
+
+          deadline.append(deadlineKicker, deadlineValue, deadlineCopy);
+
           const action = document.createElement("div");
           action.className = "pending-check-action";
-
-          const countdown = document.createElement("span");
-          countdown.className = "pending-check-countdown";
-          countdown.textContent = timing.label;
-
-          action.appendChild(countdown);
 
           if (timing.state !== "expired") {
             const cash = document.createElement("button");
@@ -1169,7 +1269,7 @@
             action.appendChild(dismiss);
           }
 
-          card.append(main, action);
+          card.append(main, deadline, action);
           pendingCheckList.appendChild(card);
         }
       }
