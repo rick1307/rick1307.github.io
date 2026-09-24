@@ -79,6 +79,25 @@
       padding:74px 0 54px;
     }
 
+    .welcome-head{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:24px;
+      align-items:center;
+    }
+
+    .welcome-head h1{margin-bottom:0}
+
+    .rick-portrait{
+      width:clamp(118px,16vw,170px);
+      aspect-ratio:4/5;
+      object-fit:cover;
+      border-radius:20px;
+      border:1px solid rgba(26,37,44,.14);
+      box-shadow:0 12px 28px rgba(26,37,44,.12);
+      display:block;
+    }
+
     .hero-intro{
       margin-top:24px;
       display:grid;
@@ -589,6 +608,8 @@
     @media(max-width:800px){
       .nav-links a:not(:last-child){display:none}
       .hero{padding-top:54px}
+      .welcome-head{gap:14px;align-items:center}
+      .rick-portrait{width:96px;border-radius:16px}
       .hero-intro{grid-template-columns:1fr}
       .hero-intro > .hero-copy{display:block}
       .story-section{padding-top:10px}
@@ -785,12 +806,15 @@
   <header id="top">
     <div class="wrap hero">
       <div class="kicker">Sailing Frog's Leap Crew Membership</div>
-      <h1>Welcome Aboard</h1>
+      <div class="welcome-head">
+        <h1>Welcome Aboard</h1>
+        <img class="rick-portrait" src="images/rick-welcome.png" alt="Rick from Sailing Frog's Leap">
+      </div>
 
       <div class="hero-intro">
         <div class="hero-copy">
           <p class="lede">
-            Watching the adventure is one thing. Becoming part of it is another.
+            Hello. My name is Rick, and I'm sailing Frog's Leap.
             If you follow Sailing Frog’s Leap, you’re already a Leaper.
             LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.
           </p>
