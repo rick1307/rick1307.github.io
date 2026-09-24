@@ -27,7 +27,50 @@
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.btn{min-height:50px;border-radius:11px;font-size:16px;font-weight:900;cursor:pointer}.edit{border:1px solid #c9d5df;background:#fff;color:var(--blue)}.xaman{border:0;background:#162536;color:#fff}.xaman:disabled{opacity:.48;cursor:not-allowed}.xaman:not(:disabled){opacity:1;cursor:pointer}
     .note{text-align:center;margin:10px 0 0;color:var(--muted);font-size:11px;line-height:1.4}.error{display:none;margin-top:14px;padding:12px 14px;border:1px solid #e5bebe;border-radius:11px;background:var(--red-soft);color:#7c2929;font-size:13px;line-height:1.45}
     @media(max-width:560px){.wrap{width:min(94%,760px);margin-top:22px}.panel-head,.body{padding-left:17px;padding-right:17px}.row{grid-template-columns:92px minmax(0,1fr)}.actions{grid-template-columns:1fr}}
-  </style>
+  
+
+    /* SFL shared button motion standard */
+    button,
+    a.button{
+      transition:
+        transform .16s ease,
+        filter .16s ease,
+        box-shadow .16s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+      button:not(:disabled):hover,
+      a.button:hover{
+        transform:translateY(-1px);
+      }
+    }
+
+    button:not(:disabled):active,
+    a.button:active{
+      transform:translateY(0) scale(.985);
+    }
+
+    button:disabled{
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      button,
+      a.button{
+        transition:none !important;
+      }
+
+      button:not(:disabled):hover,
+      a.button:hover,
+      button:not(:disabled):active,
+      a.button:active{
+        transform:none !important;
+      }
+    }
+</style>
 </head>
 <body>
 <main class="wrap">

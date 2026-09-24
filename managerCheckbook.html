@@ -43,7 +43,50 @@
     .footnote{margin:13px 3px 0;color:var(--muted);font-size:11px;line-height:1.45}
     @media(max-width:700px){.control-zone{grid-template-columns:1fr}.view-panel{grid-template-columns:1fr 1fr}.action-panel{grid-template-columns:1fr 1fr;grid-template-rows:auto}.tool.create{min-height:100%}.ledger{padding:17px}.check-grid{grid-template-columns:1fr}}
     @media(max-width:440px){.wrap{margin-top:22px}.top{align-items:flex-start}.view-panel{grid-template-columns:1fr}.action-panel{grid-template-columns:1fr}.tool{font-size:12px}.tool.create{min-height:48px}.check-top{display:block}.check-status{display:inline-block;margin-top:10px}}
-  </style>
+  
+
+    /* SFL shared button motion standard */
+    button,
+    a.button{
+      transition:
+        transform .16s ease,
+        filter .16s ease,
+        box-shadow .16s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+      button:not(:disabled):hover,
+      a.button:hover{
+        transform:translateY(-1px);
+      }
+    }
+
+    button:not(:disabled):active,
+    a.button:active{
+      transform:translateY(0) scale(.985);
+    }
+
+    button:disabled{
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      button,
+      a.button{
+        transition:none !important;
+      }
+
+      button:not(:disabled):hover,
+      a.button:hover,
+      button:not(:disabled):active,
+      a.button:active{
+        transform:none !important;
+      }
+    }
+</style>
 </head>
 <body>
 <main class="wrap">

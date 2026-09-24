@@ -451,7 +451,50 @@
       header{padding-top:62px}
       header:after{display:none}
     }
-  </style>
+  
+
+    /* SFL shared button motion standard */
+    button,
+    a.button{
+      transition:
+        transform .16s ease,
+        filter .16s ease,
+        box-shadow .16s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+      button:not(:disabled):hover,
+      a.button:hover{
+        transform:translateY(-1px);
+      }
+    }
+
+    button:not(:disabled):active,
+    a.button:active{
+      transform:translateY(0) scale(.985);
+    }
+
+    button:disabled{
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      button,
+      a.button{
+        transition:none !important;
+      }
+
+      button:not(:disabled):hover,
+      a.button:hover,
+      button:not(:disabled):active,
+      a.button:active{
+        transform:none !important;
+      }
+    }
+</style>
 </head>
 <body>
 <nav><div class="wrap nav-inner"><a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a><a class="back" href="index.html">← Back to LEAP</a></div></nav>
