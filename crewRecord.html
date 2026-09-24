@@ -432,17 +432,29 @@
       color:#ffd3ca;
     }
 
+    .pending-check-cash,
     .pending-check-dismiss{
       margin-top:7px;
-      border:1px solid rgba(255,255,255,.2);
       border-radius:9px;
-      padding:6px 9px;
-      background:rgba(255,255,255,.08);
-      color:white;
+      padding:7px 10px;
       font:inherit;
       font-size:.65rem;
       font-weight:900;
       cursor:pointer;
+    }
+
+    .pending-check-cash{
+      border:1px solid rgba(215,174,98,.78);
+      background:#d7ae62;
+      color:#17313a;
+    }
+
+    .pending-check-cash:hover{filter:brightness(1.05)}
+
+    .pending-check-dismiss{
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.08);
+      color:white;
     }
 
     .pending-check-dismiss:hover{background:rgba(255,255,255,.14)}
@@ -1141,7 +1153,14 @@
 
           action.appendChild(countdown);
 
-          if (timing.state === "expired") {
+          if (timing.state !== "expired") {
+            const cash = document.createElement("button");
+            cash.type = "button";
+            cash.className = "pending-check-cash";
+            cash.dataset.checkId = id;
+            cash.textContent = "Cash Check";
+            action.appendChild(cash);
+          } else {
             const dismiss = document.createElement("button");
             dismiss.type = "button";
             dismiss.className = "pending-check-dismiss";
@@ -1153,6 +1172,55 @@
           card.append(main, action);
           pendingCheckList.appendChild(card);
         }
+      }
+
+      function prepareCashCheck(checkId) {
+        const check = currentPendingLeapChecks.find(item => checkObjectId(item) === checkId);
+
+        if (!check || !/^[A-Fa-f0-9]{64}$/.test(checkId)) {
+          setStatus("This LEAP Check does not have a valid Check ID.", "error");
+          return;
+        }
+
+        if (!isLeapAmount(check.SendMax)) {
+          setStatus("This Check is not a valid LEAP Check.", "error");
+          return;
+        }
+
+        const activeWallet = getActiveWallet();
+
+        if (!activeWallet || check.Destination !== activeWallet) {
+          setStatus("This Check does not belong to the active Crew Record wallet.", "error");
+          return;
+        }
+
+        const amount = {
+          currency:String(check.SendMax.currency || ""),
+          issuer:String(check.SendMax.issuer || ""),
+          value:String(check.SendMax.value || "")
+        };
+
+        if (!amount.currency || !amount.issuer || !amount.value) {
+          setStatus("This LEAP Check does not contain a complete cash amount.", "error");
+          return;
+        }
+
+        const confirmed = window.confirm(
+          `Prepare to cash ${formatCheckAmount(check)}?\n\nThis opens Xaman's Signing Tool. Nothing moves until you review, sign, and submit.`
+        );
+
+        if (!confirmed) return;
+
+        const tx = {
+          TransactionType:"CheckCash",
+          Account:activeWallet,
+          CheckID:checkId,
+          Amount:amount
+        };
+
+        const payload = btoa(JSON.stringify(tx));
+        const url = `https://xumm.dev/signing-tool?payload=${encodeURIComponent(payload)}`;
+        window.open(url, "_blank", "noopener,noreferrer");
       }
 
       function dismissExpiredCheck(checkId) {
@@ -2327,9 +2395,16 @@
       }
 
       pendingCheckList.addEventListener("click", event => {
-        const button = event.target.closest(".pending-check-dismiss");
-        if (!button) return;
-        dismissExpiredCheck(button.dataset.checkId || "");
+        const cashButton = event.target.closest(".pending-check-cash");
+
+        if (cashButton) {
+          prepareCashCheck(cashButton.dataset.checkId || "");
+          return;
+        }
+
+        const dismissButton = event.target.closest(".pending-check-dismiss");
+        if (!dismissButton) return;
+        dismissExpiredCheck(dismissButton.dataset.checkId || "");
       });
 
       setInterval(() => {
