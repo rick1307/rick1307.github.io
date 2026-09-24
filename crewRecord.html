@@ -157,13 +157,52 @@
     }
 
     .console-title span{
-      display:block;
+      display:flex;
+      align-items:center;
+      gap:6px;
       margin-top:1px;
       color:rgba(255,255,255,.62);
       font-size:.76rem;
       text-transform:uppercase;
       letter-spacing:.12em;
       font-weight:800;
+    }
+
+    .console-title span::before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:rgba(255,255,255,.42);
+      box-shadow:0 0 0 2px rgba(255,255,255,.06);
+      flex:0 0 auto;
+    }
+
+    .console-title span.trustline-good{
+      color:#7ee2a8;
+    }
+
+    .console-title span.trustline-good::before{
+      background:#63d893;
+      box-shadow:0 0 0 2px rgba(99,216,147,.13),0 0 10px rgba(99,216,147,.26);
+    }
+
+    .console-title span.trustline-warn{
+      color:#f0c76b;
+    }
+
+    .console-title span.trustline-warn::before{
+      background:#e9b94f;
+      box-shadow:0 0 0 2px rgba(233,185,79,.13),0 0 10px rgba(233,185,79,.24);
+    }
+
+    .console-title span.trustline-bad{
+      color:#ff9a8c;
+    }
+
+    .console-title span.trustline-bad::before{
+      background:#f06f5d;
+      box-shadow:0 0 0 2px rgba(240,111,93,.13),0 0 10px rgba(240,111,93,.24);
     }
 
     .live-pill{
@@ -639,6 +678,54 @@
       overflow-wrap:anywhere;
     }
 
+    .transfer-enable{
+      display:none;
+      margin-top:16px;
+      padding:14px;
+      border:1px solid rgba(215,174,98,.34);
+      border-radius:14px;
+      background:rgba(215,174,98,.08);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .transfer-enable.show{display:block}
+
+    .transfer-enable-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .transfer-enable-copy b{
+      display:block;
+      color:#f2d99f;
+      font-size:.78rem;
+      letter-spacing:.03em;
+    }
+
+    .transfer-enable-copy span{
+      display:block;
+      margin-top:4px;
+      color:rgba(255,255,255,.68);
+      font-size:.7rem;
+      line-height:1.45;
+    }
+
+    .transfer-enable button{
+      flex:0 0 auto;
+      border:1px solid rgba(215,174,98,.78);
+      border-radius:10px;
+      padding:9px 12px;
+      background:#d7ae62;
+      color:#17313a;
+      font:inherit;
+      font-size:.68rem;
+      font-weight:900;
+      cursor:not-allowed;
+      opacity:.72;
+    }
+
     .discord-cta{
       display:flex;
       justify-content:center;
@@ -689,6 +776,11 @@
       }
       .pending-check-action{justify-content:stretch;text-align:left}
       .pending-check-action button{width:100%}
+      .transfer-enable-head{
+        align-items:stretch;
+        flex-direction:column;
+      }
+      .transfer-enable button{width:100%}
       .logbook-entry{grid-template-columns:72px minmax(0,1fr)}
       .logbook-fact{grid-template-columns:60px minmax(0,1fr)}
     }
@@ -708,11 +800,11 @@
 
   <header>
     <div class="wrap hero-grid">
-      <aside class="crew-console" aria-label="Sailing Frog's Leap Leaper Lounge">
+      <aside class="crew-console" aria-label="Sailing Frog's Leap Crew Record">
         <div class="console-head">
           <div class="console-title">
             <img src="leap-logo.png" alt="LEAP coin">
-            <div><b>Leaper Lounge</b><span>Your crew record</span></div>
+            <div><b>Crew Record</b><span id="trustlineStatus">Checking Trustline…</span></div>
           </div>
           <div class="live-pill">Ledger Live</div>
         </div>
@@ -735,6 +827,16 @@
         </div>
 
         <p class="crew-status" id="crewRecordStatus" role="status" aria-live="polite"></p>
+
+        <section class="transfer-enable" id="transferEnable" aria-live="polite">
+          <div class="transfer-enable-head">
+            <div class="transfer-enable-copy">
+              <b>LEAP Transfers Available</b>
+              <span>Your LEAP trustline currently has a receiving limit of 0. Enable transfers so other LEAP holders can send LEAP directly to this wallet.</span>
+            </div>
+            <button id="transferEnableButton" type="button" disabled title="Transfer setup will be connected to Xaman in the next step.">Enable LEAP Transfers</button>
+          </div>
+        </section>
 
         <section class="pending-checks" id="pendingChecks" aria-live="polite">
           <div class="pending-checks-head">
@@ -805,6 +907,7 @@
       const XRPL_WS = "wss://s1.ripple.com/";
 
       const status = document.getElementById("crewRecordStatus");
+      const trustlineStatus = document.getElementById("trustlineStatus");
       const walletEl = document.getElementById("recordWallet");
       const leapEl = document.getElementById("recordLeap");
       const rankEl = document.getElementById("recordRank");
@@ -824,6 +927,8 @@
       const pendingCheckCount = document.getElementById("pendingCheckCount");
       const pendingChecksCopy = document.getElementById("pendingChecksCopy");
       const pendingCheckList = document.getElementById("pendingCheckList");
+      const transferEnable = document.getElementById("transferEnable");
+      const transferEnableButton = document.getElementById("transferEnableButton");
       const discordCrewButton = document.getElementById("discordCrewButton");
 
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -918,6 +1023,51 @@
       function setStatus(message, kind = "") {
         status.textContent = message;
         status.className = "crew-status" + (kind ? " " + kind : "");
+      }
+
+      function resetTransferEnablement() {
+        transferEnable.classList.remove("show");
+      }
+
+      function setTrustlineStatus(leapLine, state = "loaded") {
+        if (!trustlineStatus) return;
+
+        trustlineStatus.classList.remove(
+          "trustline-good",
+          "trustline-warn",
+          "trustline-bad"
+        );
+
+        if (state === "checking") {
+          trustlineStatus.textContent = "Checking Trustline…";
+          return;
+        }
+
+        if (state === "unavailable") {
+          trustlineStatus.textContent = "Trustline Status Unavailable";
+          trustlineStatus.classList.add("trustline-warn");
+          return;
+        }
+
+        if (leapLine) {
+          trustlineStatus.textContent = "Trustline Exists";
+          trustlineStatus.classList.add("trustline-good");
+        } else {
+          trustlineStatus.textContent = "Trustline Does Not Exist";
+          trustlineStatus.classList.add("trustline-bad");
+        }
+      }
+
+      function renderTransferEnablement(leapLine) {
+        resetTransferEnablement();
+
+        if (!leapLine) return;
+
+        const limit = Number(leapLine.limit);
+
+        if (Number.isFinite(limit) && limit === 0) {
+          transferEnable.classList.add("show");
+        }
       }
 
       function resetLogbook(message = "Your LEAP history will appear here after your Crew Record is opened through the LEAP flow.") {
@@ -1333,6 +1483,8 @@
         progressValue.textContent = "—";
         progressFill.style.width = "0%";
 
+        setTrustlineStatus(null, "unavailable");
+        resetTransferEnablement();
         resetPendingChecks();
         resetLogbook();
       }
@@ -2343,6 +2495,7 @@
 
         setDiscordAccess(false);
         resetRecord("Reading your Crew Record…");
+        setTrustlineStatus(null, "checking");
         setStatus("Reading your crew record from the XRP Ledger…");
 
         try {
@@ -2358,6 +2511,7 @@
 
           const lines = linesResult.value;
           const leapLine = lines.find(isLeapLine);
+          setTrustlineStatus(leapLine);
           const balance = leapLine ? Number(leapLine.balance) : 0;
           const safeBalance = Number.isFinite(balance) ? balance : 0;
 
@@ -2386,6 +2540,7 @@
           }
 
           renderRecord(account, safeBalance);
+          renderTransferEnablement(leapLine);
           saveWallet(account);
           saveLeapSession(account, safeBalance);
           verifiedDiscordWallet = account;
