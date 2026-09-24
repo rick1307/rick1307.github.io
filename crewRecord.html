@@ -955,8 +955,8 @@
 
             return {
               state:"no-expiration",
-              label:`${daysLeft} day${daysLeft === 1 ? "" : "s"} left here`,
-              detail:"This notice leaves Crew Record after 7 days. The Check remains available in Xaman until it is cashed or canceled.",
+              label:`${daysLeft} day${daysLeft === 1 ? "" : "s"} left`,
+              detail:"Cash this Check within 7 days of issuance.",
               expirationMs:displayUntilMs
             };
           }
