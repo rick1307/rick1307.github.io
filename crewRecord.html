@@ -666,11 +666,25 @@
     }
 
     .logbook-date{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+      line-height:1.25;
+      text-transform:uppercase;
+    }
+
+    .logbook-date span{
+      color:rgba(255,255,255,.4);
+      font-size:.5rem;
+      font-weight:900;
+      letter-spacing:.12em;
+    }
+
+    .logbook-date strong{
       color:#f2d99f;
       font-size:.66rem;
       font-weight:850;
-      line-height:1.35;
-      text-transform:uppercase;
       letter-spacing:.035em;
     }
 
@@ -2260,7 +2274,8 @@
         return new Intl.DateTimeFormat(undefined, {
           month:"short",
           day:"numeric",
-          year:"numeric"
+          year:"numeric",
+          timeZone:"UTC"
         }).format(date);
       }
 
@@ -2291,13 +2306,20 @@
         const row = document.createElement("div");
         row.className = "logbook-entry";
 
-        const badgeOnly =
-          factsToShow.length > 0 &&
-          factsToShow.every(fact => fact.key === "BADGE");
-
         const date = document.createElement("div");
         date.className = "logbook-date";
-        date.textContent = badgeOnly ? "" : formatLogbookDate(record.time);
+
+        const dateLabel = document.createElement("span");
+        dateLabel.textContent = "Recorded";
+
+        const dateValue = document.createElement("strong");
+        dateValue.textContent = formatLogbookDate(record.time);
+
+        if (record.time) {
+          date.title = `Validated XRPL timestamp: ${record.time}`;
+        }
+
+        date.append(dateLabel, dateValue);
 
         const facts = document.createElement("div");
         facts.className = "logbook-facts";
@@ -2365,18 +2387,31 @@
           section.appendChild(head);
 
           if (key === "BADGE") {
-            const badgeValues = new Set();
+            const badgeRecords = new Map();
 
-            for (const record of sorted) {
+            for (const record of currentLogbookRecords) {
               for (const fact of record.facts) {
-                if (fact.key === "BADGE" && fact.value) {
-                  badgeValues.add(fact.value.trim());
+                if (fact.key !== "BADGE" || !fact.value) continue;
+
+                const badgeValue = fact.value.trim();
+                const badgeKey = badgeValue.toUpperCase();
+                const existing = badgeRecords.get(badgeKey);
+                const candidateTime = record.time ? new Date(record.time).getTime() : Number.POSITIVE_INFINITY;
+                const existingTime = existing?.record?.time
+                  ? new Date(existing.record.time).getTime()
+                  : Number.POSITIVE_INFINITY;
+
+                if (!existing || candidateTime < existingTime) {
+                  badgeRecords.set(badgeKey, {
+                    record,
+                    fact:{ key:"BADGE", value:badgeValue }
+                  });
                 }
               }
             }
 
-            const badges = [...badgeValues].sort((a, b) =>
-              a.localeCompare(b, undefined, { sensitivity:"base" })
+            const badges = [...badgeRecords.values()].sort((a, b) =>
+              a.fact.value.localeCompare(b.fact.value, undefined, { sensitivity:"base" })
             );
 
             const count = document.createElement("span");
@@ -2391,10 +2426,7 @@
             } else {
               for (const badge of badges) {
                 section.appendChild(
-                  makeLogbookEntry(
-                    { time:null, facts:[{ key:"BADGE", value:badge }] },
-                    [{ key:"BADGE", value:badge }]
-                  )
+                  makeLogbookEntry(badge.record, [badge.fact])
                 );
               }
             }
