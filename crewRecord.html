@@ -1146,7 +1146,7 @@
           button.className = "crew-state-action";
           button.type = "button";
           button.textContent = "Go to Join";
-          button.title = "Return to the Join page and enter your XRPL address.";
+          button.title = "Go to the Join page.";
           button.addEventListener("click", () => {
             window.location.href = "join.html";
           });
@@ -1171,8 +1171,8 @@
         }
 
         if (state === "unavailable") {
-          trustlineStatusText.textContent = "Transfer status unavailable";
-          trustlineStatus.classList.add("trustline-warn");
+          trustlineStatusText.textContent = "Unrecognized User";
+          trustlineStatus.classList.add("trustline-bad");
           return;
         }
 
@@ -1187,7 +1187,7 @@
             trustlineStatus.classList.add("trustline-good");
           }
         } else {
-          trustlineStatusText.textContent = "Join required";
+          trustlineStatusText.textContent = "Unrecognized User";
           trustlineStatus.classList.add("trustline-bad");
         }
       }
@@ -2595,9 +2595,11 @@
           resetRecord();
           setTrustlineStatus(null, "unavailable");
           setStateMessage(
-            "Open your Crew Record from LEAP Home or Join.",
-            "Choose a wallet through the normal LEAP flow, then come back here.",
-            "warn"
+            "You have not joined the Sailing Frog's Leap membership system.",
+            "Once you have joined, paste your XRPL address in the Crew Record text box on the LEAP Homepage.",
+            "warn",
+            false,
+            true
           );
           setStatus("");
           return;
@@ -2657,8 +2659,8 @@
               );
             } else if (!leapLine) {
               setStateMessage(
-                "Join LEAP to continue",
-                "This wallet is not set up for LEAP yet. Return to the Join page and enter your XRPL address to begin.",
+                "You have not joined the Sailing Frog's Leap membership system.",
+                "Once you have joined, paste your XRPL address in the Crew Record text box on the LEAP Homepage.",
                 "action",
                 false,
                 true
@@ -2829,9 +2831,11 @@
         resetRecord();
         setTrustlineStatus(null, "unavailable");
         setStateMessage(
-          "Open your Crew Record from LEAP Home or Join.",
-          "Choose a wallet through the normal LEAP flow, then come back here.",
-          "warn"
+          "You have not joined the Sailing Frog's Leap membership system.",
+          "Once you have joined, paste your XRPL address in the Crew Record text box on the LEAP Homepage.",
+          "warn",
+          false,
+          true
         );
         setStatus("");
       }
