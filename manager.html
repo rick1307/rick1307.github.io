@@ -119,6 +119,38 @@
       transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     }
 
+
+    .menu-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .menu-row.three-up {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .menu-row.three-up .link-title {
+      font-size: 18px;
+    }
+
+    .menu-row.three-up .link-subtitle {
+      min-height: 82px;
+      font-size: 12.5px;
+    }
+
+    .menu-row.three-up .link-file {
+      font-size: 11px;
+    }
+
+    .menu-row .link-title {
+      font-size: 22px;
+    }
+
+    .menu-row .link-subtitle {
+      min-height: 61px;
+    }
+
     .menu a:hover,
     .menu a:focus-visible {
       transform: translateY(-1px);
@@ -176,6 +208,38 @@
         font-size: 23px;
       }
 
+      .menu-row .link-title {
+        font-size: 19px;
+      }
+
+      .menu-row .link-subtitle {
+        min-height: 0;
+        font-size: 13px;
+      }
+
+      .menu-row.three-up {
+        gap: 8px;
+      }
+
+      .menu-row.three-up a {
+        padding: 14px 10px;
+        border-radius: 18px;
+      }
+
+      .menu-row.three-up .link-title {
+        font-size: 15px;
+      }
+
+      .menu-row.three-up .link-subtitle {
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .menu-row.three-up .link-file {
+        font-size: 9.5px;
+        overflow-wrap: anywhere;
+      }
+
     }
   </style>
 </head>
@@ -207,11 +271,25 @@
 
     <div class="section-label">System Documentation</div>
     <div class="menu">
-      <a href="leapProtocol.html">
-        <span class="link-title">LEAP Protocol</span>
-        <span class="link-subtitle">Memo namespaces, record structure, and the rules behind the system.</span>
-        <span class="link-file">leapProtocol.html</span>
-      </a>
+      <div class="menu-row three-up">
+        <a href="leapProtocol.html">
+          <span class="link-title">LEAP Protocol</span>
+          <span class="link-subtitle">The current memo namespace, record structure, and operating rules.</span>
+          <span class="link-file">leapProtocol.html</span>
+        </a>
+
+        <a href="protocolExtensibility.html">
+          <span class="link-title">Protocol Extensibility</span>
+          <span class="link-subtitle">How block space, versioning, and compact protocols preserve room to grow.</span>
+          <span class="link-file">protocolExtensibility.html</span>
+        </a>
+
+        <a href="prospectiveProtocol.html">
+          <span class="link-title">Prospective Protocol</span>
+          <span class="link-subtitle">Working sketchpad for a future Protocol 2 with greater data efficiency and capability.</span>
+          <span class="link-file">prospectiveProtocol.html</span>
+        </a>
+      </div>
 
       <a href="stateMachine.html">
         <span class="link-title">LEAP Logbook</span>
@@ -240,11 +318,19 @@
         <span class="link-file">kudo.html</span>
       </a>
 
-      <a href="globalStateMachine.html">
-        <span class="link-title">Global State Machine</span>
-        <span class="link-subtitle">The bigger secular thesis: blockspace as shared global state capacity.</span>
-        <span class="link-file">globalStateMachine.html</span>
-      </a>
+      <div class="menu-row">
+        <a href="globalStateMachine.html">
+          <span class="link-title">Global State Machine</span>
+          <span class="link-subtitle">The bigger secular thesis: blockspace as shared global state capacity.</span>
+          <span class="link-file">globalStateMachine.html</span>
+        </a>
+
+        <a href="ambientStateMachine/ambientStateEngine.html">
+          <span class="link-title">Ambient State Engine</span>
+          <span class="link-subtitle">Experimental engine for translating live signals into expressive site state.</span>
+          <span class="link-file">ambientStateMachine/ambientStateEngine.html</span>
+        </a>
+      </div>
     </div>
   </div>
 </body>
