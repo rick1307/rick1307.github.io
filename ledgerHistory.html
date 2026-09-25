@@ -58,14 +58,27 @@
 
     .crew-total {
       display: grid;
-      place-items: center;
-      gap: 4px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       margin-bottom: 10px;
-      padding: 20px 16px;
+      padding: 0;
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 14px;
+      overflow: hidden;
       text-align: center;
+    }
+
+    .crew-metric {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 4px;
+      min-width: 0;
+      padding: 20px 16px;
+    }
+
+    .crew-metric + .crew-metric {
+      border-left: 1px solid var(--line);
     }
 
     .crew-total strong {
@@ -83,8 +96,10 @@
     }
 
     .crew-total small {
+      max-width: 240px;
       color: var(--muted);
       font-size: 12px;
+      line-height: 1.35;
     }
 
     .statusbar {
@@ -534,6 +549,198 @@
     }
   
 
+
+    /* Manager motif experiment: Aubergine + oxidized copper + warm parchment */
+    :root {
+      --ink: #2c1f2f;
+      --muted: #7a6873;
+      --line: #dbcfc7;
+      --soft: #f4eee8;
+      --panel: #fffaf5;
+      --blue: #8f4f3b;
+      --green: #4f7a67;
+      --amber: #b87832;
+      --red: #a74646;
+      --dark: #211521;
+      --dark-line: #5d3b4a;
+      --dark-text: #f6ece4;
+      --dark-muted: #c0a7ad;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 12% 0%, rgba(160,91,62,.16), transparent 34%),
+        radial-gradient(circle at 88% 8%, rgba(83,112,96,.14), transparent 32%),
+        linear-gradient(180deg, #f7f1eb 0%, #efe7df 58%, #e9dfd6 100%);
+    }
+
+    h1 {
+      color: #3a2439;
+      letter-spacing: -.025em;
+    }
+
+    .back {
+      color: #8f4f3b;
+    }
+
+    .crew-total {
+      background:
+        linear-gradient(135deg, rgba(255,250,245,.98), rgba(246,235,225,.96));
+      border-color: #d3bcae;
+      box-shadow: 0 14px 34px rgba(74,45,50,.10);
+    }
+
+    .crew-metric:first-child {
+      background: linear-gradient(135deg, rgba(121,72,87,.07), transparent 72%);
+    }
+
+    .crew-metric:last-child {
+      background: linear-gradient(135deg, rgba(78,116,99,.08), transparent 72%);
+    }
+
+    .crew-metric + .crew-metric {
+      border-left-color: #d3bcae;
+    }
+
+    .crew-total strong {
+      color: #4a2d46;
+      text-shadow: 0 1px 0 rgba(255,255,255,.8);
+    }
+
+    .crew-total span {
+      color: #8f4f3b;
+    }
+
+    .crew-total small {
+      color: #76636d;
+    }
+
+    .refresh {
+      background: #fff8f2;
+      border-color: #ccb3a5;
+      color: #7f4435;
+      box-shadow: 0 3px 10px rgba(72,42,45,.06);
+    }
+
+    .summary-card {
+      background: rgba(255,250,245,.92);
+      border-color: #d8c8bd;
+      box-shadow: 0 8px 20px rgba(70,45,52,.055);
+    }
+
+    .summary-card strong {
+      color: #4a2d46;
+    }
+
+    .summary-card span {
+      color: #8f4f3b;
+    }
+
+    .view-toggle button {
+      background: rgba(255,250,245,.92);
+      border-color: #d4c1b5;
+      color: #745f69;
+    }
+
+    .view-toggle button[aria-pressed="true"] {
+      background: linear-gradient(135deg, #7c4252, #9a563d);
+      border-color: #7c4252;
+      color: #fff9f4;
+      box-shadow: 0 6px 16px rgba(91,47,59,.18);
+    }
+
+    .ledger {
+      background:
+        radial-gradient(circle at 92% 0%, rgba(173,102,62,.15), transparent 30%),
+        radial-gradient(circle at 0% 100%, rgba(76,120,101,.11), transparent 34%),
+        linear-gradient(145deg, #251725 0%, #1c151d 58%, #181317 100%);
+      border-color: #67424f;
+      box-shadow:
+        0 18px 44px rgba(54,31,43,.22),
+        inset 0 1px 0 rgba(255,255,255,.035);
+    }
+
+    .group-head {
+      border-bottom-color: rgba(205,151,118,.28);
+    }
+
+    .group-head h2,
+    .group-count,
+    .timeline-date,
+    .timeline-fact span,
+    .checkbook-intro,
+    .check-fact span,
+    .empty {
+      color: #bda3aa;
+    }
+
+    .name,
+    .timeline-fact strong {
+      color: #f5e8df;
+    }
+
+    .item,
+    .timeline-entry {
+      border-bottom-color: rgba(221,183,158,.09);
+    }
+
+    .history-status.cashed {
+      color: #bfe1cf;
+      border-color: rgba(113,167,140,.42);
+      background: rgba(67,116,91,.2);
+    }
+
+    .history-status.canceled {
+      color: #f0b8b8;
+      border-color: rgba(196,105,105,.38);
+      background: rgba(145,61,61,.18);
+    }
+
+    .check-card {
+      border-color: rgba(222,184,157,.14);
+      background: linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+    }
+
+    .check-card::before {
+      background: #5b8a70;
+    }
+
+    .check-card.soon::before { background: #c1843f; }
+    .check-card.urgent::before,
+    .check-card.expired::before { background: #b34e4e; }
+
+    .check-amount {
+      color: #fff6ed;
+    }
+
+    .check-reason {
+      color: #dbc8c6;
+    }
+
+    .check-fact strong {
+      color: #f2e7e0;
+    }
+
+    .check-countdown {
+      border-top-color: rgba(222,184,157,.12);
+      color: #cbb7b9;
+    }
+
+    .check-id {
+      color: #8f727d;
+    }
+
+    .errorbox {
+      background: #fff1ed;
+      border-color: #d9aaa0;
+      color: #7a3434;
+    }
+
+    .footnote {
+      color: #76646d;
+    }
+
     /* SFL shared button motion standard */
     button,
     a.button{
@@ -585,9 +792,16 @@
     </div>
 
     <div class="crew-total">
-      <strong id="crewTotal">0</strong>
-      <span>Total Crew Members</span>
-      <small>Successfully cashed NEW-MEMBER Checks</small>
+      <div class="crew-metric">
+        <strong id="crewTotal">0</strong>
+        <span>Total Crew Members</span>
+        <small>A measure of our organized community</small>
+      </div>
+      <div class="crew-metric">
+        <strong id="holderTotal">0</strong>
+        <span>Total LEAP Holders</span>
+        <small>A measure of LEAP escaping into the wild</small>
+      </div>
     </div>
 
     <div class="statusbar" aria-label="XRPL connection status">
@@ -678,11 +892,14 @@
       let pending = new Map();
       let scannedTransactions = 0;
       let historyLoaded = false;
+      let leapHolderCount = 0;
+      let holderRefreshTimer = null;
 
       const statusDot = document.getElementById("statusDot");
       const statusText = document.getElementById("statusText");
       const updatedText = document.getElementById("updatedText");
       const crewTotal = document.getElementById("crewTotal");
+      const holderTotal = document.getElementById("holderTotal");
       const errorBox = document.getElementById("errorBox");
       const historySummary = document.getElementById("historySummary");
       const badgesView = document.getElementById("badgesView");
@@ -1222,6 +1439,7 @@
           `${counts.EVENT} unique · ${activeOccurrences.EVENT} active${eventCanceledText}`;
 
         crewTotal.textContent = totalCrewMembers().toLocaleString();
+        holderTotal.textContent = leapHolderCount.toLocaleString();
 
         updatedText.textContent = historyLoaded
           ? `· Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
@@ -1238,6 +1456,7 @@
         checkResolutionsById = new Map();
         scannedTransactions = 0;
         historyLoaded = false;
+        leapHolderCount = 0;
         render();
       }
 
@@ -1332,6 +1551,40 @@
         } while (marker !== undefined && marker !== null);
       }
 
+      async function loadLeapHolderCount() {
+        const holders = new Set();
+        let marker;
+        let ledgerIndex = "validated";
+
+        do {
+          const command = {
+            command: "account_lines",
+            account: LEAP_ISSUER,
+            ledger_index: ledgerIndex,
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(command);
+          if (Number.isInteger(result.ledger_index)) ledgerIndex = result.ledger_index;
+
+          const lines = Array.isArray(result.lines) ? result.lines : [];
+          for (const line of lines) {
+            if (decodeCurrency(line.currency).toUpperCase() !== "LEAP") continue;
+            if (AUTHORIZED_DISTRIBUTORS.includes(line.account)) continue;
+
+            const issuerPerspectiveBalance = Number(line.balance);
+            if (!Number.isFinite(issuerPerspectiveBalance) || issuerPerspectiveBalance >= 0) continue;
+            holders.add(line.account);
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+
+        leapHolderCount = holders.size;
+        render();
+      }
+
       async function subscribeLive() {
         await request({ command: "subscribe", accounts: AUTHORIZED_DISTRIBUTORS });
       }
@@ -1341,16 +1594,25 @@
           if (socket) {
             try { socket.close(); } catch {}
           }
+          if (holderRefreshTimer) {
+            clearInterval(holderRefreshTimer);
+            holderRefreshTimer = null;
+          }
 
           pending.clear();
           resetRecords();
           await connect();
 
           for (const account of AUTHORIZED_DISTRIBUTORS) await loadAccountHistory(account);
+          await loadLeapHolderCount();
           historyLoaded = true;
           await subscribeLive();
           setStatus("XRPL: live", "live");
           render();
+
+          holderRefreshTimer = setInterval(() => {
+            loadLeapHolderCount().catch(() => {});
+          }, 30000);
         } catch (error) {
           showError(error?.message || String(error));
         }
