@@ -782,6 +782,71 @@
         transform:none !important;
       }
     }
+
+
+    /* Historical metric affordance */
+    .holder-metric {
+      position: relative;
+    }
+
+    .holder-metric .metric-title {
+      order: 1;
+    }
+
+    .holder-metric strong {
+      order: 2;
+      margin: 3px 0 5px;
+    }
+
+    .holder-metric .metric-footer {
+      order: 3;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+    }
+
+    .holder-metric .metric-footer small {
+      grid-column: 2;
+      max-width: none;
+      text-align: center;
+    }
+
+    .metric-chart-link {
+      grid-column: 3;
+      justify-self: end;
+      align-self: center;
+      color: #8f4f3b;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .02em;
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(143,79,59,.34);
+      padding-bottom: 1px;
+    }
+
+    .metric-chart-link:hover,
+    .metric-chart-link:focus-visible {
+      color: #633342;
+      border-bottom-color: currentColor;
+      outline: none;
+    }
+
+    @media (max-width: 620px) {
+      .holder-metric .metric-footer {
+        grid-template-columns: 1fr;
+      }
+      .holder-metric .metric-footer small,
+      .metric-chart-link {
+        grid-column: 1;
+        justify-self: center;
+      }
+      .metric-chart-link { margin-top: 2px; }
+    }
+
 </style>
 </head>
 <body>
@@ -797,10 +862,13 @@
         <span>Total Crew Members</span>
         <small>A measure of our organized community</small>
       </div>
-      <div class="crew-metric">
+      <div class="crew-metric holder-metric">
+        <span class="metric-title">Total LEAP Holders</span>
         <strong id="holderTotal">0</strong>
-        <span>Total LEAP Holders</span>
-        <small>A measure of LEAP escaping into the wild</small>
+        <div class="metric-footer">
+          <small>A measure of LEAP escaping into the wild</small>
+          <a class="metric-chart-link" href="leapHoldersChart.html" aria-label="Open the notional LEAP holders historical chart">Chart →</a>
+        </div>
       </div>
     </div>
 
