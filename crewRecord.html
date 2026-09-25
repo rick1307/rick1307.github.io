@@ -1106,13 +1106,13 @@
         status.className = "crew-status" + (kind ? " " + kind : "");
       }
 
-      function setStateMessage(title = "", body = "", kind = "", showTransferAction = false) {
+      function setStateMessage(title = "", body = "", kind = "", showTransferAction = false, showJoinAction = false) {
         if (!crewStateMessage) return;
 
         crewStateMessage.textContent = "";
         crewStateMessage.className = "crew-state-message";
 
-        if (!title && !body && !showTransferAction) {
+        if (!title && !body && !showTransferAction && !showJoinAction) {
           crewStateMessage.hidden = true;
           return;
         }
@@ -1138,6 +1138,18 @@
           button.textContent = "Enable LEAP Transfers";
           button.title = "Enable direct LEAP transfers for this wallet.";
           button.addEventListener("click", prepareLeapTrustline);
+          crewStateMessage.appendChild(button);
+        }
+
+        if (showJoinAction) {
+          const button = document.createElement("button");
+          button.className = "crew-state-action";
+          button.type = "button";
+          button.textContent = "Go to Join";
+          button.title = "Return to the Join page and enter your XRPL address.";
+          button.addEventListener("click", () => {
+            window.location.href = "join.html";
+          });
           crewStateMessage.appendChild(button);
         }
 
@@ -1175,7 +1187,7 @@
             trustlineStatus.classList.add("trustline-good");
           }
         } else {
-          trustlineStatusText.textContent = "Transfers currently disabled";
+          trustlineStatusText.textContent = "Join required";
           trustlineStatus.classList.add("trustline-bad");
         }
       }
@@ -2645,9 +2657,10 @@
               );
             } else if (!leapLine) {
               setStateMessage(
-                "",
-                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
+                "Join LEAP to continue",
+                "This wallet is not set up for LEAP yet. Return to the Join page and enter your XRPL address to begin.",
                 "action",
+                false,
                 true
               );
             } else if (Number(leapLine.limit) === 0) {
