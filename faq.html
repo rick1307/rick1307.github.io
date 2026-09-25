@@ -329,6 +329,27 @@
         transform:none !important;
       }
     }
+
+
+    /* LEAP journey banner: desktop + mobile companion artwork */
+    .leap-journey-banner{
+      width:100%;
+      overflow:hidden;
+      background:#102f38;
+      line-height:0;
+      border-bottom:1px solid rgba(18,59,70,.15);
+    }
+
+    .leap-journey-banner picture,
+    .leap-journey-banner img{
+      display:block;
+      width:100%;
+    }
+
+    .leap-journey-banner img{
+      height:auto;
+    }
+
 </style>
 </head>
 
@@ -339,6 +360,15 @@
       <div class="nav-links"><a href="index.html">← Home</a></div>
     </div>
   </nav>
+
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
+    <picture>
+      <source media="(max-width: 800px)" srcset="images/leap-journey-banner-mobile.png">
+      <img
+        src="images/leap-journey-banner-desktop.png"
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+    </picture>
+  </div>
 
   <header>
     <div class="wrap">
