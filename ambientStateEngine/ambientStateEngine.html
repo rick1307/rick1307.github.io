@@ -56,6 +56,135 @@
       width: 100%;
     }
 
+    .score-map-wrap {
+      margin: 26px 0 8px;
+    }
+
+    .score-map-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .score-map {
+      position: relative;
+      height: 92px;
+      border: 1px solid currentColor;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .score-zones {
+      display: grid;
+      grid-template-columns: 40% 20% 40%;
+      height: 100%;
+    }
+
+    .score-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px;
+      border-right: 1px solid currentColor;
+    }
+
+    .score-zone:last-child {
+      border-right: 0;
+    }
+
+    .score-zone strong {
+      display: block;
+      font-size: 1.15rem;
+    }
+
+    .score-zone span {
+      display: block;
+      font-size: .78rem;
+      opacity: .72;
+    }
+
+    .threshold-line,
+    .zero-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      pointer-events: none;
+    }
+
+    .threshold-line {
+      border-left: 2px solid currentColor;
+    }
+
+    .threshold-line.left { left: 40%; }
+    .threshold-line.right { left: 60%; }
+
+    .zero-line {
+      left: 50%;
+      border-left: 1px dashed currentColor;
+      opacity: .55;
+    }
+
+    .threshold-label,
+    .zero-label {
+      position: absolute;
+      top: 4px;
+      transform: translateX(-50%);
+      font-size: .72rem;
+      font-weight: 700;
+      background: Canvas;
+      padding: 1px 4px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .threshold-label.left { left: 40%; }
+    .threshold-label.right { left: 60%; }
+    .zero-label { left: 50%; }
+
+    .score-marker {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .score-marker::before {
+      content: "";
+      width: 3px;
+      height: 34px;
+      background: currentColor;
+      border-radius: 2px;
+    }
+
+    .score-marker-label {
+      margin-top: 3px;
+      padding: 2px 6px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      background: Canvas;
+      font: 700 .75rem ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+    }
+
+    .active-rule {
+      margin: 10px 0 0;
+      font-weight: 700;
+    }
+
+    .map-note {
+      margin: 5px 0 0;
+      font-size: .85rem;
+      opacity: .75;
+    }
+
     .buttons {
       display: flex;
       flex-wrap: wrap;
@@ -118,7 +247,9 @@
     <section class="panel">
       <strong>Two signals. One score. Two states.</strong>
       <p>
-        Move the two signals, calculate the state, then reload the page.
+        Move the two signals and calculate the state. The score map below shows
+        exactly where the collapsed score sits: <strong>B is negative</strong>,
+        <strong>A is positive</strong>, and the middle band provides inertia.
         The browser remembers the last state in <code>localStorage</code>.
       </p>
 
@@ -136,6 +267,53 @@
           <output id="signalTwoValue">-0.10</output>
         </div>
         <input id="signalTwo" type="range" min="-1" max="1" step="0.05" value="-0.10">
+      </div>
+
+      <div class="score-map-wrap">
+        <div class="score-map-heading">
+          <strong>Collapsed score map</strong>
+          <span class="tiny">B is negative · A is positive</span>
+        </div>
+
+        <div class="score-map" aria-label="Collapsed score zones from negative one to positive one">
+          <div class="score-zones">
+            <div class="score-zone">
+              <div>
+                <strong>B side</strong>
+                <span>-1.00 to -0.20</span>
+              </div>
+            </div>
+            <div class="score-zone">
+              <div>
+                <strong>Neutral / inertia</strong>
+                <span>-0.20 to +0.20</span>
+              </div>
+            </div>
+            <div class="score-zone">
+              <div>
+                <strong>A side</strong>
+                <span>+0.20 to +1.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="threshold-line left"></div>
+          <div class="threshold-line right"></div>
+          <div class="zero-line"></div>
+
+          <div class="threshold-label left">-0.20</div>
+          <div class="zero-label">0</div>
+          <div class="threshold-label right">+0.20</div>
+
+          <div id="scoreMarker" class="score-marker">
+            <div id="scoreMarkerLabel" class="score-marker-label">0.000</div>
+          </div>
+        </div>
+
+        <p id="activeRule" class="active-rule">Active switch rule: —</p>
+        <p class="map-note">
+          The ±0.20 lines apply to the <strong>collapsed score</strong>, not to either signal by itself.
+        </p>
       </div>
 
       <div class="buttons">
@@ -191,6 +369,18 @@
 
       function render(result) {
         document.getElementById("state").textContent = result.state;
+
+        const markerPercent = ((result.score + 1) / 2) * 100;
+        const scoreMarker = document.getElementById("scoreMarker");
+        scoreMarker.style.left = `${Math.max(0, Math.min(100, markerPercent))}%`;
+        document.getElementById("scoreMarkerLabel").textContent =
+          `${result.score >= 0 ? "+" : ""}${result.score.toFixed(3)}`;
+
+        const rule =
+          result.state === "A"
+            ? "State A is remembered: switch to B only at -0.20 or lower."
+            : "State B is remembered: switch to A only at +0.20 or higher.";
+        document.getElementById("activeRule").textContent = `Active switch rule: ${rule}`;
         document.getElementById("expression").textContent = result.expression;
         document.getElementById("score").textContent = result.score.toFixed(3);
         document.getElementById("previousState").textContent = result.previousState ?? "none";
