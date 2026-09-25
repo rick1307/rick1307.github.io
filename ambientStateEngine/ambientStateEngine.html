@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ambient State Engine — Version 1</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px 18px 60px;
+      line-height: 1.45;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: clamp(2rem, 7vw, 3.4rem);
+      line-height: 1;
+    }
+
+    .subhead {
+      margin-top: 0;
+      opacity: .72;
+    }
+
+    .panel {
+      border: 1px solid currentColor;
+      border-radius: 14px;
+      padding: 18px;
+      margin: 22px 0;
+    }
+
+    .signal {
+      margin: 20px 0;
+    }
+
+    .signal-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      font: inherit;
+      padding: 10px 14px;
+      border: 1px solid currentColor;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .state {
+      font-size: clamp(3rem, 15vw, 6rem);
+      font-weight: 800;
+      line-height: 1;
+      margin: 8px 0;
+    }
+
+    .expression {
+      font-size: 1.25rem;
+      min-height: 2em;
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: minmax(130px, auto) 1fr;
+      gap: 8px 14px;
+      margin-bottom: 0;
+    }
+
+    dt {
+      font-weight: 700;
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .92em;
+    }
+
+    .tiny {
+      font-size: .9rem;
+      opacity: .72;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Ambient State Engine</h1>
+    <p class="subhead">Version 1 — Hello World</p>
+
+    <section class="panel">
+      <strong>Two signals. One score. Two states.</strong>
+      <p>
+        Move the two signals, calculate the state, then reload the page.
+        The browser remembers the last state in <code>localStorage</code>.
+      </p>
+
+      <div class="signal">
+        <div class="signal-row">
+          <label for="signalOne"><strong>Signal 1</strong></label>
+          <output id="signalOneValue">0.60</output>
+        </div>
+        <input id="signalOne" type="range" min="-1" max="1" step="0.05" value="0.60">
+      </div>
+
+      <div class="signal">
+        <div class="signal-row">
+          <label for="signalTwo"><strong>Signal 2</strong></label>
+          <output id="signalTwoValue">-0.10</output>
+        </div>
+        <input id="signalTwo" type="range" min="-1" max="1" step="0.05" value="-0.10">
+      </div>
+
+      <div class="buttons">
+        <button id="calculateButton" type="button">Calculate state</button>
+        <button id="resetButton" type="button">Reset remembered state</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <div class="tiny">CURRENT EXPRESSIVE STATE</div>
+      <div id="state" class="state">—</div>
+      <div id="expression" class="expression">Waiting for the engine.</div>
+
+      <dl>
+        <dt>Collapsed score</dt>
+        <dd id="score">—</dd>
+
+        <dt>Previous state</dt>
+        <dd id="previousState">—</dd>
+
+        <dt>State changed?</dt>
+        <dd id="changed">—</dd>
+
+        <dt>Storage key</dt>
+        <dd><code id="storageKey">—</code></dd>
+
+        <dt>Remembered at</dt>
+        <dd id="updatedAt">—</dd>
+      </dl>
+    </section>
+
+    <p class="tiny">
+      Inertia rule: while State A is remembered, the score must reach -0.20
+      to switch to B. While State B is remembered, the score must reach +0.20
+      to switch to A. Inside that band, the prior state survives.
+    </p>
+  </main>
+
+  <script src="ambientStateEngine.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const signalOne = document.getElementById("signalOne");
+      const signalTwo = document.getElementById("signalTwo");
+      const signalOneValue = document.getElementById("signalOneValue");
+      const signalTwoValue = document.getElementById("signalTwoValue");
+
+      function updateSignalLabels() {
+        signalOneValue.value = Number(signalOne.value).toFixed(2);
+        signalTwoValue.value = Number(signalTwo.value).toFixed(2);
+      }
+
+      function render(result) {
+        document.getElementById("state").textContent = result.state;
+        document.getElementById("expression").textContent = result.expression;
+        document.getElementById("score").textContent = result.score.toFixed(3);
+        document.getElementById("previousState").textContent = result.previousState ?? "none";
+        document.getElementById("changed").textContent = result.changed ? "yes" : "no";
+        document.getElementById("storageKey").textContent = result.storageKey;
+        document.getElementById("updatedAt").textContent = result.updatedAt;
+      }
+
+      function calculate() {
+        updateSignalLabels();
+        const result = window.AmbientStateEngine.evaluate({
+          signalOne: signalOne.value,
+          signalTwo: signalTwo.value
+        });
+        render(result);
+      }
+
+      signalOne.addEventListener("input", updateSignalLabels);
+      signalTwo.addEventListener("input", updateSignalLabels);
+      document.getElementById("calculateButton").addEventListener("click", calculate);
+
+      document.getElementById("resetButton").addEventListener("click", () => {
+        window.AmbientStateEngine.reset();
+        calculate();
+      });
+
+      updateSignalLabels();
+      calculate();
+    })();
+  </script>
+</body>
+</html>
