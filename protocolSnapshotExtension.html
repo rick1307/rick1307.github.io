@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocol Snapshot Extension — Sailing Frog's Leap</title>
+<style>
+:root{
+  --bg:#f4f0e8;
+  --paper:#fffdf8;
+  --ink:#27282b;
+  --muted:#6e6b68;
+  --line:#d9d0c2;
+  --plum:#40263e;
+  --plum2:#5c3655;
+  --copper:#a96f3b;
+  --copper-soft:#ead7c4;
+  --sage:#dfe8df;
+  --sage-dark:#47604d;
+  --cream:#f4ead9;
+  --code:#211c22;
+  --code-text:#f8efe3;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#efe9df 0,#f7f4ee 260px,var(--bg) 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62}
+main{width:min(940px,calc(100% - 28px));margin:0 auto;padding:28px 0 72px}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--plum),#241826 76%);color:#fff;border-radius:22px;padding:36px 30px 32px;box-shadow:0 16px 36px rgba(51,31,49,.18)}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-90px;bottom:-120px;background:rgba(169,111,59,.22)}
+.eyebrow{margin:0 0 8px;text-transform:uppercase;letter-spacing:.13em;font-size:.76rem;font-weight:850;color:#e8c9a8}
+.manager-nav{position:absolute;top:22px;right:22px;z-index:2;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;border:1px solid rgba(255,255,255,.45);border-radius:999px;background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:.82rem;font-weight:800}
+.manager-nav:hover{background:rgba(255,255,255,.16)}
+h1{margin:0;max-width:760px;font-size:clamp(2.25rem,7vw,4.25rem);line-height:.98;letter-spacing:-.04em}
+.hero .lede{position:relative;z-index:1;max-width:760px;margin:18px 0 0;font-size:1.08rem;color:#eee6ee}
+.hero-links{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.hero-links a{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);color:#fff;text-decoration:none;font-size:.82rem;font-weight:750}
+.notice{position:relative;z-index:1;margin-top:22px;padding:14px 16px;border:1px solid rgba(232,201,168,.36);border-radius:12px;background:rgba(255,255,255,.06);color:#f0dfcf;font-size:.94rem}
+section{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:27px;margin-top:22px;box-shadow:0 7px 20px rgba(60,43,31,.035)}
+h2{margin:0 0 12px;color:var(--plum);font-size:1.58rem;line-height:1.14;letter-spacing:-.018em}
+h3{margin:22px 0 8px;color:var(--plum2);font-size:1.03rem}.lead{font-size:1.08rem}
+p{margin:10px 0}.muted{color:var(--muted)}
+.big-idea{margin:18px 0 6px;padding:18px 20px;border-radius:12px;background:var(--cream);border-left:5px solid var(--copper);font-size:1.07rem;font-weight:700}
+.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:21px 0 8px}.box{padding:15px 17px;border:1px solid #c9d7ca;border-radius:12px;background:var(--sage);font-weight:780;text-align:center;color:#314639}.arrow{font-size:1.45rem;color:var(--copper);font-weight:900}
+.two{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}
+.card{border:1px solid var(--line);border-radius:13px;padding:17px;background:#fff}.card strong{display:block;color:var(--plum);margin-bottom:6px}.card .tag{display:inline-block;margin-bottom:9px;padding:3px 8px;border-radius:999px;background:var(--sage);color:var(--sage-dark);font-size:.72rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}code{background:#f1ece5;padding:2px 6px;border-radius:6px;font-size:.93em}pre{overflow-x:auto;margin:15px 0;background:var(--code);color:var(--code-text);border-radius:13px;padding:18px;font-size:.92rem;line-height:1.58;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.anatomy{display:grid;grid-template-columns:1.2fr auto 1fr;gap:12px;align-items:stretch;margin:18px 0}.anatomy>div{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff}.anatomy .middle{display:flex;align-items:center;justify-content:center;border:0;background:transparent;font-size:1.6rem;color:var(--copper);font-weight:900}.label{display:block;margin-bottom:6px;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:850}
+table{width:100%;border-collapse:collapse;margin:16px 0 4px;font-size:.95rem}th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:11px 9px}th{color:var(--plum);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+ul{padding-left:22px}li{margin:8px 0}.rule{display:grid;grid-template-columns:64px 1fr;gap:13px;align-items:start;margin:11px 0}.rule b{display:flex;align-items:center;justify-content:center;width:52px;height:32px;border-radius:999px;background:var(--plum);color:#fff;font-size:.78rem;letter-spacing:.03em}.rule p{margin:2px 0}
+.grammar{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.grammar-row{display:grid;grid-template-columns:170px 1fr;gap:0;border-bottom:1px solid var(--line)}.grammar-row:last-child{border-bottom:0}.grammar-row div{padding:13px 15px}.grammar-row .left{background:#f4eee8;color:var(--plum);font-weight:850}.grammar-row .right{background:#fff}
+.footer{background:transparent;border:0;box-shadow:none;padding:8px 4px;color:var(--muted);font-size:.86rem}.footer a{color:var(--plum);font-weight:700}
+@media(max-width:720px){section{padding:22px 18px}.hero{padding:30px 22px}.manager-nav{top:18px;right:18px}.two,.three,.anatomy{grid-template-columns:1fr}.anatomy .middle{transform:rotate(90deg);min-height:34px}.grammar-row{grid-template-columns:1fr}.grammar-row .left{border-bottom:1px solid var(--line)}.rule{grid-template-columns:54px 1fr}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <a class="manager-nav" href="manager.html">Manager</a>
+  <p class="eyebrow">Sailing Frog's Leap · LEAP Protocol Extension</p>
+  <h1>Protocol Snapshot Extension</h1>
+  <p class="lede">A teaching sketch for one narrow extension to the existing LEAP protocol: how a dedicated snapshot transaction could preserve small, periodic observations about the community and later turn those observations into historical charts.</p>
+  <div class="hero-links">
+    <a href="ledgerHistory.html">Ledger History</a>
+    <a href="protocolExtensibility.html">Protocol Extensibility</a>
+  </div>
+  <div class="notice"><strong>Status: notional.</strong> Nothing on this page is adopted protocol. It documents the current working idea so it can be tested, challenged, simplified, or discarded before any namespace or grammar is made authoritative.</div>
+</header>
+
+<section>
+  <h2>1. Start with the question, not the encoding</h2>
+  <p class="lead">Ledger History now shows two live facts: how many organized crew members exist and how many wallets currently possess LEAP.</p>
+  <div class="two">
+    <div class="card"><span class="tag">Live metric</span><strong>Total Crew Members</strong><p>A measure of the organized community that has formally come aboard.</p></div>
+    <div class="card"><span class="tag">Live metric</span><strong>Total LEAP Holders</strong><p>A measure of how far LEAP has escaped beyond the organized community and into the wild.</p></div>
+  </div>
+  <p>Those numbers answer <em>what is true now</em>. The next question is historical: <strong>how did those numbers change over time?</strong></p>
+  <div class="big-idea">A chart needs historical observations. A snapshot is simply one durable observation of the system at one moment.</div>
+</section>
+
+<section>
+  <h2>2. A snapshot is its own kind of record</h2>
+  <p>The extension keeps one existing LEAP habit: <strong>do not combine unrelated record types.</strong></p>
+  <div class="three">
+    <div class="card"><strong>Badge</strong><p>A badge transaction is about a badge.</p></div>
+    <div class="card"><strong>Challenge</strong><p>A challenge transaction is about a challenge.</p></div>
+    <div class="card"><strong>Snapshot</strong><p>A snapshot transaction is about system measurements.</p></div>
+  </div>
+  <p>This means a snapshot would not be tucked inside a badge, event, challenge, or other transaction merely to save a fee. It would stand on its own, be signed on its own, and have one job.</p>
+  <div class="big-idea">One record class per transaction. Do not mix meanings just because they happen on the same day.</div>
+</section>
+
+<section>
+  <h2>3. One snapshot can contain many related measurements</h2>
+  <p>“One record class per transaction” does <strong>not</strong> mean “one number per transaction.” A snapshot is naturally a bundle of measurements taken at the same moment.</p>
+  <div class="flow"><div class="box">Crew count</div><div class="arrow">+</div><div class="box">Holder count</div><div class="arrow">+</div><div class="box">future snapshot metrics</div><div class="arrow">→</div><div class="box">one snapshot</div></div>
+  <p>The boundary is semantic: measurements that describe the same system snapshot may travel together. Unrelated record types do not.</p>
+</section>
+
+<section>
+  <h2>4. The current notional one-line record</h2>
+  <p>The working idea is to place the entire snapshot language in a single memo-data value:</p>
+  <pre>SFL-LEAP/SNAPSHOT=C/27|H/43</pre>
+  <p>That one line contains both identity and payload. No second memo subfield is required by this design.</p>
+  <div class="anatomy">
+    <div><span class="label">Record identity</span><code>SFL-LEAP/SNAPSHOT</code><p class="muted">Tells the LEAP decoder what kind of record this is.</p></div>
+    <div class="middle">=</div>
+    <div><span class="label">Snapshot payload</span><code>C/27|H/43</code><p class="muted">Carries the measurements observed at that moment.</p></div>
+  </div>
+  <p>In this notional form, the extension would leave other memo subfields unused rather than assigning them jobs merely because they exist.</p>
+</section>
+
+<section>
+  <h2>5. Read the grammar from left to right</h2>
+  <p>The line is deliberately simple enough to decode by eye.</p>
+  <div class="grammar">
+    <div class="grammar-row"><div class="left"><code>SFL-LEAP</code></div><div class="right">The LEAP namespace.</div></div>
+    <div class="grammar-row"><div class="left"><code>/SNAPSHOT</code></div><div class="right">The record class. This transaction records a system snapshot.</div></div>
+    <div class="grammar-row"><div class="left"><code>=</code></div><div class="right">Everything after this point is snapshot data.</div></div>
+    <div class="grammar-row"><div class="left"><code>C/27</code></div><div class="right"><strong>C</strong> means Crew. The observed crew count is 27.</div></div>
+    <div class="grammar-row"><div class="left"><code>|</code></div><div class="right">Delimiter: another snapshot observation follows.</div></div>
+    <div class="grammar-row"><div class="left"><code>H/43</code></div><div class="right"><strong>H</strong> means Holders. The observed holder count is 43.</div></div>
+  </div>
+  <div class="big-idea">The protocol does not need to store a sentence. It only needs enough structure for the decoder to reconstruct the meaning.</div>
+</section>
+
+<section>
+  <h2>6. Store observations. Derive relationships.</h2>
+  <p>The two charts need only two stored measurements because the ledger transaction itself supplies the observation time.</p>
+  <table>
+    <thead><tr><th>Output</th><th>Needs</th><th>Stored in snapshot?</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Crew chart</strong></td><td>Transaction time + crew count</td><td><code>C</code> only</td></tr>
+      <tr><td><strong>Holders chart</strong></td><td>Transaction time + holder count</td><td><code>H</code> only</td></tr>
+      <tr><td><strong>LEAP Reach</strong></td><td>Holder count ÷ crew count</td><td><strong>No</strong> — derived later</td></tr>
+    </tbody>
+  </table>
+  <pre>C = 27
+H = 43
+
+Reach = H / C
+Reach = 43 / 27
+Reach = 1.59×</pre>
+  <p>If a value can always be recreated from facts already stored, the extension should prefer calculation over permanent duplication.</p>
+</section>
+
+<section>
+  <h2>7. One snapshot can feed several views</h2>
+  <p>The same breadcrumb can support multiple outputs without writing multiple records.</p>
+  <div class="three">
+    <div class="card"><span class="tag">Chart</span><strong>Crew History</strong><p>Read <code>C</code> from each snapshot and plot it against transaction time.</p></div>
+    <div class="card"><span class="tag">Derived</span><strong>LEAP Reach</strong><p>For each snapshot, calculate <code>H ÷ C</code>. No extra ledger field required.</p></div>
+    <div class="card"><span class="tag">Chart</span><strong>Holder History</strong><p>Read <code>H</code> from each snapshot and plot it against transaction time.</p></div>
+  </div>
+  <div class="flow"><div class="box">One snapshot record</div><div class="arrow">→</div><div class="box">Crew chart</div><div class="arrow">+</div><div class="box">Reach history</div><div class="arrow">+</div><div class="box">Holder chart</div></div>
+</section>
+
+<section>
+  <h2>8. The snapshot grammar can grow without changing shape</h2>
+  <p>The current notional keys are intentionally minimal:</p>
+  <pre>C = Crew count
+H = Holder count</pre>
+  <p>If a future metric earns its place, the same grammar can append another observation:</p>
+  <pre>SFL-LEAP/SNAPSHOT=C/27|H/43|X/12</pre>
+  <p>The important point is that <code>X</code> would not be assigned merely because there is room. It would receive meaning only when a real historical question justifies storing that observation permanently.</p>
+  <div class="big-idea">The number of delimiters is not the design limit. Meaning is the design limit. Add a key only when the observation is worth remembering.</div>
+</section>
+
+<section>
+  <h2>9. A decoder should be tolerant of future keys</h2>
+  <p>A simple reader can split the payload into key/value pairs:</p>
+  <pre>record = "SFL-LEAP/SNAPSHOT=C/27|H/43|X/12"
+
+1. confirm prefix: SFL-LEAP/SNAPSHOT=
+2. take everything after =
+3. split observations at |
+4. split each observation at /
+5. recognize keys we understand
+6. ignore unknown keys until the protocol defines them</pre>
+  <p>This gives the snapshot format a useful form of forward compatibility: older software could continue reading <code>C</code> and <code>H</code> even if a later extension introduces another recognized snapshot key.</p>
+</section>
+
+<section>
+  <h2>10. The proposed daily workflow</h2>
+  <p>The extension becomes useful only when the site can reliably decide whether a new observation should be recorded.</p>
+  <div class="rule"><b>01</b><p>Ledger History loads and calculates the current live metrics.</p></div>
+  <div class="rule"><b>02</b><p>The page checks whether the reporting period already has a snapshot record.</p></div>
+  <div class="rule"><b>03</b><p>If a snapshot already exists, the page reads it and does nothing else.</p></div>
+  <div class="rule"><b>04</b><p>If one is missing, the page can offer the manager a prompt to record the current snapshot.</p></div>
+  <div class="rule"><b>05</b><p>The manager approves and signs one dedicated snapshot transaction.</p></div>
+  <div class="rule"><b>06</b><p>Once validated, that transaction becomes another historical observation available to future charts.</p></div>
+  <p class="muted">The exact cadence — daily, weekly, or something else — remains a design choice. The extension defines how a snapshot could be represented, not how often it must be written.</p>
+</section>
+
+<section>
+  <h2>11. What this extension deliberately does not do</h2>
+  <ul>
+    <li>It does not replace the existing badge, event, challenge, or other LEAP record classes.</li>
+    <li>It does not combine unrelated record types into one transaction.</li>
+    <li>It does not permanently assign meanings to future snapshot keys before they are needed.</li>
+    <li>It does not store values such as Reach when they can be derived from stored observations.</li>
+    <li>It does not commit the current delimiters or key names as final protocol.</li>
+    <li>It does not require a second protocol generation. It is an extension concept that can be evaluated alongside the existing protocol.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>12. The extension in one sentence</h2>
+  <div class="big-idea">A snapshot is a dedicated LEAP transaction that records several related measurements from one moment in one compact, self-contained memo-data line, so the website can later reconstruct historical charts without mixing snapshots with other LEAP record types.</div>
+  <p>The current teaching example is:</p>
+  <pre>SFL-LEAP/SNAPSHOT=C/27|H/43</pre>
+  <p><strong>Crew and Holders are observations. Reach is a relationship. The observations are remembered; the relationship is calculated.</strong></p>
+</section>
+
+<section class="footer">
+  <p>This page is a design note, not an adopted specification. It intentionally preserves open questions about cadence, signing workflow, final delimiters, key registry, and whether additional snapshot measurements are valuable enough to record permanently.</p>
+</section>
+</main>
+</body>
+</html>
