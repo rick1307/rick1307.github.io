@@ -815,10 +815,10 @@
 
   <header id="top">
     <div class="wrap hero">
-      <div class="kicker">Sailing Frog's Leap Crew Membership</div>
+      <div id="communityEyebrow" class="kicker">Sailing Frog's Leap Crew Membership</div>
       <div class="welcome-head">
         <h1>Welcome Aboard</h1>
-        <img class="rick-portrait" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
+        <img class="rick-portrait" id="communityProfileImage" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
       </div>
 
       <div class="hero-intro">
@@ -1049,11 +1049,15 @@
   const communities = {
     sfl: {
       bannerDesktop: "images/bannerDesktop.png",
-      bannerMobile: "images/bannerMobile.png"
+      bannerMobile: "images/bannerMobile.png",
+      eyebrow: "SAILING FROG\'S LEAP CREW MEMBERSHIP",
+      profileImage: "images/profileImage.png"
     },
     zach: {
       bannerDesktop: "images/zachBannerDesktop.png",
-      bannerMobile: "images/zachBannerMobile.png"
+      bannerMobile: "images/zachBannerMobile.png",
+      eyebrow: "ZACH\'S HOT RODS MEMBERSHIP",
+      profileImage: "images/zachProfileImage.png"
     }
   };
 
@@ -1066,6 +1070,9 @@
 
   document.getElementById("communityBannerMobile").srcset =
     community.bannerMobile;
+
+  document.getElementById("communityEyebrow").textContent = community.eyebrow;
+  document.getElementById("communityProfileImage").src = community.profileImage;
 </script>
 
 </body>
