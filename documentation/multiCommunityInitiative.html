@@ -1,8 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Wild Ledger — Multi-Community Initiative</title>
 <style>
 :root{--ink:#17202a;--muted:#667085;--paper:#f6f2e9;--card:#fff;--line:#d8d2c7;--accent:#243b35;--gold:#b68a52}
@@ -31,42 +32,42 @@ li{margin:8px 0}
 .num{flex:0 0 36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
 .status{display:inline-block;border:1px solid var(--gold);color:#79592f;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 footer{margin-top:55px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+
+.manager-button{display:inline-block;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:rgba(255,255,255,.78);padding:8px 13px;border-radius:999px;font-size:13px;font-weight:750;white-space:nowrap}
+.manager-button:hover{background:#fff}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header>
-  <div class="kicker">Wild Ledger · Architecture & Development Plan</div>
-  <h1>Multi-Community Initiative</h1>
-  <p class="subtitle">The game plan for evolving Sailing Frog's Leap from a single-community application into one Wild Ledger platform capable of serving many independently branded LEAP communities.</p>
-</header>
-
+<header style="position:relative">
+<div class="kicker">Wild Ledger · Architecture &amp; Development Plan</div>
+<h1>Multi-Community Initiative</h1>
+<p class="subtitle">The game plan for evolving Sailing Frog's Leap from a single-community application into one Wild Ledger platform capable of serving many independently branded LEAP communities.</p>
+<a class="manager-button" href="manager.html" style="position:absolute;right:0;top:0">Manager</a></header>
 <section>
-  <span class="status">Working plan</span>
-  <h2 style="margin-top:12px">Purpose of this document</h2>
-  <p>This document is the durable reference for the Wild Ledger multi-community transition. It should contain enough context to restart development after a break without reconstructing the strategy from old conversations.</p>
-  <div class="callout">
-    <div class="rule">Do not sell the multi-community system until it works smoothly for both Sailing Frog's Leap and Zach's Hot Rods.</div>
-    <p>Zach's Hot Rods is the fictional proving community. Sailing Frog's Leap remains the real production community.</p>
-  </div>
+<span class="status">Working plan</span>
+<h2 style="margin-top:12px">Purpose of this document</h2>
+<p>This document is the durable reference for the Wild Ledger multi-community transition. It should contain enough context to restart development after a break without reconstructing the strategy from old conversations.</p>
+<div class="callout">
+<div class="rule">Do not sell the multi-community system until it works smoothly for both Sailing Frog's Leap and Zach's Hot Rods.</div>
+<p>Zach's Hot Rods is the fictional proving community. Sailing Frog's Leap remains the real production community.</p>
+</div>
 </section>
-
 <section>
-  <h2>The core architecture</h2>
-  <div class="grid">
-    <div class="card"><h3>One LEAP</h3><p>Wild Ledger communities use the same LEAP asset. Communities do not issue separate versions of LEAP.</p></div>
-    <div class="card"><h3>One application</h3><p>There should be one shared application codebase rather than a separate copy of the site for every community.</p></div>
-    <div class="card"><h3>Many communities</h3><p>Each community gets its own configuration, identity, namespace, distributor, imagery, copy and appearance.</p></div>
-  </div>
-  <div class="callout">
-    <div class="rule">Configuration controls identity. Code controls behavior.</div>
-  </div>
+<h2>The core architecture</h2>
+<div class="grid">
+<div class="card"><h3>One LEAP</h3><p>Wild Ledger communities use the same LEAP asset. Communities do not issue separate versions of LEAP.</p></div>
+<div class="card"><h3>One application</h3><p>There should be one shared application codebase rather than a separate copy of the site for every community.</p></div>
+<div class="card"><h3>Many communities</h3><p>Each community gets its own configuration, identity, namespace, distributor, imagery, copy and appearance.</p></div>
+</div>
+<div class="callout">
+<div class="rule">Configuration controls identity. Code controls behavior.</div>
+</div>
 </section>
-
 <section>
-  <h2>Community model</h2>
-  <p>The same application should be able to become a different community by loading a different community configuration.</p>
-  <pre>Wild Ledger application
+<h2>Community model</h2>
+<p>The same application should be able to become a different community by loading a different community configuration.</p>
+<pre>Wild Ledger application
 │
 ├── Sailing Frog's Leap
 │   ├── community ID: sfl
@@ -81,127 +82,110 @@ footer{margin-top:55px;padding-top:24px;border-top:1px solid var(--line);color:v
     ├── test distributor
     ├── hot-rod branding / images
     └── fictional community copy</pre>
-  <p>Future communities such as Warriors XRP or Sailing Doodles would follow the same pattern without duplicating the application.</p>
+<p>Future communities such as Warriors XRP or Sailing Doodles would follow the same pattern without duplicating the application.</p>
 </section>
-
 <section>
-  <h2>The proving test</h2>
-  <div class="card">
-    <h3>The question the architecture must answer</h3>
-    <p class="rule">Can the exact same application operate Sailing Frog's Leap and Zach's Hot Rods simply by changing community configuration?</p>
-  </div>
-  <p>If the answer is yes across the complete user and manager workflow, the Wild Ledger architecture has been proven at the two-community level. If Zach requires duplicate versions of core application pages or special one-off logic, the architecture needs more work.</p>
+<h2>The proving test</h2>
+<div class="card">
+<h3>The question the architecture must answer</h3>
+<p class="rule">Can the exact same application operate Sailing Frog's Leap and Zach's Hot Rods simply by changing community configuration?</p>
+</div>
+<p>If the answer is yes across the complete user and manager workflow, the Wild Ledger architecture has been proven at the two-community level. If Zach requires duplicate versions of core application pages or special one-off logic, the architecture needs more work.</p>
 </section>
-
 <section>
-  <h2>What belongs in configuration</h2>
-  <p>The initial configuration model should remain deliberately small. Add configuration fields because the communities genuinely need to differ, not merely because something could theoretically be configurable.</p>
-  <div class="grid">
-    <div class="card"><h3>Identity</h3><p>Community name, community ID, LEAP namespace and community-specific labels.</p></div>
-    <div class="card"><h3>XRPL</h3><p>Community distributor address and other community-specific public XRPL settings required by the application.</p></div>
-    <div class="card"><h3>Appearance</h3><p>Logo, a small number of standard image slots, accent choices and other controlled branding.</p></div>
-    <div class="card"><h3>Copy</h3><p>Welcome text and limited community-specific language where the shared application needs it.</p></div>
-  </div>
-  <p>Community operators may create their own images using AI, photography, artwork or existing branding. Wild Ledger should define the image slots and dimensions; it does not need to create their artwork. Sensible defaults should exist when optional images are not supplied.</p>
+<h2>What belongs in configuration</h2>
+<p>The initial configuration model should remain deliberately small. Add configuration fields because the communities genuinely need to differ, not merely because something could theoretically be configurable.</p>
+<div class="grid">
+<div class="card"><h3>Identity</h3><p>Community name, community ID, LEAP namespace and community-specific labels.</p></div>
+<div class="card"><h3>XRPL</h3><p>Community distributor address and other community-specific public XRPL settings required by the application.</p></div>
+<div class="card"><h3>Appearance</h3><p>Logo, a small number of standard image slots, accent choices and other controlled branding.</p></div>
+<div class="card"><h3>Copy</h3><p>Welcome text and limited community-specific language where the shared application needs it.</p></div>
+</div>
+<p>Community operators may create their own images using AI, photography, artwork or existing branding. Wild Ledger should define the image slots and dimensions; it does not need to create their artwork. Sensible defaults should exist when optional images are not supplied.</p>
 </section>
-
 <section>
-  <h2>What must stay shared</h2>
-  <p>Core behavior must not fork by community. The objective is to preserve one maintainable application.</p>
-  <ul>
-    <li>One <code>crewRecord.html</code>, not a separate Crew Record for every community.</li>
-    <li>One <code>manager.html</code>, not community-specific Manager pages.</li>
-    <li>One ranks / achievement system implementation.</li>
-    <li>One XRPL interaction layer.</li>
-    <li>One implementation of Checks, ledger history, state handling and future shared features.</li>
-    <li>Bug fixes and improvements should become available to every community from the shared codebase.</li>
-  </ul>
+<h2>What must stay shared</h2>
+<p>Core behavior must not fork by community. The objective is to preserve one maintainable application.</p>
+<ul>
+<li>One <code>crewRecord.html</code>, not a separate Crew Record for every community.</li>
+<li>One <code>manager.html</code>, not community-specific Manager pages.</li>
+<li>One ranks / achievement system implementation.</li>
+<li>One XRPL interaction layer.</li>
+<li>One implementation of Checks, ledger history, state handling and future shared features.</li>
+<li>Bug fixes and improvements should become available to every community from the shared codebase.</li>
+</ul>
 </section>
-
 <section>
-  <h2>Zach's Hot Rods</h2>
-  <p>Zach's Hot Rods is intentionally fictional. It provides a safe second community with branding radically different from Sailing Frog's Leap.</p>
-  <div class="card">
-    <p><strong>Community:</strong> Zach's Hot Rods<br>
-    <strong>Community ID:</strong> <code>zachs-hot-rods</code><br>
-    <strong>Namespace:</strong> <code>ZACH-LEAP</code><br>
-    <strong>LEAP asset:</strong> Same LEAP used by Sailing Frog's Leap<br>
-    <strong>Distributor:</strong> Test wallet during development<br>
-    <strong>Achievements:</strong> Fictional hot-rod Badges, Events and Challenges<br>
-    <strong>Appearance:</strong> Intentionally different from Sailing Frog's Leap</p>
-  </div>
-  <p>Zach exists to expose hidden Sailing Frog assumptions. Anything that unexpectedly changes Zach when SFL changes—or requires Zach-specific application code—should be examined as a possible architecture problem.</p>
+<h2>Zach's Hot Rods</h2>
+<p>Zach's Hot Rods is intentionally fictional. It provides a safe second community with branding radically different from Sailing Frog's Leap.</p>
+<div class="card">
+<p><strong>Community:</strong> Zach's Hot Rods<br/>
+<strong>Community ID:</strong> <code>zachs-hot-rods</code><br/>
+<strong>Namespace:</strong> <code>ZACH-LEAP</code><br/>
+<strong>LEAP asset:</strong> Same LEAP used by Sailing Frog's Leap<br/>
+<strong>Distributor:</strong> Test wallet during development<br/>
+<strong>Achievements:</strong> Fictional hot-rod Badges, Events and Challenges<br/>
+<strong>Appearance:</strong> Intentionally different from Sailing Frog's Leap</p>
+</div>
+<p>Zach exists to expose hidden Sailing Frog assumptions. Anything that unexpectedly changes Zach when SFL changes—or requires Zach-specific application code—should be examined as a possible architecture problem.</p>
 </section>
-
 <section>
-  <h2>Transition plan</h2>
-
-  <div class="card phase"><div class="num">1</div><div><h3>Freeze the baseline</h3><p>Begin from a fresh, complete source-of-truth snapshot of the working Sailing Frog's Leap site. Do not reconstruct the transition from remembered or accumulated edits.</p></div></div>
-
-  <div class="card phase"><div class="num">2</div><div><h3>Create the community configuration layer</h3><p>Introduce a shared configuration mechanism, initially containing SFL and Zach. Do not change working behavior simply for the sake of refactoring.</p></div></div>
-
-  <div class="card phase"><div class="num">3</div><div><h3>Move branding out first</h3><p>Move community name, visual identity, selected images and community-specific copy from hard-coded pages into configuration. Confirm SFL still looks and behaves correctly.</p></div></div>
-
-  <div class="card phase"><div class="num">4</div><div><h3>Move protocol identity</h3><p>Move namespace and distributor-specific settings into configuration. This is where SFL and Zach must begin operating independently while using the same shared application logic.</p></div></div>
-
-  <div class="card phase"><div class="num">5</div><div><h3>Exercise the complete Zach workflow</h3><p>Run Zach through the same lifecycle expected of a real community: entry, join, Crew Record, LEAP recognition, Checks, achievements, ledger/history views, Manager tools and any other live workflow.</p></div></div>
-
-  <div class="card phase"><div class="num">6</div><div><h3>Build Community Settings</h3><p>Once the configuration model is proven, create a controlled <code>communitySettings.html</code> experience for the fields that should be manageable without editing application code.</p></div></div>
-
-  <div class="card phase"><div class="num">7</div><div><h3>Regression test SFL and Zach together</h3><p>Every important workflow must work for both communities without community-specific copies of core pages. Changes made for one community must not corrupt the other.</p></div></div>
-
-  <div class="card phase"><div class="num">8</div><div><h3>Only then prepare real onboarding</h3><p>After the two-community test is stable, convert the proven Zach onboarding process into the repeatable process used for the first real Wild Ledger community.</p></div></div>
+<h2>Transition plan</h2>
+<div class="card phase"><div class="num">1</div><div><h3>Freeze the baseline</h3><p>Begin from a fresh, complete source-of-truth snapshot of the working Sailing Frog's Leap site. Do not reconstruct the transition from remembered or accumulated edits.</p></div></div>
+<div class="card phase"><div class="num">2</div><div><h3>Create the community configuration layer</h3><p>Introduce a shared configuration mechanism, initially containing SFL and Zach. Do not change working behavior simply for the sake of refactoring.</p></div></div>
+<div class="card phase"><div class="num">3</div><div><h3>Move branding out first</h3><p>Move community name, visual identity, selected images and community-specific copy from hard-coded pages into configuration. Confirm SFL still looks and behaves correctly.</p></div></div>
+<div class="card phase"><div class="num">4</div><div><h3>Move protocol identity</h3><p>Move namespace and distributor-specific settings into configuration. This is where SFL and Zach must begin operating independently while using the same shared application logic.</p></div></div>
+<div class="card phase"><div class="num">5</div><div><h3>Exercise the complete Zach workflow</h3><p>Run Zach through the same lifecycle expected of a real community: entry, join, Crew Record, LEAP recognition, Checks, achievements, ledger/history views, Manager tools and any other live workflow.</p></div></div>
+<div class="card phase"><div class="num">6</div><div><h3>Build Community Settings</h3><p>Once the configuration model is proven, create a controlled <code>communitySettings.html</code> experience for the fields that should be manageable without editing application code.</p></div></div>
+<div class="card phase"><div class="num">7</div><div><h3>Regression test SFL and Zach together</h3><p>Every important workflow must work for both communities without community-specific copies of core pages. Changes made for one community must not corrupt the other.</p></div></div>
+<div class="card phase"><div class="num">8</div><div><h3>Only then prepare real onboarding</h3><p>After the two-community test is stable, convert the proven Zach onboarding process into the repeatable process used for the first real Wild Ledger community.</p></div></div>
 </section>
-
 <section>
-  <h2>LEAP economics currently assumed</h2>
-  <p>This initiative is primarily an application-architecture plan, but the current Wild Ledger offer affects what Manager and reporting will eventually need to expose.</p>
-  <div class="card">
-    <ul>
-      <li>Community setup: free.</li>
-      <li>Wild Ledger membership: 10 XRP per month.</li>
-      <li>Starting allocation: 1,000 LEAP.</li>
-      <li>Additional LEAP is not sold directly.</li>
-      <li>Replenishment is available on request at 110% of the LEAP distributed since the previous replenishment.</li>
-      <li>Example: distribute 500 LEAP, then request a 550 LEAP replenishment.</li>
-      <li>The mechanism rewards circulation. It does not judge why a community chose to award LEAP.</li>
-      <li>Once LEAP has been distributed to a member, Wild Ledger does not control what that member does with it.</li>
-    </ul>
-  </div>
-  <p>The Manager / ledger tooling should eventually make the relevant distribution total and available replenishment obvious enough that neither the community operator nor Wild Ledger has to calculate it manually.</p>
+<h2>LEAP economics currently assumed</h2>
+<p>This initiative is primarily an application-architecture plan, but the current Wild Ledger offer affects what Manager and reporting will eventually need to expose.</p>
+<div class="card">
+<ul>
+<li>Community setup: free.</li>
+<li>Wild Ledger membership: 10 XRP per month.</li>
+<li>Starting allocation: 1,000 LEAP.</li>
+<li>Additional LEAP is not sold directly.</li>
+<li>Replenishment is available on request at 110% of the LEAP distributed since the previous replenishment.</li>
+<li>Example: distribute 500 LEAP, then request a 550 LEAP replenishment.</li>
+<li>The mechanism rewards circulation. It does not judge why a community chose to award LEAP.</li>
+<li>Once LEAP has been distributed to a member, Wild Ledger does not control what that member does with it.</li>
+</ul>
+</div>
+<p>The Manager / ledger tooling should eventually make the relevant distribution total and available replenishment obvious enough that neither the community operator nor Wild Ledger has to calculate it manually.</p>
 </section>
-
 <section>
-  <h2>Definition of success</h2>
-  <p>The initiative is ready to move from prototype to real prospect onboarding only when all of the following are true:</p>
-  <ul>
-    <li>Sailing Frog's Leap continues to work normally.</li>
-    <li>Zach's Hot Rods works end-to-end using the same core application.</li>
-    <li>SFL and Zach have visibly different identities without duplicated core pages.</li>
-    <li>Each community uses its own namespace and distributor configuration correctly.</li>
-    <li>Community-specific ledger and Manager information does not bleed between communities.</li>
-    <li>A shared code change can improve both communities without manually patching two sites.</li>
-    <li>The steps required to create a third community are understood and repeatable.</li>
-  </ul>
-  <div class="callout">
-    <div class="rule">SFL + Zach first. Real customers second.</div>
-    <p>The fictional second community is not a demo shortcut. It is the proof that Wild Ledger is actually a platform rather than a renamed copy of the Sailing Frog's Leap website.</p>
-  </div>
+<h2>Definition of success</h2>
+<p>The initiative is ready to move from prototype to real prospect onboarding only when all of the following are true:</p>
+<ul>
+<li>Sailing Frog's Leap continues to work normally.</li>
+<li>Zach's Hot Rods works end-to-end using the same core application.</li>
+<li>SFL and Zach have visibly different identities without duplicated core pages.</li>
+<li>Each community uses its own namespace and distributor configuration correctly.</li>
+<li>Community-specific ledger and Manager information does not bleed between communities.</li>
+<li>A shared code change can improve both communities without manually patching two sites.</li>
+<li>The steps required to create a third community are understood and repeatable.</li>
+</ul>
+<div class="callout">
+<div class="rule">SFL + Zach first. Real customers second.</div>
+<p>The fictional second community is not a demo shortcut. It is the proof that Wild Ledger is actually a platform rather than a renamed copy of the Sailing Frog's Leap website.</p>
+</div>
 </section>
-
 <section>
-  <h2>Development guardrails</h2>
-  <ul>
-    <li>Protect the working Sailing Frog's Leap experience throughout the transition.</li>
-    <li>Use a fresh source-of-truth snapshot before substantial structural work.</li>
-    <li>Do not create one GitHub repository per community as the intended architecture.</li>
-    <li>Do not duplicate core HTML or JavaScript simply to make Zach work.</li>
-    <li>Do not over-engineer configuration before a real difference between SFL and Zach requires it.</li>
-    <li>Keep private credentials out of community configuration. Configuration should contain only information appropriate to the application's architecture and security model.</li>
-    <li>Test each migration step before moving the next hard-coded assumption into configuration.</li>
-  </ul>
+<h2>Development guardrails</h2>
+<ul>
+<li>Protect the working Sailing Frog's Leap experience throughout the transition.</li>
+<li>Use a fresh source-of-truth snapshot before substantial structural work.</li>
+<li>Do not create one GitHub repository per community as the intended architecture.</li>
+<li>Do not duplicate core HTML or JavaScript simply to make Zach work.</li>
+<li>Do not over-engineer configuration before a real difference between SFL and Zach requires it.</li>
+<li>Keep private credentials out of community configuration. Configuration should contain only information appropriate to the application's architecture and security model.</li>
+<li>Test each migration step before moving the next hard-coded assumption into configuration.</li>
+</ul>
 </section>
-
 <footer>
   Wild Ledger · Multi-Community Initiative · Working architecture document
 </footer>
