@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart of LEAP Distribution</title>
+  <style>
+    :root{
+      --ink:#2c1f2f;
+      --muted:#786570;
+      --line:#d6c3b8;
+      --paper:#fffaf5;
+      --soft:#f4eee8;
+      --plum:#4a2d46;
+      --wine:#7c4252;
+      --copper:#a66245;
+      --copper-deep:#8f4f3b;
+      --green:#4f7a67;
+      --gold:#c28c45;
+      --dark:#211521;
+      --dark-line:#67424f;
+      --dark-text:#f6ece4;
+      --dark-muted:#c0a7ad;
+      --holders:#d78b61;
+      --crew:#79aa91;
+      --reach:#cfb06b;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      font-family:Arial,Helvetica,sans-serif;
+      background:
+        radial-gradient(circle at 12% 0%,rgba(160,91,62,.16),transparent 34%),
+        radial-gradient(circle at 88% 8%,rgba(83,112,96,.14),transparent 32%),
+        linear-gradient(180deg,#f7f1eb 0%,#efe7df 58%,#e9dfd6 100%);
+    }
+
+    .wrap{width:min(94%,1040px);margin:34px auto 70px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+    h1{margin:0;color:#3a2439;font-size:clamp(28px,5vw,40px);letter-spacing:-.03em}
+    .back{color:var(--copper-deep);font-weight:800;text-decoration:none}
+
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      margin-bottom:10px;padding:6px 10px;border-radius:999px;
+      background:#f4e4d7;border:1px solid #d8b7a0;color:#7b4434;
+      font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+    }
+    .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold)}
+
+    .intro{
+      margin-bottom:14px;padding:18px 20px;border:1px solid #d3bcae;border-radius:14px;
+      background:linear-gradient(135deg,rgba(255,250,245,.98),rgba(246,235,225,.96));
+      box-shadow:0 14px 34px rgba(74,45,50,.08);
+    }
+    .intro p{margin:0;color:#6e5b66;line-height:1.55;font-size:14px}
+    .intro strong{color:var(--plum)}
+
+    .view-tabs{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;
+      margin:0 0 18px;
+    }
+    .view-tabs button{
+      appearance:none;border:1px solid #d4b9aa;background:rgba(255,250,245,.78);color:#684a58;
+      border-radius:11px;padding:11px 8px;font:inherit;font-size:12px;font-weight:850;cursor:pointer;
+    }
+    .view-tabs button[aria-pressed="true"]{
+      background:var(--plum);border-color:var(--plum);color:#fff7f0;box-shadow:0 8px 20px rgba(74,45,70,.16);
+    }
+
+    .chart-shell{
+      padding:22px;border-radius:18px;border:1px solid var(--dark-line);color:var(--dark-text);
+      background:
+        radial-gradient(circle at 92% 0%,rgba(173,102,62,.15),transparent 30%),
+        radial-gradient(circle at 0% 100%,rgba(76,120,101,.11),transparent 34%),
+        linear-gradient(145deg,#251725 0%,#1c151d 58%,#181317 100%);
+      box-shadow:0 18px 44px rgba(54,31,43,.22),inset 0 1px 0 rgba(255,255,255,.035);
+    }
+    .chart-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}
+    .chart-head h2{margin:0 0 5px;font-size:20px;color:#fff5ed}
+    .chart-head p{margin:0;color:var(--dark-muted);font-size:13px;line-height:1.45;max-width:620px}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:flex-end;color:#d7c2c2;font-size:12px;font-weight:750}
+    .legend span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+    .legend i{display:inline-block;width:20px;height:3px;border-radius:99px}
+    .legend .holders i{background:var(--holders)}
+    .legend .crew i{background:var(--crew)}
+    .legend .reach i{background:var(--reach)}
+
+    .plot-wrap{overflow-x:auto;padding-bottom:2px}
+    .plot{position:relative;min-width:720px;height:360px;border-radius:14px;border:1px solid rgba(222,184,157,.13);background:rgba(255,255,255,.025);overflow:hidden}
+    .grid-layer{position:absolute;inset:0}
+    .gridline{position:absolute;left:54px;right:18px;height:1px;background:rgba(236,216,202,.09)}
+    .gridline span{position:absolute;right:calc(100% + 9px);top:-7px;color:#987f88;font-size:10px}
+
+    #chartSvg{position:absolute;left:54px;right:18px;top:24px;bottom:40px;width:calc(100% - 72px);height:296px;overflow:visible}
+    .series-line{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+    .series-line.crew{stroke:var(--crew)}
+    .series-line.holders{stroke:var(--holders)}
+    .series-line.reach{stroke:var(--reach)}
+    .series-line.secondary{stroke-width:3;stroke-dasharray:8 7}
+    .dot-crew{fill:#9bc7b0;stroke:#2a1923;stroke-width:3}
+    .dot-holders{fill:#f1b089;stroke:#2a1923;stroke-width:3}
+    .dot-reach{fill:#e1c88a;stroke:#2a1923;stroke-width:3}
+
+    .x-labels{position:absolute;left:54px;right:18px;bottom:12px;display:grid;color:#987f88;font-size:10px;text-align:center}
+    .notional-note{margin:12px 2px 0;color:#a88d94;font-size:11px;line-height:1.45}
+
+    .questions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}
+    .question-card{padding:18px;border:1px solid #d7c6bb;border-radius:14px;background:rgba(255,250,245,.91);box-shadow:0 8px 20px rgba(70,45,52,.05)}
+    .question-card h3{margin:0 0 7px;color:var(--plum);font-size:15px}
+    .question-card p{margin:0;color:#715f68;font-size:13px;line-height:1.5}
+    .question-card b{color:var(--copper-deep)}
+
+    .candidate-list{margin-top:18px;padding:20px;border-radius:14px;border:1px solid #d3bcae;background:linear-gradient(135deg,rgba(255,250,245,.95),rgba(246,235,225,.92))}
+    .candidate-list h2{margin:0 0 5px;color:var(--plum);font-size:20px}
+    .candidate-list > p{margin:0 0 14px;color:#715f68;font-size:13px;line-height:1.5}
+    .metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .metric{padding:13px;border-radius:11px;background:rgba(255,255,255,.64);border:1px solid rgba(176,139,119,.28)}
+    .metric strong{display:block;color:var(--copper-deep);font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+    .metric span{color:#715f68;font-size:12px;line-height:1.4}
+
+    .footer-note{margin-top:16px;color:#7d6a73;font-size:11px;line-height:1.5;text-align:center}
+
+    @media(max-width:720px){
+      .top{align-items:flex-start}.chart-head{display:block}.legend{justify-content:flex-start;margin-top:12px}
+      .questions,.metric-grid{grid-template-columns:1fr}.view-tabs{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <h1>Chart of LEAP Distribution</h1>
+      <a class="back" href="ledgerHistory.html">Ledger History</a>
+    </div>
+
+    <div class="eyebrow">Notional design</div>
+
+    <section class="intro">
+      <p><strong>One chart form, multiple views.</strong> The page uses one shared dataset and lets JavaScript decide whether to show organized crew, total LEAP holders, both together, or the derived Reach relationship. The current history is illustrative only; no historical snapshot writes are enabled here.</p>
+    </section>
+
+    <nav class="view-tabs" aria-label="Distribution chart view">
+      <button type="button" data-view="crew">Crew</button>
+      <button type="button" data-view="holders">Holders</button>
+      <button type="button" data-view="compare">Compare</button>
+      <button type="button" data-view="reach">Reach</button>
+    </nav>
+
+    <section class="chart-shell" aria-labelledby="chartTitle">
+      <div class="chart-head">
+        <div>
+          <h2 id="chartTitle"></h2>
+          <p id="chartSubtitle"></p>
+        </div>
+        <div id="chartLegend" class="legend" aria-label="Chart legend"></div>
+      </div>
+
+      <div id="plotWrap" class="plot-wrap" role="img">
+        <div class="plot">
+          <div id="gridLayer" class="grid-layer"></div>
+          <svg id="chartSvg" viewBox="0 0 700 296" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div id="xLabels" class="x-labels"></div>
+        </div>
+      </div>
+      <p id="notionalNote" class="notional-note"></p>
+    </section>
+
+    <section class="questions">
+      <article class="question-card">
+        <h3 id="questionOneTitle"></h3>
+        <p id="questionOneText"></p>
+      </article>
+      <article class="question-card">
+        <h3 id="questionTwoTitle"></h3>
+        <p id="questionTwoText"></p>
+      </article>
+    </section>
+
+    <section class="candidate-list">
+      <h2>What the same snapshot can support</h2>
+      <p>The chart changes presentation, not underlying observations. Crew and holders are the stored facts; Reach is derived.</p>
+      <div class="metric-grid">
+        <div class="metric"><strong>Crew</strong><span>Historical organized-community count from <b>C</b>.</span></div>
+        <div class="metric"><strong>Holders</strong><span>Historical wallets possessing LEAP from <b>H</b>.</span></div>
+        <div class="metric"><strong>Compare</strong><span>Superimposes C and H from the same snapshots.</span></div>
+        <div class="metric"><strong>Reach</strong><span>Calculated at each point as H ÷ C; it does not need its own stored value.</span></div>
+        <div class="metric"><strong>One dataset</strong><span>Every view can be rebuilt from the same sequence of snapshot records.</span></div>
+        <div class="metric"><strong>Future views</strong><span>Additional presentations can be added in JavaScript without creating another HTML page.</span></div>
+      </div>
+    </section>
+
+    <p class="footer-note">Prototype only · Illustrative history · No snapshot transactions are created by this page.</p>
+  </main>
+
+  <script src="chartOfLeapDistribution.js" defer></script>
+</body>
+</html>
