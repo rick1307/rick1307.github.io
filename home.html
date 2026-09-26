@@ -817,7 +817,7 @@
     <div class="wrap hero">
       <div id="communityEyebrow" class="kicker">Sailing Frog's Leap Crew Membership</div>
       <div class="welcome-head">
-        <h1>Welcome Aboard</h1>
+        <h1 id="communityHeading">Welcome Aboard</h1>
         <img class="rick-portrait" id="communityProfileImage" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
       </div>
 
@@ -1051,12 +1051,14 @@
       bannerDesktop: "images/bannerDesktop.png",
       bannerMobile: "images/bannerMobile.png",
       eyebrow: "SAILING FROG\'S LEAP CREW MEMBERSHIP",
+      heading: "Welcome Aboard",
       profileImage: "images/profileImage.png"
     },
     zach: {
       bannerDesktop: "images/zachBannerDesktop.png",
       bannerMobile: "images/zachBannerMobile.png",
       eyebrow: "ZACH\'S HOT RODS MEMBERSHIP",
+      heading: "Start Your Engines",
       profileImage: "images/zachProfileImage.png"
     }
   };
@@ -1072,6 +1074,7 @@
     community.bannerMobile;
 
   document.getElementById("communityEyebrow").textContent = community.eyebrow;
+  document.getElementById("communityHeading").textContent = community.heading;
   document.getElementById("communityProfileImage").src = community.profileImage;
 </script>
 
