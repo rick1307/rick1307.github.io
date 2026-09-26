@@ -808,7 +808,7 @@
     <picture>
       <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
-        src="images/bannerDesktop.png"
+        id="communityBannerDesktop" src="images/bannerDesktop.png"
         alt="The LEAP journey: Website — Front Door; Crew Record — Passport; XRPL — Logbook; Discord — Yacht Club.">
     </picture>
   </div>
@@ -1042,6 +1042,25 @@
     document.body.appendChild(badge);
   });
 })();
+</script>
+
+
+<script id="community-banner-lesson">
+  const communities = {
+    sfl: {
+      bannerDesktop: "images/bannerDesktop.png"
+    },
+    zach: {
+      bannerDesktop: "images/zachBannerDesktop.png"
+    }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const communityId = params.get("community") || "sfl";
+  const community = communities[communityId] || communities.sfl;
+
+  document.getElementById("communityBannerDesktop").src =
+    community.bannerDesktop;
 </script>
 
 </body>
