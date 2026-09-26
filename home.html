@@ -823,11 +823,9 @@
 
       <div class="hero-intro">
         <div class="hero-copy">
-          <p class="lede">
-            Hello, my name is Rick, and I'm Sailing Frog's Leap.
+          <p class="lede" id="communityIntro">Hello, my name is Rick, and I'm Sailing Frog's Leap.
             If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper.
-            LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.
-          </p>
+            LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.</p>
         </div>
 
         <div class="returning-crew" aria-label="Crew Record access">
@@ -1052,6 +1050,7 @@
       bannerMobile: "images/bannerMobile.png",
       eyebrow: "SAILING FROG\'S LEAP CREW MEMBERSHIP",
       heading: "Welcome Aboard",
+      intro: "Hello, my name is Rick, and I'm Sailing Frog's Leap.             If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper.             LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.",
       profileImage: "images/profileImage.png"
     },
     zach: {
@@ -1059,6 +1058,7 @@
       bannerMobile: "images/zachBannerMobile.png",
       eyebrow: "ZACH\'S HOT RODS MEMBERSHIP",
       heading: "Start Your Engines",
+      intro: "Hey y'all. My name is Zach. If you follow me on Instagram or TikTok, you already know we're in for a good time. Show me your LEAP, climb in. Let's go for a ride!",
       profileImage: "images/zachProfileImage.png"
     }
   };
@@ -1075,6 +1075,7 @@
 
   document.getElementById("communityEyebrow").textContent = community.eyebrow;
   document.getElementById("communityHeading").textContent = community.heading;
+  document.getElementById("communityIntro").textContent = community.intro;
   document.getElementById("communityProfileImage").src = community.profileImage;
 </script>
 
