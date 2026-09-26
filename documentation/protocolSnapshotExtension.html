@@ -27,8 +27,10 @@ main{width:min(940px,calc(100% - 28px));margin:0 auto;padding:28px 0 72px}
 .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--plum),#241826 76%);color:#fff;border-radius:22px;padding:36px 30px 32px;box-shadow:0 16px 36px rgba(51,31,49,.18)}
 .hero:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-90px;bottom:-120px;background:rgba(169,111,59,.22)}
 .eyebrow{margin:0 0 8px;text-transform:uppercase;letter-spacing:.13em;font-size:.76rem;font-weight:850;color:#e8c9a8}
-.manager-nav{position:absolute;top:22px;right:22px;z-index:2;display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;border:1px solid rgba(255,255,255,.45);border-radius:999px;background:rgba(255,255,255,.09);color:#fff;text-decoration:none;font-size:.82rem;font-weight:800}
-.manager-nav:hover{background:rgba(255,255,255,.16)}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(238,243,247,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.topbar-inner{max-width:940px;min-height:58px;margin:0 auto;padding:0 14px;display:flex;align-items:center;justify-content:flex-end}
+.manager-link{color:#0b5fa5;text-decoration:none;font-size:.9rem;font-weight:750}
+.manager-link:hover{color:#084b82}
 h1{margin:0;max-width:760px;font-size:clamp(2.25rem,7vw,4.25rem);line-height:.98;letter-spacing:-.04em}
 .hero .lede{position:relative;z-index:1;max-width:760px;margin:18px 0 0;font-size:1.08rem;color:#eee6ee}
 .hero-links{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.hero-links a{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);color:#fff;text-decoration:none;font-size:.82rem;font-weight:750}
@@ -47,13 +49,17 @@ table{width:100%;border-collapse:collapse;margin:16px 0 4px;font-size:.95rem}th,
 ul{padding-left:22px}li{margin:8px 0}.rule{display:grid;grid-template-columns:64px 1fr;gap:13px;align-items:start;margin:11px 0}.rule b{display:flex;align-items:center;justify-content:center;width:52px;height:32px;border-radius:999px;background:var(--plum);color:#fff;font-size:.78rem;letter-spacing:.03em}.rule p{margin:2px 0}
 .grammar{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.grammar-row{display:grid;grid-template-columns:170px 1fr;gap:0;border-bottom:1px solid var(--line)}.grammar-row:last-child{border-bottom:0}.grammar-row div{padding:13px 15px}.grammar-row .left{background:#f4eee8;color:var(--plum);font-weight:850}.grammar-row .right{background:#fff}
 .footer{background:transparent;border:0;box-shadow:none;padding:8px 4px;color:var(--muted);font-size:.86rem}.footer a{color:var(--plum);font-weight:700}
-@media(max-width:720px){section{padding:22px 18px}.hero{padding:30px 22px}.manager-nav{top:18px;right:18px}.two,.three,.anatomy{grid-template-columns:1fr}.anatomy .middle{transform:rotate(90deg);min-height:34px}.grammar-row{grid-template-columns:1fr}.grammar-row .left{border-bottom:1px solid var(--line)}.rule{grid-template-columns:54px 1fr}}
+@media(max-width:720px){section{padding:22px 18px}.hero{padding:30px 22px}.two,.three,.anatomy{grid-template-columns:1fr}.anatomy .middle{transform:rotate(90deg);min-height:34px}.grammar-row{grid-template-columns:1fr}.grammar-row .left{border-bottom:1px solid var(--line)}.rule{grid-template-columns:54px 1fr}}
 </style>
 </head>
 <body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="manager-link" href="../manager.html">Manager →</a>
+  </div>
+</div>
 <main>
 <header class="hero">
-  <a class="manager-nav" href="../manager.html">Manager</a>
   <p class="eyebrow">Sailing Frog's Leap · LEAP Protocol Extension</p>
   <h1>Protocol Snapshot Extension</h1>
   <p class="lede">A teaching sketch for one narrow extension to the existing LEAP protocol: how a dedicated snapshot transaction could preserve small, periodic observations about the community and later turn those observations into historical charts.</p>
