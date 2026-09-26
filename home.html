@@ -806,7 +806,7 @@
 
   <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, Crew Record is the passport, XRPL is the logbook, and Discord is the yacht club.">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
         id="communityBannerDesktop" src="images/bannerDesktop.png"
         alt="The LEAP journey: Website — Front Door; Crew Record — Passport; XRPL — Logbook; Discord — Yacht Club.">
@@ -1048,10 +1048,12 @@
 <script id="community-banner-lesson">
   const communities = {
     sfl: {
-      bannerDesktop: "images/bannerDesktop.png"
+      bannerDesktop: "images/bannerDesktop.png",
+      bannerMobile: "images/bannerMobile.png"
     },
     zach: {
-      bannerDesktop: "images/zachBannerDesktop.png"
+      bannerDesktop: "images/zachBannerDesktop.png",
+      bannerMobile: "images/zachBannerMobile.png"
     }
   };
 
@@ -1061,6 +1063,9 @@
 
   document.getElementById("communityBannerDesktop").src =
     community.bannerDesktop;
+
+  document.getElementById("communityBannerMobile").srcset =
+    community.bannerMobile;
 </script>
 
 </body>
