@@ -784,22 +784,39 @@
     }
 
 
-    /* Historical metric dashboard */
+    /* Historical metric dashboard — separated card layout */
     .crew-total {
       grid-template-rows: auto auto;
+      gap: 12px;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      overflow: visible;
+      box-shadow: none;
     }
 
     .crew-metric {
       grid-row: 1;
+      min-height: 138px;
+      background: rgba(255,250,245,.94);
+      border: 1px solid #d8c8bd;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(70,45,52,.055);
     }
 
     .crew-metric:first-child {
       grid-column: 1;
+      background: linear-gradient(135deg, rgba(255,250,245,.98), rgba(249,239,232,.96));
     }
 
     .holder-metric {
       grid-column: 2;
       position: relative;
+      background: linear-gradient(135deg, rgba(255,250,245,.98), rgba(238,244,238,.94));
+    }
+
+    .crew-metric + .crew-metric {
+      border-left: 1px solid #d8c8bd;
     }
 
     .holder-metric .metric-title {
@@ -820,23 +837,28 @@
       grid-row: 2;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
       align-items: stretch;
       min-width: 0;
-      background: linear-gradient(90deg, rgba(121,72,87,.028), rgba(255,250,245,.28) 50%, rgba(78,116,99,.035));
+      background: transparent;
     }
 
     .metric-dashboard-cell {
       min-width: 0;
-      min-height: 72px;
+      min-height: 76px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 11px 12px 14px;
+      padding: 12px 12px 14px;
       text-align: center;
+      background: rgba(255,250,245,.92);
+      border: 1px solid #d8c8bd;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(70,45,52,.05);
     }
 
     .metric-dashboard-cell + .metric-dashboard-cell {
-      border-left: 1px solid rgba(211,188,174,.72);
+      border-left: 1px solid #d8c8bd;
     }
 
     .metric-chart-link {
@@ -886,6 +908,19 @@
     }
 
     @media (max-width: 560px) {
+      .crew-total {
+        grid-template-columns: 1fr;
+      }
+
+      .crew-metric:first-child,
+      .holder-metric {
+        grid-column: 1;
+      }
+
+      .crew-metric:first-child { grid-row: 1; }
+      .holder-metric { grid-row: 2; }
+      .metric-dashboard-row { grid-row: 3; gap: 8px; }
+
       .metric-dashboard-cell {
         min-height: 68px;
         padding-inline: 8px;
