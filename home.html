@@ -781,6 +781,16 @@
       }
     }
 </style>
+
+<style id="community-switch-test-style">
+#community-switch-test{
+  position:fixed;top:10px;left:50%;transform:translateX(-50%);
+  z-index:99999;padding:9px 15px;border-radius:999px;
+  background:#111;color:#fff;font:700 12px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:.06em;box-shadow:0 4px 18px rgba(0,0,0,.25);
+}
+</style>
+
 </head>
 
 <body>
@@ -1013,5 +1023,26 @@
       });
     })();
   </script>
+
+<script id="community-switch-test-script">
+(function () {
+  const community = new URLSearchParams(window.location.search).get("community");
+  const names = {
+    sfl: "SAILING FROG'S LEAP",
+    zach: "ZACH'S HOT RODS"
+  };
+
+  const badge = document.createElement("div");
+  badge.id = "community-switch-test";
+  badge.textContent = names[community]
+    ? "COMMUNITY SWITCH: " + names[community]
+    : "COMMUNITY SWITCH: NOT SET";
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.appendChild(badge);
+  });
+})();
+</script>
+
 </body>
 </html>
