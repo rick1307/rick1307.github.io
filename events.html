@@ -259,7 +259,7 @@
     <div class="wrap">
       <div class="kicker">LEAP Events</div>
       <h1>Events</h1>
-      <p class="lede" id="communityLede">Events are shared moments where a LEAP community comes together. Show up, take part, and the moment can become part of your community history.</p>
+      <p class="lede" id="communityLede">Events are shared moments tied to a specific time. Show up, take part, and that moment can become part of your community history.</p>
     </div>
   </header>
 
@@ -268,25 +268,30 @@
       <div class="wrap">
         <div class="section-title">
           <h2>What an event is</h2>
-          <p id="eventDefinitionCopy">An event is a shared moment in the community story. It has a time, a place or setting, and a clear way to take part.</p>
+          <p id="eventDefinitionCopy">An event is a shared moment tied to a particular day or defined window of time. It may happen in person or online, but it has a clear beginning, a clear end, and a way to take part.</p>
         </div>
 
         <div class="principles">
           <div class="principle">
             <b>Idea one</b>
-            <h3>Be there</h3>
-            <p id="eventParticipationCopy">Events recognize participation in something that actually happened — a meetup, gathering, project, or another announced community experience.</p>
+            <h3>Be part of the moment</h3>
+            <p id="eventParticipationCopy">Events recognize participation in something that happened at a specific time — a meetup, gathering, livestream, project day, or another announced community experience.</p>
           </div>
           <div class="principle">
             <b>Idea two</b>
-            <h3>Know the details</h3>
-            <p>Each event should say when and where it happens and what counts as taking part. If an online event counts, the announcement will say so.</p>
+            <h3>Know when it happens</h3>
+            <p>Each event should say when it begins, when it ends, where or how it happens, and what counts as taking part.</p>
           </div>
           <div class="principle">
             <b>Idea three</b>
-            <h3>Remember the moment</h3>
-            <p>When participation is recognized, that Event can become part of a member's LEAP history — separate from a Badge or Challenge.</p>
+            <h3>Preserve the moment</h3>
+            <p>Once the event is over, that occurrence is fixed in time. Recognized participation can remain part of a member's LEAP history long after the event itself has ended.</p>
           </div>
+        </div>
+
+        <div class="status-box" style="margin-top:20px">
+          <h3>The date is part of what makes it an event.</h3>
+          <p>An event is different from a badge or challenge because the occurrence itself is anchored to a known time. Many people can participate, but they are all participating in that same moment or defined window.</p>
         </div>
       </div>
     </section>
@@ -417,19 +422,19 @@
       const lede = document.getElementById("communityLede");
       if (lede) {
         lede.textContent =
-          `Events are shared moments where the LEAP community meets the real ${communityName} story. Show up, take part, and the moment can become part of your ${historyLabel}.`;
+          `Events are shared moments tied to a specific time in the ${communityName} story. Show up, take part, and that moment can become part of your ${historyLabel}.`;
       }
 
       const definition = document.getElementById("eventDefinitionCopy");
       if (definition) {
         definition.textContent =
-          `An event is a shared moment in the ${communityName} story. It has a time, a place or setting, and a clear way to take part.`;
+          `An event is a shared moment in the ${communityName} story tied to a particular day or defined window of time. It may happen in person or online, but it has a clear beginning, a clear end, and a way to take part.`;
       }
 
       const participation = document.getElementById("eventParticipationCopy");
       if (participation) {
         participation.textContent =
-          `Events recognize participation in something that actually happened — a meetup, gathering, project, or another announced ${groupName} experience.`;
+          `Events recognize participation in something that happened at a specific time — a meetup, gathering, livestream, project day, or another announced ${groupName} experience.`;
       }
 
       const recognition = document.getElementById("eventRecognitionCopy");
