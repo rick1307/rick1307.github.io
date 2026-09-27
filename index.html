@@ -1194,6 +1194,10 @@
       const community = { ...defaults, ...(window.WILD_LEDGER_COMMUNITY || {}) };
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
 
+      document.querySelectorAll('a[href="ranks.html"]').forEach(link => {
+        link.href = `ranks.html?community=${encodeURIComponent(communityId)}`;
+      });
+
       const theme = community.theme || {};
       const themeVariables = {
         paper: "--paper",
