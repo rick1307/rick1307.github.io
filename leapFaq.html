@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Simple answers about LEAP, XRP Ledger addresses, wallet privacy, Xaman, LEAP Checks, member records, transfers, and wallet safety." />
   <meta name="theme-color" content="#dce9e5" />
-  <title>LEAP FAQ — Wild Ledger</title>
+  <title>Wild Ledger FAQ</title>
 <style>
     :root{
       --paper:#efe8d8;--ink:#1a252c;--navy:#16384b;--foam:#dbece8;
@@ -40,17 +40,30 @@
     .brand{
       display:flex;align-items:center;gap:11px;text-decoration:none;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-weight:850;
+      font-weight:850;letter-spacing:.02em;
     }
-    .brand img{
-      width:40px;height:40px;border-radius:50%;object-fit:cover;
-      border:1px solid rgba(26,37,44,.14);background:white;
+    .topbar-simple{
+      width:100%;display:flex;align-items:center;
+      justify-content:space-between;gap:16px;
     }
-    .nav-links{display:flex;gap:16px;align-items:center}
-    .nav-links a{
-      text-decoration:none;color:#4e5c62;
+    .wild-ledger-name{
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.9rem;font-weight:750;
+      font-size:13px;font-weight:850;letter-spacing:.02em;
+      white-space:nowrap;
+    }
+    .back-link{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:34px;padding:0 14px;
+      border:1px solid var(--line);border-radius:999px;
+      color:inherit;text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:13px;font-weight:750;line-height:1;white-space:nowrap;
+    }
+    .back-link:hover{background:rgba(255,255,255,.18)}
+    @media (max-width:480px){
+      .topbar-simple{gap:10px}
+      .wild-ledger-name{font-size:12px}
+      .back-link{min-height:32px;padding:0 12px;font-size:12px}
     }
 
     header{padding:74px 0 44px}
@@ -354,14 +367,16 @@
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="splash.html"><img alt="LEAP logo" src="leap-logo.png"><span>Wild Ledger</span></a>
-      <div class="nav-links"><a href="splash.html">← Wild Ledger</a></div>
+      <div class="brand topbar-simple">
+        <span class="wild-ledger-name">Wild Ledger</span>
+        <a class="back-link" href="splash.html" aria-label="Back to Wild Ledger">Back to Wild Ledger</a>
+      </div>
     </div>
   </nav>
   <header>
     <div class="wrap">
-      <div class="kicker">Wild Ledger · LEAP Frequently Asked Questions</div>
-      <h1>LEAP FAQ</h1>
+      <div class="kicker">Wild Ledger · Frequently Asked Questions</div>
+      <h1>Wild Ledger FAQ</h1>
       <p class="lede">These are the rules and mechanics that apply across participating LEAP communities. A community can create its own experience, but the LEAP system underneath works the same way. </p>
     </div>
   </header>
@@ -455,6 +470,6 @@
 <section><div class="wrap"><div class="cta"><h3>Explore a LEAP community</h3><p>Each participating community explains its own activities, recognition, and ways to take part.</p><a class="button" href="splash.html">Communities →</a></div></div></section>
 
   </main>
-  <footer><div class="wrap foot"><div>Wild Ledger • LEAP FAQ</div></div></footer>
+  <footer><div class="wrap foot"><div>Wild Ledger • FAQ</div></div></footer>
 </body>
 </html>
