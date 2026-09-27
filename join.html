@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" class="community-pending">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -37,6 +37,7 @@
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
+    html.community-pending body{visibility:hidden}
 
     body{
       margin:0;
@@ -499,8 +500,8 @@
 </nav>
 <div aria-label="The LEAP journey" class="leap-journey-banner">
 <picture>
-<source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png"/>
-<img alt="The LEAP journey" id="communityBannerDesktop" src="images/bannerDesktop.png"/>
+<source id="communityBannerMobile" media="(max-width: 800px)"/>
+<img alt="The LEAP journey" id="communityBannerDesktop"/>
 </picture>
 </div>
 <main>
@@ -675,25 +676,12 @@
 <script src="js/communityConfig.js"></script>
 <script>
     (() => {
-      const community = window.WILD_LEDGER_COMMUNITY || {
-        id:"sfl",
-        layout:"classic",
-        communityName:"Community",
-        operatorName:"Operator",
-        membershipLabel:"Membership",
-        memberSingular:"member",
-        memberPlural:"members",
-        groupName:"community",
-        historyLabel:"community history",
-        heading:"Join",
-        bannerDesktop:"images/bannerDesktop.png",
-        bannerMobile:"images/bannerMobile.png",
-        walletStorageKey:"sfl.xrpl.wallet",
-        activeWalletKey:"sfl.xrpl.activeWallet",
-        ranks:[{min:1,name:"First rank"}]
-      };
+      const community = window.WILD_LEDGER_COMMUNITY;
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
 
-      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      if (!community || !communityId) {
+        throw new Error("Community configuration failed to load.");
+      }
       const communityName = community.communityName || "Community";
       const operatorName = community.operatorName || community.managerName || "the community operator";
       const groupName = community.groupName || "community";
@@ -882,6 +870,8 @@
 
       const footer = document.getElementById("footerLabel");
       if (footer) footer.textContent = `${communityName} • Join LEAP`;
+
+      document.documentElement.classList.remove("community-pending");
     })();
   </script>
 </body>
