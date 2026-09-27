@@ -175,29 +175,30 @@
       .nav-links a:nth-child(2){display:none !important}
     }
 
-    /* Sailing Frog's Leap site-wide visual system */
+    /* Shared Wild Ledger community visual system */
     :root{
       --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
       --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
       --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
-      --card:rgba(250,252,247,.80);
+      --card:rgba(250,252,247,.80);--muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:var(--nav-background);
+      --header-background:var(--header-background);
+      --section-background:var(--section-background);
+      --dark-feature-background:var(--dark-feature-background);
     }
 
     body{
       color:var(--ink);
-      background:
-        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
-        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
-        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background:var(--page-background);
       background-size:auto;
     }
 
     body::before{
       content:"";
       position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
-      background-image:
-        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
-        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      background-image:var(--page-overlay);
     }
 
     nav{
@@ -265,7 +266,7 @@
     }
 
     .cta{
-      background:linear-gradient(135deg,rgba(16,58,69,.96),rgba(37,96,106,.93));
+      background:var(--dark-feature-background);
       border:1px solid rgba(255,255,255,.12);
       border-radius:22px;
       box-shadow:0 22px 46px rgba(11,45,54,.18);
@@ -287,7 +288,7 @@
 
   
 
-    /* SFL shared button motion standard */
+    /* Shared button motion standard */
     button,
     a.button{
       transition:
@@ -330,6 +331,12 @@
     }
 
 
+    body[data-community-layout="garage"] .faq{border-radius:10px}
+    body[data-community-layout="garage"] .safety,
+    body[data-community-layout="garage"] .simple,
+    body[data-community-layout="garage"] .cta{border-radius:10px}
+    body[data-community-layout="garage"] .button{border-radius:6px}
+
     /* LEAP journey banner: desktop + mobile companion artwork */
     .leap-journey-banner{
       width:100%;
@@ -354,17 +361,15 @@
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="home.html"><img alt="LEAP logo" src="leap-logo.png"><span>Sailing Frog's Leap</span></a>
-      <div class="nav-links"><a href="home.html">← Home</a></div>
+      <a class="brand" id="communityHomeBrand" href="index.html"><img alt="LEAP logo" src="leap-logo.png"><span id="communityNameLabel">Community</span></a>
+      <div class="nav-links"><a id="communityHomeLink" href="index.html">← Home</a></div>
     </div>
   </nav>
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
-      <img
-        src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <img id="communityBannerDesktop" src="images/bannerDesktop.png" alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
     </picture>
   </div>
 
@@ -372,7 +377,7 @@
     <div class="wrap">
       <div class="kicker">Frequently Asked Questions</div>
       <h1>FAQ</h1>
-      <p class="lede">These answers cover how LEAP works inside this community. For wallets, Xaman, privacy, transfers, Checks, and shared XRP Ledger mechanics, see the Wild Ledger FAQ.</p>
+      <p class="lede" id="communityLede">These answers cover how LEAP works inside this community. For wallets, Xaman, privacy, transfers, Checks, and shared XRP Ledger mechanics, see the Wild Ledger FAQ.</p>
     </div>
   </header>
   <main>
@@ -382,8 +387,8 @@
 <span class="category">Community</span>
 <h2>Joining the community</h2>
 <div class="faq">
-<div class="row"><b>What is LEAP?</b><span>LEAP is the membership and recognition system used by Wild Ledger communities. Just one LEAP gets you into the system, and your LEAP balance advances your rank.</span></div>
-<div class="row"><b>How is LEAP distributed?</b><span>When you earn LEAP, it can be offered to you by LEAP Check. Checks let you choose whether to accept the LEAP and preserve the reason for the recognition in the XRP Ledger record.</span></div>
+<div class="row"><b>What is LEAP?</b><span id="whatIsLeapAnswer">LEAP is the membership and recognition system used by Wild Ledger communities. In this community, rank is based on the LEAP officially earned here—not the LEAP currently sitting in your wallet.</span></div>
+<div class="row"><b>How is LEAP distributed?</b><span id="distributionAnswer">When this community awards LEAP, it can be offered to you by LEAP Check. Checks let you choose whether to accept the LEAP and preserve the reason for the recognition in the XRP Ledger record.</span></div>
 <div class="row"><b>Where will my LEAP Check appear?</b><span>After you submit your XRP Ledger address on the Join page, check your Member Record. Any LEAP Checks waiting for you to cash will be listed there.</span></div>
 <div class="row"><b>Where are the wallet, Xaman, privacy, and Check instructions?</b><span>Those rules apply to every Wild Ledger community, so they live in the <a href="wildLedgerFaq.html">Wild Ledger FAQ</a>.</span></div>
 </div>
@@ -394,7 +399,7 @@
 <span class="category">Member Record</span>
 <h2>Your community history</h2>
 <div class="faq">
-<div class="row"><b>What does my Member Record show?</b><span>Your Member Record shows your current LEAP balance and rank, any outstanding LEAP Checks waiting for you, and the community history you have actually earned on the XRP Ledger.</span></div>
+<div class="row"><b>What does my Member Record show?</b><span>Your Member Record shows your current LEAP balance, the LEAP you have officially earned in this community, your community rank, any outstanding LEAP Checks waiting for you, and the community history recorded for you on the XRP Ledger.</span></div>
 <div class="row"><b>When does a recognition count as earned?</b><span>A Check-based recognition becomes part of your personal community history after that Check is successfully cashed. A Check that is still waiting or that was canceled does not count as earned.</span></div>
 <div class="row"><b>What happens to old canceled Checks?</b><span>They remain part of the public XRP Ledger transaction history, but they are not shown as earned badges or recognitions in your personal Member Record.</span></div>
 </div>
@@ -406,7 +411,7 @@
 <h2>How badges work</h2>
 <div class="faq">
 <div class="row"><b>What is a badge?</b><span>A badge is a permanent recognition for something meaningful: a milestone, a contribution, a special status, an event, a place, or another part of your story.</span></div>
-<div class="row"><b>Does rank control which badges I can have?</b><span>No. Rank is based on how much LEAP you currently hold, while badges record your history. A member at one rank can have a special badge that a higher-ranking member does not.</span></div>
+<div class="row"><b>Does rank control which badges I can have?</b><span>No. Rank is based on the LEAP officially earned in this community, while badges record specific recognitions in your history. A member at one rank can have a badge that a higher-ranking member does not.</span></div>
 <div class="row"><b>How is a badge recorded?</b><span>A community can offer a badge through a LEAP Check with a standardized memo naming the recognition. When the recipient cashes that Check, the badge becomes part of that member's earned record.</span></div>
 <div class="row"><b>Does a badge have to add more LEAP?</b><span>No. The LEAP amount can be small and symbolic. The important part of the badge can be the recognition and the ledger record that documents it.</span></div>
 <div class="row"><b>Does the badge record stay on the XRP Ledger?</b><span>Yes. The underlying transactions remain part of the public XRP Ledger history. The Member Record interprets that history and shows the badges the member has actually earned.</span></div>
@@ -423,6 +428,33 @@
 </section>
 
   </main>
-  <footer><div class="wrap foot"><div>Sailing Frog's Leap • FAQ</div></div></footer>
+  <footer><div class="wrap foot"><div id="footerLabel">Community • FAQ</div></div></footer>
+
+  <script src="js/communityConfig.js"></script>
+  <script>
+    (() => {
+      const community = window.WILD_LEDGER_COMMUNITY || { id:"sfl", layout:"classic", communityName:"Community", bannerDesktop:"images/bannerDesktop.png", bannerMobile:"images/bannerMobile.png" };
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const communityName = community.communityName || "Community";
+      const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+      const theme = community.theme || {};
+      const vars = {paper:"--paper",paper2:"--paper2",ink:"--ink",navy:"--navy",deep:"--deep",sea:"--sea",foam:"--foam",rust:"--rust",gold:"--gold",line:"--line",card:"--card",muted:"--muted",pageBackground:"--page-background",pageOverlay:"--page-overlay",navBackground:"--nav-background",headerBackground:"--header-background",sectionBackground:"--section-background",darkFeatureBackground:"--dark-feature-background"};
+      for (const [key,cssVar] of Object.entries(vars)) if (theme[key]) document.documentElement.style.setProperty(cssVar,theme[key]);
+      document.body.dataset.communityLayout = community.layout || "classic";
+      document.body.dataset.communityTheme = communityId;
+      const metaTheme=document.querySelector('meta[name="theme-color"]'); if(metaTheme&&theme.themeColor) metaTheme.content=theme.themeColor;
+      document.title=`FAQ — ${communityName}`;
+      const meta=document.querySelector('meta[name="description"]'); if(meta) meta.content=`Frequently asked questions about LEAP participation, recognition, ranks, badges, and Member Records in ${communityName}.`;
+      const name=document.getElementById("communityNameLabel"); if(name) name.textContent=communityName;
+      const brand=document.getElementById("communityHomeBrand"); if(brand) brand.href=homeHref;
+      const home=document.getElementById("communityHomeLink"); if(home) home.href=homeHref;
+      const bd=document.getElementById("communityBannerDesktop"); if(bd&&community.bannerDesktop) bd.src=community.bannerDesktop;
+      const bm=document.getElementById("communityBannerMobile"); if(bm&&community.bannerMobile) bm.srcset=community.bannerMobile;
+      const lede=document.getElementById("communityLede"); if(lede) lede.textContent=`These answers cover how LEAP works inside ${communityName}. For wallets, Xaman, privacy, transfers, Checks, and shared XRP Ledger mechanics, see the Wild Ledger FAQ.`;
+      const leap=document.getElementById("whatIsLeapAnswer"); if(leap) leap.textContent=`LEAP is the membership and recognition system used by Wild Ledger communities. In ${communityName}, rank is based on the LEAP officially earned from ${communityName}—not the LEAP currently sitting in your wallet.`;
+      const dist=document.getElementById("distributionAnswer"); if(dist) dist.textContent=`When ${communityName} awards LEAP, it can be offered to you by LEAP Check. Checks let you choose whether to accept the LEAP and preserve the reason for the recognition in the XRP Ledger record.`;
+      const footer=document.getElementById("footerLabel"); if(footer) footer.textContent=`${communityName} • FAQ`;
+    })();
+  </script>
 </body>
 </html>
