@@ -6,6 +6,7 @@
   const communities = {
     sfl: {
       id: "sfl",
+      layout: "classic",
       communityName: "Sailing Frog's Leap",
       managerName: "Rick",
       membershipLabel: "Crew Membership",
@@ -53,6 +54,7 @@
 
     zach: {
       id: "zach",
+      layout: "garage",
       communityName: "Zach's Hot Rods",
       managerName: "Zach",
       membershipLabel: "Membership",
