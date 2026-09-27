@@ -118,8 +118,28 @@ h1{
 }
 .frog{background:#7fffd4;transform:rotate(1deg)}
 .zach{background:#ff6a00;transform:rotate(-1.5deg)}
+.faq-link{
+  display:inline-block;
+  margin-top:34px;
+  padding:12px 18px;
+  color:#f7f1df;
+  text-decoration:none;
+  border:2px solid #f7f1df;
+  border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  transition:transform .16s ease,background .16s ease,color .16s ease;
+}
+.faq-link:hover,.faq-link:focus-visible{
+  transform:translateY(-2px);
+  background:#f7f1df;
+  color:#0a0c0b;
+}
 .footer{
-  margin-top:36px;
+  margin-top:24px;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:10px;
   font-weight:800;
@@ -157,6 +177,8 @@ h1{
       <span class="name">Zach's Hot Rods</span>
     </a>
   </div>
+
+  <a class="faq-link" href="LeapFAQ.html">LEAP FAQ</a>
 
   <div class="footer">Wild Ledger · Powered by LEAP</div>
 </main>
