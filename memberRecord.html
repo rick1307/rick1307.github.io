@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="See your Sailing Frog's Leap member record and validated LEAP history." />
+  <meta name="description" content="See your community member record and validated LEAP history." />
   <meta name="theme-color" content="#123b46" />
-  <title>Leaper Lounge — Sailing Frog's Leap</title>
+  <title>Member Record</title>
 
   <style>
     :root{
@@ -863,11 +863,11 @@
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="index.html">
+      <a class="brand" id="communityHomeBrand" href="index.html">
         <img src="leap-logo.png" alt="LEAP logo">
-        <span>Sailing Frog's Leap</span>
+        <span id="communityNameLabel">Community</span>
       </a>
-      <div class="nav-links"><a href="index.html">← Home</a></div>
+      <div class="nav-links"><a id="communityHomeLink" href="index.html">← Home</a></div>
     </div>
   </nav>
 
@@ -883,7 +883,7 @@
 
   <header>
     <div class="wrap hero-grid">
-      <aside class="crew-console" aria-label="Sailing Frog's Leap Member Record">
+      <aside class="crew-console" id="memberRecordConsole" aria-label="Member Record">
         <div class="console-head">
           <div class="console-title">
             <img src="leap-logo.png" alt="LEAP coin">
@@ -966,8 +966,35 @@
     </div>
   </header>
 
+  <script src="js/communityConfig.js"></script>
   <script>
     (() => {
+      const community = window.WILD_LEDGER_COMMUNITY || {
+        id: "sfl",
+        communityName: "Community",
+        memberPlural: "members",
+        walletStorageKey: "sfl.xrpl.wallet",
+        activeWalletKey: "sfl.xrpl.activeWallet"
+      };
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const communityName = community.communityName || "Community";
+      const communityMemberPlural = community.memberPlural || "members";
+      const communityHomeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+
+      document.title = `Member Record — ${communityName}`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.content = `See your ${communityName} member record and validated LEAP history.`;
+      }
+      const communityNameLabel = document.getElementById("communityNameLabel");
+      if (communityNameLabel) communityNameLabel.textContent = communityName;
+      const memberRecordConsole = document.getElementById("memberRecordConsole");
+      if (memberRecordConsole) memberRecordConsole.setAttribute("aria-label", `${communityName} Member Record`);
+      const communityHomeBrand = document.getElementById("communityHomeBrand");
+      const communityHomeLink = document.getElementById("communityHomeLink");
+      if (communityHomeBrand) communityHomeBrand.href = communityHomeHref;
+      if (communityHomeLink) communityHomeLink.href = communityHomeHref;
+
       const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
       const LEAP_CURRENCY = "4C45415000000000000000000000000000000000";
       const LEAP_TRANSFER_LIMIT = "1000000";
@@ -978,10 +1005,10 @@
       const LEAP_NAMESPACE = "SFL-LEAP";
       const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
 
-      const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
-      const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
-      const SFL_LEAP_SESSION_KEY = "sfl.leap.session";
-      const SFL_DISMISSED_EXPIRED_CHECKS_KEY = "sfl.leap.dismissedExpiredChecks";
+      const SFL_WALLET_STORAGE_KEY = community.walletStorageKey || `${communityId}.xrpl.wallet`;
+      const SFL_ACTIVE_WALLET_KEY = community.activeWalletKey || `${communityId}.xrpl.activeWallet`;
+      const SFL_LEAP_SESSION_KEY = `${communityId}.leap.session`;
+      const SFL_DISMISSED_EXPIRED_CHECKS_KEY = `${communityId}.leap.dismissedExpiredChecks`;
       const PENDING_CHECK_VISIBLE_MS = 7 * 24 * 60 * 60 * 1000;
 
       const DISCORD_OAUTH_START_URL = "https://sfl-discord-auth.yjc26zd6c4.workers.dev/start";
@@ -2595,7 +2622,7 @@
           resetRecord();
           setTrustlineStatus(null, "unavailable");
           setStateMessage(
-            "You have not joined the Sailing Frog's Leap membership system.",
+            `You have not joined the ${communityName} membership system.`,
             "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
             "warn",
             false,
@@ -2653,13 +2680,13 @@
             if (pending.length) {
               setStateMessage(
                 "Your first LEAP is waiting in Xaman.",
-                "Cash the LEAP Check to bring it aboard. New LEAP from Sailing Frog's Leap starts with a Check so its history is recorded. After that, LEAP can move directly between Leapers.",
+                `Cash the LEAP Check to bring it aboard. New LEAP from ${communityName} starts with a Check so its history is recorded. After that, LEAP can move directly between ${communityMemberPlural}.`,
                 "success",
                 transfersDisabled
               );
             } else if (!leapLine) {
               setStateMessage(
-                "You have not joined the Sailing Frog's Leap membership system.",
+                `You have not joined the ${communityName} membership system.`,
                 "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
                 "action",
                 false,
@@ -2831,7 +2858,7 @@
         resetRecord();
         setTrustlineStatus(null, "unavailable");
         setStateMessage(
-          "You have not joined the Sailing Frog's Leap membership system.",
+          `You have not joined the ${communityName} membership system.`,
           "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
           "warn",
           false,
