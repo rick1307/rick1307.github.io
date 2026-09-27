@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LEAP Protocol — Working Operating Standard</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LEAP Protocol — Working Operating Standard</title>
+<style>
     :root{
       --ink:#10243a;
       --muted:#607083;
@@ -243,213 +244,195 @@
     }
   </style>
 </head>
-
 <body>
 <div class="topbar">
-  <div class="topbar-inner">
-    <a class="manager-link" href="../manager.html">Manager →</a>
-  </div>
+<div class="topbar-inner">
+<a class="manager-link" href="../manager.html">Manager →</a>
 </div>
-
+</div>
 <div class="shell">
-  <header class="hero">
-    <div class="eyebrow">Sailing Frog's Leap — Internal Operating Document</div>
-    <h1>LEAP Protocol</h1>
-    <p>
+<header class="hero">
+<div class="eyebrow">Sailing Frog's Leap — Internal Operating Document</div>
+<h1>LEAP Protocol</h1>
+<p>
       A working standard for how LEAP is identified, distributed, named, queried, interpreted,
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
-    <div class="meta">
-      <span class="pill">Working Draft 0.9</span>
-      <span class="pill">XRPL Mainnet</span>
-      <span class="pill">Internal / Unlinked</span>
-      <span class="pill">Last revised: 2026-09-23</span>
-    </div>
-  </header>
-
-  <div class="layout">
-    <nav class="toc" aria-label="Document sections">
-      <strong>Contents</strong>
-      <div class="links">
-        <a href="#purpose">1. Purpose</a>
-        <a href="#principles">2. Core Principles</a>
-        <a href="#registry">3. Authority Registry</a>
-        <a href="#identity">4. LEAP Asset Identity</a>
-        <a href="#naming">5. Naming Conventions</a>
-        <a href="#memos">6. Namespace & Memo Standard</a>
-        <a href="#transactions">7. Transaction Standards</a>
-        <a href="#membership">8. Membership & Rank</a>
-        <a href="#badges">9. Badges & History</a>
-        <a href="#events">10. Events & Challenges</a>
-        <a href="#queries">11. Query Standards</a>
-        <a href="#validity">12. Validity Rules</a>
-        <a href="#display">13. Display vs Ledger Names</a>
-        <a href="#legacy">14. Legacy Transactions</a>
-        <a href="#change">15. Change Control</a>
-        <a href="#open">16. Open Decisions</a>
-        <a href="#sources">17. XRPL References</a>
-      </div>
-    </nav>
-
-    <main>
-      <section id="purpose">
-        <h2>1. Purpose</h2>
-        <p class="lead">
+<div class="meta">
+<span class="pill">Working Draft 0.9</span>
+<span class="pill">XRPL Mainnet</span>
+<span class="pill">Internal / Unlinked</span>
+<span class="pill">Last revised: 2026-09-23</span>
+</div>
+</header>
+<div class="layout">
+<nav aria-label="Document sections" class="toc">
+<strong>Contents</strong>
+<div class="links">
+<a href="#purpose">1. Purpose</a>
+<a href="#principles">2. Core Principles</a>
+<a href="#registry">3. Authority Registry</a>
+<a href="#identity">4. LEAP Asset Identity</a>
+<a href="#naming">5. Naming Conventions</a>
+<a href="#memos">6. Namespace &amp; Memo Standard</a>
+<a href="#transactions">7. Transaction Standards</a>
+<a href="#membership">8. Membership &amp; Rank</a>
+<a href="#badges">9. Badges &amp; History</a>
+<a href="#events">10. Events &amp; Challenges</a>
+<a href="#queries">11. Query Standards</a>
+<a href="#validity">12. Validity Rules</a>
+<a href="#display">13. Display vs Ledger Names</a>
+<a href="#legacy">14. Legacy Transactions</a>
+<a href="#change">15. Change Control</a>
+<a href="#open">16. Open Decisions</a>
+<a href="#sources">17. XRPL References</a>
+</div>
+</nav>
+<main>
+<section id="purpose">
+<h2>1. Purpose</h2>
+<p class="lead">
           The LEAP Protocol exists so that every future page, script, distribution, badge rule, and XRPL query
           interprets LEAP in the same way.
         </p>
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             This document is the operating source of truth for LEAP. Public-facing pages may simplify these rules,
             but they should not silently invent different ones.
           </div>
-        </div>
-        <p>
+</div>
+<p>
           This protocol deliberately separates <strong>current state</strong> from <strong>historical fact</strong>.
           Current state answers questions such as “How much LEAP does this wallet hold now?” Historical fact answers
           questions such as “Was this wallet officially awarded Panama Crew?”
         </p>
-      </section>
-
-      <section id="principles">
-        <h2>2. Core Principles</h2>
-        <div class="status-grid">
-          <div class="status-card">
-            <b>Current State</b>
-            <span class="mini">Membership, balance, current rank, outstanding objects.</span>
-          </div>
-          <div class="status-card">
-            <b>Historical State</b>
-            <span class="mini">Awards, events, distributions, provenance, dates, transaction hashes.</span>
-          </div>
-          <div class="status-card">
-            <b>Authority</b>
-            <span class="mini">Only approved issuer/distributor activity can create official LEAP recognition.</span>
-          </div>
-        </div>
-
-        <h3>Operating rules</h3>
-        <ul>
-          <li>Use validated XRPL data for decisions that affect membership, rank, or recognition.</li>
-          <li>Never treat a memo by itself as proof of official LEAP recognition.</li>
-          <li>Always verify LEAP currency identity and issuer identity together.</li>
-          <li>Never use a display label as the canonical machine identifier.</li>
-          <li>Once a canonical identifier has been used on-ledger, do not rename or reuse it.</li>
-          <li>Rank is dynamic. Historical recognition is permanent unless an explicit future revocation rule is created.</li>
-          <li>Each website page may query XRPL independently unless a future architecture change explicitly replaces that rule.</li>
-        </ul>
-
-        <div class="decision">
-          <div class="tag">Design Principle — Automatic Stabilizers</div>
-          <div>
+</section>
+<section id="principles">
+<h2>2. Core Principles</h2>
+<div class="status-grid">
+<div class="status-card">
+<b>Current State</b>
+<span class="mini">Membership, balance, current rank, outstanding objects.</span>
+</div>
+<div class="status-card">
+<b>Historical State</b>
+<span class="mini">Awards, events, distributions, provenance, dates, transaction hashes.</span>
+</div>
+<div class="status-card">
+<b>Authority</b>
+<span class="mini">Only approved issuer/distributor activity can create official LEAP recognition.</span>
+</div>
+</div>
+<h3>Operating rules</h3>
+<ul>
+<li>Use validated XRPL data for decisions that affect membership, rank, or recognition.</li>
+<li>Never treat a memo by itself as proof of official LEAP recognition.</li>
+<li>Always verify LEAP currency identity and issuer identity together.</li>
+<li>Never use a display label as the canonical machine identifier.</li>
+<li>Once a canonical identifier has been used on-ledger, do not rename or reuse it.</li>
+<li>Rank is dynamic. Historical recognition is permanent unless an explicit future revocation rule is created.</li>
+<li>Each website page may query XRPL independently unless a future architecture change explicitly replaces that rule.</li>
+</ul>
+<div class="decision">
+<div class="tag">Design Principle — Automatic Stabilizers</div>
+<div>
             LEAP should prefer rules that are enforced or naturally reinforced by the ledger itself rather than by a growing pile of manual administration.
             Canonical identifiers reduce ambiguity; Check state prevents ordinary duplicate issuance; the seven-day Manager cleanup policy limits how long an unattended Check normally remains open;
             validated history preserves the record; and owner reserve makes large numbers of open Checks consume real working capital.
             The reserve is not a fee or burn. It is temporary capital tied up while the ledger object remains open, which provides a useful anti-spam and discipline mechanism.
           </div>
-        </div>
-      </section>
-
-      <section id="registry">
-        <h2>3. Authority Registry</h2>
-        <p>
+</div>
+</section>
+<section id="registry">
+<h2>3. Authority Registry</h2>
+<p>
           These accounts define the authority chain for the current LEAP implementation.
           Additional distributors may be added later through protocol change control.
         </p>
-
-        <table class="registry">
-          <tr>
-            <th>Role</th>
-            <th>XRPL Account</th>
-            <th>Status</th>
-          </tr>
-          <tr>
-            <td>LEAP Issuer</td>
-            <td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td>
-            <td>Authorized</td>
-          </tr>
-          <tr>
-            <td>Distributor 01</td>
-            <td class="address">rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</td>
-            <td>Authorized</td>
-          </tr>
-        </table>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<table class="registry">
+<tr>
+<th>Role</th>
+<th>XRPL Account</th>
+<th>Status</th>
+</tr>
+<tr>
+<td>LEAP Issuer</td>
+<td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td>
+<td>Authorized</td>
+</tr>
+<tr>
+<td>Distributor 01</td>
+<td class="address">rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</td>
+<td>Authorized</td>
+</tr>
+</table>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             An official recognition transaction must originate from an account listed as an authorized LEAP authority
             for that transaction type. A matching memo from any other wallet does not count.
           </div>
-        </div>
-      </section>
-
-      <section id="identity">
-        <h2>4. LEAP Asset Identity</h2>
-
-        <table>
-          <tr><th>Property</th><th>Working value</th></tr>
-          <tr><td>Public name</td><td>LEAP</td></tr>
-          <tr><td>Network</td><td>XRP Ledger Mainnet</td></tr>
-          <tr><td>Issuer</td><td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td></tr>
-          <tr><td>Declared maximum supply</td><td>1,000,000 LEAP — project rule, not an XRPL protocol-enforced cap</td></tr>
-          <tr><td>Canonical on-ledger currency value</td><td><strong>TO VERIFY FROM LEDGER BEFORE HARD-CODING</strong></td></tr>
-          <tr><td>Genesis ledger / first issuance ledger</td><td><strong>TO RECORD</strong></td></tr>
-        </table>
-
-        <div class="fact">
-          <div class="tag">XRPL Fact</div>
-          <div>
+</div>
+</section>
+<section id="identity">
+<h2>4. LEAP Asset Identity</h2>
+<table>
+<tr><th>Property</th><th>Working value</th></tr>
+<tr><td>Public name</td><td>LEAP</td></tr>
+<tr><td>Network</td><td>XRP Ledger Mainnet</td></tr>
+<tr><td>Issuer</td><td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td></tr>
+<tr><td>Declared maximum supply</td><td>1,000,000 LEAP — project rule, not an XRPL protocol-enforced cap</td></tr>
+<tr><td>Canonical on-ledger currency value</td><td><strong>TO VERIFY FROM LEDGER BEFORE HARD-CODING</strong></td></tr>
+<tr><td>Genesis ledger / first issuance ledger</td><td><strong>TO RECORD</strong></td></tr>
+</table>
+<div class="fact">
+<div class="tag">XRPL Fact</div>
+<div>
             Standard XRPL currency codes are three characters. Nonstandard currency codes use a 160-bit hexadecimal value.
             Because LEAP is four letters, code must compare against the actual on-ledger currency value rather than assuming
             every API will return the literal text <code>LEAP</code>.
           </div>
-        </div>
-      </section>
-
-      <section id="naming">
-        <h2>5. Naming Conventions</h2>
-        <p>
+</div>
+</section>
+<section id="naming">
+<h2>5. Naming Conventions</h2>
+<p>
           Human-facing names may be friendly and change over time. Canonical IDs are for machines and must remain stable.
         </p>
-
-        <table>
-          <tr><th>Object</th><th>Canonical pattern</th><th>Example</th></tr>
-          <tr><td>Root namespace</td><td><code>SFL-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
-          <tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>NEW-MEMBER</code></td></tr>
-          <tr><td>Event ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LA-CRUZ-BEACH-BONFIRE</code></td></tr>
-          <tr><td>Challenge ID</td><td><code>LEAP-NNN</code></td><td><code>LEAP-001</code></td></tr>
-        </table>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<table>
+<tr><th>Object</th><th>Canonical pattern</th><th>Example</th></tr>
+<tr><td>Root namespace</td><td><code>SFL-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
+<tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>NEW-MEMBER</code></td></tr>
+<tr><td>Event ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LA-CRUZ-BEACH-BONFIRE</code></td></tr>
+<tr><td>Challenge ID</td><td><code>LEAP-NNN</code></td><td><code>LEAP-001</code></td></tr>
+</table>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             Canonical IDs use uppercase ASCII letters, numbers, and hyphens only. Avoid spaces, underscores, punctuation,
             apostrophes, emojis, and decorative capitalization. Once used on-ledger, an ID is permanent.
           </div>
-        </div>
-
-        <h3>Broad-to-narrow specificity</h3>
-        <p>
+</div>
+<h3>Broad-to-narrow specificity</h3>
+<p>
           When a recurring or similar real-world recognition needs to be distinguished from an earlier one, extend the identifier
           from the broadest concept toward progressively narrower qualifiers. Add only as much specificity as is needed to make the intended recognition unambiguous.
         </p>
-        <pre><code>PANAMA-CREW
+<pre><code>PANAMA-CREW
 PANAMA-CREW-2026
 PANAMA-CREW-2026-MARCH
 PANAMA-CREW-2026-MARCH-13</code></pre>
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             Specificity proceeds from <strong>large to small</strong>, left to right. A recurring recognition should receive a more specific canonical ID rather than reusing
             the same exact recognition for the same recipient. A year, month, day, location, edition, or other qualifier may be added when it distinguishes the recognition itself.
             The XRPL validated timestamp remains the authoritative record of when the transaction was actually issued.
           </div>
-        </div>
-
-        <h3>Examples</h3>
-        <pre><code>NEW-MEMBER
+</div>
+<h3>Examples</h3>
+<pre><code>NEW-MEMBER
 FIRST-MEMBER
 LEAP-OG
 PANAMA-CREW-2026
@@ -459,380 +442,351 @@ PACIFIC-CROSSING
 
 LEAP-001
 LEAP-002</code></pre>
-
-        <div class="note">
+<div class="note">
           Public display names can be “New Member,” “First Member,” “LEAP OG,” “Panama Crew 2026,” or “Pacific Crossing.”
           The canonical identifiers remain unchanged on the ledger.
         </div>
-      </section>
-
-      <section id="memos">
-        <h2>6. Namespace & Memo Standard</h2>
-        <p>
+</section>
+<section id="memos">
+<h2>6. Namespace &amp; Memo Standard</h2>
+<p>
           LEAP uses one short public memo string to identify the project, the recognition category, and the canonical value.
           The root namespace is <code>SFL-LEAP</code>.
         </p>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             The canonical public memo grammar is <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.
             One Check records one recognition reason, so one canonical recognition Check carries one public LEAP memo.
           </div>
-        </div>
-
-        <h3>Current recognition categories</h3>
-        <table>
-          <tr><th>Category</th><th>What it records</th><th>Canonical example</th></tr>
-          <tr><td><code>BADGE</code></td><td>Permanent recognition for something the member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=NEW-MEMBER</code></td></tr>
-          <tr><td><code>EVENT</code></td><td>A specific real-world or community occasion connected to the award</td><td><code>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
-          <tr><td><code>CHALLENGE</code></td><td>A numbered LEAP participation challenge</td><td><code>SFL-LEAP/CHALLENGE=LEAP-001</code></td></tr>
-        </table>
-
-        <div class="decision">
-          <div class="tag">Current Production Convention</div>
-          <div>
-            <strong>One Check. One recognition. One reason. One line in the logbook.</strong>
+</div>
+<h3>Memo location, token scope, and community namespaces</h3><div class="fact">
+<div class="tag">XRPL Fact</div>
+<div>
+    The public LEAP memo belongs to the <code>CheckCreate</code> transaction that creates the Check. It does not belong to an individual LEAP token or to the Check ledger object itself. Cashing uses a separate <code>CheckCash</code> transaction, and canceling uses a separate <code>CheckCancel</code> transaction. The original <code>CheckCreate</code> and its memo remain in validated public ledger history either way.
+  </div>
+</div><div class="note">
+<strong>LEAP is fungible.</strong> A memo does not travel with one specific LEAP coin or unit. The memo is part of the transaction record, not an individually serialized LEAP unit.
+</div><div class="rule">
+<div class="tag">Community Namespace Rule</div>
+<div>
+    A community namespace lets Wild Ledger software separate that community's LEAP records from unrelated wallet activity and organize them into the community's badges, events, challenges, member history, and administrative history. Each participating community can use its own namespace and conventions within the LEAP protocol.
+  </div>
+</div><h3>Current recognition categories</h3>
+<table>
+<tr><th>Category</th><th>What it records</th><th>Canonical example</th></tr>
+<tr><td><code>BADGE</code></td><td>Permanent recognition for something the member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=NEW-MEMBER</code></td></tr>
+<tr><td><code>EVENT</code></td><td>A specific real-world or community occasion connected to the award</td><td><code>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
+<tr><td><code>CHALLENGE</code></td><td>A numbered LEAP participation challenge</td><td><code>SFL-LEAP/CHALLENGE=LEAP-001</code></td></tr>
+</table>
+<div class="decision">
+<div class="tag">Current Production Convention</div>
+<div>
+<strong>One Check. One recognition. One reason. One line in the logbook.</strong>
             A Check may carry one or more whole LEAP, but it records exactly one Badge, Event, or Challenge recognition.
             Do not bundle multiple recognitions into one Check. If a member earns two separate recognitions, create two separate Checks.
           </div>
-        </div>
-
-        <h3>Canonical grammar rules</h3>
-        <ul class="checklist">
-          <li>The prefix is exactly <code>SFL-LEAP/</code>.</li>
-          <li>The category is one of <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code>. No fourth recognition category is implied by onboarding, rank, origin, or protocol metadata.</li>
-          <li><code>NEW-MEMBER</code> is a Badge: <code>SFL-LEAP/BADGE=NEW-MEMBER</code>.</li>
-          <li>Use one equals sign between category and value: <code>=</code>.</li>
-          <li>The value uses uppercase ASCII letters, numbers, and hyphens only.</li>
-          <li>Challenge values use the form <code>LEAP-NNN</code>, beginning with <code>LEAP-001</code>.</li>
-          <li>Do not add spaces around separators.</li>
-          <li>Do not append a date merely to duplicate the ledger timestamp. Add time or other qualifiers when they are needed to make a recurring recognition canonically distinct.</li>
-          <li>The vertical bar character (<code>|</code>) is not part of the current recognition memo grammar and must not be used to bundle multiple recognitions into one Check.</li>
-        </ul>
-
-        <h3>Production examples</h3>
-        <pre><code>SFL-LEAP/BADGE=NEW-MEMBER
+</div>
+<h3>Canonical grammar rules</h3>
+<ul class="checklist">
+<li>The prefix is exactly <code>SFL-LEAP/</code>.</li>
+<li>The category is one of <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code>. No fourth recognition category is implied by onboarding, rank, origin, or protocol metadata.</li>
+<li><code>NEW-MEMBER</code> is a Badge: <code>SFL-LEAP/BADGE=NEW-MEMBER</code>.</li>
+<li>Use one equals sign between category and value: <code>=</code>.</li>
+<li>The value uses uppercase ASCII letters, numbers, and hyphens only.</li>
+<li>Challenge values use the form <code>LEAP-NNN</code>, beginning with <code>LEAP-001</code>.</li>
+<li>Do not add spaces around separators.</li>
+<li>Do not append a date merely to duplicate the ledger timestamp. Add time or other qualifiers when they are needed to make a recurring recognition canonically distinct.</li>
+<li>The vertical bar character (<code>|</code>) is not part of the current recognition memo grammar and must not be used to bundle multiple recognitions into one Check.</li>
+</ul>
+<h3>Production examples</h3>
+<pre><code>SFL-LEAP/BADGE=NEW-MEMBER
 SFL-LEAP/BADGE=FIRST-MEMBER
 SFL-LEAP/BADGE=PANAMA-CREW-2026
 SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026
 SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
-
-        <h3>Ledger-discovered recognition vocabulary</h3>
-        <p>
+<h3>Ledger-discovered recognition vocabulary</h3>
+<p>
           The XRPL is the working registry of canonical recognition IDs. The normal Create Check interface keeps the Reason choices fixed at
           <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>, then discovers the existing values for the selected category from validated,
           protocol-compliant <code>CheckCreate</code> history produced by an authorized LEAP distributor.
         </p>
-        <div class="rule">
-          <div class="tag">Implementation Rule</div>
-          <div>
+<div class="rule">
+<div class="tag">Implementation Rule</div>
+<div>
             The first canonical use of a brand-new Badge, Event, or Challenge value may be created manually in Xaman or through another authorized protocol-compliant writer.
             Once that successful <code>CheckCreate</code> appears in validated distributor history, the value becomes discoverable by the website and may be offered as a future choice.
             Failed transactions, malformed memos, and matching text from unauthorized accounts do not populate the recognition vocabulary.
           </div>
-        </div>
-        <div class="note">
+</div>
+<div class="note">
           Once a canonical ID has appeared in valid authorized history, the ID remains part of the protocol vocabulary even if the individual Check later expires or is canceled.
           Check state affects whether that recognition may be issued again to a particular recipient; it does not erase the identifier itself.
         </div>
-
-        <div class="fact">
-          <div class="tag">XRPL Fact</div>
-          <div>
+<div class="fact">
+<div class="tag">XRPL Fact</div>
+<div>
             XRPL transactions can contain a <code>Memos</code> array. A memo can use the protocol fields
             <code>MemoType</code>, <code>MemoFormat</code>, and <code>MemoData</code>, which are represented as hexadecimal in transaction JSON.
             Wallet software may expose these fields through a simpler user interface.
           </div>
-        </div>
-
-        <div class="rule">
-          <div class="tag">Implementation Rule</div>
-          <div>
+</div>
+<div class="rule">
+<div class="tag">Implementation Rule</div>
+<div>
             The LEAP protocol standardizes the <strong>decoded public text</strong>, not a particular wallet's field layout.
             In Xaman's Check workflow, enter the complete canonical string into the single public memo box.
             Reader software should decode the transaction memo fields, normalize the wallet representation, and accept only
             a string that matches the LEAP grammar above.
           </div>
-        </div>
-
-        <div class="note">
+</div>
+<div class="note">
           Earlier draft structures may still be read for backward compatibility, but they are not used for new issuance.
           <code>ORIGIN</code> and <code>PROTOCOL</code> are not current member-recognition categories. Protocol versions belong to this operating document and its change log.
         </div>
-      </section>
-
-      <section id="transactions">
-        <h2>7. Transaction Standards</h2>
-
-        <h3>7.1 Official recognition distribution</h3>
-        <div class="flow">
-          Authorized Distributor<br>
-          ↓<br>
-          CheckCreate<br>
-          ↓<br>
-          Destination + positive whole LEAP SendMax + no on-ledger expiration + one canonical public memo<br>
-          ↓<br>
-          Member<br>
-          ↓<br>
+</section>
+<section id="transactions">
+<h2>7. Transaction Standards</h2>
+<h3>7.1 Official recognition distribution</h3>
+<div class="flow">
+          Authorized Distributor<br/>
+          ↓<br/>
+          CheckCreate<br/>
+          ↓<br/>
+          Destination + positive whole LEAP SendMax + no on-ledger expiration + one canonical public memo<br/>
+          ↓<br/>
+          Member<br/>
+          ↓<br/>
           CheckCash
         </div>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             When a Check is used to deliver official recognition, the recognition memo belongs on the
             <strong>CheckCreate</strong> transaction because that transaction is created by the authorized LEAP distributor.
             The later <code>CheckCash</code> claims the Check; it does not replace the original recognition record.
             The <code>CheckCreate</code> remains in validated transaction history even after the temporary Check ledger object is removed.
           </div>
-        </div>
-
-        <h3>7.2 Minimum checks for a canonical recognition CheckCreate</h3>
-        <ul class="checklist">
-          <li><code>TransactionType = CheckCreate</code></li>
-          <li><code>Account</code> is an authorized LEAP distributor</li>
-          <li><code>Destination</code> is the intended member wallet</li>
-          <li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
-          <li><code>SendMax.issuer</code> is the LEAP issuer</li>
-          <li><code>SendMax.value</code> is a positive whole-number LEAP amount; fractional LEAP is not used by protocol policy</li>
-          <li>The normal LEAP recognition Check omits the XRPL <code>Expiration</code> field</li>
-          <li>Transaction is successful</li>
-          <li>Transaction is in validated ledger history</li>
-          <li>Exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> public memo records the recognition reason</li>
-        </ul>
-
-        <h3>7.3 Issuance controls: amount, visibility, and cleanup</h3>
-        <p>
+</div>
+<h3>7.2 Minimum checks for a canonical recognition CheckCreate</h3>
+<ul class="checklist">
+<li><code>TransactionType = CheckCreate</code></li>
+<li><code>Account</code> is an authorized LEAP distributor</li>
+<li><code>Destination</code> is the intended member wallet</li>
+<li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
+<li><code>SendMax.issuer</code> is the LEAP issuer</li>
+<li><code>SendMax.value</code> is a positive whole-number LEAP amount; fractional LEAP is not used by protocol policy</li>
+<li>The normal LEAP recognition Check omits the XRPL <code>Expiration</code> field</li>
+<li>Transaction is successful</li>
+<li>Transaction is in validated ledger history</li>
+<li>Exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> public memo records the recognition reason</li>
+</ul>
+<h3>7.3 Issuance controls: amount, visibility, and cleanup</h3>
+<p>
           The recognition identity comes from the canonical memo. Delivery timing is handled operationally rather than by putting an expiration on the normal Check.
         </p>
-        <table>
-          <tr><th>Control</th><th>Protocol / interface rule</th></tr>
-          <tr><td>LEAP amount</td><td>Positive whole numbers only. The normal form starts blank so the issuer must enter the amount deliberately. Zero is never submitted.</td></tr>
-          <tr><td>XRPL Expiration</td><td>The normal LEAP recognition Check sets <strong>no on-ledger expiration</strong>. The Check remains cashable until it is cashed or canceled.</td></tr>
-          <tr><td>Crew Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
-          <tr><td>Manager cleanup flag</td><td>The Manager Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is a Manager-side operating rule only; it does not change the ledger object.</td></tr>
-          <tr><td>Cleanup action</td><td>Rick decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
-          <tr><td>Legacy expirations</td><td>Readers remain compatible with older Checks that contain an XRPL <code>Expiration</code>. Those legacy Checks are interpreted according to their actual ledger expiration.</td></tr>
-        </table>
-        <div class="note">
+<table>
+<tr><th>Control</th><th>Protocol / interface rule</th></tr>
+<tr><td>LEAP amount</td><td>Positive whole numbers only. The normal form starts blank so the issuer must enter the amount deliberately. Zero is never submitted.</td></tr>
+<tr><td>XRPL Expiration</td><td>The normal LEAP recognition Check sets <strong>no on-ledger expiration</strong>. The Check remains cashable until it is cashed or canceled.</td></tr>
+<tr><td>Crew Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
+<tr><td>Manager cleanup flag</td><td>The Manager Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is a Manager-side operating rule only; it does not change the ledger object.</td></tr>
+<tr><td>Cleanup action</td><td>Rick decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
+<tr><td>Legacy expirations</td><td>Readers remain compatible with older Checks that contain an XRPL <code>Expiration</code>. Those legacy Checks are interpreted according to their actual ledger expiration.</td></tr>
+</table>
+<div class="note">
           If the validated creation timestamp cannot be established, software must not invent a seven-day age. Crew Record may keep the notice visible and the Checkbook may report that cleanup age is unavailable until authoritative timing can be determined.
         </div>
-
-        <h3>7.4 Recognition uniqueness and duplicate suppression</h3>
-        <p>
+<h3>7.4 Recognition uniqueness and duplicate suppression</h3>
+<p>
           Normal LEAP issuance treats the recipient address plus the exact canonical recognition as the duplicate key.
           Amount, age, and cleanup status do not create a different recognition.
         </p>
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
-            <strong>Same destination address + same exact canonical recognition = duplicate.</strong>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
+<strong>Same destination address + same exact canonical recognition = duplicate.</strong>
             The normal Create Check interface should not offer a recognition while an open Check for that exact recognition still exists for the recipient,
             even after the seven-day cleanup flag appears, or after the recipient has already redeemed it. A canceled unredeemed Check reopens the recognition.
             A legacy Check that truly expired on-ledger may also reopen it.
           </div>
-        </div>
-        <table>
-          <tr><th>Earlier state for same recipient + recognition</th><th>Normal Create Check behavior</th></tr>
-          <tr><td>Open Check, including 7+ days old</td><td>Suppress the recognition choice; do not create a second pending Check while the original Check still exists.</td></tr>
-          <tr><td>Successfully redeemed / cashed</td><td>Suppress the recognition choice; the exact recognition is already part of that recipient's history.</td></tr>
-          <tr><td>Canceled and unredeemed</td><td>Recognition may be offered again.</td></tr>
-          <tr><td>Legacy expired and unredeemed</td><td>Recognition may be offered again. If the expired Check object still exists, clean it up separately.</td></tr>
-        </table>
-        <div class="note">
+</div>
+<table>
+<tr><th>Earlier state for same recipient + recognition</th><th>Normal Create Check behavior</th></tr>
+<tr><td>Open Check, including 7+ days old</td><td>Suppress the recognition choice; do not create a second pending Check while the original Check still exists.</td></tr>
+<tr><td>Successfully redeemed / cashed</td><td>Suppress the recognition choice; the exact recognition is already part of that recipient's history.</td></tr>
+<tr><td>Canceled and unredeemed</td><td>Recognition may be offered again.</td></tr>
+<tr><td>Legacy expired and unredeemed</td><td>Recognition may be offered again. If the expired Check object still exists, clean it up separately.</td></tr>
+</table>
+<div class="note">
           Deliberate duplicate or “plus-up” issuance is an exceptional manual action, not a normal software path.
           If ever needed, it should be performed judgmentally outside the standard Create Check interface, for example manually in Xaman.
           The standard interface is intentionally designed to make ordinary duplicates impossible rather than merely warn about them.
         </div>
-
-        <h3>7.5 Trust lines are not part of the issuer workflow</h3>
-        <p>
+<h3>7.5 Trust lines are not part of the issuer workflow</h3>
+<p>
           A recipient does not need to establish a LEAP trust line before the distributor creates a Check. The Create Check interface therefore does not require,
           warn about, or preflight a destination trust line as a condition of issuance. When an issued-token Check is cashed, XRPL can automatically create the
           trust line needed to hold the token with a zero limit. After cashing, that trust line remains as needed to hold the recipient's LEAP balance.
         </p>
-        <div class="decision">
-          <div class="tag">Why LEAP Uses Checks</div>
-          <div>
+<div class="decision">
+<div class="tag">Why LEAP Uses Checks</div>
+<div>
             Checks separate <strong>recognition issuance</strong> from <strong>recipient token setup</strong>. The distributor can record and deliver the recognition first;
             the recipient establishes the holding relationship by cashing the Check. This lowers onboarding friction while preserving an authoritative
             <code>CheckCreate</code> history for the LEAP logbook.
           </div>
-        </div>
-
-        <h3>7.6 Check linkage</h3>
-        <p>
+</div>
+<h3>7.6 Check linkage</h3>
+<p>
           Store or derive the Check ledger object's ID from the successful CheckCreate metadata.
           A later <code>CheckCash.CheckID</code> can be matched back to that exact Check.
         </p>
-
-        <h3>7.7 Direct Payment fallback</h3>
-        <p>
+<h3>7.7 Direct Payment fallback</h3>
+<p>
           Direct LEAP Payments may be valid when deliberately used. When determining the amount actually delivered by a Payment,
           use transaction metadata rather than assuming the requested amount equals the delivered amount.
           The Check workflow remains the current onboarding and recognition standard.
         </p>
-
-        <h3>7.8 Xaman Check cleanup procedure</h3>
-        <p>
+<h3>7.8 Xaman Check cleanup procedure</h3>
+<p>
           Xaman separates the historical transaction from the live Check ledger object. The <strong>All</strong> tab in Events
           shows the historical <code>CheckCreate</code> transaction. The actionable open Check is found under <strong>Planned</strong>.
         </p>
-
-        <div class="flow">
-          LEAP Distributor wallet<br>
-          ↓<br>
-          Xaman → Events<br>
-          ↓<br>
-          Planned<br>
-          ↓<br>
-          Open the Check object<br>
-          ↓<br>
+<div class="flow">
+          LEAP Distributor wallet<br/>
+          ↓<br/>
+          Xaman → Events<br/>
+          ↓<br/>
+          Planned<br/>
+          ↓<br/>
+          Open the Check object<br/>
+          ↓<br/>
           Cancel Check
         </div>
-
-        <div class="rule">
-          <div class="tag">LEAP Operating Procedure</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Operating Procedure</div>
+<div>
             When the manager Checkbook identifies a Cleanup Due, legacy-expired, or otherwise unwanted outstanding Check, open the LEAP Distributor
             wallet in Xaman and use <strong>Events → Planned → Check → Cancel Check</strong>. After the <code>CheckCancel</code>
             transaction validates, the Check ledger object is removed and the XRP owner reserve associated with that Check is released.
           </div>
-        </div>
-
-        <div class="fact">
-          <div class="tag">Current XRPL State</div>
-          <div>
+</div>
+<div class="fact">
+<div class="tag">Current XRPL State</div>
+<div>
             At this revision, each open Check created by the distributor increases its owner reserve by <strong>0.2 XRP</strong>.
             The manager Checkbook should read the network's current reserve value rather than assume that 0.2 XRP will remain permanent.
             The owner reserve is temporary working capital, not a transaction fee; it becomes available again when the Check object is removed.
           </div>
-        </div>
-
-        <div class="note">
-          <strong>The seven-day cleanup rule is not expiration.</strong> A normal LEAP Check that is 7+ days old remains cashable because no XRPL expiration was set.
+</div>
+<div class="note">
+<strong>The seven-day cleanup rule is not expiration.</strong> A normal LEAP Check that is 7+ days old remains cashable because no XRPL expiration was set.
           The Manager Checkbook merely marks it for cleanup so Rick can decide whether to cancel it. For older legacy Checks that do contain an expiration,
           expiration and cancellation are still different: expiration stops cashing, but only a valid <code>CheckCancel</code> removes the ledger object and releases owner reserve.
         </div>
-      </section>
-
-      <section id="membership">
-        <h2>8. Membership & Rank Rules</h2>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+</section>
+<section id="membership">
+<h2>8. Membership &amp; Rank Rules</h2>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             Membership and rank are determined from the wallet's <strong>current validated LEAP trust-line balance</strong>.
             They are current-state properties, not historical awards.
           </div>
-        </div>
-
-        <table>
-          <tr><th>Current LEAP balance</th><th>Meaning</th></tr>
-          <tr><td>0</td><td>No current LEAP membership status</td></tr>
-          <tr><td>1–4</td><td>Deckhand</td></tr>
-          <tr><td>5–9</td><td>Bosun</td></tr>
-          <tr><td>10–24</td><td>Quartermaster</td></tr>
-          <tr><td>25–50</td><td>First Mate</td></tr>
-          <tr><td>51+</td><td>Master Of The Leap</td></tr>
-        </table>
-
-        <p>
+</div>
+<table>
+<tr><th>Current LEAP balance</th><th>Meaning</th></tr>
+<tr><td>0</td><td>No current LEAP membership status</td></tr>
+<tr><td>1–4</td><td>Deckhand</td></tr>
+<tr><td>5–9</td><td>Bosun</td></tr>
+<tr><td>10–24</td><td>Quartermaster</td></tr>
+<tr><td>25–50</td><td>First Mate</td></tr>
+<tr><td>51+</td><td>Master Of The Leap</td></tr>
+</table>
+<p>
           Rank can rise or fall as the wallet's LEAP balance changes. A badge or historical record does not disappear merely
           because the current balance changes.
         </p>
-      </section>
-
-      <section id="badges">
-        <h2>9. Badge & Historical Recognition Rules</h2>
-
-        <p>
+</section>
+<section id="badges">
+<h2>9. Badge &amp; Historical Recognition Rules</h2>
+<p>
           A badge represents something the wallet owner actually did, attended, contributed to, or was officially recognized for.
           <code>NEW-MEMBER</code> is a Badge; onboarding does not create a separate recognition category.
         </p>
-
-        <h3>Badge validity test</h3>
-        <pre><code>VALIDATED
+<h3>Badge validity test</h3>
+<pre><code>VALIDATED
 AND transaction result = success
 AND originating account = authorized distributor
 AND destination = member wallet
 AND currency = canonical LEAP currency
 AND issuer = canonical LEAP issuer
 AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             A matching memo created by an unauthorized wallet does not establish a badge.
             Provenance and content must both validate. The authoritative badge vocabulary is discovered from valid authorized on-ledger history,
             not from a separately maintained website-only list.
           </div>
-        </div>
-
-        <h3>Known / illustrative badge IDs</h3>
-        <table>
-          <tr><th>Canonical ID</th><th>Display label</th><th>Notes</th></tr>
-          <tr><td><code>NEW-MEMBER</code></td><td>New Member</td><td>Onboarding recognition; still a normal Badge.</td></tr>
-          <tr><td><code>FIRST-MEMBER</code></td><td>First Member</td><td>Unique designation.</td></tr>
-          <tr><td><code>LEAP-OG</code></td><td>LEAP OG</td><td>Historical / early-crew recognition.</td></tr>
-          <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td><td>Illustrative family name; add broad-to-narrow qualifiers when needed to distinguish a specific recognition.</td></tr>
-          <tr><td><code>PACIFIC-CREW</code></td><td>Pacific Crew</td><td>Illustrative family name.</td></tr>
-          <tr><td><code>SFL-CAMEO</code></td><td>SFL Cameo</td><td>Illustrative family name.</td></tr>
-        </table>
-        <div class="note">
+</div>
+<h3>Known / illustrative badge IDs</h3>
+<table>
+<tr><th>Canonical ID</th><th>Display label</th><th>Notes</th></tr>
+<tr><td><code>NEW-MEMBER</code></td><td>New Member</td><td>Onboarding recognition; still a normal Badge.</td></tr>
+<tr><td><code>FIRST-MEMBER</code></td><td>First Member</td><td>Unique designation.</td></tr>
+<tr><td><code>LEAP-OG</code></td><td>LEAP OG</td><td>Historical / early-crew recognition.</td></tr>
+<tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td><td>Illustrative family name; add broad-to-narrow qualifiers when needed to distinguish a specific recognition.</td></tr>
+<tr><td><code>PACIFIC-CREW</code></td><td>Pacific Crew</td><td>Illustrative family name.</td></tr>
+<tr><td><code>SFL-CAMEO</code></td><td>SFL Cameo</td><td>Illustrative family name.</td></tr>
+</table>
+<div class="note">
           This table is explanatory, not the canonical registry. The ledger-discovered vocabulary described in Section 6 is authoritative for production choices.
         </div>
-      </section>
-
-      <section id="events">
-        <h2>10. Event & Challenge Rules</h2>
-
-        <h3>Event</h3>
-        <p>
+</section>
+<section id="events">
+<h2>10. Event &amp; Challenge Rules</h2>
+<h3>Event</h3>
+<p>
           A specific real-world or community occasion connected to a LEAP distribution or recognition.
           Example: <code>LA-CRUZ-BEACH-BONFIRE-2026</code>.
         </p>
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             The XRPL validated timestamp records when the recognition transaction was actually issued. The canonical EVENT identifier describes which event the recognition means.
             If the same or similar event occurs again, make the new identifier more specific using the broad-to-narrow convention from Section 5 rather than relying on timestamp alone
             to distinguish two recognitions. Date components are acceptable when they identify the occurrence itself.
           </div>
-        </div>
-
-        <h3>Challenge</h3>
-        <p>
+</div>
+<h3>Challenge</h3>
+<p>
           A defined participation opportunity. Challenges receive unique sequential IDs and are never recycled.
           Example: <code>LEAP-001</code>. The next challenge receives the next unused number.
         </p>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             Event, challenge, badge, and rank are separate concepts. Do not overload one identifier to mean another.
             For a given recipient, the exact same canonical Event, Challenge, or Badge is normally recognized only once through the standard issuance interface.
           </div>
-        </div>
-      </section>
-
-      <section id="queries">
-        <h2>11. Query Standards</h2>
-
-        <h3>11.1 Current membership / rank — <code>account_lines</code></h3>
-        <pre><code>{
+</div>
+</section>
+<section id="queries">
+<h2>11. Query Standards</h2>
+<h3>11.1 Current membership / rank — <code>account_lines</code></h3>
+<pre><code>{
   "command": "account_lines",
   "account": "MEMBER_WALLET",
   "peer": "LEAP_ISSUER",
   "ledger_index": "validated"
 }</code></pre>
-        <p>
+<p>
           Filter the returned line by the canonical LEAP currency value and issuer. Use the returned balance for rank.
         </p>
-
-        <h3>11.2 Historical logbook — <code>account_tx</code></h3>
-        <pre><code>{
+<h3>11.2 Historical logbook — <code>account_tx</code></h3>
+<pre><code>{
   "command": "account_tx",
   "account": "MEMBER_WALLET",
   "ledger_index_min": "LEAP_GENESIS_LEDGER",
@@ -840,177 +794,160 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
   "forward": true,
   "limit": 200
 }</code></pre>
-        <p>
+<p>
           Follow <code>marker</code> pagination until the needed history is exhausted. Parse transactions and metadata;
           do not assume every transaction involving the account is a LEAP transaction.
         </p>
-
-        <h3>11.3 Outstanding Checks — <code>account_objects</code></h3>
-        <pre><code>{
+<h3>11.3 Outstanding Checks — <code>account_objects</code></h3>
+<pre><code>{
   "command": "account_objects",
   "account": "MEMBER_WALLET",
   "ledger_index": "validated",
   "type": "check"
 }</code></pre>
-
-        <h3>11.4 Query output categories</h3>
-        <table>
-          <tr><th>Question</th><th>Primary source</th></tr>
-          <tr><td>Does this wallet currently hold LEAP?</td><td><code>account_lines</code></td></tr>
-          <tr><td>What is the current LEAP balance?</td><td><code>account_lines</code></td></tr>
-          <tr><td>What is the current rank?</td><td>Calculated from validated balance</td></tr>
-          <tr><td>What official awards exist in history?</td><td><code>account_tx</code> + provenance validation</td></tr>
-          <tr><td>When did an award occur?</td><td>Validated transaction ledger/time</td></tr>
-          <tr><td>Was a specific Check claimed?</td><td>Match Check ID to <code>CheckCash</code></td></tr>
-          <tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
-          <tr><td>Which Badge/Event/Challenge values exist?</td><td>Authorized distributor <code>account_tx</code> history + canonical memo validation</td></tr>
-          <tr><td>Should a recognition be offered to this recipient?</td><td>Recipient/distributor history + Check state: suppress open pending or redeemed; reopen canceled unredeemed and legacy expired unredeemed</td></tr>
-        </table>
-      </section>
-
-      <section id="validity">
-        <h2>12. Transaction Validity Rules</h2>
-        <p>
+<h3>11.4 Query output categories</h3>
+<table>
+<tr><th>Question</th><th>Primary source</th></tr>
+<tr><td>Does this wallet currently hold LEAP?</td><td><code>account_lines</code></td></tr>
+<tr><td>What is the current LEAP balance?</td><td><code>account_lines</code></td></tr>
+<tr><td>What is the current rank?</td><td>Calculated from validated balance</td></tr>
+<tr><td>What official awards exist in history?</td><td><code>account_tx</code> + provenance validation</td></tr>
+<tr><td>When did an award occur?</td><td>Validated transaction ledger/time</td></tr>
+<tr><td>Was a specific Check claimed?</td><td>Match Check ID to <code>CheckCash</code></td></tr>
+<tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
+<tr><td>Which Badge/Event/Challenge values exist?</td><td>Authorized distributor <code>account_tx</code> history + canonical memo validation</td></tr>
+<tr><td>Should a recognition be offered to this recipient?</td><td>Recipient/distributor history + Check state: suppress open pending or redeemed; reopen canceled unredeemed and legacy expired unredeemed</td></tr>
+</table>
+</section>
+<section id="validity">
+<h2>12. Transaction Validity Rules</h2>
+<p>
           Before website code treats an XRPL transaction as an official LEAP fact, validate all applicable conditions.
         </p>
-        <ul class="checklist">
-          <li>Data is from validated ledger history</li>
-          <li>Transaction result indicates success</li>
-          <li>Transaction type is allowed for the intended interpretation</li>
-          <li>Issuer matches the canonical LEAP issuer</li>
-          <li>Currency matches the canonical LEAP currency value</li>
-          <li>Authority account is authorized for the action</li>
-          <li>Destination or affected wallet matches the member being evaluated</li>
-          <li>Memo fields decode successfully when memo-based recognition is required</li>
-          <li>The decoded public memo normalizes to exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
-          <li>The category is recognized and the value is a valid canonical identifier</li>
-        </ul>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+<ul class="checklist">
+<li>Data is from validated ledger history</li>
+<li>Transaction result indicates success</li>
+<li>Transaction type is allowed for the intended interpretation</li>
+<li>Issuer matches the canonical LEAP issuer</li>
+<li>Currency matches the canonical LEAP currency value</li>
+<li>Authority account is authorized for the action</li>
+<li>Destination or affected wallet matches the member being evaluated</li>
+<li>Memo fields decode successfully when memo-based recognition is required</li>
+<li>The decoded public memo normalizes to exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
+<li>The category is recognized and the value is a valid canonical identifier</li>
+</ul>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             Fail closed. If required provenance cannot be established, the website may display the transaction as history,
             but it must not convert it into official LEAP recognition.
           </div>
-        </div>
-      </section>
-
-      <section id="display">
-        <h2>13. Display Names vs. Ledger Identifiers</h2>
-
-        <table>
-          <tr><th>Canonical ledger ID</th><th>Possible display label</th></tr>
-          <tr><td><code>FIRST-MEMBER</code></td><td>First Member</td></tr>
-          <tr><td><code>LEAP-OG</code></td><td>LEAP OG</td></tr>
-          <tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td></tr>
-          <tr><td><code>PACIFIC-CROSSING</code></td><td>Pacific Crossing</td></tr>
-          <tr><td><code>LEAP-001</code></td><td>LEAP 001</td></tr>
-        </table>
-
-        <div class="rule">
-          <div class="tag">LEAP Standard</div>
-          <div>
+</div>
+</section>
+<section id="display">
+<h2>13. Display Names vs. Ledger Identifiers</h2>
+<table>
+<tr><th>Canonical ledger ID</th><th>Possible display label</th></tr>
+<tr><td><code>FIRST-MEMBER</code></td><td>First Member</td></tr>
+<tr><td><code>LEAP-OG</code></td><td>LEAP OG</td></tr>
+<tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td></tr>
+<tr><td><code>PACIFIC-CROSSING</code></td><td>Pacific Crossing</td></tr>
+<tr><td><code>LEAP-001</code></td><td>LEAP 001</td></tr>
+</table>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
             Display text may be revised without changing historical identifiers.
             Once an ID has appeared in a canonical on-ledger LEAP transaction, that ID is permanent.
           </div>
-        </div>
-      </section>
-
-      <section id="legacy">
-        <h2>14. Legacy / Pre-Protocol Transactions</h2>
-        <p>
+</div>
+</section>
+<section id="legacy">
+<h2>14. Legacy / Pre-Protocol Transactions</h2>
+<p>
           Reader software may preserve compatibility with earlier LEAP memo experiments so genuine historical records remain readable.
           New issuance must use the canonical single-string format from Section 6.
         </p>
-
-        <table>
-          <tr><th>Legacy pattern</th><th>Interpretation</th><th>Rule</th></tr>
-          <tr><td><code>MemoType=SFL-LEAP</code> + <code>MemoData=BADGE=...</code></td><td>Earlier structured LEAP form</td><td>Read-only compatibility after full authority, asset, destination, and validation checks</td></tr>
-          <tr><td><code>MemoType=SFL-LEAP/BADGE</code> + <code>MemoData=...</code></td><td>Earlier split-memo proposal</td><td>Read-only compatibility; do not create new records this way</td></tr>
-          <tr><td>Raw <code>LEAP-OG</code> or another free-form memo</td><td>Potential pre-protocol marker</td><td>Do not automatically grant recognition; map it manually only after provenance is verified</td></tr>
-          <tr><td>No LEAP recognition memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge, event, or challenge meaning without another authoritative rule</td></tr>
-        </table>
-
-        <div class="note">
+<table>
+<tr><th>Legacy pattern</th><th>Interpretation</th><th>Rule</th></tr>
+<tr><td><code>MemoType=SFL-LEAP</code> + <code>MemoData=BADGE=...</code></td><td>Earlier structured LEAP form</td><td>Read-only compatibility after full authority, asset, destination, and validation checks</td></tr>
+<tr><td><code>MemoType=SFL-LEAP/BADGE</code> + <code>MemoData=...</code></td><td>Earlier split-memo proposal</td><td>Read-only compatibility; do not create new records this way</td></tr>
+<tr><td>Raw <code>LEAP-OG</code> or another free-form memo</td><td>Potential pre-protocol marker</td><td>Do not automatically grant recognition; map it manually only after provenance is verified</td></tr>
+<tr><td>No LEAP recognition memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge, event, or challenge meaning without another authoritative rule</td></tr>
+</table>
+<div class="note">
           Backward-compatible readers are intentionally more tolerant than the production writer. The writer follows one current grammar; readers may understand older approved forms without making those forms current again.
         </div>
-      </section>
-
-      <section id="change">
-        <h2>15. Versioning & Change Control</h2>
-
-        <table>
-          <tr><th>Version</th><th>Use</th></tr>
-          <tr><td><code>0.x</code></td><td>Working drafts before the first production standard</td></tr>
-          <tr><td><code>1.0</code></td><td>First approved production protocol</td></tr>
-          <tr><td><code>1.1, 1.2…</code></td><td>Additive / backward-compatible rules</td></tr>
-          <tr><td><code>2.0</code></td><td>Breaking interpretation change</td></tr>
-        </table>
-
-        <h3>Change rules</h3>
-        <ul>
-          <li>Never silently redefine an identifier already used on-ledger.</li>
-          <li>Never reuse a retired badge, event, or challenge ID for a different meaning.</li>
-          <li>Do not add a recognition category outside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> without an explicit protocol revision.</li>
-          <li>When a recurring recognition needs distinction, extend the canonical ID from broad to narrow rather than redefining an existing ID.</li>
-          <li>Record newly authorized distributors here before treating their transactions as official.</li>
-          <li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
-          <li>Prefer additive changes over breaking changes.</li>
-        </ul>
-
-        <h3>Change log</h3>
-        <table>
-          <tr><th>Version</th><th>Date</th><th>Change</th></tr>
-          <tr><td>0.1</td><td>2026-09-16</td><td>Initial working protocol document.</td></tr>
-          <tr><td>0.2</td><td>2026-09-16</td><td>Standardized one <code>SFL-LEAP</code> memo with structured plain-text MemoData; simplified challenge IDs; removed per-transaction protocol-version memo.</td></tr>
-          <tr><td>0.3</td><td>2026-09-16</td><td>EVENT identifiers no longer carry year or month solely for dating; the XRPL validated transaction timestamp supplies the event date.</td></tr>
-          <tr><td>0.4</td><td>2026-09-17</td><td>Simplified the recognition model to <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. OG-style historical recognition is handled as a badge rather than a separate record type.</td></tr>
-          <tr><td>0.5</td><td>2026-09-19</td><td>Adopted the Xaman-friendly canonical public memo <code>SFL-LEAP/CATEGORY=VALUE</code>; established one Check / one LEAP / one reason; standardized challenge IDs as <code>LEAP-NNN</code>; confirmed <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> as the current recognition categories; excluded <code>ORIGIN</code> and <code>PROTOCOL</code> from member recognition.</td></tr>
-          <tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
-          <tr><td>0.7</td><td>2026-09-20</td><td>Added the Xaman operational cleanup path for outstanding Checks: <strong>Events → Planned → Check → Cancel Check</strong>; documented the distinction between historical <code>CheckCreate</code> entries in All and actionable Check objects in Planned; recorded the current 0.2 XRP owner reserve per open Check; clarified that expiration does not itself remove the Check object or release reserve.</td></tr>
-          <tr><td>0.8</td><td>2026-09-23</td><td>Expanded the issuance architecture: kept all recognition inside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>; confirmed <code>NEW-MEMBER</code> as a Badge; adopted broad-to-narrow canonical specificity for recurring recognitions; made the XRPL validated distributor history the working recognition vocabulary; allowed positive whole-number LEAP amounts rather than one LEAP only; standardized deliberate no-default expiration choices of 30/15/7/3/2/1 days; defined recipient + exact canonical recognition as the duplicate key; suppressed pending and redeemed duplicates while reopening expired/canceled unredeemed recognition; kept trust lines out of the issuer workflow; and documented owner reserve as a temporary working-capital automatic stabilizer rather than a fee.</td></tr>
-          <tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Crew Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
-        </table>
-      </section>
-
-      <section id="open">
-        <h2>16. Open Decisions / Next Work</h2>
-        <p>These are intentionally unresolved or implementation work still required before declaring Protocol 1.0.</p>
-        <ul class="checklist">
-          <li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
-          <li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
-          <li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
-          <li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
-          <li>Verify the ledger-discovered Badge/Event/Challenge vocabulary and duplicate-state logic against live distributor history.</li>
-          <li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier.</li>
-        </ul>
-      </section>
-
-      <section id="sources">
-        <h2>17. XRPL Technical References</h2>
-        <p class="mini">
+</section>
+<section id="change">
+<h2>15. Versioning &amp; Change Control</h2>
+<table>
+<tr><th>Version</th><th>Use</th></tr>
+<tr><td><code>0.x</code></td><td>Working drafts before the first production standard</td></tr>
+<tr><td><code>1.0</code></td><td>First approved production protocol</td></tr>
+<tr><td><code>1.1, 1.2…</code></td><td>Additive / backward-compatible rules</td></tr>
+<tr><td><code>2.0</code></td><td>Breaking interpretation change</td></tr>
+</table>
+<h3>Change rules</h3>
+<ul>
+<li>Never silently redefine an identifier already used on-ledger.</li>
+<li>Never reuse a retired badge, event, or challenge ID for a different meaning.</li>
+<li>Do not add a recognition category outside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> without an explicit protocol revision.</li>
+<li>When a recurring recognition needs distinction, extend the canonical ID from broad to narrow rather than redefining an existing ID.</li>
+<li>Record newly authorized distributors here before treating their transactions as official.</li>
+<li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
+<li>Prefer additive changes over breaking changes.</li>
+</ul>
+<h3>Change log</h3>
+<table>
+<tr><th>Version</th><th>Date</th><th>Change</th></tr>
+<tr><td>0.1</td><td>2026-09-16</td><td>Initial working protocol document.</td></tr>
+<tr><td>0.2</td><td>2026-09-16</td><td>Standardized one <code>SFL-LEAP</code> memo with structured plain-text MemoData; simplified challenge IDs; removed per-transaction protocol-version memo.</td></tr>
+<tr><td>0.3</td><td>2026-09-16</td><td>EVENT identifiers no longer carry year or month solely for dating; the XRPL validated transaction timestamp supplies the event date.</td></tr>
+<tr><td>0.4</td><td>2026-09-17</td><td>Simplified the recognition model to <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. OG-style historical recognition is handled as a badge rather than a separate record type.</td></tr>
+<tr><td>0.5</td><td>2026-09-19</td><td>Adopted the Xaman-friendly canonical public memo <code>SFL-LEAP/CATEGORY=VALUE</code>; established one Check / one LEAP / one reason; standardized challenge IDs as <code>LEAP-NNN</code>; confirmed <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> as the current recognition categories; excluded <code>ORIGIN</code> and <code>PROTOCOL</code> from member recognition.</td></tr>
+<tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
+<tr><td>0.7</td><td>2026-09-20</td><td>Added the Xaman operational cleanup path for outstanding Checks: <strong>Events → Planned → Check → Cancel Check</strong>; documented the distinction between historical <code>CheckCreate</code> entries in All and actionable Check objects in Planned; recorded the current 0.2 XRP owner reserve per open Check; clarified that expiration does not itself remove the Check object or release reserve.</td></tr>
+<tr><td>0.8</td><td>2026-09-23</td><td>Expanded the issuance architecture: kept all recognition inside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>; confirmed <code>NEW-MEMBER</code> as a Badge; adopted broad-to-narrow canonical specificity for recurring recognitions; made the XRPL validated distributor history the working recognition vocabulary; allowed positive whole-number LEAP amounts rather than one LEAP only; standardized deliberate no-default expiration choices of 30/15/7/3/2/1 days; defined recipient + exact canonical recognition as the duplicate key; suppressed pending and redeemed duplicates while reopening expired/canceled unredeemed recognition; kept trust lines out of the issuer workflow; and documented owner reserve as a temporary working-capital automatic stabilizer rather than a fee.</td></tr>
+<tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Crew Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
+</table>
+</section>
+<section id="open">
+<h2>16. Open Decisions / Next Work</h2>
+<p>These are intentionally unresolved or implementation work still required before declaring Protocol 1.0.</p>
+<ul class="checklist">
+<li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
+<li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
+<li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
+<li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
+<li>Verify the ledger-discovered Badge/Event/Challenge vocabulary and duplicate-state logic against live distributor history.</li>
+<li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier.</li>
+</ul>
+</section>
+<section id="sources">
+<h2>17. XRPL Technical References</h2>
+<p class="mini">
           These links describe XRPL behavior. The LEAP naming, provenance, badge, rank, and protocol rules above are project-level standards.
         </p>
-        <ul>
-          <li><a href="https://xrpl.org/docs/references/protocol/transactions/common-fields">Transaction Common Fields — Memos</a></li>
-          <li><a href="https://xrpl.org/docs/references/protocol/data-types/currency-formats">Currency Formats</a></li>
-          <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_lines">account_lines</a></li>
-          <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_tx">account_tx</a></li>
-          <li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_objects">account_objects</a></li>
-          <li><a href="https://xrpl.org/docs/references/protocol/ledger-data/ledger-entry-types/check">Check ledger object</a></li>
-          <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcreate">CheckCreate</a></li>
-          <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcash">CheckCash</a></li>
-          <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcancel">CheckCancel</a></li>
-          <li><a href="https://xrpl.org/docs/tutorials/payments/send-a-check">Send a Check</a></li>
-          <li><a href="https://xrpl.org/docs/concepts/accounts/reserves">Account Reserves</a></li>
-          <li><a href="https://xrpl.org/resources/known-amendments">Known Amendments — CheckCashMakesTrustLine</a></li>
-          <li><a href="https://xrpl.org/docs/concepts/tokens/fungible-tokens/trust-line-tokens">Trust Line Tokens</a></li>
-        </ul>
-      </section>
-    </main>
-  </div>
-
-  <footer>
+<ul>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/common-fields">Transaction Common Fields — Memos</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/data-types/currency-formats">Currency Formats</a></li>
+<li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_lines">account_lines</a></li>
+<li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_tx">account_tx</a></li>
+<li><a href="https://xrpl.org/docs/references/http-websocket-apis/public-api-methods/account-methods/account_objects">account_objects</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/ledger-data/ledger-entry-types/check">Check ledger object</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcreate">CheckCreate</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcash">CheckCash</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcancel">CheckCancel</a></li>
+<li><a href="https://xrpl.org/docs/tutorials/payments/send-a-check">Send a Check</a></li>
+<li><a href="https://xrpl.org/docs/concepts/accounts/reserves">Account Reserves</a></li>
+<li><a href="https://xrpl.org/resources/known-amendments">Known Amendments — CheckCashMakesTrustLine</a></li>
+<li><a href="https://xrpl.org/docs/concepts/tokens/fungible-tokens/trust-line-tokens">Trust Line Tokens</a></li>
+</ul>
+</section>
+</main>
+</div>
+<footer>
     LEAP Protocol — working internal standard for Sailing Frog's Leap.
   </footer>
 </div>
