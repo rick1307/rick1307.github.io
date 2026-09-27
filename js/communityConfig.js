@@ -24,7 +24,31 @@
       experienceLine: "Earning LEAP follows a clear idea: come aboard, show up, and leave a wake.",
       experienceSteps: ["Come aboard", "Show up", "Leave a wake"],
       walletStorageKey: "sfl.xrpl.wallet",
-      activeWalletKey: "sfl.xrpl.activeWallet"
+      activeWalletKey: "sfl.xrpl.activeWallet",
+      theme: {
+        paper: "#efe8d8",
+        paper2: "#f8f3e8",
+        ink: "#17313a",
+        navy: "#123b46",
+        deep: "#0b2d36",
+        sea: "#2f7481",
+        foam: "#d7ebe7",
+        rust: "#b85a40",
+        gold: "#d7ae62",
+        line: "rgba(15,52,64,.16)",
+        card: "rgba(250,252,247,.80)",
+        muted: "#526a70",
+        pageBackground: "radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%), radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%), linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%)",
+        pageOverlay: "repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px), repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px)",
+        navBackground: "rgba(226,235,230,.88)",
+        headerBackground: "linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent)",
+        sectionBackground: "linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))",
+        manifestoBackground: "linear-gradient(135deg,#0b2d36,#184d58 68%,#235f69)",
+        darkFeatureBackground: "linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92))",
+        badgeBackground: "linear-gradient(135deg,rgba(211,235,230,.94),rgba(235,243,236,.78))",
+        portraitBackground: "rgba(250,252,247,.84)",
+        themeColor: "#efe8d8"
+      }
     },
 
     zach: {
@@ -47,7 +71,31 @@
       experienceLine: "Show up. Get your hands dirty. Leave inspired.",
       experienceSteps: ["Show up", "Get your hands dirty", "Leave inspired"],
       walletStorageKey: "zach.xrpl.wallet",
-      activeWalletKey: "zach.xrpl.activeWallet"
+      activeWalletKey: "zach.xrpl.activeWallet",
+      theme: {
+        paper: "#e7dfd2",
+        paper2: "#f3ece2",
+        ink: "#2c2926",
+        navy: "#3a2923",
+        deep: "#241a17",
+        sea: "#746458",
+        foam: "#eadfce",
+        rust: "#a33a2c",
+        gold: "#c79a56",
+        line: "rgba(58,41,35,.19)",
+        card: "rgba(248,242,233,.84)",
+        muted: "#665a52",
+        pageBackground: "radial-gradient(circle at 10% -8%,rgba(163,58,44,.22),transparent 28%), radial-gradient(circle at 90% 2%,rgba(199,154,86,.22),transparent 30%), linear-gradient(180deg,#e3d8ca 0%,#d7cbbb 24%,#c9bbaa 56%,#b4a18d 100%)",
+        pageOverlay: "repeating-linear-gradient(115deg,transparent 0 34px,rgba(58,41,35,.035) 35px 36px,transparent 37px 70px), repeating-radial-gradient(ellipse at 78% 68%,transparent 0 46px,rgba(255,255,255,.13) 47px 48px,transparent 49px 92px)",
+        navBackground: "rgba(226,214,200,.91)",
+        headerBackground: "linear-gradient(180deg,rgba(234,223,209,.74),rgba(213,198,181,.20) 78%,transparent)",
+        sectionBackground: "linear-gradient(180deg,rgba(255,255,255,.07),rgba(58,41,35,.025),rgba(255,255,255,.05))",
+        manifestoBackground: "linear-gradient(135deg,#241a17,#4d2b25 68%,#6d382c)",
+        darkFeatureBackground: "linear-gradient(135deg,rgba(52,31,27,.97),rgba(107,54,43,.94))",
+        badgeBackground: "linear-gradient(135deg,rgba(235,219,197,.96),rgba(245,235,221,.82))",
+        portraitBackground: "rgba(248,242,233,.88)",
+        themeColor: "#e7dfd2"
+      }
     }
   };
 
