@@ -739,8 +739,11 @@
 
     .crew-logbook{
       margin-top:18px;
-      padding-top:17px;
-      border-top:1px solid rgba(255,255,255,.13);
+      padding:20px 18px 18px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      background:rgba(255,255,255,.035);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
     }
 
     .logbook-head{
@@ -846,8 +849,8 @@
 
     .logbook-entry{
       display:grid;
-      grid-template-columns:84px minmax(0,1fr) 82px;
-      gap:12px;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:16px;
       padding:12px 0;
       border-top:1px solid rgba(255,255,255,.08);
       align-items:center;
@@ -876,13 +879,19 @@
       letter-spacing:.035em;
     }
 
-    .logbook-facts{display:grid;gap:8px}
+    .logbook-facts{
+      grid-column:2 / span 2;
+      display:grid;
+      gap:8px;
+      min-width:0;
+    }
 
     .logbook-fact{
       display:grid;
-      grid-template-columns:66px minmax(0,1fr);
-      gap:8px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
       align-items:baseline;
+      min-width:0;
     }
 
     .logbook-fact span{
@@ -901,14 +910,15 @@
     }
 
     .logbook-earned{
+      grid-column:4;
       display:flex;
       flex-direction:column;
-      align-items:flex-end;
+      align-items:flex-start;
       justify-content:center;
       gap:2px;
       min-width:0;
       line-height:1.2;
-      text-align:right;
+      text-align:left;
     }
 
     .logbook-earned span{
@@ -961,6 +971,7 @@
     body[data-community-layout="garage"] .crew-console{border-radius:14px;}
     body[data-community-layout="garage"] .record-stat{border-radius:7px;}
     body[data-community-layout="garage"] .rank-progress{border-radius:9px;}
+    body[data-community-layout="garage"] .crew-logbook{border-radius:9px;}
     body[data-community-layout="garage"] .crew-state-message{border-radius:8px;}
     body[data-community-layout="garage"] .crew-state-action,
     body[data-community-layout="garage"] .discord-cta button{border-radius:6px;}
@@ -988,8 +999,9 @@
       .pending-check-action{justify-content:stretch;text-align:left}
       .pending-check-action button{width:100%}
       .crew-state-action{width:100%}
-      .logbook-entry{grid-template-columns:72px minmax(0,1fr) 68px;gap:9px}
-      .logbook-fact{grid-template-columns:60px minmax(0,1fr)}
+      .crew-logbook{padding:16px 14px 14px}
+      .logbook-entry{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+      .logbook-fact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
       .logbook-earned strong{font-size:.66rem}
     }
   
