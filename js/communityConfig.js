@@ -13,7 +13,7 @@
       memberSingular: "Leaper",
       memberPlural: "Leapers",
       groupName: "crew",
-      recordLabel: "Crew Record",
+      recordLabel: "Member Record",
       historyLabel: "crew history",
       joinLabel: "Join the Crew →",
       heading: "Welcome Aboard",
