@@ -449,20 +449,13 @@
     .after-cash{padding:28px}
     .after-cash .status{margin-top:18px}
     .help-box{
-      display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 26px;
+      display:flex;align-items:center;justify-content:space-between;gap:22px;padding:24px 26px;
       background:#fff7e9;border:1px solid rgba(210,163,79,.42);border-radius:16px
     }
-    .help-copy{flex:1;min-width:0}
-    .help-box h3{margin:0 0 6px;color:#714c15}
-    .help-box p{margin:0;color:var(--muted)}
-    .help-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .help-actions .button{margin-top:0;white-space:nowrap}
-    @media(max-width:800px){
-      .help-box{align-items:stretch;flex-direction:column}
-      .help-actions{justify-content:flex-start}
-      .help-actions .button{flex:1 1 220px}
-    }
+    .help-box h3{margin:0;color:#714c15}
     .help-box p{flex:1;margin:0;color:#62584b}
+    .help-copy{flex:1}
+    .help-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .help-box .button{margin-top:0;white-space:nowrap}
 
     body[data-community-layout="garage"] .gateway-card,
@@ -477,7 +470,8 @@
       .gateway-card{padding:21px}
       .help-box{display:block;padding:21px}
       .help-box p{margin-top:6px}
-      .help-box .button{width:100%;margin-top:16px}
+      .help-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
+      .help-box .button{width:100%;margin-top:0}
       .after-cash{padding:22px}
     }
 
@@ -665,7 +659,7 @@
 <div class="help-box">
 <div class="help-copy">
 <h3>Need help before you start?</h3>
-<p id="helpFaqCopy">For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For Sailing Frog's Leap ranks, badges, events, and participation, use the Sailing Frog's Leap FAQ.</p>
+<p id="bottomHelpCopy">For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For Community ranks, badges, events, and participation, use the Community FAQ.</p>
 </div>
 <div class="help-actions">
 <a class="button secondary" href="wildLedgerFaq.html" id="wildLedgerFaqLink">Wild Ledger FAQ →</a>
@@ -824,15 +818,14 @@
       const nameLabel = document.getElementById("communityNameLabel");
       if (nameLabel) nameLabel.textContent = communityName;
 
-      const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
-      if (bottomCommunityFaqLink) bottomCommunityFaqLink.textContent = `${communityName} FAQ →`;
-
-      const helpFaqCopy = document.getElementById("helpFaqCopy");
-      if (helpFaqCopy) {
-        helpFaqCopy.textContent =
+      const bottomHelpCopy = document.getElementById("bottomHelpCopy");
+      if (bottomHelpCopy) {
+        bottomHelpCopy.textContent =
           `For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For ${communityName} ranks, badges, events, and participation, use the ${communityName} FAQ.`;
       }
 
+      const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
+      if (bottomCommunityFaqLink) bottomCommunityFaqLink.textContent = `${communityName} FAQ →`;
 
       const bannerDesktop = document.getElementById("communityBannerDesktop");
       const bannerMobile = document.getElementById("communityBannerMobile");
