@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Explore LEAP badges: permanent recognition for voyages, milestones, participation, contribution, and shared history in the Sailing Frog's Leap crew." />
+  <meta name="description" content="Explore LEAP badges: permanent recognition for milestones, participation, contribution, places, events, and shared community history." />
   <meta name="theme-color" content="#efe8d8" />
-  <title>Badges — Sailing Frog's Leap</title>
+  <title>Badges — LEAP</title>
 
   <style>
     :root{
@@ -83,38 +83,39 @@
       --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
       --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
       --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
-      --card:rgba(250,252,247,.80);
+      --card:rgba(250,252,247,.80);--muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
     }
     body{
       margin:0;color:var(--ink);
-      background:
-        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
-        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
-        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background:var(--page-background);
       background-size:auto;
       font-family:Georgia,"Times New Roman",serif;
     }
     body::before{
       content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
-      background-image:
-        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
-        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      background-image:var(--page-overlay);
     }
     nav{
-      background:rgba(226,235,230,.88);backdrop-filter:blur(14px) saturate(120%);
+      background:var(--nav-background);backdrop-filter:blur(14px) saturate(120%);
       border-bottom:1px solid rgba(18,59,70,.15);box-shadow:0 8px 24px rgba(11,45,54,.05)
     }
     .brand img{border:1px solid rgba(18,59,70,.16);box-shadow:0 4px 14px rgba(11,45,54,.09)}
     .nav-links a{color:#45636a}.nav-links a:hover{color:var(--rust)}
     header{
-      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      background:var(--header-background);
       border-bottom:1px solid rgba(18,59,70,.08)
     }
     .kicker{color:var(--rust)}
     h1,h2{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
     .lede{color:#3f5a61}
     main{position:relative}
-    section:nth-of-type(even){background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))}
+    section:nth-of-type(even){background:var(--section-background)}
     .section-title p{color:#526a70}
     .button{background:var(--rust);box-shadow:0 8px 20px rgba(184,90,64,.16)}
     .button.secondary{background:transparent;color:var(--deep);border:1px solid rgba(18,59,70,.18);box-shadow:none}
@@ -137,14 +138,14 @@
     .badge-head{border-bottom-color:rgba(18,59,70,.13)}
     .badge-icon{background:linear-gradient(135deg,var(--foam),rgba(255,255,255,.72));box-shadow:0 6px 16px rgba(11,45,54,.06)}
     .return-box{
-      background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+      background:var(--dark-feature-background);
       border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 22px 46px rgba(11,45,54,.18)
     }
     .return-box h3{color:white}.return-box p{color:rgba(255,255,255,.82)}
 
 
 
-    /* SFL shared button motion standard */
+    /* Shared button motion standard */
     button,
     a.button{
       transition:
@@ -187,6 +188,43 @@
     }
 
 
+    body[data-community-layout="garage"] .badge-card,
+    body[data-community-layout="garage"] .principle{border-radius:10px}
+    body[data-community-layout="garage"] .return-box{border-radius:10px}
+    body[data-community-layout="garage"] .button{border-radius:6px}
+
+    .badge-empty{
+      grid-column:1/-1;
+      padding:28px;
+      border:1px dashed var(--line);
+      border-radius:16px;
+      background:var(--card);
+      color:var(--muted);
+      text-align:center;
+      font-size:1.02rem;
+    }
+
+    .framework-note{
+      margin-top:20px;
+      padding:24px 26px;
+      border-left:4px solid var(--gold);
+      border-radius:0 14px 14px 0;
+      background:var(--card);
+      border-top:1px solid var(--line);
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      box-shadow:0 12px 28px rgba(11,45,54,.05);
+    }
+    .framework-note h3{
+      margin:0 0 8px;
+      color:var(--deep);
+      font-size:1.35rem;
+    }
+    .framework-note p{
+      margin:0;
+      color:var(--muted);
+    }
+
     /* LEAP journey banner: desktop + mobile companion artwork */
     .leap-journey-banner{
       width:100%;
@@ -212,30 +250,27 @@
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="index.html">
+      <a class="brand" id="communityHomeBrand" href="index.html">
         <img src="leap-logo.png" alt="LEAP logo">
-        <span>Sailing Frog's Leap</span>
+        <span id="communityNameLabel">Community</span>
       </a>
-      <div class="nav-links"><a href="index.html">← Home</a></div>
+      <div class="nav-links"><a id="communityHomeLink" href="index.html">← Home</a></div>
     </div>
   </nav>
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
-      <img
-        src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <img id="communityBannerDesktop" src="images/bannerDesktop.png" alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
     </picture>
   </div>
 
   <header>
     <div class="wrap">
-      <div class="kicker">LEAP Badges & Crew Logbook</div>
+      <div class="kicker" id="communityKicker">LEAP Badges & Community History</div>
       <h1>Badges</h1>
-      <p class="lede">
-        LEAP badges recognize the moments, contributions, voyages, places, milestones, and shared experiences
-        that make one Sailing Frog's Leap crew member's history different from another's.
+      <p class="lede" id="communityLede">
+        LEAP badges recognize the moments, contributions, places, milestones, and shared experiences that make one member's community history different from another's.
       </p>
     </div>
   </header>
@@ -244,8 +279,8 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>Three ideas define the badge system</h2>
-          <p>Badges work best when they are meaningful, scarce enough to matter, and easy to understand.</p>
+          <h2>Three ideas behind badges</h2>
+          <p>Each community operator decides what deserves recognition. These ideas are a useful starting point, not a rulebook.</p>
         </div>
 
         <div class="principles">
@@ -253,7 +288,7 @@
             <b>Idea one</b>
             <h3>Badges recognize meaningful things</h3>
             <p>
-              A badge should mean something actually happened: a passage, a contribution, a milestone, a useful act, a role, or a shared moment.
+              A badge can mark something worth remembering: a contribution, a milestone, a useful act, a role, a place, or a shared moment.
             </p>
           </div>
 
@@ -261,7 +296,7 @@
             <b>Idea two</b>
             <h3>Badges preserve history</h3>
             <p>
-              Unlike rank, a badge is not meant to change just because the member's current LEAP balance changes.
+              Badges preserve specific recognitions in your history. Once earned, they are not erased because your wallet balance changes.
             </p>
           </div>
 
@@ -269,66 +304,9 @@
             <b>Idea three</b>
             <h3>Badges create identity</h3>
             <p>
-              Two Quartermasters may hold the same amount of LEAP but have completely different badge histories—and therefore completely different stories.
+              Two members at the same rank can have completely different badge histories—and therefore completely different stories.
             </p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="current-badges">
-      <div class="wrap">
-        <div class="section-title">
-          <h2>Badges you can earn</h2>
-          <p>
-            Some badges are part of the standard LEAP system. Others are limited to a particular chapter in the story.
-          </p>
-        </div>
-
-        <div class="badge-grid">
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🛠️</div>
-              <div><h3>Crew</h3><p>Standard badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>You showed up and helped in a real way — on the boat, with a project, with logistics, with local help, or wherever an extra hand mattered.</p>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">⛵</div>
-              <div><h3>Shipmate</h3><p>Standard badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>You were actually aboard Frog's Leap. It marks a real connection to the boat and a shared piece of the Sailing Frog's Leap story.</p>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🌊</div>
-              <div><h3>First Wake</h3><p>Standard badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>Your first meaningful contribution after joining — helping someone, contributing something useful, participating in a real way, or otherwise leaving a wake.</p>
-            </div>
-          </article>
-
-          <article class="badge-card">
-            <div class="badge-head">
-              <div class="badge-icon">🐸</div>
-              <div><h3>LEAP OG</h3><p>Limited badge</p></div>
-            </div>
-            <div class="badge-body">
-              <span class="label">What it means</span>
-              <p>You were part of LEAP at the beginning. Unlike the standard badges, LEAP OG will only belong to the original early crew.</p>
-            </div>
-          </article>
         </div>
       </div>
     </section>
@@ -336,24 +314,70 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>Types of badges</h2>
-          <p>The system can grow over time, but these categories give LEAP a strong starting structure.</p>
+          <h2>A useful way to think about the records</h2>
+          <p>Wild Ledger gives community operators a few different ways to preserve recognition. The operator decides how to use them.</p>
+        </div>
+
+        <div class="principles">
+          <div class="principle">
+            <b>Generally</b>
+            <h3>Badge</h3>
+            <p>One badge can be a reusable recognition that is awarded to many different members over time.</p>
+          </div>
+
+          <div class="principle">
+            <b>Generally</b>
+            <h3>Challenge</h3>
+            <p>One challenge record points to a specific challenge — the particular thing members were invited to do.</p>
+          </div>
+
+          <div class="principle">
+            <b>Generally</b>
+            <h3>Event</h3>
+            <p>One event record points to a specific event — the particular thing that happened.</p>
+          </div>
+        </div>
+
+        <div class="framework-note">
+          <h3>A pattern, not a requirement</h3>
+          <p>Community operators are free to organize recognition in the way that makes sense for their community. These are design patterns, not enforced rules. Sometimes a record may later look like it would have fit better somewhere else. That is okay. The important thing is preserving what the operator intended to recognize when the record was created.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="current-badges">
+      <div class="wrap">
+        <div class="section-title">
+          <h2 id="communityBadgeHeading">Badges you can earn</h2>
+          <p id="communityBadgeIntro">Each community can create recognitions that fit its own people, story, and experiences.</p>
+        </div>
+
+        <div class="badge-grid" id="communityBadgeGrid"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Ways badges can be used</h2>
+          <p>These are simply examples of how a community might use badges. They are not fixed categories, and an operator can combine them, ignore them, or create something completely different.</p>
         </div>
 
         <div class="badge-grid">
           <article class="badge-card">
             <div class="badge-head">
               <div class="badge-icon">⚓</div>
-              <div><h3>Voyage & Passage Badges</h3><p>“I was part of this chapter.”</p></div>
+              <div><h3>Journeys & Adventures</h3><p>“I was part of this chapter.”</p></div>
             </div>
             <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Important passages, cruising regions, canal transits, crossings, or voyage milestones connected to the channel.</p>
+              <span class="label">Could recognize</span>
+              <p>Trips, routes, journeys, crossings, road trips, passages, or other shared adventures that become part of the community story.</p>
+              <span class="label">Examples might include</span>
               <ul class="examples">
-                <li>Panama Canal</li>
-                <li>Mexican Riviera</li>
-                <li>San Francisco Departure</li>
-                <li>Caribbean Passage</li>
+                <li>First Road Trip</li>
+                <li>Coastal Passage</li>
+                <li>Cross-Country Run</li>
+                <li>Major Journey</li>
               </ul>
             </div>
           </article>
@@ -361,16 +385,17 @@
           <article class="badge-card">
             <div class="badge-head">
               <div class="badge-icon">📍</div>
-              <div><h3>Port & Place Badges</h3><p>“This place is in my logbook.”</p></div>
+              <div><h3>Places</h3><p>“This place is part of my story.”</p></div>
             </div>
             <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Specific ports, anchorages, marinas, regions, or memorable locations in the Sailing Frog's Leap story.</p>
+              <span class="label">Could recognize</span>
+              <p>Places, venues, ports, regions, shows, meet-ups, or memorable destinations that matter to the community.</p>
+              <span class="label">Examples might include</span>
               <ul class="examples">
-                <li>Shelter Bay</li>
-                <li>Golfito</li>
-                <li>Bahía del Sol</li>
-                <li>La Cruz</li>
+                <li>Home Port</li>
+                <li>First Meet-Up</li>
+                <li>Favorite Venue</li>
+                <li>Special Destination</li>
               </ul>
             </div>
           </article>
@@ -378,16 +403,17 @@
           <article class="badge-card">
             <div class="badge-head">
               <div class="badge-icon">🧭</div>
-              <div><h3>Participation Badges</h3><p>“I showed up and took part.”</p></div>
+              <div><h3>Participation</h3><p>“I showed up and took part.”</p></div>
             </div>
             <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Sailing Frog's Leap community participation that matters: livestreams, polls, special events, recurring involvement, or helping shape a channel decision.</p>
+              <span class="label">Could recognize</span>
+              <p>Showing up for livestreams, polls, special gatherings, recurring participation, challenges, or moments when members help shape the community.</p>
+              <span class="label">Examples might include</span>
               <ul class="examples">
-                <li>Live Watch Crew</li>
-                <li>Poll Crew</li>
-                <li>Launch Day Crew</li>
-                <li>Watch Party Crew</li>
+                <li>Live Event</li>
+                <li>Community Poll</li>
+                <li>Launch Day</li>
+                <li>Watch Party</li>
               </ul>
             </div>
           </article>
@@ -395,15 +421,16 @@
           <article class="badge-card">
             <div class="badge-head">
               <div class="badge-icon">🛠️</div>
-              <div><h3>Contribution Badges</h3><p>“I helped make something better.”</p></div>
+              <div><h3>Contributions</h3><p>“I helped make something better.”</p></div>
             </div>
             <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Useful contributions to the Sailing Frog's Leap channel or community: information, problem-solving, technical help, ideas, research, or helping another crew member.</p>
+              <span class="label">Could recognize</span>
+              <p>Useful contributions such as problem-solving, technical help, ideas, research, creative work, information, or helping another member.</p>
+              <span class="label">Examples might include</span>
               <ul class="examples">
                 <li>Problem Solver</li>
-                <li>Chart Table Contributor</li>
-                <li>Crew Helper</li>
+                <li>Community Contributor</li>
+                <li>Helping Hand</li>
                 <li>Useful Intel</li>
               </ul>
             </div>
@@ -412,15 +439,16 @@
           <article class="badge-card">
             <div class="badge-head">
               <div class="badge-icon">🏁</div>
-              <div><h3>Milestone Badges</h3><p>“I was here when it happened.”</p></div>
+              <div><h3>Milestones</h3><p>“I was here when it happened.”</p></div>
             </div>
             <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Moments in the history of Sailing Frog's Leap itself.</p>
+              <span class="label">Could recognize</span>
+              <p>Important moments in the life of the community or meaningful milestones in a member’s own history.</p>
+              <span class="label">Examples might include</span>
               <ul class="examples">
                 <li>LEAP Genesis</li>
-                <li>First Discord Crew</li>
-                <li>Channel Milestone</li>
+                <li>First Community Group</li>
+                <li>Community Milestone</li>
                 <li>First LEAP Pilot</li>
               </ul>
             </div>
@@ -429,16 +457,17 @@
           <article class="badge-card">
             <div class="badge-head">
               <div class="badge-icon">🐸</div>
-              <div><h3>Special Recognition Badges</h3><p>“This one has a story behind it.”</p></div>
+              <div><h3>Special Recognition</h3><p>“This one has a story behind it.”</p></div>
             </div>
             <div class="badge-body">
-              <span class="label">What they recognize</span>
-              <p>Rare or one-off recognitions that do not need their own permanent category.</p>
+              <span class="label">Could recognize</span>
+              <p>Something unusual, personal, rare, or simply worth remembering that does not fit neatly anywhere else.</p>
+              <span class="label">Examples might include</span>
               <ul class="examples">
-                <li>Captain's Recognition</li>
+                <li>Community Recognition</li>
                 <li>Above & Beyond</li>
                 <li>LEAP OG</li>
-                <li>Special Expedition Crew</li>
+                <li>Special Project Recognition</li>
               </ul>
             </div>
           </article>
@@ -449,11 +478,11 @@
     <section>
       <div class="wrap">
         <div class="return-box">
-          <h3>Badges make participation cumulative rather than disposable.</h3>
-          <p>
-            Your Sailing Frog's Leap crew history builds over time — one voyage, milestone, contribution, and shared moment at a time.
+          <h3>Badges turn participation into history.</h3>
+          <p id="returnCopy">
+            Your community history builds over time — one milestone, contribution, badge, and shared moment at a time.
           </p>
-          <a class="button" href="join.html">Join the Crew →</a>
+          <a class="button" id="joinButton" href="join.html">Join →</a>
         </div>
       </div>
     </section>
@@ -461,14 +490,147 @@
 
   <footer>
     <div class="wrap foot">
-      <div>Sailing Frog's Leap • LEAP Badges & Crew Logbook</div>
+      <div id="footerLabel">Community • LEAP Badges</div>
     </div>
   </footer>
 
+
+
+  <script src="js/communityConfig.js"></script>
   <script>
-    try {
-      sessionStorage.removeItem("sfl.xrpl.activeWallet");
-    } catch (_) {}
+    (() => {
+      const community = window.WILD_LEDGER_COMMUNITY || {
+        id:"sfl",
+        layout:"classic",
+        communityName:"Community",
+        joinLabel:"Join →",
+        bannerDesktop:"images/bannerDesktop.png",
+        bannerMobile:"images/bannerMobile.png",
+        badges:[]
+      };
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const communityName = community.communityName || "Community";
+      const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+      const joinHref = `join.html?community=${encodeURIComponent(communityId)}`;
+
+      const theme = community.theme || {};
+      const themeVars = {
+        paper:"--paper", paper2:"--paper2", ink:"--ink", navy:"--navy", deep:"--deep",
+        sea:"--sea", foam:"--foam", rust:"--rust", gold:"--gold", line:"--line",
+        card:"--card", muted:"--muted", pageBackground:"--page-background",
+        pageOverlay:"--page-overlay", navBackground:"--nav-background",
+        headerBackground:"--header-background", sectionBackground:"--section-background",
+        darkFeatureBackground:"--dark-feature-background"
+      };
+      for (const [key, cssVar] of Object.entries(themeVars)) {
+        if (theme[key]) document.documentElement.style.setProperty(cssVar, theme[key]);
+      }
+
+      document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
+
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
+
+      document.title = `Badges — ${communityName}`;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.content = `Explore LEAP badges, recognition, milestones, and community history in ${communityName}.`;
+
+      const nameLabel = document.getElementById("communityNameLabel");
+      if (nameLabel) nameLabel.textContent = communityName;
+
+      const homeBrand = document.getElementById("communityHomeBrand");
+      const homeLink = document.getElementById("communityHomeLink");
+      if (homeBrand) homeBrand.href = homeHref;
+      if (homeLink) homeLink.href = homeHref;
+
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
+      const kicker = document.getElementById("communityKicker");
+      if (kicker) kicker.textContent = `${communityName} Badges & Community History`;
+
+      const lede = document.getElementById("communityLede");
+      if (lede) {
+        lede.textContent =
+          `LEAP badges recognize the moments, contributions, places, milestones, and shared experiences that make one ${communityName} member's history different from another's.`;
+      }
+
+      const badgeHeading = document.getElementById("communityBadgeHeading");
+      if (badgeHeading) badgeHeading.textContent = `Badges in ${communityName}`;
+
+      const badgeIntro = document.getElementById("communityBadgeIntro");
+      if (badgeIntro) {
+        badgeIntro.textContent =
+          `These are the recognitions currently defined by ${communityName}. Other Wild Ledger communities can define their own badges.`;
+      }
+
+      const grid = document.getElementById("communityBadgeGrid");
+      const badges = Array.isArray(community.badges) ? community.badges : [];
+      if (grid) {
+        grid.replaceChildren();
+
+        if (!badges.length) {
+          const empty = document.createElement("div");
+          empty.className = "badge-empty";
+          empty.textContent =
+            `${communityName} has not published its community-specific badge list yet. The shared badge framework below still applies.`;
+          grid.appendChild(empty);
+        } else {
+          badges.forEach(badge => {
+            const card = document.createElement("article");
+            card.className = "badge-card";
+
+            const head = document.createElement("div");
+            head.className = "badge-head";
+
+            const icon = document.createElement("div");
+            icon.className = "badge-icon";
+            icon.textContent = badge.icon || "★";
+            icon.setAttribute("aria-hidden","true");
+
+            const titleWrap = document.createElement("div");
+            const title = document.createElement("h3");
+            title.textContent = badge.name || "Community Badge";
+            const type = document.createElement("p");
+            type.textContent = badge.type || "Community badge";
+            titleWrap.append(title, type);
+
+            head.append(icon, titleWrap);
+
+            const body = document.createElement("div");
+            body.className = "badge-body";
+            const label = document.createElement("span");
+            label.className = "label";
+            label.textContent = "What it means";
+            const description = document.createElement("p");
+            description.textContent =
+              badge.description || `A recognition defined by ${communityName}.`;
+
+            body.append(label, description);
+            card.append(head, body);
+            grid.appendChild(card);
+          });
+        }
+      }
+
+      const returnCopy = document.getElementById("returnCopy");
+      if (returnCopy) {
+        returnCopy.textContent =
+          `Your ${communityName} history builds over time — one milestone, contribution, badge, and shared moment at a time.`;
+      }
+
+      const joinButton = document.getElementById("joinButton");
+      if (joinButton) {
+        joinButton.href = joinHref;
+        joinButton.textContent = community.joinLabel || "Join →";
+      }
+
+      const footer = document.getElementById("footerLabel");
+      if (footer) footer.textContent = `${communityName} • LEAP Badges`;
+    })();
   </script>
 </body>
 </html>
