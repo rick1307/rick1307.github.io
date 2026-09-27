@@ -851,12 +851,12 @@
   </nav>
 
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, Member Record is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
     <picture>
       <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
         id="communityBannerDesktop" src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; Member Record — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
     </picture>
   </div>
 
@@ -1059,7 +1059,7 @@
           sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
         } catch (_) {}
 
-        window.location.href = "crewRecord.html";
+        window.location.href = "memberRecord.html";
       }
 
       openButton.addEventListener("click", openCrewRecord);

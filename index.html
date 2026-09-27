@@ -991,13 +991,13 @@
   </nav>
 
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, Crew Record is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
     <picture>
       <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
         id="communityBannerDesktop"
         src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; Crew Record — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
     </picture>
   </div>
 
@@ -1018,9 +1018,9 @@
           </p>
         </div>
 
-        <div class="returning-crew" id="communityRecordPanel" aria-label="Crew Record access">
+        <div class="returning-crew" id="communityRecordPanel" aria-label="Member Record access">
           <div class="returning-crew-head">
-            <strong data-community="recordLabel">Crew Record</strong>
+            <strong data-community="recordLabel">Member Record</strong>
             <span>Your home base for LEAP, rank, badges, and <span data-community="historyLabel">crew history</span>.</span>
           </div>
           <div class="returning-crew-row">
@@ -1033,7 +1033,7 @@
               spellcheck="false"
               placeholder="Enter your XRPL wallet address"
               aria-label="Returning crew XRPL wallet address">
-            <button id="openCrewRecord" type="button">Enter <span data-community="recordLabel">Crew Record</span> →</button>
+            <button id="openCrewRecord" type="button">Enter <span data-community="recordLabel">Member Record</span> →</button>
           </div>
           <p class="returning-crew-status" id="returningCrewStatus" role="status" aria-live="polite"></p>
         </div>
@@ -1176,7 +1176,7 @@
         memberSingular: "Leaper",
         memberPlural: "Leapers",
         groupName: "crew",
-        recordLabel: "Crew Record",
+        recordLabel: "Member Record",
         historyLabel: "crew history",
         joinLabel: "Join the Crew →",
         heading: "Welcome Aboard",
@@ -1323,7 +1323,7 @@
           sessionStorage.setItem(activeWalletKey, account);
         } catch (_) {}
 
-        window.location.href = `crewRecord.html?community=${encodeURIComponent(communityId)}`;
+        window.location.href = `memberRecord.html?community=${encodeURIComponent(communityId)}`;
       }
 
       openButton.addEventListener("click", openCrewRecord);

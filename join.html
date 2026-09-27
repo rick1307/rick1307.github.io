@@ -732,12 +732,12 @@
   </nav>
 
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, Crew Record is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
     <picture>
       <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
         src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; Crew Record — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
     </picture>
   </div>
 
@@ -857,7 +857,7 @@
                 <div class="result-mark">✓</div>
                 <h4>You're already aboard.</h4>
                 <p>LEAP was found at this XRP Ledger address.</p>
-                <a class="button" id="openCrewRecordButton" href="crewRecord.html">Open My Crew Record →</a>
+                <a class="button" id="openCrewRecordButton" href="memberRecord.html">Open My Member Record →</a>
               </div>
 
               <div id="checkWaitingMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
@@ -948,13 +948,13 @@
           <h2>Welcome Aboard</h2>
           <p>
             Once you've cashed your first LEAP Check, you're part of the Sailing Frog's Leap crew.
-            Enter your XRP Ledger address below to open <strong>Crew Record</strong> and see your LEAP, crew rank, badges, and history.
+            Enter your XRP Ledger address below to open <strong>Member Record</strong> and see your LEAP, crew rank, badges, and history.
           </p>
 
           <div class="wallet-check">
             <div class="wallet-check-row">
               <input id="xrplAddress" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter your XRPL wallet address" aria-label="XRPL wallet address">
-              <button class="button" id="checkLeapButton" type="button">Enter Crew Record →</button>
+              <button class="button" id="checkLeapButton" type="button">Enter Member Record →</button>
             </div>
             <p class="wallet-status" id="walletStatus" role="status" aria-live="polite"></p>
           </div>
@@ -981,7 +981,7 @@
       const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
       const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
       const XRPL_WS = "wss://s1.ripple.com/";
-      const NEXT_PAGE = "crewRecord.html";
+      const NEXT_PAGE = "memberRecord.html";
 
       try {
         sessionStorage.removeItem(SFL_ACTIVE_WALLET_KEY);
@@ -1367,7 +1367,7 @@
               localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
               sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
             } catch (_) {}
-            setStatus(`LEAP found: ${balance}. Opening Crew Record…`, "success");
+            setStatus(`LEAP found: ${balance}. Opening Member Record…`, "success");
             setTimeout(() => { window.location.href = NEXT_PAGE; }, 450);
           } else {
             setStatus("No LEAP found for this wallet yet. Join the crew to earn your first LEAP.", "error");
@@ -1381,7 +1381,7 @@
           }
         } finally {
           checkButton.disabled = false;
-          checkButton.textContent = "Enter Crew Record →";
+          checkButton.textContent = "Enter Member Record →";
         }
       }
 
