@@ -799,8 +799,9 @@
 
   <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, Crew Record is the passport, XRPL is the logbook, and Discord is the yacht club.">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
+        id="communityBannerDesktop"
         src="images/bannerDesktop.png"
         alt="The LEAP journey: Website — Front Door; Crew Record — Passport; XRPL — Logbook; Discord — Yacht Club.">
     </picture>
@@ -810,13 +811,13 @@
     <div class="wrap hero">
       <div class="kicker" id="communityKicker">Sailing Frog's Leap Crew Membership</div>
       <div class="welcome-head">
-        <h1>Welcome Aboard</h1>
+        <h1 id="communityHeading">Welcome Aboard</h1>
         <img class="rick-portrait" id="communityProfileImage" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
       </div>
 
       <div class="hero-intro">
         <div class="hero-copy">
-          <p class="lede">
+          <p class="lede" id="communityIntro">
             Hello, my name is <span data-community="managerName">Rick</span>, and I'm <span data-community="communityName">Sailing Frog's Leap</span>.
             If you follow my <span data-community="communityName">Sailing Frog's Leap</span> YouTube channel, you're already a <span data-community="memberSingular">Leaper</span>.
             LEAP is how <span data-community="memberPlural">Leapers</span> can come aboard and become part of the <span data-community="communityName">Sailing Frog's Leap</span> <span data-community="groupName">crew</span>.
@@ -851,7 +852,7 @@
         <section id="idea" class="story-section">
       <div class="wrap">
         <div class="story-panel">
-          <img src="images/heroImage.png" alt="Crew members on a sailboat at sunset with a logbook in the foreground and the message: The blockchain is just the logbook. The point is the crew." loading="lazy">
+          <img id="communityHeroImage" src="images/heroImage.png" alt="Crew members on a sailboat at sunset with a logbook in the foreground and the message: The blockchain is just the logbook. The point is the crew." loading="lazy">
         </div>
       </div>
     </section>
@@ -860,7 +861,7 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Earning LEAP / Rank</h2>
-          <p>
+          <p id="communityExperienceLine">
             Earning LEAP follows a clear idea: come aboard, show up, and leave a wake.
           </p>
         </div>
@@ -868,7 +869,7 @@
         <div class="three">
           <article class="card">
             <div class="card-topline">
-              <b>Come aboard</b>
+              <b id="communityStep1">Come aboard</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Get your first LEAP</h3>
@@ -877,7 +878,7 @@
 
           <article class="card">
             <div class="card-topline">
-              <b>Show up</b>
+              <b id="communityStep2">Show up</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Take part in the adventure</h3>
@@ -888,7 +889,7 @@
 
           <article class="card">
             <div class="card-topline">
-              <b>Leave a wake</b>
+              <b id="communityStep3">Leave a wake</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Build a <span data-community="historyLabel">crew history</span></h3>
@@ -973,6 +974,7 @@
   <script>
     (() => {
       const defaults = {
+        id: "sfl",
         communityName: "Sailing Frog's Leap",
         managerName: "Rick",
         membershipLabel: "Crew Membership",
@@ -981,17 +983,28 @@
         groupName: "crew",
         recordLabel: "Crew Record",
         historyLabel: "crew history",
-        joinLabel: "Join the Crew →"
+        joinLabel: "Join the Crew →",
+        heading: "Welcome Aboard",
+        intro: "Hello, my name is Rick, and I'm Sailing Frog's Leap. If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper. LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.",
+        bannerDesktop: "images/bannerDesktop.png",
+        bannerMobile: "images/bannerMobile.png",
+        profileImage: "images/profileImage.png",
+        heroImage: "images/heroImage.png",
+        experienceLine: "Earning LEAP follows a clear idea: come aboard, show up, and leave a wake.",
+        experienceSteps: ["Come aboard", "Show up", "Leave a wake"],
+        walletStorageKey: "sfl.xrpl.wallet",
+        activeWalletKey: "sfl.xrpl.activeWallet"
       };
 
       const community = { ...defaults, ...(window.WILD_LEDGER_COMMUNITY || {}) };
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
 
-      document.title = `Welcome Aboard — ${community.communityName}`;
+      document.title = `${community.heading} — ${community.communityName}`;
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
         metaDescription.setAttribute(
           "content",
-          `Join the ${community.communityName} ${community.groupName}. LEAP is the on-chain membership credential for people who take part in the community.`
+          `Join ${community.communityName}. LEAP is the on-chain membership credential for people who take part in the community.`
         );
       }
 
@@ -1006,34 +1019,62 @@
       const kicker = document.getElementById("communityKicker");
       if (kicker) kicker.textContent = `${community.communityName} ${community.membershipLabel}`;
 
+      const heading = document.getElementById("communityHeading");
+      if (heading) heading.textContent = community.heading;
+
+      const intro = document.getElementById("communityIntro");
+      if (intro && community.intro) intro.textContent = community.intro;
+
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
       const profileImage = document.getElementById("communityProfileImage");
-      if (profileImage) profileImage.alt = `${community.managerName} from ${community.communityName}`;
+      if (profileImage) {
+        if (community.profileImage) profileImage.src = community.profileImage;
+        profileImage.alt = `${community.managerName} from ${community.communityName}`;
+      }
+
+      const heroImage = document.getElementById("communityHeroImage");
+      if (heroImage && community.heroImage) heroImage.src = community.heroImage;
+
+      const experienceLine = document.getElementById("communityExperienceLine");
+      if (experienceLine && community.experienceLine) experienceLine.textContent = community.experienceLine;
+
+      const steps = Array.isArray(community.experienceSteps) ? community.experienceSteps : [];
+      steps.slice(0, 3).forEach((value, index) => {
+        const element = document.getElementById(`communityStep${index + 1}`);
+        if (element && value) element.textContent = value;
+      });
 
       const recordPanel = document.getElementById("communityRecordPanel");
       if (recordPanel) recordPanel.setAttribute("aria-label", `${community.recordLabel} access`);
 
       const joinButton = document.getElementById("communityJoinButton");
-      if (joinButton) joinButton.textContent = community.joinLabel;
+      if (joinButton) {
+        joinButton.textContent = community.joinLabel;
+        joinButton.href = `join.html?community=${encodeURIComponent(communityId)}`;
+      }
 
       const openRecordButton = document.getElementById("openCrewRecord");
       if (openRecordButton) openRecordButton.textContent = `Enter ${community.recordLabel} →`;
 
-      const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
-      const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
+      const walletStorageKey = community.walletStorageKey || `${communityId}.xrpl.wallet`;
+      const activeWalletKey = community.activeWalletKey || `${communityId}.xrpl.activeWallet`;
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 
       const walletInput = document.getElementById("returningCrewWallet");
       const openButton = document.getElementById("openCrewRecord");
       const status = document.getElementById("returningCrewStatus");
 
-      // Entering the public side resets only the active journey.
       try {
-        sessionStorage.removeItem(SFL_ACTIVE_WALLET_KEY);
+        sessionStorage.removeItem(activeWalletKey);
       } catch (_) {}
 
-      // A remembered validated wallet can be offered back to the member.
       try {
-        const rememberedWallet = localStorage.getItem(SFL_WALLET_STORAGE_KEY);
+        const rememberedWallet = localStorage.getItem(walletStorageKey);
         if (rememberedWallet && classicAddressPattern.test(rememberedWallet)) {
           walletInput.value = rememberedWallet;
         }
@@ -1050,10 +1091,10 @@
         }
 
         try {
-          sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
+          sessionStorage.setItem(activeWalletKey, account);
         } catch (_) {}
 
-        window.location.href = "crewRecord.html";
+        window.location.href = `crewRecord.html?community=${encodeURIComponent(communityId)}`;
       }
 
       openButton.addEventListener("click", openCrewRecord);
