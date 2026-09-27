@@ -675,7 +675,7 @@
 <div class="help-box">
 <div class="help-copy">
 <h3>Need help before you start?</h3>
-<p>For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For this community's ranks, badges, events, and participation, use the community FAQ.</p>
+<p id="helpFaqCopy">For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For Sailing Frog's Leap ranks, badges, events, and participation, use the Sailing Frog's Leap FAQ.</p>
 </div>
 <div class="help-actions">
 <a class="button secondary" href="wildLedgerFaq.html" id="wildLedgerFaqLink">Wild Ledger FAQ →</a>
@@ -850,6 +850,13 @@
 
       const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
       if (bottomCommunityFaqLink) bottomCommunityFaqLink.textContent = `${communityName} FAQ →`;
+
+      const helpFaqCopy = document.getElementById("helpFaqCopy");
+      if (helpFaqCopy) {
+        helpFaqCopy.textContent =
+          `For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For ${communityName} ranks, badges, events, and participation, use the ${communityName} FAQ.`;
+      }
+
 
       const bannerDesktop = document.getElementById("communityBannerDesktop");
       const bannerMobile = document.getElementById("communityBannerMobile");
