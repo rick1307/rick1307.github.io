@@ -206,32 +206,70 @@
       height:auto;
     }
 
+
+    /* Community-driven theme */
+    :root{
+      --deep:#0b2d36;
+      --muted:#526a70;
+      --page-background:
+        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:
+        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+    }
+
+    body{background:var(--page-background)}
+    body::before{background-image:var(--page-overlay)}
+    nav{background:var(--nav-background)}
+    header{background:var(--header-background)}
+    section:nth-of-type(even){background:var(--section-background)}
+    .section-title p,
+    .rank-title p,
+    .rank-body p,
+    .principle p{color:var(--muted)}
+    .return-box{background:var(--dark-feature-background)}
+
+    body[data-community-layout="garage"] .rank-card{border-radius:11px}
+    body[data-community-layout="garage"] .principle{border-radius:10px}
+    body[data-community-layout="garage"] .return-box{border-radius:12px}
+    body[data-community-layout="garage"] .button{border-radius:6px}
+    body[data-community-layout="garage"] .rank-badge{border-radius:10px}
+
   </style>
 </head>
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>LEAP Ranks</span></a>
-      <div class="nav-links"><a href="index.html">← Home</a></div>
+      <a class="brand" id="communityHomeBrand" href="index.html">
+        <img src="leap-logo.png" alt="LEAP logo">
+        <span id="communityNameLabel">Community</span>
+      </a>
+      <div class="nav-links"><a id="communityHomeLink" href="index.html">← Home</a></div>
     </div>
   </nav>
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: website, LEAP, the XRP Ledger, and Discord.">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
+        id="communityBannerDesktop"
         src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="The LEAP journey for this community.">
     </picture>
   </div>
 
   <header>
     <div class="wrap">
-      <div class="kicker">LEAP Crew Ranks</div>
+      <div class="kicker" id="communityKicker">Community Ranks</div>
       <h1>Ranks</h1>
-      <p class="lede">
-        LEAP ranks recognize how deeply someone has become part of a community.
-        Your current LEAP balance determines your rank. What you actually did along the way is recorded separately through badges and recognition.
+      <p class="lede" id="communityLede">
+        LEAP ranks recognize growing participation within a community.
       </p>
     </div>
   </header>
@@ -240,81 +278,11 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>The crew ladder</h2>
-          <p>Five rank levels create progression without turning LEAP into a complicated game.</p>
+          <h2>The rank ladder</h2>
+          <p id="rankLadderIntro">Five rank levels create progression without turning LEAP into a complicated game.</p>
         </div>
 
-        <div class="rank-grid">
-          <article class="rank-card">
-            <div class="rank-head">
-              <div class="rank-number">1–4 LEAP</div>
-              <div class="rank-title"><h3>Deckhand</h3><p>“I’m officially part of the crew.”</p></div>
-              <div class="rank-badge">⚓</div>
-            </div>
-            <div class="rank-body">
-              <div>
-                <h4>What it means</h4>
-                <p>Deckhand is the first crew rank—the moment someone crosses the line from audience to participant. One LEAP is enough to say: <em>I showed up, I joined, and I'm aboard.</em></p>
-              </div>
-            </div>
-          </article>
-
-          <article class="rank-card">
-            <div class="rank-head">
-              <div class="rank-number">5–9 LEAP</div>
-              <div class="rank-title"><h3>Bosun</h3><p>“I’m not just aboard. I keep showing up.”</p></div>
-              <div class="rank-badge">🪢</div>
-            </div>
-            <div class="rank-body">
-              <div>
-                <h4>What it means</h4>
-                <p>A Bosun is becoming a familiar hand—someone who keeps showing up, participating, helping, and becoming part of the fabric of the crew.</p>
-              </div>
-            </div>
-          </article>
-
-          <article class="rank-card">
-            <div class="rank-head">
-              <div class="rank-number">10–24 LEAP</div>
-              <div class="rank-title"><h3>Quartermaster</h3><p>“I have history here, and my voice matters.”</p></div>
-              <div class="rank-badge">🧭</div>
-            </div>
-            <div class="rank-body">
-              <div>
-                <h4>What it means</h4>
-                <p>Quartermaster represents an established supporter with a recognizable history in the community. Useful participation matters more than simply being loud or constantly online.</p>
-              </div>
-            </div>
-          </article>
-
-          <article class="rank-card">
-            <div class="rank-head">
-              <div class="rank-number">25–50 LEAP</div>
-              <div class="rank-title"><h3>First Mate</h3><p>“I’m part of the inner crew.”</p></div>
-              <div class="rank-badge">⛵</div>
-            </div>
-            <div class="rank-body">
-              <div>
-                <h4>What it means</h4>
-                <p>First Mate is an inner-crew rank for members whose long-term participation and repeated contributions have built a meaningful history with the community.</p>
-              </div>
-            </div>
-          </article>
-
-          <article class="rank-card">
-            <div class="rank-head">
-              <div class="rank-number">51+ LEAP</div>
-              <div class="rank-title"><h3>Master of the Leap</h3><p>“I’ve become part of the history of this community.”</p></div>
-              <div class="rank-badge">🐸</div>
-            </div>
-            <div class="rank-body">
-              <div>
-                <h4>What it means</h4>
-                <p>Master of the Leap is the highest crew rank. At 51+ LEAP, the emphasis shifts away from chasing another title and toward the history the member continues to build.</p>
-              </div>
-            </div>
-          </article>
-        </div>
+        <div class="rank-grid" id="rankGrid"></div>
       </div>
     </section>
 
@@ -322,12 +290,24 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Three rules keep the rank system honest</h2>
-          <p>These three rules keep the ladder clear and useful.</p>
+          <p>These rules keep rank tied to real participation in the active community.</p>
         </div>
         <div class="principles">
-          <div class="principle"><b>Rule one</b><h3>Rank follows current holdings</h3><p>Your current LEAP balance determines your current rank. If the balance changes, the rank can change too.</p></div>
-          <div class="principle"><b>Rule two</b><h3>Badges preserve history</h3><p>Rank can change. Badges preserve the meaningful moments and contributions that happened along the way.</p></div>
-          <div class="principle"><b>Rule three</b><h3>Participation beats noise</h3><p>LEAP should recognize useful involvement—not simply whoever posts most often.</p></div>
+          <div class="principle">
+            <b>Rule one</b>
+            <h3>Rank follows earned LEAP</h3>
+            <p id="ruleEarned">Your rank is based on LEAP officially earned from this community.</p>
+          </div>
+          <div class="principle">
+            <b>Rule two</b>
+            <h3>Earned stays earned</h3>
+            <p>Sending LEAP to another wallet or member can change your current balance, but it does not erase rank you already earned.</p>
+          </div>
+          <div class="principle">
+            <b>Rule three</b>
+            <h3>Each community stands alone</h3>
+            <p>The same wallet can have different ranks in different communities because each community counts only its own official awards.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -335,25 +315,206 @@
     <section>
       <div class="wrap">
         <div class="return-box">
-          <h3>Ready to earn your first rank?</h3>
-          <p>One LEAP earns your first rank. Join the community and start building your history.</p>
-          <a class="button" href="join.html">Join the Crew →</a>
+          <h3 id="returnHeading">Ready to earn your first rank?</h3>
+          <p id="returnCopy">Earn 1 LEAP from this community and your rank journey begins.</p>
+          <a class="button" id="joinButton" href="join.html">Join →</a>
         </div>
       </div>
     </section>
-
-</main>
+  </main>
 
   <footer>
     <div class="wrap foot">
-      <div>LEAP • Community Ranks</div>
+      <div id="footerLabel">LEAP • Community Ranks</div>
     </div>
   </footer>
 
+  <script src="js/communityConfig.js"></script>
   <script>
-    try {
-      sessionStorage.removeItem("sfl.xrpl.activeWallet");
-    } catch (_) {}
+    (() => {
+      const community = window.WILD_LEDGER_COMMUNITY || {
+        id: "sfl",
+        layout: "classic",
+        communityName: "Community",
+        groupName: "community",
+        joinLabel: "Join →",
+        bannerDesktop: "images/bannerDesktop.png",
+        bannerMobile: "images/bannerMobile.png",
+        ranks: []
+      };
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const communityName = community.communityName || "Community";
+      const communityHomeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+      const joinHref = `join.html?community=${encodeURIComponent(communityId)}`;
+
+      const theme = community.theme || {};
+      const themeVariables = {
+        paper: "--paper",
+        paper2: "--paper2",
+        ink: "--ink",
+        navy: "--navy",
+        deep: "--deep",
+        sea: "--sea",
+        foam: "--foam",
+        rust: "--rust",
+        gold: "--gold",
+        line: "--line",
+        card: "--card",
+        muted: "--muted",
+        pageBackground: "--page-background",
+        pageOverlay: "--page-overlay",
+        navBackground: "--nav-background",
+        headerBackground: "--header-background",
+        sectionBackground: "--section-background",
+        darkFeatureBackground: "--dark-feature-background"
+      };
+
+      Object.entries(themeVariables).forEach(([key, cssVariable]) => {
+        if (theme[key]) document.documentElement.style.setProperty(cssVariable, theme[key]);
+      });
+
+      document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
+
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor && theme.themeColor) themeColor.setAttribute("content", theme.themeColor);
+
+      document.title = `Ranks — ${communityName}`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute(
+          "content",
+          `Explore the LEAP ranks for ${communityName} and see how earned LEAP builds community rank.`
+        );
+      }
+
+      const nameLabel = document.getElementById("communityNameLabel");
+      if (nameLabel) nameLabel.textContent = communityName;
+
+      const homeBrand = document.getElementById("communityHomeBrand");
+      const homeLink = document.getElementById("communityHomeLink");
+      if (homeBrand) homeBrand.href = communityHomeHref;
+      if (homeLink) homeLink.href = communityHomeHref;
+
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
+      const kicker = document.getElementById("communityKicker");
+      if (kicker) kicker.textContent = `${communityName} Ranks`;
+
+      const lede = document.getElementById("communityLede");
+      if (lede) {
+        lede.textContent =
+          `LEAP ranks recognize how deeply someone has become part of ${communityName}. ` +
+          `Rank is based on LEAP officially earned from ${communityName}. ` +
+          `Your current wallet balance can change without erasing rank you have already earned.`;
+      }
+
+      const ruleEarned = document.getElementById("ruleEarned");
+      if (ruleEarned) {
+        ruleEarned.textContent =
+          `Your rank in ${communityName} is based on the total LEAP officially awarded to you by ${communityName}.`;
+      }
+
+      const ranks = Array.isArray(community.ranks)
+        ? [...community.ranks].sort((a, b) => Number(a.min) - Number(b.min))
+        : [];
+
+      const rankGrid = document.getElementById("rankGrid");
+
+      const fallbackIcons =
+        (community.layout || "classic") === "garage"
+          ? ["🔩", "🔧", "⚙️", "🏁", "🏆"]
+          : ["⚓", "🪢", "🧭", "⛵", "🐸"];
+
+      const fallbackTaglines = [
+        "I’m officially part of the community.",
+        "I keep showing up.",
+        "I have history here, and my voice matters.",
+        "I’m part of the core community.",
+        "I’ve become part of the history of this community."
+      ];
+
+      if (rankGrid) {
+        rankGrid.replaceChildren();
+
+        ranks.forEach((rank, index) => {
+          const next = ranks[index + 1];
+          const min = Number(rank.min);
+          const rangeLabel = next
+            ? `${min}–${Number(next.min) - 1} LEAP`
+            : `${min}+ LEAP`;
+
+          const card = document.createElement("article");
+          card.className = "rank-card";
+
+          const head = document.createElement("div");
+          head.className = "rank-head";
+
+          const number = document.createElement("div");
+          number.className = "rank-number";
+          number.textContent = rangeLabel;
+
+          const titleWrap = document.createElement("div");
+          titleWrap.className = "rank-title";
+
+          const title = document.createElement("h3");
+          title.textContent = rank.name || `Rank ${index + 1}`;
+
+          const tagline = document.createElement("p");
+          tagline.textContent = rank.tagline || fallbackTaglines[index] || "I keep building history here.";
+
+          titleWrap.append(title, tagline);
+
+          const badge = document.createElement("div");
+          badge.className = "rank-badge";
+          badge.textContent = rank.icon || fallbackIcons[index] || "•";
+          badge.setAttribute("aria-hidden", "true");
+
+          head.append(number, titleWrap, badge);
+
+          const body = document.createElement("div");
+          body.className = "rank-body";
+
+          const bodyInner = document.createElement("div");
+          const bodyHeading = document.createElement("h4");
+          bodyHeading.textContent = "What it means";
+
+          const description = document.createElement("p");
+          description.textContent =
+            rank.description ||
+            `${rank.name || "This rank"} recognizes growing participation and history in ${communityName}.`;
+
+          bodyInner.append(bodyHeading, description);
+          body.appendChild(bodyInner);
+
+          card.append(head, body);
+          rankGrid.appendChild(card);
+        });
+      }
+
+      const returnHeading = document.getElementById("returnHeading");
+      if (returnHeading) returnHeading.textContent = `Ready to earn your first rank in ${communityName}?`;
+
+      const returnCopy = document.getElementById("returnCopy");
+      if (returnCopy) {
+        const firstRank = ranks[0]?.name || "first rank";
+        const firstMin = Number(ranks[0]?.min) || 1;
+        returnCopy.textContent =
+          `Earn ${firstMin} LEAP from ${communityName} and you become ${firstRank}. From there, every official award adds to the rank history you have earned in this community.`;
+      }
+
+      const joinButton = document.getElementById("joinButton");
+      if (joinButton) {
+        joinButton.href = joinHref;
+        joinButton.textContent = community.joinLabel || "Join →";
+      }
+
+      const footerLabel = document.getElementById("footerLabel");
+      if (footerLabel) footerLabel.textContent = `${communityName} • LEAP Ranks`;
+    })();
   </script>
 </body>
 </html>
