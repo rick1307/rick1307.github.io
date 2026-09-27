@@ -1069,25 +1069,7 @@
     })();
   </script>
 
-<script id="community-switch-test-script">
-(function () {
-  const community = new URLSearchParams(window.location.search).get("community");
-  const names = {
-    sfl: "SAILING FROG'S LEAP",
-    zach: "ZACH'S HOT RODS"
-  };
 
-  const badge = document.createElement("div");
-  badge.id = "community-switch-test";
-  badge.textContent = names[community]
-    ? "COMMUNITY SWITCH: " + names[community]
-    : "COMMUNITY SWITCH: NOT SET";
-
-  document.addEventListener("DOMContentLoaded", function () {
-    document.body.appendChild(badge);
-  });
-})();
-</script>
 
 
 <script id="community-banner-lesson">
