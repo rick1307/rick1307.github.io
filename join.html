@@ -43,7 +43,7 @@
       color:var(--ink);
       background:var(--page-background);
       background-size:auto;
-      font-family:Georgia,"Times New Roman",serif;
+      font-family:var(--community-display-font);
       line-height:1.62;
     }
 
@@ -70,7 +70,7 @@
 
     .brand{
       display:flex;align-items:center;gap:11px;text-decoration:none;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:850;
     }
 
@@ -83,7 +83,7 @@
 
     .nav-links a{
       text-decoration:none;color:#4e5c62;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.9rem;font-weight:750;
     }
 
@@ -91,7 +91,7 @@
 
     .kicker{
       color:var(--rust);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       text-transform:uppercase;letter-spacing:.14em;
       font-size:.78rem;font-weight:900;
     }
@@ -167,7 +167,7 @@
       display:grid;place-items:center;
       margin:0 auto 12px;
       background:var(--navy);color:white;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:900;
     }
 
@@ -215,7 +215,7 @@
       width:42px;height:42px;border-radius:50%;
       display:grid;place-items:center;
       background:var(--navy);color:white;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:900;
     }
 
@@ -229,7 +229,7 @@
     .member-record-open input{
       flex:1;min-width:0;padding:13px 14px;border-radius:8px;
       border:1px solid rgba(26,37,44,.22);background:#fff;color:var(--ink);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:1rem;outline:none;
     }
     .leap-request-form input[type="text"]:focus,
@@ -244,7 +244,7 @@
     .member-record-open .button:disabled{opacity:.68;cursor:wait}
     .leap-request-message{
       margin-top:10px;color:#356a53;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.95rem;font-weight:800;
     }
     .leap-request-message.error{color:var(--rust)}
@@ -253,14 +253,14 @@
       border:1px solid rgba(47,116,129,.24);
       background:linear-gradient(135deg,rgba(219,236,232,.95),rgba(255,250,240,.98));
       box-shadow:0 10px 24px rgba(11,45,54,.08);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
     }
     .request-result .result-mark{
       width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
       margin:0 auto 12px;background:var(--sea);color:white;font-size:1.65rem;font-weight:900;
     }
     .request-result h4{
-      margin:0 0 8px;color:var(--navy);font-family:Georgia,"Times New Roman",serif;
+      margin:0 0 8px;color:var(--navy);font-family:var(--community-display-font);
       font-size:1.55rem;line-height:1.15;
     }
     .request-result p{margin:0;color:#4f6066}
@@ -273,7 +273,7 @@
     .member-record-open-row{display:flex;gap:10px;align-items:stretch}
     .member-record-status{
       min-height:1.45em;margin:10px auto 0 !important;color:var(--muted) !important;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.92rem;text-align:left;
     }
     .member-record-status.error{color:var(--rust) !important}
@@ -321,7 +321,7 @@
     .status b{
       display:block;
       color:var(--navy);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       margin-bottom:4px;
     }
 
@@ -364,7 +364,7 @@
       text-decoration:none;
       background:var(--rust);
       color:white;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:850;
     }
 
@@ -373,7 +373,7 @@
     footer{
       padding:38px 0 48px;
       color:#69757a;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.86rem;
     }
 
@@ -416,8 +416,9 @@
     header .lede{max-width:760px}
     .hero-line{max-width:760px;margin-top:18px;padding:15px 18px}
     section{padding:34px 0}
-    .join-gateway{padding-top:30px}
+    .join-gateway{padding-top:12px;padding-bottom:20px}
     .gateway-title{margin-bottom:16px}
+    .join-divider{height:1px;background:var(--line);margin-top:24px}
     .gateway-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:18px;align-items:stretch}
     .gateway-card{
       background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;
@@ -425,7 +426,7 @@
     }
     .gateway-primary{border-color:rgba(47,116,129,.34);background:linear-gradient(135deg,#fffaf0,#edf5ef)}
     .gateway-label{
-      margin-bottom:5px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      margin-bottom:5px;color:var(--rust);font-family:var(--community-ui-font);
       text-transform:uppercase;letter-spacing:.11em;font-size:.74rem;font-weight:900
     }
     .gateway-card h3{margin:0 0 7px;color:var(--navy);font-size:1.65rem;line-height:1.12}
@@ -484,6 +485,7 @@
       .brand img{width:36px;height:36px}
     }
 </style>
+<link rel="stylesheet" href="communityTypography.css">
 </head>
 <body>
 <nav>
@@ -501,17 +503,9 @@
 <img alt="The LEAP journey" id="communityBannerDesktop" src="images/bannerDesktop.png"/>
 </picture>
 </div>
-<header>
-<div class="wrap">
-<h1>Your first LEAP is the doorway.</h1>
-</div>
-</header>
 <main>
 <section class="join-gateway" id="join-now">
 <div class="wrap">
-<div class="section-title gateway-title">
-<p>Choose the one that matches where you are right now.</p>
-</div>
 <div class="gateway-grid">
 <div class="gateway-card gateway-primary" id="request-first-leap">
 <div class="gateway-label">New member</div>
@@ -549,12 +543,13 @@
 <p aria-live="polite" class="member-record-status" id="memberRecordStatus" role="status"></p>
 </div></div>
 </div>
+<div class="join-divider" aria-hidden="true"></div>
 </div>
 </section>
 <section class="prep-section">
 <div class="wrap">
 <div class="section-title compact-title">
-<h2>Before you start</h2>
+<h2>Requesting your first LEAP?</h2>
 <p>You only need three things.</p>
 </div>
 <div class="prep-grid">
