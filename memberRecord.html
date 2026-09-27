@@ -279,7 +279,7 @@
 
     .record-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(5,minmax(0,1fr));
       gap:9px;
     }
 
@@ -901,7 +901,8 @@
         <div class="record-wallet" id="recordWallet" hidden></div>
 
         <div class="record-grid">
-          <div class="record-stat"><b>LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
+          <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
+          <div class="record-stat"><b>Earned</b><strong id="recordEarned">—</strong><small id="recordEarnedNote">in this community</small></div>
           <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small>from LEAP held</small></div>
           <div class="record-stat"><b>Next</b><strong id="recordNext">—</strong><small id="recordNextNote">next rank</small></div>
           <div class="record-stat"><b>Badges</b><strong id="recordBadges">—</strong><small id="recordBadgesNote">in your logbook</small></div>
@@ -1021,6 +1022,8 @@
       const trustlineStatusText = document.getElementById("trustlineStatusText");
       const walletEl = document.getElementById("recordWallet");
       const leapEl = document.getElementById("recordLeap");
+      const earnedEl = document.getElementById("recordEarned");
+      const earnedNoteEl = document.getElementById("recordEarnedNote");
       const rankEl = document.getElementById("recordRank");
       const nextEl = document.getElementById("recordNext");
       const nextNoteEl = document.getElementById("recordNextNote");
@@ -1590,6 +1593,8 @@
         setStateMessage();
 
         leapEl.textContent = "—";
+        earnedEl.textContent = "—";
+        earnedNoteEl.textContent = `in ${communityName}`;
         rankEl.textContent = "—";
         nextEl.textContent = "—";
         nextNoteEl.textContent = "next rank";
@@ -1697,6 +1702,13 @@
 
         const currency = decodeHexCurrency(String(amount.currency || "")).toUpperCase();
         return currency === "LEAP" || currency.startsWith("LEAP");
+      }
+
+      function leapAmountValue(amount) {
+        if (!isLeapAmount(amount)) return null;
+
+        const value = Number(amount.value);
+        return Number.isFinite(value) && value >= 0 ? value : null;
       }
 
       function officialIncomingLeapCheck(object, memberAccount) {
@@ -2048,7 +2060,7 @@
         return "";
       }
 
-      function officialLeapHistoryRecord(entry, memberAccount, cashedCheckIds) {
+      function officialLeapHistoryRecord(entry, memberAccount, cashedCheckAmounts) {
         if (!entry || entry.validated === false) return null;
 
         const tx = entry.tx_json || entry.tx || entry.transaction || {};
@@ -2061,25 +2073,34 @@
 
         let officialLeapAsset = false;
         let checkId = "";
+        let earnedAmount = null;
 
         if (tx.TransactionType === "CheckCreate") {
           officialLeapAsset = isLeapAmount(tx.SendMax);
           checkId = extractCreatedCheckId(meta);
 
-          // A CheckCreate is only an earned Member Record item after that exact
-          // Check has been successfully cashed. Pending and canceled Checks
-          // therefore never become personal logbook recognitions.
-          if (!checkId || !cashedCheckIds?.has(checkId)) return null;
+          // A CheckCreate becomes earned only after that exact Check is
+          // successfully cashed. Use the CheckCash delivered_amount so earned
+          // LEAP reflects what actually reached the member, not SendMax.
+          if (!checkId || !cashedCheckAmounts?.has(checkId)) return null;
+          earnedAmount = cashedCheckAmounts.get(checkId);
         } else if (tx.TransactionType === "Payment") {
-          const delivered = meta.delivered_amount;
+          const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
           const requested = tx.DeliverMax || tx.Amount;
 
           officialLeapAsset = isLeapAmount(delivered) || isLeapAmount(requested);
+          earnedAmount = leapAmountValue(delivered);
+
+          // For an exact non-partial Payment, Amount is a safe fallback if the
+          // server did not include delivered_amount.
+          if (earnedAmount === null && isLeapAmount(tx.Amount)) {
+            earnedAmount = leapAmountValue(tx.Amount);
+          }
         } else {
           return null;
         }
 
-        if (!officialLeapAsset) return null;
+        if (!officialLeapAsset || earnedAmount === null) return null;
 
         const facts = extractLeapFacts(tx);
 
@@ -2092,6 +2113,7 @@
         return {
           hash: entry.hash || tx.hash || "",
           checkId,
+          earnedAmount,
           ledger: entry.ledger_index || tx.ledger_index || null,
           transactionIndex: meta.TransactionIndex ?? meta.transaction_index ?? null,
           time,
@@ -2181,7 +2203,7 @@
               page += 1;
               sendPage();
             } else {
-              const cashedCheckIds = new Set();
+              const cashedCheckAmounts = new Map();
 
               for (const historyEntry of entries) {
                 if (!historyEntry || historyEntry.validated === false) continue;
@@ -2203,7 +2225,21 @@
                   historyTx.TransactionType === "CheckCash" &&
                   historyTx.CheckID
                 ) {
-                  cashedCheckIds.add(String(historyTx.CheckID));
+                  const delivered =
+                    historyMeta.delivered_amount ??
+                    historyMeta.DeliveredAmount;
+
+                  let deliveredValue = leapAmountValue(delivered);
+
+                  // Exact-amount CheckCash transactions can safely fall back to
+                  // their Amount field if delivered_amount is unavailable.
+                  if (deliveredValue === null && isLeapAmount(historyTx.Amount)) {
+                    deliveredValue = leapAmountValue(historyTx.Amount);
+                  }
+
+                  if (deliveredValue !== null) {
+                    cashedCheckAmounts.set(String(historyTx.CheckID), deliveredValue);
+                  }
                 }
               }
 
@@ -2213,7 +2249,7 @@
                 const record = officialLeapHistoryRecord(
                   historyEntry,
                   account,
-                  cashedCheckIds
+                  cashedCheckAmounts
                 );
 
                 if (record) records.push(record);
@@ -2449,6 +2485,23 @@
 
           logbookEntries.appendChild(section);
         }
+      }
+
+      function earnedLeapTotal(records) {
+        const total = (Array.isArray(records) ? records : []).reduce((sum, record) => {
+          const value = Number(record?.earnedAmount);
+          return Number.isFinite(value) && value > 0 ? sum + value : sum;
+        }, 0);
+
+        return Number(total.toFixed(6));
+      }
+
+      function renderEarnedLeap(records) {
+        const total = earnedLeapTotal(records);
+        earnedEl.textContent = Number.isInteger(total)
+          ? String(total)
+          : String(total);
+        earnedNoteEl.textContent = `in ${communityName}`;
       }
 
       function renderLogbook(records = currentLogbookRecords) {
@@ -2720,8 +2773,11 @@
           const checksLoaded = checksResult.status === "fulfilled";
 
           if (historyLoaded) {
+            renderEarnedLeap(historyResult.value);
             renderLogbook(historyResult.value);
           } else {
+            earnedEl.textContent = "—";
+            earnedNoteEl.textContent = `in ${communityName}`;
             resetLogbook(
               "Current balance loaded, but the logbook could not be read right now."
             );
