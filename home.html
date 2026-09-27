@@ -903,7 +903,7 @@
         <section id="idea" class="story-section">
       <div class="wrap">
         <div class="story-panel">
-          <img src="images/heroImage.png" alt="Crew members on a sailboat at sunset with a logbook in the foreground and the message: The blockchain is just the logbook. The point is the crew." loading="lazy">
+          <img id="communityHeroImage" src="images/heroImage.png" alt="Crew members on a sailboat at sunset with a logbook in the foreground and the message: The blockchain is just the logbook. The point is the crew." loading="lazy">
         </div>
       </div>
     </section>
@@ -1080,7 +1080,8 @@
       eyebrow: "SAILING FROG\'S LEAP CREW MEMBERSHIP",
       heading: "Welcome Aboard",
       intro: "Hello, my name is Rick, and I'm Sailing Frog's Leap.             If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper.             LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.",
-      profileImage: "images/profileImage.png"
+      profileImage: "images/profileImage.png",
+      heroImage: "images/heroImage.png"
     },
     zach: {
       bannerDesktop: "images/zachBannerDesktop.png",
@@ -1088,7 +1089,8 @@
       eyebrow: "ZACH\'S HOT RODS MEMBERSHIP",
       heading: "Start Your Engines",
       intro: "Hey y'all. My name is Zach. If you follow me on Instagram or TikTok, you already know we're in for a good time. Show me your LEAP, climb in. Let's go for a ride!",
-      profileImage: "images/zachProfileImage.png"
+      profileImage: "images/zachProfileImage.png",
+      heroImage: "images/zachHeroImage.png"
     }
   };
 
@@ -1106,6 +1108,7 @@
   document.getElementById("communityHeading").textContent = community.heading;
   document.getElementById("communityIntro").textContent = community.intro;
   document.getElementById("communityProfileImage").src = community.profileImage;
+  document.getElementById("communityHeroImage").src = community.heroImage;
 </script>
 
 </body>
