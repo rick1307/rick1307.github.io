@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="community-pending">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -105,6 +105,7 @@
     }
 
     *{box-sizing:border-box}
+    html.community-pending body{visibility:hidden}
 
     body{
       margin:0;
@@ -1089,17 +1090,11 @@
   </nav>
 
   <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
-    <picture class="journey-banner-picture journey-banner-sfl">
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
+    <picture class="journey-banner-picture">
+      <source id="communityBannerMobile" media="(max-width: 800px)">
       <img
-        src="images/bannerDesktop.png"
-        alt="Sailing Frog's Leap journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
-    </picture>
-    <picture class="journey-banner-picture journey-banner-zach">
-      <source media="(max-width: 800px)" srcset="images/zachBannerMobile.png">
-      <img
-        src="images/zachBannerDesktop.png"
-        alt="Zach's Hot Rods journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Garage Club.">
+        id="communityBannerDesktop"
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
     </picture>
   </div>
 
@@ -1201,15 +1196,12 @@
   <script src="js/communityConfig.js"></script>
   <script>
     (() => {
-      const community = window.WILD_LEDGER_COMMUNITY || {
-        id: "sfl",
-        communityName: "Community",
-        leapNamespace: "SFL-LEAP",
-        memberPlural: "members",
-        walletStorageKey: "sfl.xrpl.wallet",
-        activeWalletKey: "sfl.xrpl.activeWallet"
-      };
-      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const community = window.WILD_LEDGER_COMMUNITY;
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
+
+      if (!community || !communityId) {
+        throw new Error("Community configuration failed to load.");
+      }
       const communityName = community.communityName || "Community";
       const communityMemberPlural = community.memberPlural || "members";
       const communityHomeHref = `index.html?community=${encodeURIComponent(communityId)}`;
@@ -1246,6 +1238,11 @@
       if (communityHomeBrand) communityHomeBrand.href = communityHomeHref;
       if (communityHomeLink) communityHomeLink.href = communityHomeHref;
 
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
       const wildLedger = window.WILD_LEDGER_CONFIG;
       if (!wildLedger) {
         throw new Error("Wild Ledger configuration failed to load.");
@@ -1256,7 +1253,7 @@
       const LEAP_TRANSFER_LIMIT = wildLedger.leapTransferLimit;
       const LEAP_DISTRIBUTORS = new Set(wildLedger.leapDistributors);
 
-      const LEAP_NAMESPACE = community.leapNamespace || "SFL-LEAP";
+      const LEAP_NAMESPACE = community.leapNamespace;
       const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
 
       const SFL_WALLET_STORAGE_KEY = community.walletStorageKey || `${communityId}.xrpl.wallet`;
@@ -3225,6 +3222,8 @@
         );
         setStatus("");
       }
+
+      document.documentElement.classList.remove("community-pending");
     })();
   </script>
 </body>
