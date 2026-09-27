@@ -338,6 +338,7 @@
     }
 
     .progress-track{
+      position:relative;
       height:7px;
       border-radius:999px;
       background:rgba(255,255,255,.11);
@@ -345,11 +346,48 @@
     }
 
     .progress-fill{
+      position:relative;
+      z-index:1;
       height:100%;
       width:0;
       border-radius:inherit;
       background:linear-gradient(90deg,var(--gold),#f1cf83);
       transition:width .35s ease;
+    }
+
+    .progress-dividers{
+      position:absolute;
+      inset:0;
+      z-index:2;
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      pointer-events:none;
+    }
+
+    .progress-division{
+      border-right:1px solid rgba(255,255,255,.22);
+    }
+
+    .progress-division:last-child{
+      border-right:0;
+    }
+
+    .progress-rank-labels{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:0;
+      margin-top:8px;
+      color:rgba(255,255,255,.62);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:clamp(.58rem,1.15vw,.72rem);
+      font-weight:800;
+      line-height:1.15;
+      text-align:center;
+    }
+
+    .progress-rank-labels span{
+      padding:0 4px;
+      overflow-wrap:anywhere;
     }
 
     .crew-status{
@@ -913,7 +951,11 @@
             <span id="progressLabel">Rank progress</span>
             <strong id="progressValue">—</strong>
           </div>
-          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-dividers" id="progressDividers" aria-hidden="true"></div>
+          </div>
+          <div class="progress-rank-labels" id="progressRankLabels" aria-label="Community ranks"></div>
         </div>
 
         <p class="crew-status" id="crewRecordStatus" role="status" aria-live="polite"></p>
@@ -1039,6 +1081,8 @@
       const progressLabel = document.getElementById("progressLabel");
       const progressValue = document.getElementById("progressValue");
       const progressFill = document.getElementById("progressFill");
+      const progressDividers = document.getElementById("progressDividers");
+      const progressRankLabels = document.getElementById("progressRankLabels");
       const pendingChecks = document.getElementById("pendingChecks");
       const pendingChecksTitle = document.getElementById("pendingChecksTitle");
       const pendingCheckCount = document.getElementById("pendingCheckCount");
@@ -1053,6 +1097,8 @@
       let currentLogbookRecords = [];
       let currentPendingLeapChecks = [];
       let verifiedDiscordWallet = "";
+
+      renderProgressRankScale();
 
       function getRawActiveWallet() {
         try {
@@ -1588,6 +1634,33 @@
         dismissed.add(checkId);
         saveDismissedExpiredChecks(dismissed);
         renderPendingChecks(currentPendingLeapChecks);
+      }
+
+      function renderProgressRankScale() {
+        const ranks = Array.isArray(community.ranks) && community.ranks.length
+          ? [...community.ranks].sort((a,b) => a.min - b.min)
+          : [
+              { min:1, name:"Deckhand" },
+              { min:5, name:"Bosun" },
+              { min:10, name:"Quartermaster" },
+              { min:25, name:"First Mate" },
+              { min:51, name:"Master of the Leap" }
+            ];
+
+        const fiveRanks = ranks.slice(0,5);
+
+        progressDividers.replaceChildren();
+        progressRankLabels.replaceChildren();
+
+        for (let i = 0; i < fiveRanks.length; i += 1) {
+          const divider = document.createElement("span");
+          divider.className = "progress-division";
+          progressDividers.appendChild(divider);
+
+          const label = document.createElement("span");
+          label.textContent = fiveRanks[i].name;
+          progressRankLabels.appendChild(label);
+        }
       }
 
       function resetRecord() {
