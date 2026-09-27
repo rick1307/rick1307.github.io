@@ -903,7 +903,7 @@
         <div class="record-grid">
           <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
           <div class="record-stat"><b>Earned</b><strong id="recordEarned">—</strong><small id="recordEarnedNote">in this community</small></div>
-          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small>from LEAP held</small></div>
+          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote">from LEAP held</small></div>
           <div class="record-stat"><b>Next</b><strong id="recordNext">—</strong><small id="recordNextNote">next rank</small></div>
           <div class="record-stat"><b>Badges</b><strong id="recordBadges">—</strong><small id="recordBadgesNote">in your logbook</small></div>
         </div>
@@ -1025,6 +1025,7 @@
       const earnedEl = document.getElementById("recordEarned");
       const earnedNoteEl = document.getElementById("recordEarnedNote");
       const rankEl = document.getElementById("recordRank");
+      const rankNoteEl = document.getElementById("recordRankNote");
       const nextEl = document.getElementById("recordNext");
       const nextNoteEl = document.getElementById("recordNextNote");
       const badgesEl = document.getElementById("recordBadges");
@@ -1596,6 +1597,7 @@
         earnedEl.textContent = "—";
         earnedNoteEl.textContent = `in ${communityName}`;
         rankEl.textContent = "—";
+        rankNoteEl.textContent = `In ${communityName}`;
         nextEl.textContent = "—";
         nextNoteEl.textContent = "next rank";
 
@@ -2504,6 +2506,12 @@
         earnedNoteEl.textContent = `in ${communityName}`;
 
         const earnedRank = rankFor(total);
+
+        if (total <= 0) {
+          rankEl.textContent = "Unranked";
+          rankNoteEl.textContent = `In ${communityName}`;
+        }
+
         progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
         progressValue.textContent = `${total} LEAP`;
 
