@@ -449,10 +449,19 @@
     .after-cash{padding:28px}
     .after-cash .status{margin-top:18px}
     .help-box{
-      display:flex;align-items:center;justify-content:space-between;gap:22px;padding:24px 26px;
+      display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 26px;
       background:#fff7e9;border:1px solid rgba(210,163,79,.42);border-radius:16px
     }
-    .help-box h3{margin:0;color:#714c15}
+    .help-copy{flex:1;min-width:0}
+    .help-box h3{margin:0 0 6px;color:#714c15}
+    .help-box p{margin:0;color:var(--muted)}
+    .help-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .help-actions .button{margin-top:0;white-space:nowrap}
+    @media(max-width:800px){
+      .help-box{align-items:stretch;flex-direction:column}
+      .help-actions{justify-content:flex-start}
+      .help-actions .button{flex:1 1 220px}
+    }
     .help-box p{flex:1;margin:0;color:#62584b}
     .help-box .button{margin-top:0;white-space:nowrap}
 
@@ -661,7 +670,20 @@
 </div>
 </div>
 </section>
-<section><div class="wrap"><div class="help-box"><h3>Need help before you start?</h3><p>The FAQ explains Xaman, public wallet addresses, LEAP Checks, and what happens after you join.</p><a class="button secondary" href="faq.html" id="bottomFaqLink">Read the FAQ →</a></div></div></section>
+<section>
+<div class="wrap">
+<div class="help-box">
+<div class="help-copy">
+<h3>Need help before you start?</h3>
+<p>For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For this community's ranks, badges, events, and participation, use the community FAQ.</p>
+</div>
+<div class="help-actions">
+<a class="button secondary" href="wildLedgerFaq.html" id="wildLedgerFaqLink">Wild Ledger FAQ →</a>
+<a class="button secondary" href="faq.html" id="bottomCommunityFaqLink">Community FAQ →</a>
+</div>
+</div>
+</div>
+</section>
 </main>
 <footer>
 <div class="wrap foot">
@@ -812,7 +834,7 @@
         ["stateMachineLink", pageHref("stateMachine.html")],
         ["nextRanksLink", pageHref("ranks.html")],
         ["nextBadgesLink", pageHref("badges.html")],
-        ["bottomFaqLink", pageHref("faq.html")],
+        ["bottomCommunityFaqLink", pageHref("faq.html")],
         ["footerHomeLink", homeHref],
         ["footerRanksLink", pageHref("ranks.html")],
         ["footerBadgesLink", pageHref("badges.html")],
@@ -825,6 +847,9 @@
 
       const nameLabel = document.getElementById("communityNameLabel");
       if (nameLabel) nameLabel.textContent = communityName;
+
+      const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
+      if (bottomCommunityFaqLink) bottomCommunityFaqLink.textContent = `${communityName} FAQ →`;
 
       const bannerDesktop = document.getElementById("communityBannerDesktop");
       const bannerMobile = document.getElementById("communityBannerMobile");
