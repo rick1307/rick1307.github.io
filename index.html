@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="community-pending">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Join the Sailing Frog's Leap crew. LEAP is the on-chain crew credential for people who take part in the voyage." />
+  <meta name="description" content="Wild Ledger community membership powered by LEAP." />
   <meta name="theme-color" content="#efe8d8" />
-  <title>Welcome Aboard — Sailing Frog's Leap</title>
+  <title>Wild Ledger Community</title>
 
   <style>
     :root{
@@ -24,6 +24,7 @@
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
+    html.community-pending body{visibility:hidden}
     body{
       margin:0;
       color:var(--ink);
@@ -32,13 +33,13 @@
         linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
         var(--paper);
       background-size:30px 30px;
-      font-family:Georgia, "Times New Roman", serif;
+      font-family:var(--community-display-font);
       line-height:1.62;
     }
 
     a{color:inherit}
     .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
-    .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    .sans{font-family:var(--community-ui-font)}
 
     nav{
       position:sticky;top:0;z-index:10;
@@ -55,7 +56,7 @@
     .brand{
       display:flex;align-items:center;gap:11px;
       text-decoration:none;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:850;letter-spacing:.02em;
     }
 
@@ -69,7 +70,7 @@
 
     .nav-links a{
       text-decoration:none;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.92rem;font-weight:750;color:#46555c;
     }
 
@@ -114,7 +115,7 @@
     }
 
     .kicker{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       color:var(--rust);
       text-transform:uppercase;
       letter-spacing:.16em;
@@ -160,7 +161,7 @@
       border-radius:14px;
       background:rgba(250,252,247,.66);
       box-shadow:0 10px 24px rgba(11,45,54,.05);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
     }
 
     .returning-crew-head{
@@ -245,7 +246,7 @@
       text-decoration:none;
       background:var(--rust);
       color:white;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:850;
       box-shadow:0 8px 20px rgba(184,79,50,.17);
     }
@@ -426,7 +427,7 @@
       display:block;
       margin-bottom:7px;
       color:var(--rust);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       text-transform:uppercase;
       letter-spacing:.08em;
       font-size:.76rem;
@@ -447,7 +448,7 @@
       flex:0 0 auto;
       text-decoration:none;
       color:var(--sea);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.8rem;
       font-weight:850;
       white-space:nowrap;
@@ -467,7 +468,7 @@
 
     .rank .count{
       color:var(--rust);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:900;
     }
 
@@ -532,7 +533,7 @@
       display:block;
       margin-top:14px;
       color:#67747a;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.9rem;
       font-style:normal;
     }
@@ -564,7 +565,7 @@
       border-radius:50%;
       display:grid;place-items:center;
       background:var(--navy);color:white;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-weight:900;
     }
 
@@ -574,7 +575,7 @@
     .pilot{
       margin-top:22px;
       color:#66737a;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.9rem;
     }
 
@@ -597,7 +598,7 @@
     footer{
       padding:38px 0 48px;
       color:#69757a;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--community-ui-font);
       font-size:.86rem;
     }
 
@@ -670,7 +671,7 @@
       margin:0;color:var(--ink);
       background:var(--page-background);
       background-size:auto;
-      font-family:Georgia,"Times New Roman",serif;
+      font-family:var(--community-display-font);
     }
     body::before{
       content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
@@ -975,6 +976,7 @@
     }
 
 </style>
+<link rel="stylesheet" href="communityTypography.css">
 </head>
 
 <body>
@@ -982,7 +984,7 @@
     <div class="wrap nav-inner">
       <div class="brand">
         <img src="leap-logo.png" alt="LEAP logo">
-        <span id="communityBrand">Sailing Frog's Leap</span>
+        <span id="communityBrand">Community</span>
       </div>
       <div class="nav-links">
         <a href="splash.html">Wild Ledger</a>
@@ -993,35 +995,30 @@
 
   <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
     <picture>
-      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <source id="communityBannerMobile" media="(max-width: 800px)">
       <img
         id="communityBannerDesktop"
-        src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="Community LEAP journey">
     </picture>
   </div>
 
   <header id="top">
     <div class="wrap hero">
-      <div class="kicker" id="communityKicker">Sailing Frog's Leap Crew Membership</div>
+      <div class="kicker" id="communityKicker">Community Membership</div>
       <div class="welcome-head">
-        <h1 id="communityHeading">Welcome Aboard</h1>
-        <img class="rick-portrait" id="communityProfileImage" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
+        <h1 id="communityHeading">Community</h1>
+        <img class="rick-portrait" id="communityProfileImage" alt="Community profile">
       </div>
 
       <div class="hero-intro">
         <div class="hero-copy">
-          <p class="lede" id="communityIntro">
-            Hello, my name is <span data-community="managerName">Rick</span>, and I'm <span data-community="communityName">Sailing Frog's Leap</span>.
-            If you follow my <span data-community="communityName">Sailing Frog's Leap</span> YouTube channel, you're already a <span data-community="memberSingular">Leaper</span>.
-            LEAP is how <span data-community="memberPlural">Leapers</span> can come aboard and become part of the <span data-community="communityName">Sailing Frog's Leap</span> <span data-community="groupName">crew</span>.
-          </p>
+          <p class="lede" id="communityIntro"></p>
         </div>
 
         <div class="returning-crew" id="communityRecordPanel" aria-label="Member Record access">
           <div class="returning-crew-head">
             <strong data-community="recordLabel">Member Record</strong>
-            <span>Your home base for LEAP, rank, badges, and <span data-community="historyLabel">crew history</span>.</span>
+            <span>Your home base for LEAP, rank, badges, and <span data-community="historyLabel">community history</span>.</span>
           </div>
           <div class="returning-crew-row">
             <input
@@ -1046,7 +1043,7 @@
         <section id="idea" class="story-section">
       <div class="wrap">
         <div class="story-panel">
-          <img id="communityHeroImage" src="images/heroImage.png" alt="Crew members on a sailboat at sunset with a logbook in the foreground and the message: The blockchain is just the logbook. The point is the crew." loading="lazy">
+          <img id="communityHeroImage" alt="Community story" loading="lazy">
         </div>
       </div>
     </section>
@@ -1055,15 +1052,13 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Earning LEAP / Rank</h2>
-          <p id="communityExperienceLine">
-            Earning LEAP follows a clear idea: come aboard, show up, and leave a wake.
-          </p>
+          <p id="communityExperienceLine"></p>
         </div>
 
         <div class="three">
           <article class="card">
             <div class="card-topline">
-              <b id="communityStep1">Come aboard</b>
+              <b id="communityStep1"></b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Get your first LEAP</h3>
@@ -1072,7 +1067,7 @@
 
           <article class="card">
             <div class="card-topline">
-              <b id="communityStep2">Show up</b>
+              <b id="communityStep2"></b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Take part in the adventure</h3>
@@ -1083,7 +1078,7 @@
 
           <article class="card">
             <div class="card-topline">
-              <b id="communityStep3">Leave a wake</b>
+              <b id="communityStep3"></b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Build a <span data-community="historyLabel">crew history</span></h3>
@@ -1159,7 +1154,7 @@
 
   <footer>
     <div class="wrap foot">
-      <div><span data-community="communityName">Sailing Frog's Leap</span> • LEAP Membership System</div>
+      <div><span data-community="communityName">Community</span> • LEAP Membership System</div>
 
     </div>
   </footer>
@@ -1167,32 +1162,12 @@
   <script src="js/communityConfig.js"></script>
   <script>
     (() => {
-      const defaults = {
-        id: "sfl",
-        layout: "classic",
-        communityName: "Sailing Frog's Leap",
-        managerName: "Rick",
-        membershipLabel: "Crew Membership",
-        memberSingular: "Leaper",
-        memberPlural: "Leapers",
-        groupName: "crew",
-        recordLabel: "Member Record",
-        historyLabel: "crew history",
-        joinLabel: "Join the Crew →",
-        heading: "Welcome Aboard",
-        intro: "Hello, my name is Rick, and I'm Sailing Frog's Leap. If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper. LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.",
-        bannerDesktop: "images/bannerDesktop.png",
-        bannerMobile: "images/bannerMobile.png",
-        profileImage: "images/profileImage.png",
-        heroImage: "images/heroImage.png",
-        experienceLine: "Earning LEAP follows a clear idea: come aboard, show up, and leave a wake.",
-        experienceSteps: ["Come aboard", "Show up", "Leave a wake"],
-        walletStorageKey: "sfl.xrpl.wallet",
-        activeWalletKey: "sfl.xrpl.activeWallet"
-      };
+      const community = window.WILD_LEDGER_COMMUNITY;
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
 
-      const community = { ...defaults, ...(window.WILD_LEDGER_COMMUNITY || {}) };
-      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      if (!community || !communityId) {
+        throw new Error("Community configuration failed to load.");
+      }
 
       document.querySelectorAll('a[href="ranks.html"]').forEach(link => {
         link.href = `ranks.html?community=${encodeURIComponent(communityId)}`;
@@ -1334,6 +1309,8 @@
       walletInput.addEventListener("keydown", event => {
         if (event.key === "Enter") openCrewRecord();
       });
+
+      document.documentElement.classList.remove("community-pending");
     })();
   </script>
 </body>
