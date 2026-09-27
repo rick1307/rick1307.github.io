@@ -498,13 +498,7 @@
 <img alt="LEAP logo" src="leap-logo.png"/>
 <span id="communityNameLabel">Community</span>
 </a>
-<div class="nav-links">
-<a href="index.html" id="homeLink">Home</a>
-<a href="ranks.html" id="ranksLink">Ranks</a>
-<a href="badges.html" id="badgesLink">Badges</a>
-<a href="faq.html" id="faqLink">FAQ</a>
-<a href="stateMachine.html" id="stateMachineLink">State machine</a>
-</div>
+<div class="nav-links"><a href="index.html" id="communityHomeLink">← Home</a></div>
 </div>
 </nav>
 <div aria-label="The LEAP journey" class="leap-journey-banner">
@@ -684,12 +678,6 @@
 <footer>
 <div class="wrap foot">
 <div id="footerLabel">Community • Join LEAP</div>
-<div>
-<a href="index.html" id="footerHomeLink">Home</a> •
-        <a href="ranks.html" id="footerRanksLink">Ranks</a> •
-        <a href="badges.html" id="footerBadgesLink">Badges</a> •
-        <a href="faq.html" id="footerFaqLink">FAQ</a>
-</div>
 </div>
 </footer>
 <script defer="" src="https://js.usebasin.com/v2.11.1.min.js"></script>
@@ -823,18 +811,10 @@
       const pageHref = page => `${page}?community=${encodeURIComponent(communityId)}`;
       const routeMap = [
         ["communityHomeBrand", homeHref],
-        ["homeLink", homeHref],
-        ["ranksLink", pageHref("ranks.html")],
-        ["badgesLink", pageHref("badges.html")],
-        ["faqLink", pageHref("faq.html")],
-        ["stateMachineLink", pageHref("stateMachine.html")],
+        ["communityHomeLink", homeHref],
         ["nextRanksLink", pageHref("ranks.html")],
         ["nextBadgesLink", pageHref("badges.html")],
-        ["bottomCommunityFaqLink", pageHref("faq.html")],
-        ["footerHomeLink", homeHref],
-        ["footerRanksLink", pageHref("ranks.html")],
-        ["footerBadgesLink", pageHref("badges.html")],
-        ["footerFaqLink", pageHref("faq.html")]
+        ["bottomCommunityFaqLink", pageHref("faq.html")]
       ];
       routeMap.forEach(([id, href]) => {
         const el = document.getElementById(id);
