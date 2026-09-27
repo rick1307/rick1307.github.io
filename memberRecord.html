@@ -9,11 +9,99 @@
 
   <style>
     :root{
+      --paper:#efe8d8;
+      --paper2:#f8f3e8;
       --ink:#17313a;
+      --navy:#123b46;
       --deep:#0b2d36;
+      --sea:#2f7481;
+      --foam:#d7ebe7;
       --rust:#b85a40;
       --gold:#d7ae62;
+      --line:rgba(15,52,64,.16);
+      --card:rgba(250,252,247,.80);
+      --muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
       --max:1060px;
+    }
+
+
+    /* Community-specific visual fallbacks.
+       These mirror communityConfig.js so the active community look remains
+       unmistakable even before/without runtime CSS-variable hydration. */
+    body[data-community-theme="sfl"]{
+      --paper:#efe8d8;
+      --paper2:#f8f3e8;
+      --ink:#17313a;
+      --navy:#123b46;
+      --deep:#0b2d36;
+      --sea:#2f7481;
+      --foam:#d7ebe7;
+      --rust:#b85a40;
+      --gold:#d7ae62;
+      --line:rgba(15,52,64,.16);
+      --card:rgba(250,252,247,.80);
+      --muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+    }
+
+    body[data-community-theme="zach"]{
+      --paper:#e7dfd2;
+      --paper2:#f3ece2;
+      --ink:#2c2926;
+      --navy:#3a2923;
+      --deep:#241a17;
+      --sea:#746458;
+      --foam:#eadfce;
+      --rust:#a33a2c;
+      --gold:#c79a56;
+      --line:rgba(58,41,35,.19);
+      --card:rgba(248,242,233,.84);
+      --muted:#665a52;
+      --page-background:radial-gradient(circle at 10% -8%,rgba(163,58,44,.22),transparent 28%),radial-gradient(circle at 90% 2%,rgba(199,154,86,.22),transparent 30%),linear-gradient(180deg,#e3d8ca 0%,#d7cbbb 24%,#c9bbaa 56%,#b4a18d 100%);
+      --page-overlay:repeating-linear-gradient(115deg,transparent 0 34px,rgba(58,41,35,.035) 35px 36px,transparent 37px 70px),repeating-radial-gradient(ellipse at 78% 68%,transparent 0 46px,rgba(255,255,255,.13) 47px 48px,transparent 49px 92px);
+      --nav-background:rgba(226,214,200,.91);
+      --header-background:linear-gradient(180deg,rgba(234,223,209,.74),rgba(213,198,181,.20) 78%,transparent);
+      --dark-feature-background:linear-gradient(135deg,rgba(52,31,27,.97),rgba(107,54,43,.94));
+    }
+
+    body[data-community-theme="zach"] .crew-console{
+      box-shadow:0 24px 52px rgba(49,24,20,.28);
+    }
+
+    body[data-community-theme="zach"] .crew-console::after{
+      background:
+        linear-gradient(115deg,rgba(255,255,255,.045),transparent 30%,transparent 68%,rgba(199,154,86,.08)),
+        repeating-linear-gradient(135deg,transparent 0 42px,rgba(255,255,255,.018) 43px 44px);
+    }
+
+    body[data-community-theme="zach"] .record-stat,
+    body[data-community-theme="zach"] .rank-progress{
+      background:rgba(255,244,226,.055);
+      border-color:rgba(233,194,132,.16);
+    }
+
+    body[data-community-theme="zach"] .live-pill{
+      border-color:rgba(199,154,86,.48);
+      color:#f0c982;
+      background:rgba(199,154,86,.10);
+    }
+
+    body[data-community-theme="zach"] .crew-state-action{
+      background:var(--gold);
+      color:var(--deep);
+    }
+
+    body[data-community-theme="zach"] .discord-cta button{
+      background:var(--rust);
     }
 
     *{box-sizing:border-box}
@@ -21,10 +109,7 @@
     body{
       margin:0;
       color:var(--ink);
-      background:
-        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
-        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
-        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background:var(--page-background);
       font-family:Georgia,"Times New Roman",serif;
       line-height:1.62;
       min-height:100vh;
@@ -37,9 +122,7 @@
       z-index:-1;
       pointer-events:none;
       opacity:.48;
-      background-image:
-        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
-        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      background-image:var(--page-overlay);
     }
 
     a{color:inherit}
@@ -49,9 +132,9 @@
       position:sticky;
       top:0;
       z-index:10;
-      background:rgba(226,235,230,.88);
+      background:var(--nav-background);
       backdrop-filter:blur(14px) saturate(120%);
-      border-bottom:1px solid rgba(18,59,70,.15);
+      border-bottom:1px solid var(--line);
       box-shadow:0 8px 24px rgba(11,45,54,.05);
     }
 
@@ -84,7 +167,7 @@
 
     .nav-links a{
       text-decoration:none;
-      color:#45636a;
+      color:var(--muted);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       font-size:.9rem;
       font-weight:750;
@@ -94,7 +177,7 @@
 
     header{
       padding:54px 0 70px;
-      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      background:var(--header-background);
     }
 
     .hero-grid{
@@ -106,8 +189,8 @@
       position:relative;
       overflow:hidden;
       background:
-        radial-gradient(circle at 92% 8%,rgba(215,174,98,.17),transparent 30%),
-        linear-gradient(145deg,rgba(9,39,48,.98),rgba(19,72,82,.96));
+        radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--gold) 18%,transparent),transparent 30%),
+        var(--dark-feature-background);
       border:1px solid rgba(255,255,255,.13);
       border-radius:24px;
       padding:24px;
@@ -263,8 +346,8 @@
       border:1px solid rgba(215,174,98,.78);
       border-radius:10px;
       padding:9px 12px;
-      background:#d7ae62;
-      color:#17313a;
+      background:var(--gold);
+      color:var(--ink);
       font:inherit;
       font-size:.68rem;
       font-weight:900;
@@ -394,7 +477,7 @@
       height:100%;
       width:0;
       border-radius:inherit;
-      background:linear-gradient(90deg,var(--gold),#f1cf83);
+      background:linear-gradient(90deg,var(--gold),color-mix(in srgb,var(--gold) 68%,white));
       transition:width .35s ease;
     }
 
@@ -848,6 +931,13 @@
       box-shadow:0 7px 16px rgba(11,45,54,.07);
     }
 
+    body[data-community-layout="garage"] .crew-console{border-radius:14px;}
+    body[data-community-layout="garage"] .record-stat{border-radius:7px;}
+    body[data-community-layout="garage"] .rank-progress{border-radius:9px;}
+    body[data-community-layout="garage"] .crew-state-message{border-radius:8px;}
+    body[data-community-layout="garage"] .crew-state-action,
+    body[data-community-layout="garage"] .discord-cta button{border-radius:6px;}
+
     @media(max-width:600px){
       header{padding-top:54px}
       .crew-console{padding:18px;border-radius:20px}
@@ -923,9 +1013,9 @@
     .leap-journey-banner{
       width:100%;
       overflow:hidden;
-      background:#102f38;
+      background:var(--deep);
       line-height:0;
-      border-bottom:1px solid rgba(18,59,70,.15);
+      border-bottom:1px solid var(--line);
     }
 
     .leap-journey-banner picture,
@@ -937,6 +1027,11 @@
     .leap-journey-banner img{
       height:auto;
     }
+
+    .leap-journey-banner .journey-banner-picture{display:block;}
+    .leap-journey-banner .journey-banner-zach{display:none;}
+    body[data-community-theme="zach"] .journey-banner-sfl{display:none;}
+    body[data-community-theme="zach"] .journey-banner-zach{display:block;}
 
 </style>
 </head>
@@ -952,12 +1047,18 @@
     </div>
   </nav>
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
-    <picture>
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
+    <picture class="journey-banner-picture journey-banner-sfl">
       <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
         src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="Sailing Frog's Leap journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+    </picture>
+    <picture class="journey-banner-picture journey-banner-zach">
+      <source media="(max-width: 800px)" srcset="images/zachBannerMobile.png">
+      <img
+        src="images/zachBannerDesktop.png"
+        alt="Zach's Hot Rods journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Garage Club.">
     </picture>
   </div>
 
@@ -1070,6 +1171,22 @@
       const communityName = community.communityName || "Community";
       const communityMemberPlural = community.memberPlural || "members";
       const communityHomeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+      const theme = community.theme || {};
+      const rootStyle = document.documentElement.style;
+      const themeVars = {
+        paper:"--paper", paper2:"--paper2", ink:"--ink", navy:"--navy", deep:"--deep",
+        sea:"--sea", foam:"--foam", rust:"--rust", gold:"--gold", line:"--line",
+        card:"--card", muted:"--muted", pageBackground:"--page-background",
+        pageOverlay:"--page-overlay", navBackground:"--nav-background",
+        headerBackground:"--header-background", darkFeatureBackground:"--dark-feature-background"
+      };
+      for (const [key, cssVar] of Object.entries(themeVars)) {
+        if (theme[key]) rootStyle.setProperty(cssVar, theme[key]);
+      }
+      document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeColorMeta && theme.themeColor) themeColorMeta.content = theme.themeColor;
 
       document.title = `Member Record — ${communityName}`;
       const metaDescription = document.querySelector('meta[name="description"]');
