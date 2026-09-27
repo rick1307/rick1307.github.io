@@ -279,7 +279,7 @@
 
     .record-grid{
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:9px;
     }
 
@@ -315,6 +315,43 @@
       color:rgba(255,255,255,.54);
       font-size:.66rem;
       line-height:1.2;
+    }
+
+    .record-stat.community-totals{
+      display:grid;
+      grid-template-rows:repeat(3,1fr);
+      gap:0;
+      padding:8px 10px;
+    }
+
+    .community-total-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:10px;
+      min-height:0;
+      padding:5px 0;
+    }
+
+    .community-total-row + .community-total-row{
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+
+    .community-total-row span{
+      color:rgba(255,255,255,.58);
+      font-size:.62rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      line-height:1.1;
+    }
+
+    .community-total-row strong{
+      color:white;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:1rem;
+      line-height:1;
+      text-align:right;
     }
 
     .rank-progress{
@@ -945,8 +982,11 @@
           <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
           <div class="record-stat"><b>Earned</b><strong id="recordEarned">—</strong><small id="recordEarnedNote">in this community</small></div>
           <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote">from LEAP held</small></div>
-          <div class="record-stat"><b>Next</b><strong id="recordNext">—</strong><small id="recordNextNote">next rank</small></div>
-          <div class="record-stat"><b>Badges</b><strong id="recordBadges">—</strong><small id="recordBadgesNote">in your logbook</small></div>
+          <div class="record-stat community-totals" aria-label="Community recognition totals">
+            <div class="community-total-row"><span>Badges</span><strong id="recordBadges">—</strong></div>
+            <div class="community-total-row"><span>Challenges</span><strong id="recordChallenges">—</strong></div>
+            <div class="community-total-row"><span>Events</span><strong id="recordEvents">—</strong></div>
+          </div>
         </div>
 
         <div class="rank-progress">
@@ -1073,10 +1113,9 @@
       const earnedNoteEl = document.getElementById("recordEarnedNote");
       const rankEl = document.getElementById("recordRank");
       const rankNoteEl = document.getElementById("recordRankNote");
-      const nextEl = document.getElementById("recordNext");
-      const nextNoteEl = document.getElementById("recordNextNote");
       const badgesEl = document.getElementById("recordBadges");
-      const badgesNoteEl = document.getElementById("recordBadgesNote");
+      const challengesEl = document.getElementById("recordChallenges");
+      const eventsEl = document.getElementById("recordEvents");
       const logbookEntries = document.getElementById("logbookEntries");
       const personalChronologicalButton = document.getElementById("personalChronologicalButton");
       const personalCategoryButton = document.getElementById("personalCategoryButton");
@@ -1299,7 +1338,8 @@
       function resetLogbook(message = "Your LEAP history will appear here after your Member Record is opened through the LEAP flow.") {
         currentLogbookRecords = [];
         badgesEl.textContent = "—";
-        badgesNoteEl.textContent = "in your logbook";
+        challengesEl.textContent = "—";
+        eventsEl.textContent = "—";
         logbookEntries.className = "logbook-empty";
         logbookEntries.textContent = message;
       }
@@ -1676,8 +1716,6 @@
         earnedNoteEl.textContent = `in ${communityName}`;
         rankEl.textContent = "—";
         rankNoteEl.textContent = `In ${communityName}`;
-        nextEl.textContent = "—";
-        nextNoteEl.textContent = "next rank";
 
         progressLabel.textContent = "Rank progress";
         progressValue.textContent = "—";
@@ -2605,21 +2643,23 @@
         currentLogbookRecords = Array.isArray(records) ? records : [];
 
         const sorted = sortLogbookRecords(currentLogbookRecords);
-        const uniqueBadges = new Set();
+        const recognitionTotals = {
+          BADGE:new Set(),
+          CHALLENGE:new Set(),
+          EVENT:new Set()
+        };
 
         for (const record of sorted) {
           for (const fact of record.facts) {
-            if (fact.key === "BADGE") {
-              uniqueBadges.add(fact.value);
+            if (recognitionTotals[fact.key]) {
+              recognitionTotals[fact.key].add(fact.value);
             }
           }
         }
 
-        badgesEl.textContent = String(uniqueBadges.size);
-        badgesNoteEl.textContent =
-          uniqueBadges.size === 1
-            ? "badge in your logbook"
-            : "badges in your logbook";
+        badgesEl.textContent = String(recognitionTotals.BADGE.size);
+        challengesEl.textContent = String(recognitionTotals.CHALLENGE.size);
+        eventsEl.textContent = String(recognitionTotals.EVENT.size);
 
         logbookEntries.replaceChildren();
 
@@ -2732,18 +2772,12 @@
         rankEl.textContent = rank.name;
 
         if (rank.threshold === null) {
-          nextEl.textContent = "Top Rank";
-          nextNoteEl.textContent = "keep building history";
           progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
           progressValue.textContent = `${balance} LEAP`;
           progressFill.style.width = "100%";
           return;
         }
 
-        const remaining = Math.max(0, rank.threshold - balance);
-
-        nextEl.textContent = rank.next;
-        nextNoteEl.textContent = `${remaining} LEAP to go`;
         progressLabel.textContent = `${rank.name} → ${rank.next}`;
         progressValue.textContent = `${balance} / ${rank.threshold} LEAP`;
         progressFill.style.width =
