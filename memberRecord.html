@@ -972,6 +972,7 @@
       const community = window.WILD_LEDGER_COMMUNITY || {
         id: "sfl",
         communityName: "Community",
+        leapNamespace: "SFL-LEAP",
         memberPlural: "members",
         walletStorageKey: "sfl.xrpl.wallet",
         activeWalletKey: "sfl.xrpl.activeWallet"
@@ -1002,7 +1003,7 @@
         "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
       ]);
 
-      const LEAP_NAMESPACE = "SFL-LEAP";
+      const LEAP_NAMESPACE = community.leapNamespace || "SFL-LEAP";
       const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
 
       const SFL_WALLET_STORAGE_KEY = community.walletStorageKey || `${communityId}.xrpl.wallet`;
