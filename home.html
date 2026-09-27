@@ -912,15 +912,15 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Earning LEAP / Rank</h2>
-          <p>
-            Earning LEAP follows a clear idea: come aboard, show up, and leave a wake.
+          <p id="communityExperienceLine">
+            Show up. Come aboard. Leave awake.
           </p>
         </div>
 
         <div class="three">
           <article class="card">
             <div class="card-topline">
-              <b>Come aboard</b>
+              <b id="communityStep1">Show up</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Get your first LEAP</h3>
@@ -929,7 +929,7 @@
 
           <article class="card">
             <div class="card-topline">
-              <b>Show up</b>
+              <b id="communityStep2">Come aboard</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Take part in the adventure</h3>
@@ -940,7 +940,7 @@
 
           <article class="card">
             <div class="card-topline">
-              <b>Leave a wake</b>
+              <b id="communityStep3">Leave awake</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
             <h3>Build a crew history</h3>
@@ -1081,7 +1081,9 @@
       heading: "Welcome Aboard",
       intro: "Hello, my name is Rick, and I'm Sailing Frog's Leap.             If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper.             LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.",
       profileImage: "images/profileImage.png",
-      heroImage: "images/heroImage.png"
+      heroImage: "images/heroImage.png",
+      experienceLine: "Show up. Come aboard. Leave awake.",
+      experienceSteps: ["Show up", "Come aboard", "Leave awake"]
     },
     zach: {
       bannerDesktop: "images/zachBannerDesktop.png",
@@ -1090,7 +1092,9 @@
       heading: "Start Your Engines",
       intro: "Hey y'all. My name is Zach. If you follow me on Instagram or TikTok, you already know we're in for a good time. Show me your LEAP, climb in. Let's go for a ride!",
       profileImage: "images/zachProfileImage.png",
-      heroImage: "images/zachHeroImage.png"
+      heroImage: "images/zachHeroImage.png",
+      experienceLine: "Show up. Get your hands dirty. Leave inspired.",
+      experienceSteps: ["Show up", "Get your hands dirty", "Leave inspired"]
     }
   };
 
@@ -1109,6 +1113,10 @@
   document.getElementById("communityIntro").textContent = community.intro;
   document.getElementById("communityProfileImage").src = community.profileImage;
   document.getElementById("communityHeroImage").src = community.heroImage;
+  document.getElementById("communityExperienceLine").textContent = community.experienceLine;
+  document.getElementById("communityStep1").textContent = community.experienceSteps[0];
+  document.getElementById("communityStep2").textContent = community.experienceSteps[1];
+  document.getElementById("communityStep3").textContent = community.experienceSteps[2];
 </script>
 
 </body>
