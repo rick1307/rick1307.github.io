@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Simple answers about Wild Ledger, LEAP, XRP Ledger addresses, wallet privacy, Xaman, LEAP Checks, member records, transfers, and wallet safety." />
-  <meta name="theme-color" content="#dce9e5" />
-  <title>Wild Ledger FAQ</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Simple answers about Wild Ledger, LEAP, XRP Ledger addresses, wallet privacy, Xaman, LEAP Checks, member records, transfers, and wallet safety." name="description"/>
+<meta content="#dce9e5" name="theme-color"/>
+<title>Wild Ledger FAQ</title>
 <style>
     :root{
       --paper:#efe8d8;--ink:#1a252c;--navy:#16384b;--foam:#dbece8;
@@ -538,23 +539,22 @@
 </style>
 </head>
 <body>
-  <nav>
-    <div class="wrap nav-inner">
-      <div class="brand topbar-simple">
-        <span class="wild-ledger-name">Wild Ledger</span>
-        <a class="back-link" href="splash.html" aria-label="Back to Wild Ledger">Back to Wild Ledger</a>
-      </div>
-    </div>
-  </nav>
-  <header>
-    <div class="wrap">
-      <div class="kicker">Wild Ledger · Frequently Asked Questions</div>
-      <h1>Wild Ledger FAQ</h1>
-      <p class="lede">These are the rules and mechanics that apply across participating LEAP communities. Each community has its own identity and experience, but LEAP on the XRP Ledger is the common thread that connects them. This technology is still new to many people, so this FAQ is here to explain clearly what we’re building, how it works, and what stays the same in every Wild Ledger community you participate in.</p>
-    </div>
-  </header>
-  <main>
-
+<nav>
+<div class="wrap nav-inner">
+<div class="brand topbar-simple">
+<span class="wild-ledger-name">Wild Ledger</span>
+<a aria-label="Back to Wild Ledger" class="back-link" href="splash.html">Back to Wild Ledger</a>
+</div>
+</div>
+</nav>
+<header>
+<div class="wrap">
+<div class="kicker">Wild Ledger · Frequently Asked Questions</div>
+<h1>Wild Ledger FAQ</h1>
+<p class="lede">These are the rules and mechanics that apply across participating LEAP communities. Each community has its own identity and experience, but LEAP on the XRP Ledger is the common thread that connects them. This technology is still new to many people, so this FAQ is here to explain clearly what we’re building, how it works, and what stays the same in every Wild Ledger community you participate in.</p>
+</div>
+</header>
+<main>
 <section>
 <div class="wrap">
 <span class="category">Getting started</span>
@@ -618,19 +618,7 @@
 </div>
 </div>
 </section>
-<section>
-<div class="wrap">
-<span class="category">Technical details</span>
-<h2>Under the hood</h2>
-<p class="technical-note">You do not need to understand any of this to use LEAP. This section is for anyone interested in how LEAP uses the XRP Ledger under the hood.</p>
-<h3 class="faq-subhead">Memos &amp; Transactions</h3>
-<div class="faq">
-<div class="row"><b>Where does the memo actually live?</b><span>The memo belongs to the <code>CheckCreate</code> transaction that creates the Check. It does not belong to an individual LEAP token or to the Check object itself. Cashing uses a separate <code>CheckCash</code> transaction, and canceling uses a separate <code>CheckCancel</code> transaction. The original <code>CheckCreate</code> and its memo remain in public ledger history either way.</span></div>
-<div class="row"><b>Does the memo travel with one specific LEAP coin?</b><span>No. LEAP is fungible. The memo belongs to the transaction record, not to one individually serialized LEAP unit.</span></div>
-<div class="row"><b>Why use community namespaces?</b><span>A namespace lets Wild Ledger software separate a community's LEAP records from unrelated wallet activity and organize them into the community's badges, events, challenges, member history, and administrative history. Each community can use its own namespace and conventions.</span></div>
-</div>
-</div>
-</section>
+
 <section>
 <div class="wrap">
 <span class="category">About LEAP</span>
@@ -641,8 +629,7 @@
 </div>
 </section>
 <section><div class="wrap"><div class="cta"><h3>Explore a LEAP community</h3><p>Each participating community explains its own activities, recognition, and ways to take part.</p><a class="button" href="splash.html">Communities →</a></div></div></section>
-
-  </main>
-  <footer><div class="wrap foot"><div>Wild Ledger • FAQ</div></div></footer>
+</main>
+<footer><div class="wrap foot"><div>Wild Ledger • FAQ</div></div></footer>
 </body>
 </html>
