@@ -846,10 +846,11 @@
 
     .logbook-entry{
       display:grid;
-      grid-template-columns:84px minmax(0,1fr);
+      grid-template-columns:84px minmax(0,1fr) 82px;
       gap:12px;
       padding:12px 0;
       border-top:1px solid rgba(255,255,255,.08);
+      align-items:center;
     }
 
     .logbook-date{
@@ -897,6 +898,32 @@
       font-size:.76rem;
       font-weight:750;
       overflow-wrap:anywhere;
+    }
+
+    .logbook-earned{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:center;
+      gap:2px;
+      min-width:0;
+      line-height:1.2;
+      text-align:right;
+    }
+
+    .logbook-earned span{
+      color:rgba(255,255,255,.4);
+      font-size:.5rem;
+      font-weight:900;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+
+    .logbook-earned strong{
+      color:#f2d99f;
+      font-size:.72rem;
+      font-weight:900;
+      white-space:nowrap;
     }
 
     .discord-cta{
@@ -961,8 +988,9 @@
       .pending-check-action{justify-content:stretch;text-align:left}
       .pending-check-action button{width:100%}
       .crew-state-action{width:100%}
-      .logbook-entry{grid-template-columns:72px minmax(0,1fr)}
+      .logbook-entry{grid-template-columns:72px minmax(0,1fr) 68px;gap:9px}
       .logbook-fact{grid-template-columns:60px minmax(0,1fr)}
+      .logbook-earned strong{font-size:.66rem}
     }
   
 
@@ -2600,7 +2628,23 @@
           facts.appendChild(factRow);
         }
 
-        row.append(date, facts);
+        const earned = document.createElement("div");
+        earned.className = "logbook-earned";
+
+        const earnedLabel = document.createElement("span");
+        earnedLabel.textContent = "LEAP Earned";
+
+        const earnedValue = document.createElement("strong");
+        const earnedAmount = Number(record?.earnedAmount);
+        const earnedText = Number.isFinite(earnedAmount)
+          ? (Number.isInteger(earnedAmount)
+              ? String(earnedAmount)
+              : String(Number(earnedAmount.toFixed(6))))
+          : "—";
+        earnedValue.textContent = `${earnedText} LEAP`;
+
+        earned.append(earnedLabel, earnedValue);
+        row.append(date, facts, earned);
 
         return row;
       }
