@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="community-pending">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,6 +15,7 @@
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
+    html.community-pending body{visibility:hidden}
     body{
       margin:0;color:var(--ink);
       background:
@@ -22,7 +23,7 @@
         linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
         var(--paper);
       background-size:30px 30px;
-      font-family:Georgia,"Times New Roman",serif;line-height:1.62;
+      font-family:var(--community-display-font);line-height:1.62;
     }
     a{color:inherit}
     .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
@@ -31,12 +32,12 @@
       backdrop-filter:blur(10px);border-bottom:1px solid var(--line)
     }
     .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:var(--community-ui-font);font-weight:850}
     .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
     .nav-links{display:flex;gap:18px;align-items:center}
-    .nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
+    .nav-links a{text-decoration:none;color:#4e5c62;font-family:var(--community-ui-font);font-size:.9rem;font-weight:750}
     header{padding:78px 0 48px}
-    .kicker{color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}
+    .kicker{color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}
     h1{margin:.14em 0 .2em;color:var(--navy);font-size:clamp(3.2rem,8vw,6.3rem);line-height:.94;letter-spacing:-.055em}
     .lede{max-width:860px;margin:0;color:#46575f;font-size:clamp(1.16rem,2vw,1.4rem)}
     .hero-note{margin-top:25px;padding:20px 22px;border-left:4px solid var(--gold);background:rgba(255,250,240,.58);color:#4f5c62;font-size:1.08rem}
@@ -49,7 +50,7 @@
 
     .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     .principle{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
-    .principle b{display:block;margin-bottom:7px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem}
+    .principle b{display:block;margin-bottom:7px;color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.08em;font-size:.76rem}
     .principle h3{margin:0 0 7px;color:var(--navy);font-size:1.25rem}
     .principle p{margin:0;color:#58666c}
 
@@ -63,13 +64,13 @@
     .badge-body p{margin:0 0 14px;color:#56646a}.badge-body p:last-child{margin-bottom:0}
     .examples{margin:13px 0 0;padding-left:20px;color:#536269}
     .examples li{margin:6px 0}
-    .label{display:inline-block;margin-bottom:8px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+    .label{display:inline-block;margin-bottom:8px;color:var(--rust);font-family:var(--community-ui-font);font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
 
     .return-box{background:linear-gradient(135deg,#e5efeb,#f7f0e3);border:1px solid var(--line);border-radius:18px;padding:30px;text-align:center}
     .return-box h3{margin:0 0 8px;color:var(--navy);font-size:1.55rem}.return-box p{margin:0;color:#58666c}
-    .button{display:inline-flex;align-items:center;justify-content:center;margin-top:18px;padding:12px 18px;border-radius:8px;text-decoration:none;background:var(--rust);color:white;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+    .button{display:inline-flex;align-items:center;justify-content:center;margin-top:18px;padding:12px 18px;border-radius:8px;text-decoration:none;background:var(--rust);color:white;font-family:var(--community-ui-font);font-weight:850}
 
-    footer{padding:38px 0 48px;color:#69757a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.86rem}
+    footer{padding:38px 0 48px;color:#69757a;font-family:var(--community-ui-font);font-size:.86rem}
     .foot{padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px}
 
     @media(max-width:850px){
@@ -95,7 +96,7 @@
       margin:0;color:var(--ink);
       background:var(--page-background);
       background-size:auto;
-      font-family:Georgia,"Times New Roman",serif;
+      font-family:var(--community-display-font);
     }
     body::before{
       content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
@@ -245,6 +246,7 @@
     }
 
 </style>
+<link rel="stylesheet" href="communityTypography.css">
 </head>
 
 <body>
@@ -260,8 +262,8 @@
 
   <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
     <picture>
-      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
-      <img id="communityBannerDesktop" src="images/bannerDesktop.png" alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
+      <source id="communityBannerMobile" media="(max-width: 800px)">
+      <img id="communityBannerDesktop" alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
     </picture>
   </div>
 
@@ -499,16 +501,12 @@
   <script src="js/communityConfig.js"></script>
   <script>
     (() => {
-      const community = window.WILD_LEDGER_COMMUNITY || {
-        id:"sfl",
-        layout:"classic",
-        communityName:"Community",
-        joinLabel:"Join →",
-        bannerDesktop:"images/bannerDesktop.png",
-        bannerMobile:"images/bannerMobile.png",
-        badges:[]
-      };
-      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const community = window.WILD_LEDGER_COMMUNITY;
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
+
+      if (!community || !communityId) {
+        throw new Error("Community configuration failed to load.");
+      }
       const communityName = community.communityName || "Community";
       const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
       const joinHref = `join.html?community=${encodeURIComponent(communityId)}`;
@@ -630,6 +628,8 @@
 
       const footer = document.getElementById("footerLabel");
       if (footer) footer.textContent = `${communityName} • LEAP Badges`;
+
+      document.documentElement.classList.remove("community-pending");
     })();
   </script>
 </body>
