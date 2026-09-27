@@ -472,7 +472,19 @@ LEAP-002</code></pre>
 <div>
     A community namespace lets Wild Ledger software separate that community's LEAP records from unrelated wallet activity and organize them into the community's badges, events, challenges, member history, and administrative history. Each participating community can use its own namespace and conventions within the LEAP protocol.
   </div>
-</div><h3>Current recognition categories</h3>
+</div><h3>Community naming convention</h3>
+<p>
+          Participating communities use a common naming pattern so Wild Ledger software can recognize and organize community records consistently while keeping each community distinct.
+        </p>
+<table>
+<tr><th>Rule</th><th>Standard</th></tr>
+<tr><td>Community memo format</td><td>Each community uses its own namespace followed by a category and value: <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.</td></tr>
+<tr><td>Recognition categories</td><td>The standard categories are <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. Examples include <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, <code>&lt;COMMUNITY&gt;-LEAP/EVENT=COMMUNITY-MEETUP</code>, and <code>&lt;COMMUNITY&gt;-LEAP/CHALLENGE=LEAP-001</code>.</td></tr>
+<tr><td>Badge memo</td><td>The memo gives the recognition a consistent name inside the community's namespace, such as <code>&lt;COMMUNITY&gt;-LEAP/BADGE=NEW-MEMBER</code> or <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, so the badge can be identified later from ledger history.</td></tr>
+<tr><td>What the XRP Ledger understands</td><td>The XRP Ledger stores the memo data; it does not interpret the community namespace. The namespace is a Wild Ledger convention that lets software recognize and organize each community's records consistently.</td></tr>
+<tr><td>Why each community uses a namespace</td><td>It lets Wild Ledger software separate one community's records from unrelated wallet activity and organize them into badges, events, challenges, the Member Record, and administrative history.</td></tr>
+</table>
+<h3>Current recognition categories</h3>
 <table>
 <tr><th>Category</th><th>What it records</th><th>Canonical example</th></tr>
 <tr><td><code>BADGE</code></td><td>Permanent recognition for something the member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=NEW-MEMBER</code></td></tr>
