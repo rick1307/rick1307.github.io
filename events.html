@@ -311,15 +311,44 @@
       </div>
     </section>
 
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>What an event might look like</h2>
+          <p>There are no fixed event types. These are simply examples of moments a community operator might choose to recognize.</p>
+        </div>
+
+        <div class="principles">
+          <div class="principle">
+            <b>For example</b>
+            <h3>Gathering</h3>
+            <p>A meetup, watch party, open house, cruise-in, marina day, or another planned gathering tied to a specific date and time.</p>
+          </div>
+
+          <div class="principle">
+            <b>For example</b>
+            <h3>Shared online moment</h3>
+            <p>A livestream, premiere, virtual meetup, or another online experience that happens during a defined window.</p>
+          </div>
+
+          <div class="principle">
+            <b>For example</b>
+            <h3>Project or experience day</h3>
+            <p>A work day, outing, launch, passage day, show, ride, or another real-world experience where participation happens at a known time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="upcoming-events">
       <div class="wrap">
         <div class="section-title">
           <h2>Upcoming events</h2>
-          <p>This is where announced LEAP events will live once the time and place are set.</p>
+          <p>This is the active event log — the place to see what has been announced and what is coming next.</p>
         </div>
         <div class="status-box">
-          <h3>No event has been announced yet.</h3>
-          <p>When an event is ready, this page can show the date, location, what to expect, and exactly what counts as participation.</p>
+          <h3 id="upcomingEventStatus">No upcoming event is listed right now.</h3>
+          <p id="upcomingEventCopy">When an event is announced, this page can show the date, time, location or link, what to expect, and what counts as participation.</p>
         </div>
       </div>
     </section>
@@ -328,10 +357,10 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Past events</h2>
-          <p id="pastEventsIntro">After an event ends, it does not have to disappear. Past events can remain here as part of the public history of the community.</p>
+          <p id="pastEventsIntro">This is the past event log. Once an event is over, it can remain here as part of the public history of the community.</p>
         </div>
         <div class="status-box">
-          <h3>The event log starts with the first gathering.</h3>
+          <h3 id="pastEventStatus">The past event log starts with the first event.</h3>
           <p id="pastEventsHistory">Over time, this section can become a timeline of the real places and moments where members showed up together.</p>
         </div>
       </div>
@@ -341,7 +370,7 @@
       <div class="wrap">
         <div class="return-box">
           <h3>Events are the “I was there” part of LEAP.</h3>
-          <p>The first one will appear here when the details are ready.</p>
+          <p id="eventCtaCopy">When an event is announced, this page is where you can see what is coming and what has already become part of the community story.</p>
           <a class="button" id="backToCommunity" href="index.html">Back to community →</a>
         </div>
       </div>
@@ -453,6 +482,18 @@
       if (pastHistory) {
         pastHistory.textContent =
           `Over time, this section can become a timeline of the real places and moments where ${memberPlural} showed up together.`;
+      }
+
+      const upcomingCopy = document.getElementById("upcomingEventCopy");
+      if (upcomingCopy) {
+        upcomingCopy.textContent =
+          `When ${communityName} announces an event, this page can show the date, time, location or link, what to expect, and what counts as participation.`;
+      }
+
+      const ctaCopy = document.getElementById("eventCtaCopy");
+      if (ctaCopy) {
+        ctaCopy.textContent =
+          `When ${communityName} announces an event, this page is where you can see what is coming and what has already become part of the ${groupName} story.`;
       }
 
       const footer = document.getElementById("footerLabel");
