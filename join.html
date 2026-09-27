@@ -515,17 +515,13 @@
 </div>
 <header>
 <div class="wrap">
-<div class="kicker" id="joinKicker">Join the Community</div>
-<h1 id="joinHeading">Join</h1>
-<p class="lede" id="joinLede">Your first LEAP is the doorway in. Request it with your public Xaman wallet address, cash the Check in Xaman, and your Member Record begins.</p>
-<div class="hero-line" id="heroLine"><strong>New here? Request your first LEAP below.</strong> Already have it? Open your Member Record.</div>
+<h1>Your first LEAP is the doorway.</h1>
 </div>
 </header>
 <main>
 <section class="join-gateway" id="join-now">
 <div class="wrap">
 <div class="section-title gateway-title">
-<h2>Start here</h2>
 <p>Choose the one that matches where you are right now.</p>
 </div>
 <div class="gateway-grid">
@@ -862,24 +858,6 @@
       const bannerMobile = document.getElementById("communityBannerMobile");
       if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
       if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
-
-      const joinKicker = document.getElementById("joinKicker");
-      if (joinKicker) joinKicker.textContent = `Join ${communityName}`;
-
-      const joinHeading = document.getElementById("joinHeading");
-      if (joinHeading) joinHeading.textContent = community.heading || "Join";
-
-      const joinLede = document.getElementById("joinLede");
-      if (joinLede) {
-        joinLede.textContent =
-          `Your first LEAP is the doorway into ${communityName}. Request it with your public Xaman wallet address, cash the Check in Xaman, and your ${community.recordLabel || "Member Record"} begins.`;
-      }
-
-      const heroLine = document.getElementById("heroLine");
-      if (heroLine) {
-        heroLine.innerHTML =
-          `<strong>New here? Request your first LEAP below.</strong> Already have it? Open your ${community.recordLabel || "Member Record"}.`;
-      }
 
       const threeStepWelcome = document.getElementById("threeStepWelcome");
       if (threeStepWelcome) {
