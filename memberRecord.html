@@ -2525,56 +2525,40 @@
       }
 
       function rankFor(balance) {
-        if (balance >= 51) {
+        const configuredRanks = Array.isArray(community.ranks) && community.ranks.length
+          ? community.ranks
+          : [
+              { min:1, name:"Deckhand" },
+              { min:5, name:"Bosun" },
+              { min:10, name:"Quartermaster" },
+              { min:25, name:"First Mate" },
+              { min:51, name:"Master of the Leap" }
+            ];
+
+        const ranks = [...configuredRanks].sort((a,b) => a.min - b.min);
+        let currentIndex = -1;
+
+        for (let i = 0; i < ranks.length; i += 1) {
+          if (balance >= ranks[i].min) currentIndex = i;
+        }
+
+        if (currentIndex < 0) {
           return {
-            name:"Master of the Leap",
-            next:null,
-            threshold:null,
-            start:51
+            name: community.unrankedRankLabel || "Not ranked",
+            next: ranks[0].name,
+            threshold: ranks[0].min,
+            start:0
           };
         }
 
-        if (balance >= 25) {
-          return {
-            name:"First Mate",
-            next:"Master of the Leap",
-            threshold:51,
-            start:25
-          };
-        }
-
-        if (balance >= 10) {
-          return {
-            name:"Quartermaster",
-            next:"First Mate",
-            threshold:25,
-            start:10
-          };
-        }
-
-        if (balance >= 5) {
-          return {
-            name:"Bosun",
-            next:"Quartermaster",
-            threshold:10,
-            start:5
-          };
-        }
-
-        if (balance >= 1) {
-          return {
-            name:"Deckhand",
-            next:"Bosun",
-            threshold:5,
-            start:1
-          };
-        }
+        const current = ranks[currentIndex];
+        const next = ranks[currentIndex + 1] || null;
 
         return {
-          name:"Not aboard",
-          next:"Deckhand",
-          threshold:1,
-          start:0
+          name: current.name,
+          next: next ? next.name : null,
+          threshold: next ? next.min : null,
+          start: current.min
         };
       }
 
@@ -2599,7 +2583,7 @@
         if (rank.threshold === null) {
           nextEl.textContent = "Top Rank";
           nextNoteEl.textContent = "keep building history";
-          progressLabel.textContent = "Highest crew rank reached";
+          progressLabel.textContent = "Highest rank reached";
           progressValue.textContent = `${balance} LEAP`;
           progressFill.style.width = "100%";
           return;
