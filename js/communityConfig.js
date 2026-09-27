@@ -119,9 +119,38 @@
     }
   };
 
+  const ACTIVE_COMMUNITY_KEY = "wildLedger.activeCommunity";
   const params = new URLSearchParams(window.location.search);
-  const requestedId = (params.get("community") || "sfl").toLowerCase();
-  const communityId = communities[requestedId] ? requestedId : "sfl";
+  const requestedFromUrl = (params.get("community") || "").toLowerCase();
+
+  let requestedFromReferrer = "";
+  try {
+    if (document.referrer) {
+      const referrerUrl = new URL(document.referrer);
+      if (referrerUrl.origin === window.location.origin) {
+        requestedFromReferrer =
+          (referrerUrl.searchParams.get("community") || "").toLowerCase();
+      }
+    }
+  } catch (_) {}
+
+  let rememberedCommunity = "";
+  try {
+    rememberedCommunity =
+      (sessionStorage.getItem(ACTIVE_COMMUNITY_KEY) || "").toLowerCase();
+  } catch (_) {}
+
+  const requestedId =
+    (communities[requestedFromUrl] && requestedFromUrl) ||
+    (communities[requestedFromReferrer] && requestedFromReferrer) ||
+    (communities[rememberedCommunity] && rememberedCommunity) ||
+    "sfl";
+
+  const communityId = requestedId;
+
+  try {
+    sessionStorage.setItem(ACTIVE_COMMUNITY_KEY, communityId);
+  } catch (_) {}
 
   window.WILD_LEDGER_COMMUNITIES = communities;
   window.WILD_LEDGER_COMMUNITY_ID = communityId;
