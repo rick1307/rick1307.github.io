@@ -788,7 +788,7 @@
     <div class="wrap nav-inner">
       <div class="brand">
         <img src="leap-logo.png" alt="LEAP logo">
-        <span>Sailing Frog's Leap</span>
+        <span id="communityBrand">Sailing Frog's Leap</span>
       </div>
       <div class="nav-links">
         <a href="splash.html">Wild Ledger</a>
@@ -808,25 +808,25 @@
 
   <header id="top">
     <div class="wrap hero">
-      <div class="kicker">Sailing Frog's Leap Crew Membership</div>
+      <div class="kicker" id="communityKicker">Sailing Frog's Leap Crew Membership</div>
       <div class="welcome-head">
         <h1>Welcome Aboard</h1>
-        <img class="rick-portrait" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
+        <img class="rick-portrait" id="communityProfileImage" src="images/profileImage.png" alt="Rick from Sailing Frog's Leap">
       </div>
 
       <div class="hero-intro">
         <div class="hero-copy">
           <p class="lede">
-            Hello, my name is Rick, and I'm Sailing Frog's Leap.
-            If you follow my Sailing Frog's Leap YouTube channel, you're already a Leaper.
-            LEAP is how Leapers can come aboard and become part of the Sailing Frog's Leap crew.
+            Hello, my name is <span data-community="managerName">Rick</span>, and I'm <span data-community="communityName">Sailing Frog's Leap</span>.
+            If you follow my <span data-community="communityName">Sailing Frog's Leap</span> YouTube channel, you're already a <span data-community="memberSingular">Leaper</span>.
+            LEAP is how <span data-community="memberPlural">Leapers</span> can come aboard and become part of the <span data-community="communityName">Sailing Frog's Leap</span> <span data-community="groupName">crew</span>.
           </p>
         </div>
 
-        <div class="returning-crew" aria-label="Crew Record access">
+        <div class="returning-crew" id="communityRecordPanel" aria-label="Crew Record access">
           <div class="returning-crew-head">
-            <strong>Crew Record</strong>
-            <span>Your home base for LEAP, rank, badges, and crew history.</span>
+            <strong data-community="recordLabel">Crew Record</strong>
+            <span>Your home base for LEAP, rank, badges, and <span data-community="historyLabel">crew history</span>.</span>
           </div>
           <div class="returning-crew-row">
             <input
@@ -838,7 +838,7 @@
               spellcheck="false"
               placeholder="Enter your XRPL wallet address"
               aria-label="Returning crew XRPL wallet address">
-            <button id="openCrewRecord" type="button">Enter Crew Record →</button>
+            <button id="openCrewRecord" type="button">Enter <span data-community="recordLabel">Crew Record</span> →</button>
           </div>
           <p class="returning-crew-status" id="returningCrewStatus" role="status" aria-live="polite"></p>
         </div>
@@ -891,9 +891,9 @@
               <b>Leave a wake</b>
               <a class="card-more" href="ranks.html">Learn More →</a>
             </div>
-            <h3>Build a crew history</h3>
+            <h3>Build a <span data-community="historyLabel">crew history</span></h3>
             <p>
-              Your LEAP balance advances your rank. Badges, challenges, and events help turn the things you do into a crew history you can look back on.
+              Your LEAP balance advances your rank. Badges, challenges, and events help turn the things you do into a <span data-community="historyLabel">crew history</span> you can look back on.
             </p>
           </article>
         </div>
@@ -953,7 +953,7 @@
             Joining takes a few steps, and we'll walk you through each one.
           </p>
           <div class="cta-links">
-            <a class="button" href="join.html">Join the Crew →</a>
+            <a class="button" id="communityJoinButton" href="join.html">Join the Crew →</a>
             <a class="button secondary" href="faq.html">FAQs →</a>
           </div>
         </div>
@@ -964,13 +964,60 @@
 
   <footer>
     <div class="wrap foot">
-      <div>Sailing Frog's Leap • LEAP Membership System</div>
+      <div><span data-community="communityName">Sailing Frog's Leap</span> • LEAP Membership System</div>
 
     </div>
   </footer>
 
+  <script src="js/communityConfig.js"></script>
   <script>
     (() => {
+      const defaults = {
+        communityName: "Sailing Frog's Leap",
+        managerName: "Rick",
+        membershipLabel: "Crew Membership",
+        memberSingular: "Leaper",
+        memberPlural: "Leapers",
+        groupName: "crew",
+        recordLabel: "Crew Record",
+        historyLabel: "crew history",
+        joinLabel: "Join the Crew →"
+      };
+
+      const community = { ...defaults, ...(window.WILD_LEDGER_COMMUNITY || {}) };
+
+      document.title = `Welcome Aboard — ${community.communityName}`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute(
+          "content",
+          `Join the ${community.communityName} ${community.groupName}. LEAP is the on-chain membership credential for people who take part in the community.`
+        );
+      }
+
+      document.querySelectorAll("[data-community]").forEach((element) => {
+        const key = element.dataset.community;
+        if (community[key] !== undefined) element.textContent = community[key];
+      });
+
+      const brand = document.getElementById("communityBrand");
+      if (brand) brand.textContent = community.communityName;
+
+      const kicker = document.getElementById("communityKicker");
+      if (kicker) kicker.textContent = `${community.communityName} ${community.membershipLabel}`;
+
+      const profileImage = document.getElementById("communityProfileImage");
+      if (profileImage) profileImage.alt = `${community.managerName} from ${community.communityName}`;
+
+      const recordPanel = document.getElementById("communityRecordPanel");
+      if (recordPanel) recordPanel.setAttribute("aria-label", `${community.recordLabel} access`);
+
+      const joinButton = document.getElementById("communityJoinButton");
+      if (joinButton) joinButton.textContent = community.joinLabel;
+
+      const openRecordButton = document.getElementById("openCrewRecord");
+      if (openRecordButton) openRecordButton.textContent = `Enter ${community.recordLabel} →`;
+
       const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
       const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
