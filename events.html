@@ -390,6 +390,8 @@
         id:"sfl",
         layout:"classic",
         communityName:"Community",
+        operatorName:"Operator",
+        operatorPossessive:"Operator's",
         memberSingular:"member",
         memberPlural:"members",
         groupName:"community",
@@ -401,6 +403,9 @@
 
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
       const communityName = community.communityName || "Community";
+      const operatorName = community.operatorName || community.managerName || "Operator";
+      const operatorPossessive =
+        community.operatorPossessive || `${operatorName}'s`;
       const memberSingular = community.memberSingular || "member";
       const memberPlural = community.memberPlural || "members";
       const groupName = community.groupName || "community";
@@ -451,13 +456,13 @@
       const lede = document.getElementById("communityLede");
       if (lede) {
         lede.textContent =
-          `Events are shared moments tied to a specific time in the ${communityName} story. Show up, take part, and that moment can become part of your ${historyLabel}.`;
+          `Events are shared moments tied to a specific time in ${operatorPossessive} story. Show up, take part, and that moment can become part of your ${historyLabel}.`;
       }
 
       const definition = document.getElementById("eventDefinitionCopy");
       if (definition) {
         definition.textContent =
-          `An event is a shared moment in the ${communityName} story tied to a particular day or defined window of time. It may happen in person or online, but it has a clear beginning, a clear end, and a way to take part.`;
+          `An event is a shared moment in ${operatorPossessive} story tied to a particular day or defined window of time. It may happen in person or online, but it has a clear beginning, a clear end, and a way to take part.`;
       }
 
       const participation = document.getElementById("eventParticipationCopy");
@@ -469,7 +474,7 @@
       const recognition = document.getElementById("eventRecognitionCopy");
       if (recognition) {
         recognition.textContent =
-          `${communityName} records who took part and what event it was.`;
+          `${operatorName} records who took part and what event it was.`;
       }
 
       const pastIntro = document.getElementById("pastEventsIntro");
@@ -487,13 +492,13 @@
       const upcomingCopy = document.getElementById("upcomingEventCopy");
       if (upcomingCopy) {
         upcomingCopy.textContent =
-          `When ${communityName} announces an event, this page can show the date, time, location or link, what to expect, and what counts as participation.`;
+          `When ${operatorName} announces an event, this page can show the date, time, location or link, what to expect, and what counts as participation.`;
       }
 
       const ctaCopy = document.getElementById("eventCtaCopy");
       if (ctaCopy) {
         ctaCopy.textContent =
-          `When ${communityName} announces an event, this page is where you can see what is coming and what has already become part of the ${groupName} story.`;
+          `When ${operatorName} announces an event, this page is where you can see what is coming and what has already become part of the ${groupName} story.`;
       }
 
       const footer = document.getElementById("footerLabel");
