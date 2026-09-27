@@ -888,7 +888,7 @@
           <div class="console-title">
             <img src="leap-logo.png" alt="LEAP coin">
             <div>
-              <b>Member Record</b>
+              <b id="memberRecordTitle">Member Record</b>
               <div class="trustline-row" id="trustlineStatus">
                 <span id="trustlineStatusText">Checking transfers…</span>
               </div>
@@ -990,6 +990,8 @@
       }
       const communityNameLabel = document.getElementById("communityNameLabel");
       if (communityNameLabel) communityNameLabel.textContent = communityName;
+      const memberRecordTitle = document.getElementById("memberRecordTitle");
+      if (memberRecordTitle) memberRecordTitle.textContent = `Member Record in ${communityName}`;
       const memberRecordConsole = document.getElementById("memberRecordConsole");
       if (memberRecordConsole) memberRecordConsole.setAttribute("aria-label", `${communityName} Member Record`);
       const communityHomeBrand = document.getElementById("communityHomeBrand");
