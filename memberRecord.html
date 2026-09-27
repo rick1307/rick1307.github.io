@@ -2502,6 +2502,17 @@
           ? String(total)
           : String(total);
         earnedNoteEl.textContent = `in ${communityName}`;
+
+        const earnedRank = rankFor(total);
+        progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
+        progressValue.textContent = `${total} LEAP`;
+
+        if (earnedRank.threshold === null) {
+          progressFill.style.width = "100%";
+        } else {
+          progressFill.style.width =
+            `${Math.max(0, Math.min(100, (total / earnedRank.threshold) * 100))}%`;
+        }
       }
 
       function renderLogbook(records = currentLogbookRecords) {
@@ -2778,6 +2789,9 @@
           } else {
             earnedEl.textContent = "—";
             earnedNoteEl.textContent = `in ${communityName}`;
+            progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
+            progressValue.textContent = "—";
+            progressFill.style.width = "0%";
             resetLogbook(
               "Current balance loaded, but the logbook could not be read right now."
             );
