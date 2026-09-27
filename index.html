@@ -785,6 +785,195 @@
         transform:none !important;
       }
     }
+
+
+    /* Community layout system -------------------------------------------------
+       The config chooses the layout.  SFL uses "classic".  Zach uses "garage".
+       This changes arrangement only; community content still comes from config.
+    */
+    body[data-community-layout="garage"]{
+      --max:1180px;
+    }
+
+    body[data-community-layout="garage"] .hero{
+      padding:48px 0 42px;
+      display:grid;
+      grid-template-columns:minmax(280px,.88fr) minmax(0,1.12fr);
+      column-gap:42px;
+      row-gap:18px;
+      align-items:start;
+    }
+
+    body[data-community-layout="garage"] .hero > .kicker{
+      grid-column:1/-1;
+      margin-bottom:2px;
+    }
+
+    body[data-community-layout="garage"] .welcome-head{
+      grid-column:1;
+      grid-row:2;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:22px;
+      align-items:start;
+    }
+
+    body[data-community-layout="garage"] .welcome-head h1{
+      font-size:clamp(3.35rem,6.3vw,5.85rem);
+      line-height:.88;
+    }
+
+    body[data-community-layout="garage"] .rick-portrait{
+      width:min(100%,310px);
+      aspect-ratio:1/1;
+      justify-self:start;
+      border-radius:7px;
+      border:2px solid rgba(58,41,35,.22);
+      box-shadow:10px 12px 0 rgba(36,26,23,.12),0 18px 36px rgba(36,26,23,.16);
+    }
+
+    body[data-community-layout="garage"] .hero-intro{
+      grid-column:2;
+      grid-row:2;
+      margin-top:0;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      align-self:stretch;
+    }
+
+    body[data-community-layout="garage"] .hero-intro > .hero-copy{
+      display:flex;
+      align-items:flex-start;
+      flex:1 1 auto;
+    }
+
+    body[data-community-layout="garage"] .lede{
+      max-width:none;
+      font-size:clamp(1.2rem,2vw,1.48rem);
+      line-height:1.55;
+    }
+
+    body[data-community-layout="garage"] .returning-crew{
+      height:auto;
+      border-radius:7px;
+      border-width:2px;
+    }
+
+    body[data-community-layout="garage"] .story-panel{
+      border-radius:7px;
+      box-shadow:12px 14px 0 rgba(36,26,23,.10),0 20px 42px rgba(36,26,23,.14);
+    }
+
+    body[data-community-layout="garage"] #how-it-works .wrap,
+    body[data-community-layout="garage"] #participation .wrap{
+      display:grid;
+      grid-template-columns:minmax(220px,.68fr) minmax(0,1.32fr);
+      gap:38px;
+      align-items:start;
+    }
+
+    body[data-community-layout="garage"] #how-it-works .section-title,
+    body[data-community-layout="garage"] #participation .section-title{
+      margin:0;
+      position:sticky;
+      top:92px;
+    }
+
+    body[data-community-layout="garage"] #how-it-works .three,
+    body[data-community-layout="garage"] #participation .three{
+      grid-template-columns:1fr;
+      gap:13px;
+    }
+
+    body[data-community-layout="garage"] #how-it-works .card,
+    body[data-community-layout="garage"] #participation .card{
+      border-radius:6px;
+      padding:24px 26px;
+    }
+
+    body[data-community-layout="garage"] #how-it-works .card::before,
+    body[data-community-layout="garage"] #participation .card::before{
+      left:0;
+      top:0;
+      bottom:0;
+      right:auto;
+      width:5px;
+      height:auto;
+      background:linear-gradient(180deg,var(--gold),var(--rust));
+    }
+
+    body[data-community-layout="garage"] .deep-dive{
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:28px;
+      padding:28px 30px;
+    }
+
+    body[data-community-layout="garage"] .deep-dive p{
+      margin:0;
+      max-width:650px;
+      font-size:1.08rem;
+    }
+
+    body[data-community-layout="garage"] .deep-dive .cta-links{
+      flex:0 0 auto;
+      margin:0;
+    }
+
+    @media(max-width:800px){
+      body[data-community-layout="garage"] .hero{
+        display:block;
+        padding-top:48px;
+      }
+
+      body[data-community-layout="garage"] .welcome-head{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 118px;
+        gap:14px;
+        align-items:center;
+      }
+
+      body[data-community-layout="garage"] .welcome-head h1{
+        font-size:clamp(3.3rem,13vw,5rem);
+      }
+
+      body[data-community-layout="garage"] .rick-portrait{
+        width:96px;
+        aspect-ratio:1/1;
+        justify-self:center;
+        border-radius:10px;
+        box-shadow:5px 6px 0 rgba(36,26,23,.10),0 10px 22px rgba(36,26,23,.13);
+      }
+
+      body[data-community-layout="garage"] .hero-intro{
+        display:grid;
+        grid-template-columns:1fr;
+        margin-top:24px;
+      }
+
+      body[data-community-layout="garage"] #how-it-works .wrap,
+      body[data-community-layout="garage"] #participation .wrap{
+        display:block;
+      }
+
+      body[data-community-layout="garage"] #how-it-works .section-title,
+      body[data-community-layout="garage"] #participation .section-title{
+        position:static;
+        margin-bottom:20px;
+      }
+
+      body[data-community-layout="garage"] .deep-dive{
+        display:block;
+      }
+
+      body[data-community-layout="garage"] .deep-dive .cta-links{
+        margin-top:18px;
+      }
+    }
+
 </style>
 </head>
 
@@ -980,6 +1169,7 @@
     (() => {
       const defaults = {
         id: "sfl",
+        layout: "classic",
         communityName: "Sailing Frog's Leap",
         managerName: "Rick",
         membershipLabel: "Crew Membership",
@@ -1033,6 +1223,7 @@
         if (theme[key]) document.documentElement.style.setProperty(cssVariable, theme[key]);
       });
       document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
 
       const themeColor = document.querySelector('meta[name="theme-color"]');
       if (themeColor && theme.themeColor) themeColor.setAttribute("content", theme.themeColor);
