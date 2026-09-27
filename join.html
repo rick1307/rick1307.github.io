@@ -223,6 +223,66 @@
     .step p{margin:0;color:var(--muted)}
     .step p+p{margin-top:9px}
 
+    .leap-request-form{margin-top:16px}
+    .leap-request-row{display:flex;gap:10px;align-items:stretch}
+    .leap-request-form input[type="text"],
+    .member-record-open input{
+      flex:1;min-width:0;padding:13px 14px;border-radius:8px;
+      border:1px solid rgba(26,37,44,.22);background:#fff;color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:1rem;outline:none;
+    }
+    .leap-request-form input[type="text"]:focus,
+    .member-record-open input:focus{
+      border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.14);
+    }
+    .leap-request-form .button,
+    .member-record-open .button{
+      margin-top:0;border:0;cursor:pointer;white-space:nowrap;
+    }
+    .leap-request-form .button:disabled,
+    .member-record-open .button:disabled{opacity:.68;cursor:wait}
+    .leap-request-message{
+      margin-top:10px;color:#356a53;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.95rem;font-weight:800;
+    }
+    .leap-request-message.error{color:var(--rust)}
+    .request-result{
+      margin-top:16px;padding:22px;border-radius:16px;
+      border:1px solid rgba(47,116,129,.24);
+      background:linear-gradient(135deg,rgba(219,236,232,.95),rgba(255,250,240,.98));
+      box-shadow:0 10px 24px rgba(11,45,54,.08);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .request-result .result-mark{
+      width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+      margin:0 auto 12px;background:var(--sea);color:white;font-size:1.65rem;font-weight:900;
+    }
+    .request-result h4{
+      margin:0 0 8px;color:var(--navy);font-family:Georgia,"Times New Roman",serif;
+      font-size:1.55rem;line-height:1.15;
+    }
+    .request-result p{margin:0;color:#4f6066}
+    .request-result p+p{margin-top:8px}
+
+    .member-record-open{
+      max-width:720px;margin:22px auto 0;padding-top:20px;border-top:1px solid rgba(47,116,129,.20);
+    }
+    .member-record-open p{margin:0 auto 12px}
+    .member-record-open-row{display:flex;gap:10px;align-items:stretch}
+    .member-record-status{
+      min-height:1.45em;margin:10px auto 0 !important;color:var(--muted) !important;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.92rem;text-align:left;
+    }
+    .member-record-status.error{color:var(--rust) !important}
+
+    @media(max-width:650px){
+      .leap-request-row,.member-record-open-row{flex-direction:column}
+      .leap-request-form .button,.member-record-open .button{width:100%}
+    }
+
     .invite{
       background:var(--foam);
       border:1px solid rgba(47,116,129,.18);
@@ -520,14 +580,59 @@
           <div class="step">
             <div class="step-num">3</div>
             <div>
-              <h3 id="sendAddressHeading">Send us your public Xaman wallet address</h3>
-              <p>
-                This is the address where we send your Check.
+              <h3 id="sendAddressHeading">Your XRP Ledger address</h3>
+              <p id="sendAddressCopy">
+                This is the public address where we send your first LEAP Check.
               </p>
               <p>
                 Your public address is safe to share.
                 Your secret words and private keys are not.
               </p>
+
+              <form
+                class="leap-request-form"
+                id="firstLeapRequestForm"
+                action="https://usebasin.com/f/93034286b67b"
+                method="POST"
+                data-basin-form
+                data-basin-success-action="render"
+                data-basin-success-id="firstLeapSuccess"
+                data-basin-error-id="firstLeapError"
+              >
+                <input type="hidden" id="firstLeapCommunityId" name="community_id" value="">
+                <input type="hidden" id="firstLeapCommunityName" name="community_name" value="">
+                <input type="hidden" id="firstLeapOperatorName" name="operator_name" value="">
+
+                <div class="leap-request-row">
+                  <input
+                    id="firstLeapXrplAddress"
+                    name="xrpl_address"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="r..."
+                    aria-label="Your XRP Ledger address"
+                    pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}"
+                    title="Enter a valid XRP Ledger address beginning with r."
+                    required
+                  >
+                  <button class="button" type="submit">Request My First LEAP</button>
+                </div>
+              </form>
+
+              <div id="firstLeapSuccess" class="request-result" style="display:none;" role="status" aria-live="polite">
+                <div class="result-mark">✓</div>
+                <h4>Request received. You're on your way.</h4>
+                <p>We received your request for your first LEAP.</p>
+                <p>Your first LEAP Check will be sent to this XRP Ledger address, usually within 24 hours.</p>
+                <p><strong>Nothing else is needed right now.</strong></p>
+              </div>
+
+              <div id="firstLeapError" class="leap-request-message error" style="display:none;" role="alert">
+                Could not send request. Please try again.
+              </div>
             </div>
           </div>
 
@@ -595,6 +700,26 @@
               <span>LEAP-JOINED</span>
             </div>
           </div>
+
+          <div class="member-record-open">
+            <p id="memberRecordHandoffCopy">
+              Once you've cashed your first LEAP Check, enter your XRP Ledger address to open your Member Record.
+            </p>
+            <div class="member-record-open-row">
+              <input
+                id="memberRecordWallet"
+                type="text"
+                inputmode="text"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                placeholder="Enter your XRP Ledger address"
+                aria-label="XRP Ledger address for Member Record"
+              >
+              <button class="button" id="openMemberRecordButton" type="button">Open My Member Record →</button>
+            </div>
+            <p class="member-record-status" id="memberRecordStatus" role="status" aria-live="polite"></p>
+          </div>
         </div>
       </div>
     </section>
@@ -661,6 +786,7 @@
   </footer>
 
 
+  <script src="https://js.usebasin.com/v2.11.1.min.js" defer></script>
   <script src="js/communityConfig.js"></script>
   <script>
     (() => {
@@ -692,10 +818,77 @@
           ? community.ranks[0].name
           : "First rank";
 
-      // Keep the community-specific wallet keys available to the join flow.
+      // Community-specific wallet identity for the request and Member Record handoff.
       const walletStorageKey = community.walletStorageKey || `${communityId}.xrpl.wallet`;
       const activeWalletKey = community.activeWalletKey || `${communityId}.xrpl.activeWallet`;
+      const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
       window.WILD_LEDGER_JOIN_KEYS = { walletStorageKey, activeWalletKey };
+
+      const firstLeapForm = document.getElementById("firstLeapRequestForm");
+      const firstLeapInput = document.getElementById("firstLeapXrplAddress");
+      const firstLeapCommunityId = document.getElementById("firstLeapCommunityId");
+      const firstLeapCommunityName = document.getElementById("firstLeapCommunityName");
+      const firstLeapOperatorName = document.getElementById("firstLeapOperatorName");
+      const memberRecordWallet = document.getElementById("memberRecordWallet");
+      const openMemberRecordButton = document.getElementById("openMemberRecordButton");
+      const memberRecordStatus = document.getElementById("memberRecordStatus");
+
+      if (firstLeapCommunityId) firstLeapCommunityId.value = communityId;
+      if (firstLeapCommunityName) firstLeapCommunityName.value = communityName;
+      if (firstLeapOperatorName) firstLeapOperatorName.value = operatorName;
+
+      try {
+        sessionStorage.removeItem(activeWalletKey);
+        const rememberedWallet = localStorage.getItem(walletStorageKey) || "";
+        if (rememberedWallet && classicAddressPattern.test(rememberedWallet) && memberRecordWallet) {
+          memberRecordWallet.value = rememberedWallet;
+        }
+      } catch (_) {}
+
+      if (firstLeapForm && firstLeapInput) {
+        firstLeapForm.addEventListener("submit", event => {
+          const account = firstLeapInput.value.trim();
+          if (!classicAddressPattern.test(account)) {
+            event.preventDefault();
+            firstLeapInput.setCustomValidity("Enter a valid XRP Ledger address beginning with r.");
+            firstLeapInput.reportValidity();
+            firstLeapInput.setCustomValidity("");
+            return;
+          }
+
+          // Remember only the public address. This does not mark the member as joined.
+          try { localStorage.setItem(walletStorageKey, account); } catch (_) {}
+          if (memberRecordWallet && !memberRecordWallet.value.trim()) memberRecordWallet.value = account;
+        });
+      }
+
+      function openMemberRecord() {
+        if (!memberRecordWallet) return;
+        const account = memberRecordWallet.value.trim();
+
+        if (!classicAddressPattern.test(account)) {
+          if (memberRecordStatus) {
+            memberRecordStatus.textContent = "Enter a valid XRP Ledger address beginning with r.";
+            memberRecordStatus.className = "member-record-status error";
+          }
+          memberRecordWallet.focus();
+          return;
+        }
+
+        try {
+          localStorage.setItem(walletStorageKey, account);
+          sessionStorage.setItem(activeWalletKey, account);
+        } catch (_) {}
+
+        window.location.href = `memberRecord.html?community=${encodeURIComponent(communityId)}`;
+      }
+
+      if (openMemberRecordButton) openMemberRecordButton.addEventListener("click", openMemberRecord);
+      if (memberRecordWallet) {
+        memberRecordWallet.addEventListener("keydown", event => {
+          if (event.key === "Enter") openMemberRecord();
+        });
+      }
 
       const theme = community.theme || {};
       const themeVariables = {
@@ -775,7 +968,9 @@
       }
 
       const sendAddressHeading = document.getElementById("sendAddressHeading");
-      if (sendAddressHeading) sendAddressHeading.textContent = `Send ${operatorName} your public Xaman wallet address`;
+      if (sendAddressHeading) sendAddressHeading.textContent = "Your XRP Ledger address";
+      const sendAddressCopy = document.getElementById("sendAddressCopy");
+      if (sendAddressCopy) sendAddressCopy.textContent = `This is the public address where ${operatorName} sends your first LEAP Check.`;
 
       const sendCheckHeading = document.getElementById("sendCheckHeading");
       if (sendCheckHeading) sendCheckHeading.textContent = `${operatorName} sends a LEAP Check to your Xaman Wallet`;
@@ -808,6 +1003,15 @@
 
       const safetyCopy = document.getElementById("safetyCommunityCopy");
       if (safetyCopy) safetyCopy.textContent = `${communityName} only needs your public Xaman wallet address.`;
+
+      const memberRecordHandoffCopy = document.getElementById("memberRecordHandoffCopy");
+      if (memberRecordHandoffCopy) {
+        memberRecordHandoffCopy.textContent =
+          `Once you've cashed your first LEAP Check, enter your XRP Ledger address to open your ${community.recordLabel || "Member Record"}.`;
+      }
+      if (openMemberRecordButton) {
+        openMemberRecordButton.textContent = `Open My ${community.recordLabel || "Member Record"} →`;
+      }
 
       const footer = document.getElementById("footerLabel");
       if (footer) footer.textContent = `${communityName} • Join LEAP`;
