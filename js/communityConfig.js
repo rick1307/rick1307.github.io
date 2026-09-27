@@ -10,6 +10,8 @@
       communityName: "Sailing Frog's Leap",
       leapNamespace: "SFL-LEAP",
       managerName: "Rick",
+      operatorName: "Rick",
+      operatorPossessive: "Rick's",
       membershipLabel: "Crew Membership",
       memberSingular: "Leaper",
       memberPlural: "Leapers",
@@ -34,6 +36,32 @@
         { min: 10, name: "Quartermaster" },
         { min: 25, name: "First Mate" },
         { min: 51, name: "Master of the Leap" }
+      ],
+      badges: [
+        {
+          name: "Crew",
+          type: "Standard badge",
+          icon: "🛠️",
+          description: "You showed up and helped in a real way — on the boat, with a project, with logistics, with local help, or wherever an extra hand mattered."
+        },
+        {
+          name: "Shipmate",
+          type: "Standard badge",
+          icon: "⛵",
+          description: "You were actually aboard Frog's Leap. It marks a real connection to the boat and a shared piece of the Sailing Frog's Leap story."
+        },
+        {
+          name: "First Wake",
+          type: "Standard badge",
+          icon: "🌊",
+          description: "Your first meaningful contribution after joining — helping someone, contributing something useful, participating in a real way, or otherwise leaving a wake."
+        },
+        {
+          name: "LEAP OG",
+          type: "Limited badge",
+          icon: "🐸",
+          description: "You were part of LEAP at the beginning. Unlike the standard badges, LEAP OG belongs only to the original early crew."
+        }
       ],
       theme: {
         paper: "#efe8d8",
@@ -67,6 +95,8 @@
       communityName: "Zach's Hot Rods",
       leapNamespace: "ZHR-LEAP",
       managerName: "Zach",
+      operatorName: "Zach",
+      operatorPossessive: "Zach's",
       membershipLabel: "Membership",
       memberSingular: "member",
       memberPlural: "members",
@@ -92,6 +122,7 @@
         { min: 25, name: "Crew Chief" },
         { min: 51, name: "Shop Legend" }
       ],
+      badges: [],
       theme: {
         paper: "#e7dfd2",
         paper2: "#f3ece2",
