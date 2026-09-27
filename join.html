@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Join the Sailing Frog's Leap crew with Xaman Wallet and your first LEAP Check." />
+  <meta name="description" content="Join a Wild Ledger community with your first LEAP." />
   <meta name="theme-color" content="#efe8d8" />
-  <title>Join the Crew — Sailing Frog's Leap</title>
+  <title>Join — LEAP</title>
 
   <style>
     :root{
@@ -19,6 +19,19 @@
       --gold:#d2a34f;
       --line:rgba(26,37,44,.18);
       --card:#fffaf0;
+      --muted:#58666c;
+      --deep:#0b2d36;
+      --page-background:
+        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:
+        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.97),rgba(37,96,106,.94));
       --max:980px;
     }
 
@@ -28,13 +41,16 @@
     body{
       margin:0;
       color:var(--ink);
-      background:
-        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
-        var(--paper);
-      background-size:30px 30px;
+      background:var(--page-background);
+      background-size:auto;
       font-family:Georgia,"Times New Roman",serif;
       line-height:1.62;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
+      background-image:var(--page-overlay);
     }
 
     a{color:inherit}
@@ -42,7 +58,7 @@
 
     nav{
       position:sticky;top:0;z-index:20;
-      background:rgba(239,232,216,.94);
+      background:var(--nav-background);
       backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line);
     }
@@ -63,7 +79,7 @@
       object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white;
     }
 
-    .nav-links{display:flex;gap:16px;align-items:center;margin-left:auto}
+    .nav-links{display:flex;gap:16px;align-items:center}
 
     .nav-links a{
       text-decoration:none;color:#4e5c62;
@@ -71,7 +87,7 @@
       font-size:.9rem;font-weight:750;
     }
 
-    header{padding:72px 0 46px}
+    header{padding:72px 0 46px;background:var(--header-background);border-bottom:1px solid var(--line)}
 
     .kicker{
       color:var(--rust);
@@ -117,6 +133,21 @@
 
     .section-title p{margin:0;color:#5a686e;font-size:1.05rem}
 
+    .welcome{
+      background:var(--dark-feature-background);
+      color:white;
+      border-radius:20px;
+      padding:36px;
+    }
+
+    .welcome p{
+      max-width:820px;
+      margin:0 0 1rem;
+      font-size:1.18rem;
+    }
+
+    .welcome p:last-child{margin-bottom:0}
+
     .three{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -141,97 +172,31 @@
     }
 
     .mini h3{margin:0 0 7px;color:var(--navy)}
-    .mini p{margin:0;color:#58666c}
+    .mini p{margin:0;color:var(--muted)}
 
-    .onboarding{
-      background:linear-gradient(135deg,rgba(228,239,233,.72),rgba(248,242,229,.72));
+    .need-box{
+      background:linear-gradient(135deg,#e4efe9,#f8f2e5);
       border:1px solid var(--line);
-      border-radius:20px;
+      border-radius:18px;
       padding:28px;
     }
 
-    .phase{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin:6px 0 16px;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    .need-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:16px;
     }
 
-    .phase + .steps{margin-bottom:24px}
-
-    .phase-badge{
-      flex:0 0 auto;
-      padding:7px 11px;
-      border-radius:999px;
-      background:var(--navy);
-      color:white;
-      font-size:.78rem;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .phase.claim .phase-badge{background:var(--rust)}
-
-    .phase-copy h3{
-      margin:0;
-      color:var(--navy);
-      font-size:1.28rem;
-    }
-
-    .phase-copy p{
-      margin:2px 0 0;
-      color:#5d696e;
-      font-size:.94rem;
-    }
-
-    .phase-divider{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin:8px 0 22px;
-      color:#68757a;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.86rem;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.07em;
-    }
-
-    .phase-divider::before,
-    .phase-divider::after{
-      content:"";
-      height:1px;
-      flex:1;
-      background:var(--line);
-    }
-
-    .safety-strip{
-      margin:4px 0 24px;
-      padding:14px 16px;
-      border-radius:12px;
-      background:rgba(210,163,79,.12);
-      border:1px solid rgba(210,163,79,.38);
-      color:#5c5548;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.93rem;
-    }
-
-    .safety-strip strong{color:var(--navy)}
-
-    .optional-ritual{
-      margin:4px 0 24px;
-      padding:20px 22px;
+    .need{
+      background:rgba(255,255,255,.65);
+      border:1px solid var(--line);
       border-radius:14px;
-      background:var(--foam);
-      border:1px solid rgba(47,116,129,.22);
+      padding:20px;
     }
-    .optional-ritual b{
-      display:block;margin-bottom:6px;color:var(--navy);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    }
-    .optional-ritual p{margin:0;color:#526167}
+
+    .need h3{margin:0 0 6px;color:var(--navy)}
+    .need p{margin:0;color:var(--muted)}
 
     .steps{display:grid;gap:16px}
 
@@ -255,127 +220,8 @@
     }
 
     .step h3{margin:1px 0 6px;color:var(--navy);font-size:1.25rem}
-    .step p{margin:0;color:#58666c}
+    .step p{margin:0;color:var(--muted)}
     .step p+p{margin-top:9px}
-
-    .leap-request-form{
-      margin-top:14px;
-    }
-    .leap-request-form label{
-      display:block;
-      margin-bottom:7px;
-      color:var(--navy);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.9rem;
-      font-weight:800;
-    }
-    .leap-request-row{
-      display:flex;
-      gap:10px;
-      align-items:stretch;
-    }
-    .leap-request-form input{
-      flex:1;
-      min-width:0;
-      padding:13px 14px;
-      border-radius:8px;
-      border:1px solid rgba(26,37,44,.22);
-      background:#fff;
-      color:var(--ink);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:1rem;
-      outline:none;
-    }
-    .leap-request-form input:focus{
-      border-color:var(--sea);
-      box-shadow:0 0 0 3px rgba(47,116,129,.14);
-    }
-    .leap-request-form .button{
-      margin-top:0;
-      border:0;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .leap-request-message{
-      margin-top:10px;
-      color:#356a53;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.95rem;
-      font-weight:800;
-    }
-    .leap-request-message.error{color:var(--rust)}
-    .leap-request-form .button:disabled{
-      opacity:.68;
-      cursor:wait;
-    }
-    .request-result{
-      margin-top:16px;
-      padding:22px;
-      border-radius:16px;
-      border:1px solid rgba(47,116,129,.24);
-      background:linear-gradient(135deg,rgba(219,236,232,.95),rgba(255,250,240,.98));
-      box-shadow:0 10px 24px rgba(11,45,54,.08);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    }
-    .request-result .result-mark{
-      width:48px;height:48px;border-radius:50%;
-      display:grid;place-items:center;
-      margin-bottom:12px;
-      background:var(--sea);color:white;
-      font-size:1.65rem;font-weight:900;
-    }
-    .request-result h4{
-      margin:0 0 8px;
-      color:var(--navy);
-      font-family:Georgia,"Times New Roman",serif;
-      font-size:1.55rem;
-      line-height:1.15;
-    }
-    .request-result p{margin:0;color:#4f6066}
-    .request-result p+p{margin-top:8px}
-    .request-result .button{margin-top:16px}
-    .request-result.already{
-      border-color:rgba(210,163,79,.45);
-      background:linear-gradient(135deg,rgba(255,247,225,.98),rgba(219,236,232,.9));
-    }
-    .request-result.already .result-mark{background:var(--gold);color:var(--navy)}
-
-    @media(max-width:650px){
-      .leap-request-row{flex-direction:column}
-      .leap-request-form .button{width:100%}
-    }
-
-    .official-address{
-      margin-top:14px;
-      padding:16px 18px;
-      background:rgba(219,236,232,.72);
-      border:1px solid rgba(22,56,75,.20);
-      border-left:4px solid var(--gold);
-      border-radius:12px;
-    }
-
-    .official-address b{
-      display:block;
-      margin-bottom:7px;
-      color:var(--navy);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    }
-
-    .official-address code{
-      display:block;
-      color:var(--ink);
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-      font-size:.94rem;
-      line-height:1.5;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-
-    .official-address .verify-note{
-      margin-top:9px;
-      color:#58666c;
-      font-size:.94rem;
-    }
 
     .invite{
       background:var(--foam);
@@ -394,7 +240,7 @@
     .invite p{
       max-width:700px;
       margin:0 auto;
-      color:#526167;
+      color:var(--muted);
       font-size:1.06rem;
     }
 
@@ -419,7 +265,7 @@
       margin-bottom:4px;
     }
 
-    .status span{color:#657278;font-size:.94rem}
+    .status span{color:var(--muted);font-size:.94rem}
 
     .two{
       display:grid;
@@ -435,41 +281,13 @@
     }
 
     .panel h3{margin:0 0 8px;color:var(--navy)}
-    .panel p{margin:0;color:#58666c}
+    .panel p{margin:0;color:var(--muted)}
 
     .safety{
       background:#fff7e9;
       border:1px solid rgba(210,163,79,.42);
       border-radius:18px;
       padding:26px;
-    }
-
-    .learn-more{
-      text-align:center;
-      padding:8px 0 2px;
-    }
-
-    .learn-more h3{
-      margin:0 0 8px;
-      color:var(--navy);
-    }
-
-    .learn-more p{
-      max-width:680px;
-      margin:0 auto;
-      color:#58666c;
-    }
-
-    .learn-more-links{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:10px;
-      margin-top:4px;
-    }
-
-    .learn-more-links .button{
-      margin-top:14px;
     }
 
     .safety h3{margin:0 0 8px;color:#714c15}
@@ -505,436 +323,159 @@
       display:flex;justify-content:space-between;gap:18px;
     }
 
-    @media(max-width:800px){
-      .three,.two,.status{grid-template-columns:1fr}
-      
-    }
-  
-
-    /* Site-wide navigation: mirrored from ranks.html */
-    nav{position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
-    .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
-    .nav-links{display:flex;gap:18px;align-items:center}
-    .nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
-    .nav-links a:hover{color:var(--rust)}
-
-    @media(max-width:850px){
-      .nav-links a{display:inline !important}
-      .nav-links a:nth-child(2),.nav-links a:nth-child(3){display:none !important}
-    }
-  
-
-    /* Site-wide visual system: derived from next.html */
-    :root{
-      --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
-      --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
-      --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
-      --card:rgba(250,252,247,.80);
-    }
-    body{
-      margin:0;color:var(--ink);
-      background:
-        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
-        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
-        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
-      background-size:auto;
-      font-family:Georgia,"Times New Roman",serif;
-    }
-    body::before{
-      content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
-      background-image:
-        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
-        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
-    }
-    nav{
-      background:rgba(226,235,230,.88);backdrop-filter:blur(14px) saturate(120%);
-      border-bottom:1px solid rgba(18,59,70,.15);box-shadow:0 8px 24px rgba(11,45,54,.05)
-    }
-    .brand img{border:1px solid rgba(18,59,70,.16);box-shadow:0 4px 14px rgba(11,45,54,.09)}
-    .nav-links a{color:#45636a}.nav-links a:hover{color:var(--rust)}
-    header{
-      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
-      border-bottom:1px solid rgba(18,59,70,.08)
-    }
-    .kicker{color:var(--rust)}
-    h1,h2{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
-    .lede{color:#3f5a61}
-    main{position:relative}
-    section:nth-of-type(even){background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))}
-    .section-title p{color:#526a70}
-    .button{background:var(--rust);box-shadow:0 8px 20px rgba(184,90,64,.16)}
-    .button.secondary{background:transparent;color:var(--deep);border:1px solid rgba(18,59,70,.18);box-shadow:none}
-    footer{color:#49636a}
-    .foot{border-top:1px solid rgba(18,59,70,.16)}
-
-    .hero-line{
-      background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.52));
-      color:#3f5960;border-radius:0 14px 14px 0;box-shadow:0 12px 28px rgba(11,45,54,.06)
-    }
-    .onboarding{
-      background:linear-gradient(135deg,rgba(207,231,226,.78),rgba(238,243,234,.70));
-      border-color:rgba(18,59,70,.16);border-radius:22px;box-shadow:0 18px 38px rgba(11,45,54,.08)
-    }
-    .mini,.step,.panel,.status div{
-      background:rgba(250,252,247,.78);backdrop-filter:blur(9px);
-      border-color:rgba(18,59,70,.15);box-shadow:0 12px 28px rgba(11,45,54,.06)
-    }
-    .step,.mini,.panel{border-radius:18px}
-    .mini h3,.step h3,.panel h3,.phase-copy h3,.official-address b{color:var(--deep)}
-    .step p,.mini p,.panel p,.phase-copy p,.official-address .verify-note{color:#526970}
-    .optional-ritual{
-      background:linear-gradient(135deg,rgba(211,235,230,.96),rgba(235,243,236,.78));
-      border-color:rgba(47,116,129,.24);box-shadow:0 14px 30px rgba(11,45,54,.055)
-    }
-    .official-address{background:rgba(215,235,231,.72);border-color:rgba(18,59,70,.18)}
-    .invite{
-      background:linear-gradient(135deg,rgba(211,235,230,.96),rgba(235,243,236,.80));
-      border-color:rgba(47,116,129,.24);border-radius:20px;box-shadow:0 18px 38px rgba(11,45,54,.07)
-    }
-    .invite h3{color:var(--deep)}.invite p{color:#496168}
-    .learn-more{
-      background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
-      border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:34px;
-      box-shadow:0 22px 46px rgba(11,45,54,.18)
-    }
-    .learn-more h2,.learn-more h3{color:white}.learn-more p{color:rgba(255,255,255,.82)}
-    .learn-more .button.secondary{background:var(--rust);color:white;border-color:transparent;box-shadow:0 8px 20px rgba(184,90,64,.16)}
-
-    .wallet-check{
-      max-width:680px;
-      margin:24px auto 0;
-    }
-    .wallet-check-row{
-      display:flex;
-      gap:10px;
-      align-items:stretch;
-    }
-    .wallet-check input{
-      flex:1;
-      min-width:0;
-      padding:13px 14px;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,.28);
-      background:rgba(255,255,255,.94);
-      color:var(--deep);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:1rem;
-      outline:none;
-    }
-    .wallet-check input:focus{
-      border-color:var(--gold);
-      box-shadow:0 0 0 3px rgba(215,174,98,.18);
-    }
-    .wallet-check .button{
-      margin-top:0;
-      border:0;
-      cursor:pointer;
-      white-space:nowrap;
-      background:var(--rust);
-      box-shadow:0 8px 20px rgba(184,90,64,.16);
-    }
-    .wallet-check .button:disabled{
-      opacity:.68;
-      cursor:wait;
-    }
-    .wallet-status{
-      min-height:1.5em;
-      margin:12px auto 0 !important;
-      color:rgba(255,255,255,.92) !important;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      font-size:.92rem;
-      text-align:left;
-    }
-    .wallet-status.error{color:#ffd9ce !important}
-    .wallet-status.success{color:#dff5de !important}
-
-    @media(max-width:650px){
-      .wallet-check-row{flex-direction:column}
-      .wallet-check .button{width:100%}
-    }
-
-    .safety{background:rgba(255,247,233,.82);box-shadow:0 12px 26px rgba(11,45,54,.045)}
-
-
-
-    /* SFL shared button motion standard */
-    button,
-    a.button{
-      transition:
-        transform .16s ease,
-        filter .16s ease,
-        box-shadow .16s ease,
-        background-color .16s ease,
-        border-color .16s ease,
-        color .16s ease;
-    }
-
-    @media (hover:hover) and (pointer:fine){
-      button:not(:disabled):hover,
-      a.button:hover{
-        transform:translateY(-1px);
-      }
-    }
-
-    button:not(:disabled):active,
-    a.button:active{
-      transform:translateY(0) scale(.985);
-    }
-
-    button:disabled{
-      transform:none;
-    }
-
-    @media (prefers-reduced-motion:reduce){
-      button,
-      a.button{
-        transition:none !important;
-      }
-
-      button:not(:disabled):hover,
-      a.button:hover,
-      button:not(:disabled):active,
-      a.button:active{
-        transform:none !important;
-      }
-    }
-
-    /* LEAP journey banner: desktop + mobile companion artwork */
     .leap-journey-banner{
       width:100%;
       overflow:hidden;
-      background:#102f38;
+      background:var(--deep);
       line-height:0;
-      border-bottom:1px solid rgba(18,59,70,.15);
+      border-bottom:1px solid var(--line);
     }
-
     .leap-journey-banner picture,
-    .leap-journey-banner img{
-      display:block;
-      width:100%;
-    }
+    .leap-journey-banner img{display:block;width:100%}
+    .leap-journey-banner img{height:auto}
 
-    .leap-journey-banner img{
-      height:auto;
-    }
+    body[data-community-layout="garage"] .welcome,
+    body[data-community-layout="garage"] .mini,
+    body[data-community-layout="garage"] .need-box,
+    body[data-community-layout="garage"] .need,
+    body[data-community-layout="garage"] .step,
+    body[data-community-layout="garage"] .invite,
+    body[data-community-layout="garage"] .status div,
+    body[data-community-layout="garage"] .panel,
+    body[data-community-layout="garage"] .safety{border-radius:10px}
+    body[data-community-layout="garage"] .button{border-radius:6px}
 
-</style>
+    @media(max-width:800px){
+      .three,.need-grid,.two,.status{grid-template-columns:1fr}
+      .nav-links a:nth-child(n+4){display:none}
+    }
+  </style>
 </head>
 
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="index.html"><img src="leap-logo.png" alt="LEAP logo"><span>Sailing Frog's Leap</span></a>
-      <div class="nav-links"><a href="index.html">← Home</a></div>
+      <a class="brand" id="communityHomeBrand" href="index.html">
+        <img src="leap-logo.png" alt="LEAP logo">
+        <span id="communityNameLabel">Community</span>
+      </a>
+
+      <div class="nav-links">
+        <a id="homeLink" href="index.html">Home</a>
+        <a id="ranksLink" href="ranks.html">Ranks</a>
+        <a id="badgesLink" href="badges.html">Badges</a>
+        <a id="faqLink" href="faq.html">FAQ</a>
+        <a id="stateMachineLink" href="stateMachine.html">State machine</a>
+      </div>
     </div>
   </nav>
 
-
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
-      <img
-        src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <img id="communityBannerDesktop" src="images/bannerDesktop.png" alt="The LEAP journey">
     </picture>
   </div>
 
   <header>
     <div class="wrap">
-      <div class="kicker">Join the Sailing Frog's Leap Crew</div>
-      <h1>Join the Crew</h1>
+      <div class="kicker" id="joinKicker">Join the Community</div>
+      <h1 id="joinHeading">Join</h1>
 
-      <p class="lede">
-        Ready to go from Leaper to Sailing Frog's Leap crew member?
-        Joining the crew takes a few steps, and we'll walk you through each one.
-        We'll help you get set up, send you your first LEAP Check,
-        and when you cash it, you're officially a Sailing Frog's Leap Deckhand.
+      <p class="lede" id="joinLede">
+        Joining is simple.
+        Start with Xaman Wallet on your mobile device.
+        We send a LEAP Check to your Xaman Wallet.
+        You cash it in Xaman.
+        Then you are part of the community.
       </p>
 
+      <div class="hero-line" id="heroLine">
+        <strong>Your first LEAP starts your first rank.</strong>
+        After that, each LEAP you earn can come to you the same way: by Check.
+      </div>
     </div>
   </header>
 
   <main>
 
-<section>
+    <section>
+      <div class="wrap">
+        <div class="welcome">
+          <p>
+            You do not need to be a crypto expert.
+          </p>
+          <p>
+            You only need Xaman Wallet, a small amount of XRP for the network,
+            and a public wallet address where we can send your LEAP Checks.
+          </p>
+          <p>
+            <strong>The rest is simple: we send the Check. You choose to cash it.</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>Step by Step</h2>
-          <p>Everything you need and exactly what happens, in one place.</p>
+          <h2>The whole process in three steps</h2>
         </div>
 
-        <div class="onboarding">
-          <div class="phase">
-            <div class="phase-badge">Phase 1</div>
-            <div class="phase-copy">
-              <h3>Get ready</h3>
-              <p>Three steps get you ready for your first LEAP Check.</p>
-            </div>
+        <div class="three">
+          <div class="mini">
+            <div class="num">1</div>
+            <h3>Set up Xaman</h3>
+            <p>Use Xaman Wallet on your mobile device.</p>
           </div>
 
-          <div class="steps">
-
-          <div class="step">
-            <div class="step-num">1</div>
-            <div>
-              <h3>Open Xaman on your mobile device</h3>
-              <p>
-                Xaman is the wallet app you use to manage your own XRP Ledger account.
-                Sailing Frog's Leap only uses the public address you choose to share so we can send you LEAP Checks and read the public LEAP information associated with that address.
-              </p>
-              <p>
-                <strong>We never have access to or control over your account.</strong>
-              </p>
-              <p>
-                If you already use Xaman, you are ready. If not, set it up first.
-              </p>
-            </div>
+          <div class="mini">
+            <div class="num">2</div>
+            <h3>Get your LEAP Check</h3>
+            <p>Send us your public Xaman wallet address.</p>
           </div>
 
-          <div class="step">
-            <div class="step-num">2</div>
-            <div>
-              <h3>Keep a small amount of XRP in your XRP Ledger account</h3>
+          <div class="mini">
+            <div class="num">3</div>
+            <h3>Cash it</h3>
+            <p id="threeStepWelcome">Cash the Check in Xaman. Your first rank begins.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="need-box">
+          <h2>What you need before we send your first Check</h2>
+
+          <div class="need-grid">
+            <div class="need">
+              <h3>Xaman Wallet</h3>
               <p>
-                XRP pays the XRP Ledger's small network fees and satisfies the reserve requirements for your account.
-              </p>
-              <p>
-                You do not need much. A few XRP is plenty for LEAP.
+                Xaman is the mobile wallet we use for LEAP.
               </p>
             </div>
-          </div>
 
-          <div class="step">
-            <div class="step-num">3</div>
-            <div>
-              <h3>Your XRP Ledger address</h3>
-
-              <form
-                class="leap-request-form"
-                id="firstLeapRequestForm"
-                action="https://usebasin.com/f/93034286b67b"
-                method="POST"
-                data-basin-form
-                data-basin-success-action="render"
-                data-basin-success-id="firstLeapSuccess"
-                data-basin-error-id="firstLeapError"
-              >
-                <div class="leap-request-row">
-                  <input
-                    id="firstLeapXrplAddress"
-                    name="xrpl_address"
-                    type="text"
-                    inputmode="text"
-                    autocomplete="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    placeholder="r..."
-                    aria-label="Your XRP Ledger address"
-                    pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}"
-                    title="Enter a valid XRP Ledger address beginning with r."
-                    required
-                  >
-                  <button class="button" type="submit">Request My First LEAP</button>
-                </div>
-
-              </form>
-
-              <div id="firstLeapSuccess" class="request-result" style="display:none;" role="status" aria-live="polite">
-                <div class="result-mark">✓</div>
-                <h4>Request received. You're on your way.</h4>
-                <p>We received your request for your first LEAP.</p>
-                <p>Your first LEAP Check will be sent to this XRP Ledger address, usually within 24 hours.</p>
-                <p><strong>Nothing else is needed right now.</strong></p>
-              </div>
-
-              <div id="firstLeapError" class="leap-request-message error" style="display:none;" role="alert">
-                Could not send request. Please try again.
-              </div>
-
-              <div id="alreadyCrewMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
-                <div class="result-mark">✓</div>
-                <h4>You're already aboard.</h4>
-                <p>LEAP was found at this XRP Ledger address.</p>
-                <a class="button" id="openCrewRecordButton" href="memberRecord.html">Open My Member Record →</a>
-              </div>
-
-              <div id="checkWaitingMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
-                <div class="result-mark">✓</div>
-                <h4>Your first LEAP Check is already waiting.</h4>
-                <p>An active new-member LEAP Check has already been sent to this XRP Ledger address.</p>
-                <p><strong>Open Xaman to review and cash your Check.</strong></p>
-              </div>
-
-              <div id="firstLeapAlreadyClaimedMessage" class="request-result already" style="display:none;" role="status" aria-live="polite">
-                <div class="result-mark">✓</div>
-                <h4>Your first LEAP has already been claimed.</h4>
-                <p>This XRP Ledger address has already redeemed its one-time new-member LEAP Check.</p>
-                <p>Another first-LEAP request was not sent.</p>
-              </div>
-            </div>
-          </div>
-          </div>
-
-          <div class="safety-strip">
-            <strong>Nothing secret.</strong>
-            We never need your recovery words, private key, family seed, or wallet secret.
-          </div>
-
-          <div class="phase-divider">You're ready for your LEAP Check</div>
-
-          <div class="phase claim">
-            <div class="phase-badge">Phase 2</div>
-            <div class="phase-copy">
-              <h3>Claim your first LEAP</h3>
-              <p>We send the Check. You verify it, cash it, and come aboard.</p>
-            </div>
-          </div>
-
-          <div class="steps">
-          <div class="step">
-            <div class="step-num">4</div>
-            <div>
-              <h3>We send your first LEAP Check</h3>
+            <div class="need">
+              <h3>A small amount of XRP</h3>
               <p>
-                When we receive your request, we'll send your first LEAP Check to that XRP Ledger address.
-              </p>
-              <p>
-                Your first Check is for 1 LEAP.
-              </p>
-              <p>
-                <strong>This is your invite to join the crew of Sailing Frog's Leap.</strong>
+                XRP pays the XRP Ledger's very small network fees and helps meet the wallet's reserve requirement.
+                You do not need much, but you do need some.
               </p>
             </div>
-          </div>
 
-          <div class="step">
-            <div class="step-num">5</div>
-            <div>
-              <h3>Open the Check in Xaman</h3>
+            <div class="need">
+              <h3>Your public Xaman address</h3>
               <p>
-                Verify the Check before accepting it.
-                Make sure it is for LEAP and was sent by the official Sailing Frog's Leap distributor wallet.
+                This tells us where to send your LEAP Check.
               </p>
-
-              <div class="official-address">
-                <b>Official LEAP Distributor Address</b>
-                <code>rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</code>
-                <p class="verify-note">
-                  The sending address must match this address exactly. If it does not match, do not cash the Check.
-                </p>
-              </div>
             </div>
-          </div>
 
-          <div class="step">
-            <div class="step-num">6</div>
-            <div>
-              <h3>Cash the Check in Xaman</h3>
+            <div class="need">
+              <h3>Nothing secret</h3>
               <p>
-                Approve the action in Xaman.
-                The LEAP is credited to your XRP Ledger account and appears in Xaman.
+                We never need your recovery words, private key, or wallet secret.
               </p>
             </div>
           </div>
@@ -944,21 +485,164 @@
 
     <section>
       <div class="wrap">
-        <div class="learn-more">
-          <h2>Welcome Aboard</h2>
-          <p>
-            Once you've cashed your first LEAP Check, you're part of the Sailing Frog's Leap crew.
-            Enter your XRP Ledger address below to open <strong>Member Record</strong> and see your LEAP, crew rank, badges, and history.
+        <div class="section-title">
+          <h2>Step by step</h2>
+          <p>Here is exactly what happens.</p>
+        </div>
+
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Open Xaman Wallet on your mobile device</h3>
+              <p>
+                If you already use Xaman, you are ready.
+                If not, set up Xaman first.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Keep a small amount of XRP in Xaman</h3>
+              <p>
+                XRP is used for the XRP Ledger's small network fees.
+                Your wallet also needs some XRP in reserve.
+              </p>
+              <p>
+                You do not need much. Just make sure there is some XRP in the wallet before you try to cash a LEAP Check.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3 id="sendAddressHeading">Send us your public Xaman wallet address</h3>
+              <p>
+                This is the address where we send your Check.
+              </p>
+              <p>
+                Your public address is safe to share.
+                Your secret words and private keys are not.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3 id="sendCheckHeading">We send a LEAP Check to your Xaman Wallet</h3>
+              <p>
+                Your first Check will be for 1 LEAP.
+              </p>
+              <p>
+                <strong id="inviteCopy">This is your invite to join the community.</strong>
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div>
+              <h3>Open the Check in Xaman</h3>
+              <p>
+                Look at the Check.
+                Make sure it is for LEAP and came from the official LEAP account.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">6</div>
+            <div>
+              <h3>Cash the Check in Xaman</h3>
+              <p>
+                Approve the action in Xaman.
+                The LEAP goes into your wallet.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="invite">
+          <h3 id="welcomeRankHeading">Welcome.</h3>
+          <p id="welcomeHistoryCopy">
+            You now hold your first LEAP.
+            Your community story has started.
           </p>
 
-          <div class="wallet-check">
-            <div class="wallet-check-row">
-              <input id="xrplAddress" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter your XRPL wallet address" aria-label="XRPL wallet address">
-              <button class="button" id="checkLeapButton" type="button">Enter Member Record →</button>
+          <div class="status">
+            <div>
+              <b>Rank</b>
+              <span id="firstRankLabel">First rank</span>
             </div>
-            <p class="wallet-status" id="walletStatus" role="status" aria-live="polite"></p>
+
+            <div>
+              <b>LEAP</b>
+              <span>1</span>
+            </div>
+
+            <div>
+              <b>First log entry</b>
+              <span>LEAP-JOINED</span>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>What happens next?</h2>
+        </div>
+
+        <div class="two">
+          <div class="panel">
+            <h3>You earn more LEAP</h3>
+            <p>
+              <span id="takePartCopy">Take part in the community.</span>
+              Help out.
+              Join an event.
+              Earn recognition.
+              When you earn LEAP, we send another Check to your Xaman Wallet.
+            </p>
+            <a class="button secondary" id="nextRanksLink" href="ranks.html">See the ranks →</a>
+          </div>
+
+          <div class="panel">
+            <h3>Your story grows</h3>
+            <p>
+              LEAP Checks can include short notes about why you received them.
+              <span id="storyGrowthCopy">Those notes help build your community history and badges.</span>
+            </p>
+            <a class="button secondary" id="nextBadgesLink" href="badges.html">See the badges →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="safety">
+          <h3>One rule: keep your wallet secrets private.</h3>
+          <p>
+            <span id="safetyCommunityCopy">This community only needs your public Xaman wallet address.</span>
+          </p>
+          <p>
+            Never send us your secret words, private key, family seed, or recovery phrase.
+          </p>
+        </div>
+
+        <a class="button" id="bottomFaqLink" href="faq.html">Read the FAQ →</a>
       </div>
     </section>
 
@@ -966,429 +650,167 @@
 
   <footer>
     <div class="wrap foot">
-      <div>Sailing Frog's Leap • Join the LEAP Crew</div>
+      <div id="footerLabel">Community • Join LEAP</div>
+      <div>
+        <a id="footerHomeLink" href="index.html">Home</a> •
+        <a id="footerRanksLink" href="ranks.html">Ranks</a> •
+        <a id="footerBadgesLink" href="badges.html">Badges</a> •
+        <a id="footerFaqLink" href="faq.html">FAQ</a>
+      </div>
     </div>
   </footer>
 
-  <script src="https://js.usebasin.com/v2.11.1.min.js" defer></script>
 
+  <script src="js/communityConfig.js"></script>
   <script>
     (() => {
-      const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
-      const LEAP_DISTRIBUTOR = "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU";
-      const NEW_MEMBER_MEMO = "SFL-LEAP/NEW-MEMBER";
-      const RIPPLE_EPOCH_OFFSET = 946684800;
-      const SFL_WALLET_STORAGE_KEY = "sfl.xrpl.wallet";
-      const SFL_ACTIVE_WALLET_KEY = "sfl.xrpl.activeWallet";
-      const XRPL_WS = "wss://s1.ripple.com/";
-      const NEXT_PAGE = "memberRecord.html";
-
-      try {
-        sessionStorage.removeItem(SFL_ACTIVE_WALLET_KEY);
-      } catch (_) {}
-
-      const addressInput = document.getElementById("xrplAddress");
-      const checkButton = document.getElementById("checkLeapButton");
-      const status = document.getElementById("walletStatus");
-      const firstLeapForm = document.getElementById("firstLeapRequestForm");
-      const firstLeapInput = document.getElementById("firstLeapXrplAddress");
-      const firstLeapButton = firstLeapForm?.querySelector('button[type="submit"]');
-      const firstLeapFail = document.getElementById("firstLeapError");
-      const alreadyCrewMessage = document.getElementById("alreadyCrewMessage");
-      const checkWaitingMessage = document.getElementById("checkWaitingMessage");
-      const firstLeapAlreadyClaimedMessage = document.getElementById("firstLeapAlreadyClaimedMessage");
-      let allowBasinSubmit = false;
-
-      // Classic XRPL addresses begin with r and use the XRP Ledger base58 alphabet.
-      const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
-
-      function setStatus(message, kind = "") {
-        status.textContent = message;
-        status.className = "wallet-status" + (kind ? " " + kind : "");
-      }
-
-      function decodeHexCurrency(code) {
-        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
-        try {
-          let text = "";
-          for (let i = 0; i < code.length; i += 2) {
-            const n = parseInt(code.slice(i, i + 2), 16);
-            if (n === 0) break;
-            text += String.fromCharCode(n);
-          }
-          return text;
-        } catch (_) {
-          return code;
-        }
-      }
-
-      function decodeHexText(value) {
-        const text = String(value || "");
-        if (!text || text.length % 2 !== 0 || !/^[A-Fa-f0-9]+$/.test(text)) return text;
-        try {
-          let decoded = "";
-          for (let i = 0; i < text.length; i += 2) {
-            decoded += String.fromCharCode(parseInt(text.slice(i, i + 2), 16));
-          }
-          return decoded.replace(/\0+$/g, "");
-        } catch (_) {
-          return text;
-        }
-      }
-
-      function isLeapAmount(amount) {
-        if (!amount || typeof amount !== "object") return false;
-        if (amount.issuer !== LEAP_ISSUER) return false;
-        const currency = decodeHexCurrency(String(amount.currency || "")).toUpperCase();
-        return currency === "LEAP" || currency.startsWith("LEAP");
-      }
-
-      function hasNewMemberMemo(tx) {
-        const memos = Array.isArray(tx?.Memos) ? tx.Memos : [];
-        return memos.some(entry => {
-          const memo = entry?.Memo || {};
-          const type = decodeHexText(memo.MemoType).toUpperCase();
-          return type === NEW_MEMBER_MEMO;
-        });
-      }
-
-      function isSuccessfulMeta(meta) {
-        return meta && typeof meta === "object" && meta.TransactionResult === "tesSUCCESS";
-      }
-
-      function rippleTimeNow() {
-        return Math.floor(Date.now() / 1000) - RIPPLE_EPOCH_OFFSET;
-      }
-
-      function isUnexpiredCheck(check) {
-        if (!check?.Expiration) return true;
-        return Number(check.Expiration) > rippleTimeNow();
-      }
-
-      function isOfficialLeapCheck(check, account) {
-        return Boolean(
-          check &&
-          check.Account === LEAP_DISTRIBUTOR &&
-          check.Destination === account &&
-          isLeapAmount(check.SendMax)
-        );
-      }
-
-      function isLeapLine(line) {
-        if (!line || line.account !== LEAP_ISSUER) return false;
-        const currency = decodeHexCurrency(String(line.currency || "")).toUpperCase();
-        return currency === "LEAP" || currency.startsWith("LEAP");
-      }
-
-      function queryAccountLines(account) {
-        return new Promise((resolve, reject) => {
-          const ws = new WebSocket(XRPL_WS);
-          const timer = setTimeout(() => {
-            try { ws.close(); } catch (_) {}
-            reject(new Error("The XRPL server took too long to respond."));
-          }, 12000);
-
-          ws.addEventListener("open", () => {
-            ws.send(JSON.stringify({
-              id: "leap-check",
-              command: "account_lines",
-              account,
-              peer: LEAP_ISSUER,
-              ledger_index: "validated",
-              limit: 400,
-              api_version: 2
-            }));
-          });
-
-          ws.addEventListener("message", event => {
-            let response;
-            try { response = JSON.parse(event.data); }
-            catch (_) { return; }
-            if (response.id !== "leap-check") return;
-
-            clearTimeout(timer);
-            try { ws.close(); } catch (_) {}
-
-            if (response.status === "error" || response.error || response.result?.error) {
-              const code = response.error || response.result?.error || "XRPL error";
-              reject(new Error(code));
-              return;
-            }
-
-            resolve(response.result?.lines || []);
-          });
-
-          ws.addEventListener("error", () => {
-            clearTimeout(timer);
-            reject(new Error("Could not connect to the XRP Ledger."));
-          });
-        });
-      }
-
-      function xrplRequest(command, params = {}, timeoutMs = 15000) {
-        return new Promise((resolve, reject) => {
-          const ws = new WebSocket(XRPL_WS);
-          const requestId = `sfl-${command}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-          const timer = setTimeout(() => {
-            try { ws.close(); } catch (_) {}
-            reject(new Error("The XRPL server took too long to respond."));
-          }, timeoutMs);
-
-          ws.addEventListener("open", () => {
-            ws.send(JSON.stringify({
-              id: requestId,
-              command,
-              ...params,
-              api_version: 2
-            }));
-          });
-
-          ws.addEventListener("message", event => {
-            let response;
-            try { response = JSON.parse(event.data); }
-            catch (_) { return; }
-            if (response.id !== requestId) return;
-
-            clearTimeout(timer);
-            try { ws.close(); } catch (_) {}
-
-            if (response.status === "error" || response.error || response.result?.error) {
-              const code = response.error || response.result?.error || "XRPL error";
-              reject(new Error(code));
-              return;
-            }
-
-            resolve(response.result || {});
-          });
-
-          ws.addEventListener("error", () => {
-            clearTimeout(timer);
-            reject(new Error("Could not connect to the XRP Ledger."));
-          });
-        });
-      }
-
-      async function fetchTransaction(hash) {
-        if (!hash) throw new Error("Missing CheckCreate transaction hash.");
-        const result = await xrplRequest("tx", {
-          transaction: hash,
-          binary: false
-        });
-        return result.tx_json || result.tx || result;
-      }
-
-      async function isNewMemberCheckCreate(hash, account) {
-        const tx = await fetchTransaction(hash);
-        return Boolean(
-          tx &&
-          tx.TransactionType === "CheckCreate" &&
-          tx.Account === LEAP_DISTRIBUTOR &&
-          tx.Destination === account &&
-          isLeapAmount(tx.SendMax) &&
-          hasNewMemberMemo(tx)
-        );
-      }
-
-      async function getAllCheckObjects(account) {
-        const checks = [];
-        let marker;
-
-        do {
-          const result = await xrplRequest("account_objects", {
-            account,
-            ledger_index: "validated",
-            type: "check",
-            limit: 400,
-            ...(marker ? { marker } : {})
-          });
-
-          checks.push(...(result.account_objects || []));
-          marker = result.marker;
-        } while (marker);
-
-        return checks;
-      }
-
-      async function hasActiveNewMemberCheck(account) {
-        const checks = await getAllCheckObjects(account);
-
-        for (const check of checks) {
-          if (!isOfficialLeapCheck(check, account)) continue;
-          if (!isUnexpiredCheck(check)) continue;
-          if (await isNewMemberCheckCreate(check.PreviousTxnID, account)) return true;
-        }
-
-        return false;
-      }
-
-      function getDeletedChecks(meta) {
-        if (!meta || typeof meta !== "object" || !Array.isArray(meta.AffectedNodes)) return [];
-        return meta.AffectedNodes
-          .map(node => node?.DeletedNode)
-          .filter(node => node?.LedgerEntryType === "Check")
-          .map(node => node.FinalFields)
-          .filter(Boolean);
-      }
-
-      async function hasRedeemedNewMemberCheck(account) {
-        let marker;
-
-        do {
-          const result = await xrplRequest("account_tx", {
-            account,
-            ledger_index_min: -1,
-            ledger_index_max: -1,
-            binary: false,
-            forward: false,
-            limit: 200,
-            ...(marker ? { marker } : {})
-          }, 20000);
-
-          for (const entry of result.transactions || []) {
-            const tx = entry.tx_json || entry.tx || {};
-            const meta = entry.meta;
-
-            if (!entry.validated || tx.TransactionType !== "CheckCash" || !isSuccessfulMeta(meta)) continue;
-
-            const matchingChecks = getDeletedChecks(meta).filter(check => isOfficialLeapCheck(check, account));
-            for (const check of matchingChecks) {
-              if (await isNewMemberCheckCreate(check.PreviousTxnID, account)) return true;
-            }
-          }
-
-          marker = result.marker;
-        } while (marker);
-
-        return false;
-      }
-
-      function hideFirstLeapResults() {
-        if (firstLeapFail) firstLeapFail.style.display = "none";
-        if (alreadyCrewMessage) alreadyCrewMessage.style.display = "none";
-        if (checkWaitingMessage) checkWaitingMessage.style.display = "none";
-        if (firstLeapAlreadyClaimedMessage) firstLeapAlreadyClaimedMessage.style.display = "none";
-      }
-
-      function showFirstLeapResult(element) {
-        firstLeapForm.style.display = "none";
-        if (element) {
-          element.style.display = "block";
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }
-
-      async function screenFirstLeapRequest(event) {
-        if (allowBasinSubmit) {
-          allowBasinSubmit = false;
-          return;
-        }
-
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        const account = firstLeapInput.value.trim();
-
-        if (!classicAddressPattern.test(account)) {
-          firstLeapInput.setCustomValidity("Enter a valid XRP Ledger address beginning with r.");
-          firstLeapInput.reportValidity();
-          firstLeapInput.setCustomValidity("");
-          return;
-        }
-
-        firstLeapButton.disabled = true;
-        firstLeapButton.textContent = "Checking eligibility…";
-        hideFirstLeapResults();
-
-        try {
-          const lines = await queryAccountLines(account);
-          const leapLine = lines.find(isLeapLine);
-          const balance = leapLine ? Number(leapLine.balance) : 0;
-
-          if (Number.isFinite(balance) && balance > 0) {
-            try {
-              localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
-              sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
-            } catch (_) {}
-
-            showFirstLeapResult(alreadyCrewMessage);
-            return;
-          }
-
-          if (await hasActiveNewMemberCheck(account)) {
-            showFirstLeapResult(checkWaitingMessage);
-            return;
-          }
-
-          if (await hasRedeemedNewMemberCheck(account)) {
-            showFirstLeapResult(firstLeapAlreadyClaimedMessage);
-            return;
-          }
-
-          allowBasinSubmit = true;
-          firstLeapForm.requestSubmit();
-        } catch (error) {
-          const message = String(error?.message || "");
-          if (firstLeapFail) {
-            firstLeapFail.textContent = message.includes("actNotFound")
-              ? "That XRP Ledger account was not found. Please check the address and try again."
-              : "We couldn't check the XRP Ledger right now. Please try again.";
-            firstLeapFail.style.display = "block";
-          }
-        } finally {
-          firstLeapButton.disabled = false;
-          firstLeapButton.textContent = "Request My First LEAP";
-        }
-      }
-
-      if (firstLeapForm) {
-        firstLeapForm.addEventListener("submit", screenFirstLeapRequest);
-      }
-
-      async function checkLeap() {
-        const account = addressInput.value.trim();
-
-        if (!classicAddressPattern.test(account)) {
-          setStatus("Please enter a valid XRPL wallet address beginning with r.", "error");
-          addressInput.focus();
-          return;
-        }
-
-        checkButton.disabled = true;
-        checkButton.textContent = "Checking…";
-        setStatus("Checking the XRP Ledger…");
-
-        try {
-          const lines = await queryAccountLines(account);
-          const leapLine = lines.find(isLeapLine);
-          const balance = leapLine ? Number(leapLine.balance) : 0;
-
-          if (Number.isFinite(balance) && balance > 0) {
-            try {
-              localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
-              sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
-            } catch (_) {}
-            setStatus(`LEAP found: ${balance}. Opening Member Record…`, "success");
-            setTimeout(() => { window.location.href = NEXT_PAGE; }, 450);
-          } else {
-            setStatus("No LEAP found for this wallet yet. Join the crew to earn your first LEAP.", "error");
-          }
-        } catch (error) {
-          const message = String(error?.message || "");
-          if (message.includes("actNotFound")) {
-            setStatus("That XRPL account was not found on the ledger.", "error");
-          } else {
-            setStatus("I couldn't check the XRP Ledger right now. Please try again.", "error");
-          }
-        } finally {
-          checkButton.disabled = false;
-          checkButton.textContent = "Enter Member Record →";
-        }
-      }
-
-      checkButton.addEventListener("click", checkLeap);
-      addressInput.addEventListener("keydown", event => {
-        if (event.key === "Enter") checkLeap();
+      const community = window.WILD_LEDGER_COMMUNITY || {
+        id:"sfl",
+        layout:"classic",
+        communityName:"Community",
+        operatorName:"Operator",
+        membershipLabel:"Membership",
+        memberSingular:"member",
+        memberPlural:"members",
+        groupName:"community",
+        historyLabel:"community history",
+        heading:"Join",
+        bannerDesktop:"images/bannerDesktop.png",
+        bannerMobile:"images/bannerMobile.png",
+        walletStorageKey:"sfl.xrpl.wallet",
+        activeWalletKey:"sfl.xrpl.activeWallet",
+        ranks:[{min:1,name:"First rank"}]
+      };
+
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const communityName = community.communityName || "Community";
+      const operatorName = community.operatorName || community.managerName || "the community operator";
+      const groupName = community.groupName || "community";
+      const historyLabel = community.historyLabel || "community history";
+      const firstRankName =
+        Array.isArray(community.ranks) && community.ranks.length
+          ? community.ranks[0].name
+          : "First rank";
+
+      // Keep the community-specific wallet keys available to the join flow.
+      const walletStorageKey = community.walletStorageKey || `${communityId}.xrpl.wallet`;
+      const activeWalletKey = community.activeWalletKey || `${communityId}.xrpl.activeWallet`;
+      window.WILD_LEDGER_JOIN_KEYS = { walletStorageKey, activeWalletKey };
+
+      const theme = community.theme || {};
+      const themeVariables = {
+        paper:"--paper", paper2:"--paper2", ink:"--ink", navy:"--navy",
+        deep:"--deep", sea:"--sea", foam:"--foam", rust:"--rust",
+        gold:"--gold", line:"--line", card:"--card", muted:"--muted",
+        pageBackground:"--page-background", pageOverlay:"--page-overlay",
+        navBackground:"--nav-background", headerBackground:"--header-background",
+        sectionBackground:"--section-background", darkFeatureBackground:"--dark-feature-background"
+      };
+      Object.entries(themeVariables).forEach(([key, cssVariable]) => {
+        if (theme[key]) document.documentElement.style.setProperty(cssVariable, theme[key]);
       });
+
+      document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
+
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor && theme.themeColor) themeColor.setAttribute("content", theme.themeColor);
+
+      document.title = `Join — ${communityName}`;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.content = `Join ${communityName} with your first LEAP.`;
+
+      const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+      const pageHref = page => `${page}?community=${encodeURIComponent(communityId)}`;
+      const routeMap = [
+        ["communityHomeBrand", homeHref],
+        ["homeLink", homeHref],
+        ["ranksLink", pageHref("ranks.html")],
+        ["badgesLink", pageHref("badges.html")],
+        ["faqLink", pageHref("faq.html")],
+        ["stateMachineLink", pageHref("stateMachine.html")],
+        ["nextRanksLink", pageHref("ranks.html")],
+        ["nextBadgesLink", pageHref("badges.html")],
+        ["bottomFaqLink", pageHref("faq.html")],
+        ["footerHomeLink", homeHref],
+        ["footerRanksLink", pageHref("ranks.html")],
+        ["footerBadgesLink", pageHref("badges.html")],
+        ["footerFaqLink", pageHref("faq.html")]
+      ];
+      routeMap.forEach(([id, href]) => {
+        const el = document.getElementById(id);
+        if (el) el.href = href;
+      });
+
+      const nameLabel = document.getElementById("communityNameLabel");
+      if (nameLabel) nameLabel.textContent = communityName;
+
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
+      const joinKicker = document.getElementById("joinKicker");
+      if (joinKicker) joinKicker.textContent = `Join ${communityName}`;
+
+      const joinHeading = document.getElementById("joinHeading");
+      if (joinHeading) joinHeading.textContent = community.heading || "Join";
+
+      const joinLede = document.getElementById("joinLede");
+      if (joinLede) {
+        joinLede.textContent =
+          `Joining is simple. Start with Xaman Wallet on your mobile device. ${operatorName} sends a LEAP Check to your Xaman Wallet. You cash it in Xaman. Then you are part of ${communityName}.`;
+      }
+
+      const heroLine = document.getElementById("heroLine");
+      if (heroLine) {
+        heroLine.innerHTML =
+          `<strong>Your first LEAP makes you a ${firstRankName}.</strong> After that, each LEAP you earn can come to you the same way: by Check.`;
+      }
+
+      const threeStepWelcome = document.getElementById("threeStepWelcome");
+      if (threeStepWelcome) {
+        threeStepWelcome.textContent =
+          `Cash the Check in Xaman. Welcome, ${firstRankName}.`;
+      }
+
+      const sendAddressHeading = document.getElementById("sendAddressHeading");
+      if (sendAddressHeading) sendAddressHeading.textContent = `Send ${operatorName} your public Xaman wallet address`;
+
+      const sendCheckHeading = document.getElementById("sendCheckHeading");
+      if (sendCheckHeading) sendCheckHeading.textContent = `${operatorName} sends a LEAP Check to your Xaman Wallet`;
+
+      const inviteCopy = document.getElementById("inviteCopy");
+      if (inviteCopy) inviteCopy.textContent = `This is your invite to join ${communityName}.`;
+
+      const welcomeRankHeading = document.getElementById("welcomeRankHeading");
+      if (welcomeRankHeading) {
+        welcomeRankHeading.textContent =
+          community.layout === "classic"
+            ? `Welcome aboard, ${firstRankName}.`
+            : `Welcome, ${firstRankName}.`;
+      }
+
+      const welcomeHistoryCopy = document.getElementById("welcomeHistoryCopy");
+      if (welcomeHistoryCopy) {
+        welcomeHistoryCopy.textContent =
+          `You now hold your first LEAP. Your ${historyLabel} has started.`;
+      }
+
+      const firstRankLabel = document.getElementById("firstRankLabel");
+      if (firstRankLabel) firstRankLabel.textContent = firstRankName;
+
+      const takePartCopy = document.getElementById("takePartCopy");
+      if (takePartCopy) takePartCopy.textContent = `Take part in the ${groupName}.`;
+
+      const storyGrowthCopy = document.getElementById("storyGrowthCopy");
+      if (storyGrowthCopy) storyGrowthCopy.textContent = `Those notes help build your ${historyLabel} and badges.`;
+
+      const safetyCopy = document.getElementById("safetyCommunityCopy");
+      if (safetyCopy) safetyCopy.textContent = `${communityName} only needs your public Xaman wallet address.`;
+
+      const footer = document.getElementById("footerLabel");
+      if (footer) footer.textContent = `${communityName} • Join LEAP`;
     })();
   </script>
 
