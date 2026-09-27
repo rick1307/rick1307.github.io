@@ -95,6 +95,7 @@
       border-radius:20px;
       border:1px solid rgba(26,37,44,.14);
       box-shadow:0 12px 28px rgba(26,37,44,.12);
+      background:var(--portrait-background);
       display:block;
       justify-self:center;
     }
@@ -654,42 +655,46 @@
       --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
       --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
       --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
-      --card:rgba(250,252,247,.80);
+      --card:rgba(250,252,247,.80);--muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --manifesto-background:linear-gradient(135deg,var(--deep),#184d58 68%,#235f69);
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+      --badge-background:linear-gradient(135deg,rgba(211,235,230,.94),rgba(235,243,236,.78));
+      --portrait-background:rgba(250,252,247,.84);
     }
     body{
       margin:0;color:var(--ink);
-      background:
-        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
-        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
-        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background:var(--page-background);
       background-size:auto;
       font-family:Georgia,"Times New Roman",serif;
     }
     body::before{
       content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
-      background-image:
-        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
-        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      background-image:var(--page-overlay);
     }
     nav{
-      background:rgba(226,235,230,.88);backdrop-filter:blur(14px) saturate(120%);
+      background:var(--nav-background);backdrop-filter:blur(14px) saturate(120%);
       border-bottom:1px solid rgba(18,59,70,.15);box-shadow:0 8px 24px rgba(11,45,54,.05)
     }
     .brand img{border:1px solid rgba(18,59,70,.16);box-shadow:0 4px 14px rgba(11,45,54,.09)}
-    .nav-links a{color:#45636a}.nav-links a:hover{color:var(--rust)}
+    .nav-links a{color:var(--muted)}.nav-links a:hover{color:var(--rust)}
     header{
-      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      background:var(--header-background);
       border-bottom:1px solid rgba(18,59,70,.08)
     }
     .kicker{color:var(--rust)}
     h1,h2{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
-    .lede{color:#3f5a61}
+    .lede{color:var(--muted)}
     main{position:relative}
-    section:nth-of-type(even){background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))}
-    .section-title p{color:#526a70}
+    section:nth-of-type(even){background:var(--section-background)}
+    .section-title p{color:var(--muted)}
     .button{background:var(--rust);box-shadow:0 8px 20px rgba(184,90,64,.16)}
     .button.secondary{background:transparent;color:var(--deep);border:1px solid rgba(18,59,70,.18);box-shadow:none}
-    footer{color:#49636a}
+    footer{color:var(--muted)}
     .foot{border-top:1px solid rgba(18,59,70,.16)}
 
     .hero-card,.card,.deep-dive{
@@ -702,20 +707,20 @@
     .card h3,.hero-card h3,.deep-dive h3{color:var(--deep)}
     .card p,.hero-card p,.deep-dive p{color:#526970}
     .manifesto{
-      background:linear-gradient(135deg,var(--deep),#184d58 68%,#235f69);
+      background:var(--manifesto-background);
       border:1px solid rgba(255,255,255,.12);box-shadow:0 22px 46px rgba(11,45,54,.18)
     }
     .manifesto p{color:rgba(255,255,255,.92)}
     .deep-dive{border-radius:20px;padding:32px}
     main section:nth-of-type(3) .deep-dive{
-      background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+      background:var(--dark-feature-background);
       border:1px solid rgba(255,255,255,.12);box-shadow:0 22px 46px rgba(11,45,54,.18)
     }
     main section:nth-of-type(3) .deep-dive h3{color:white}
     main section:nth-of-type(3) .deep-dive p{color:rgba(255,255,255,.82)}
     main section:nth-of-type(3) .deep-dive .button.secondary{color:#f0d59d;border-color:rgba(255,255,255,.24)}
-    .badge{background:linear-gradient(135deg,rgba(211,235,230,.94),rgba(235,243,236,.78));border-color:rgba(47,116,129,.24);box-shadow:0 14px 30px rgba(11,45,54,.06)}
-    .onboard,.closing{background:rgba(250,252,247,.72);backdrop-filter:blur(9px);border-color:rgba(18,59,70,.15);box-shadow:0 14px 32px rgba(11,45,54,.06)}
+    .badge{background:var(--badge-background);border-color:var(--line);box-shadow:0 14px 30px rgba(11,45,54,.06)}
+    .onboard,.closing{background:var(--card);backdrop-filter:blur(9px);border-color:var(--line);box-shadow:0 14px 32px rgba(11,45,54,.06)}
 
 
     /* LEAP journey banner: desktop + mobile companion artwork */
@@ -998,6 +1003,39 @@
 
       const community = { ...defaults, ...(window.WILD_LEDGER_COMMUNITY || {}) };
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+
+      const theme = community.theme || {};
+      const themeVariables = {
+        paper: "--paper",
+        paper2: "--paper2",
+        ink: "--ink",
+        navy: "--navy",
+        deep: "--deep",
+        sea: "--sea",
+        foam: "--foam",
+        rust: "--rust",
+        gold: "--gold",
+        line: "--line",
+        card: "--card",
+        muted: "--muted",
+        pageBackground: "--page-background",
+        pageOverlay: "--page-overlay",
+        navBackground: "--nav-background",
+        headerBackground: "--header-background",
+        sectionBackground: "--section-background",
+        manifestoBackground: "--manifesto-background",
+        darkFeatureBackground: "--dark-feature-background",
+        badgeBackground: "--badge-background",
+        portraitBackground: "--portrait-background"
+      };
+
+      Object.entries(themeVariables).forEach(([key, cssVariable]) => {
+        if (theme[key]) document.documentElement.style.setProperty(cssVariable, theme[key]);
+      });
+      document.body.dataset.communityTheme = communityId;
+
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor && theme.themeColor) themeColor.setAttribute("content", theme.themeColor);
 
       document.title = `${community.heading} — ${community.communityName}`;
       const metaDescription = document.querySelector('meta[name="description"]');
