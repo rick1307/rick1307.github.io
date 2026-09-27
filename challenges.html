@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Learn how LEAP challenges work: clear objectives that invite Sailing Frog's Leap crew members to participate, act, and build crew history." />
+  <meta name="description" content="Learn how LEAP challenges work inside a Wild Ledger community." />
   <meta name="theme-color" content="#efe8d8" />
-  <title>Challenges — Sailing Frog's Leap</title>
+  <title>Challenges — LEAP</title>
 
   <style>
     :root{
@@ -83,38 +83,39 @@
       --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
       --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
       --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
-      --card:rgba(250,252,247,.80);
+      --card:rgba(250,252,247,.80);--muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
     }
     body{
       margin:0;color:var(--ink);
-      background:
-        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
-        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
-        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background:var(--page-background);
       background-size:auto;
       font-family:Georgia,"Times New Roman",serif;
     }
     body::before{
       content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
-      background-image:
-        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
-        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      background-image:var(--page-overlay);
     }
     nav{
-      background:rgba(226,235,230,.88);backdrop-filter:blur(14px) saturate(120%);
+      background:var(--nav-background);backdrop-filter:blur(14px) saturate(120%);
       border-bottom:1px solid rgba(18,59,70,.15);box-shadow:0 8px 24px rgba(11,45,54,.05)
     }
     .brand img{border:1px solid rgba(18,59,70,.16);box-shadow:0 4px 14px rgba(11,45,54,.09)}
     .nav-links a{color:#45636a}.nav-links a:hover{color:var(--rust)}
     header{
-      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      background:var(--header-background);
       border-bottom:1px solid rgba(18,59,70,.08)
     }
     .kicker{color:var(--rust)}
     h1,h2{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
     .lede{color:#3f5a61}
     main{position:relative}
-    section:nth-of-type(even){background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06))}
+    section:nth-of-type(even){background:var(--section-background)}
     .section-title p{color:#526a70}
     .button{background:var(--rust);box-shadow:0 8px 20px rgba(184,90,64,.16)}
     .button.secondary{background:transparent;color:var(--deep);border:1px solid rgba(18,59,70,.18);box-shadow:none}
@@ -137,7 +138,7 @@
     .badge-head{border-bottom-color:rgba(18,59,70,.13)}
     .badge-icon{background:linear-gradient(135deg,var(--foam),rgba(255,255,255,.72));box-shadow:0 6px 16px rgba(11,45,54,.06)}
     .return-box{
-      background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+      background:var(--dark-feature-background);
       border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 22px 46px rgba(11,45,54,.18)
     }
     .return-box h3{color:white}.return-box p{color:rgba(255,255,255,.82)}
@@ -164,7 +165,7 @@
 
 
 
-    /* SFL shared button motion standard */
+    /* Shared button motion standard */
     button,
     a.button{
       transition:
@@ -223,6 +224,11 @@
   .flow-step b{display:block;margin-bottom:7px;color:var(--rust);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.74rem}
   .flow-step h3{margin:0 0 7px;color:var(--deep);font-size:1.18rem}
   .flow-step p{margin:0;color:#526970}
+  body[data-community-layout="garage"] .principle,
+  body[data-community-layout="garage"] .flow-step,
+  body[data-community-layout="garage"] .status-box,
+  body[data-community-layout="garage"] .return-box{border-radius:10px}
+  body[data-community-layout="garage"] .button{border-radius:6px}
   @media(max-width:850px){.flow{grid-template-columns:1fr}}
 </style>
 </head>
@@ -230,20 +236,21 @@
 <body>
   <nav>
     <div class="wrap nav-inner">
-      <a class="brand" href="index.html">
+      <a class="brand" id="communityHomeBrand" href="index.html">
         <img src="leap-logo.png" alt="LEAP logo">
-        <span>Sailing Frog's Leap</span>
+        <span id="communityNameLabel">Community</span>
       </a>
-      <div class="nav-links"><a href="index.html">← Home</a></div>
+      <div class="nav-links"><a id="communityHomeLink" href="index.html">← Home</a></div>
     </div>
   </nav>
 
-  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the yacht club.">
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
     <picture>
-      <source media="(max-width: 800px)" srcset="images/bannerMobile.png">
+      <source id="communityBannerMobile" media="(max-width: 800px)" srcset="images/bannerMobile.png">
       <img
+        id="communityBannerDesktop"
         src="images/bannerDesktop.png"
-        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Yacht Club.">
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
     </picture>
   </div>
 
@@ -251,7 +258,7 @@
     <div class="wrap">
       <div class="kicker">LEAP Challenges</div>
       <h1>Challenges</h1>
-      <p class="lede">Challenges turn watching into doing. They give Leapers a clear objective, a reason to participate, and another way to build a history with Sailing Frog's Leap.</p>
+      <p class="lede" id="communityLede">Challenges turn watching into doing. They give members a clear objective and a temporary opportunity to participate, accomplish something, and add that accomplishment to their community history.</p>
     </div>
   </header>
 
@@ -260,7 +267,7 @@
       <div class="wrap">
         <div class="section-title">
           <h2>What a challenge is</h2>
-          <p>A challenge is a clear invitation to go do something. It has a recognizable objective and, when needed, a time window or simple rules.</p>
+          <p>A challenge is a temporary invitation to go do something specific. It opens, stays active for a while, and eventually closes — but the end does not always have to be known when it begins.</p>
         </div>
 
         <div class="principles">
@@ -272,13 +279,18 @@
           <div class="principle">
             <b>Idea two</b>
             <h3>Know what counts</h3>
-            <p>Every challenge should say what the objective is, who can take part, and what a Leaper needs to do for the challenge to count.</p>
+            <p id="challengeCountsCopy">Every challenge should make the objective clear, say who can take part, and explain what a member needs to do for the challenge to count. If a closing date or limit is known, that can be stated too.</p>
           </div>
           <div class="principle">
             <b>Idea three</b>
             <h3>Build history</h3>
-            <p>When a completed challenge is recognized, it can become part of that member's LEAP crew history as a Challenge — separate from a Badge or Event.</p>
+            <p id="historyCopy">When a completed challenge is recognized, it can become part of that member's LEAP community history as a Challenge. The challenge itself may still remain open for other members until it is closed.</p>
           </div>
+        </div>
+
+        <div class="status-box" style="margin-top:20px">
+          <h3>The end can be known — or decided later.</h3>
+          <p>A challenge is temporary, but temporary does not always mean a fixed deadline. The community operator may announce the end in advance, tie it to a result or number of completions, or simply close it when the challenge has served its purpose.</p>
         </div>
       </div>
     </section>
@@ -287,13 +299,42 @@
       <div class="wrap">
         <div class="section-title">
           <h2>How challenges work</h2>
-          <p>The exact rules can change from challenge to challenge, but the basic path stays simple.</p>
+          <p>The exact rules can change from challenge to challenge. For a member, the basic path stays simple even if the challenge remains open for other people afterward.</p>
         </div>
         <div class="flow">
-          <div class="flow-step"><b>1</b><h3>A challenge opens</h3><p>The objective, any deadline, and what counts are announced.</p></div>
+          <div class="flow-step"><b>1</b><h3>A challenge opens</h3><p>The objective, what counts, and any known deadline or limit are announced.</p></div>
           <div class="flow-step"><b>2</b><h3>You go do it</h3><p>The point is participation in the real world or the real community.</p></div>
           <div class="flow-step"><b>3</b><h3>You show what happened</h3><p>If the challenge calls for proof or a story, the instructions will say what to share.</p></div>
           <div class="flow-step"><b>4</b><h3>It joins your history</h3><p>Once recognized, the Challenge can appear as part of your LEAP record.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>What a challenge might look like</h2>
+          <p>There are no fixed challenge types. These are simply examples of how a community operator might decide to run one.</p>
+        </div>
+
+        <div class="principles">
+          <div class="principle">
+            <b>For example</b>
+            <h3>First to finish</h3>
+            <p>A challenge could stay open until the first person, the first five people, or another set number of members completes it.</p>
+          </div>
+
+          <div class="principle">
+            <b>For example</b>
+            <h3>Reach a goal</h3>
+            <p>A challenge could remain active until a particular result is reached, then close once that goal has been met.</p>
+          </div>
+
+          <div class="principle">
+            <b>For example</b>
+            <h3>Open for a while</h3>
+            <p>A challenge could run until a stated date, or simply stay open until the community operator decides it has served its purpose.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -305,8 +346,8 @@
           <p>This is where current challenges will live once they are announced.</p>
         </div>
         <div class="status-box">
-          <h3>No challenge has been announced yet.</h3>
-          <p>Some challenges may stay open for weeks or months. Others may appear for only a short time, so this page will be the place to check what is currently in play.</p>
+          <h3 id="activeChallengeStatus">No active challenge is listed right now.</h3>
+          <p>Some challenges may stay open for weeks or months. Others may close after a certain number of people complete them, after a goal is reached, on a particular date, or whenever the community operator decides the challenge has run its course.</p>
         </div>
       </div>
     </section>
@@ -315,11 +356,11 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Completed challenges</h2>
-          <p>Closed challenges can remain here as part of the public history of LEAP — even after they can no longer be completed.</p>
+          <p>Closed challenges can remain here as part of the public history of LEAP — even after the opportunity to complete them has ended.</p>
         </div>
         <div class="status-box">
           <h3>The log starts with the first challenge.</h3>
-          <p>As LEAP grows, this section can become a record of what the crew was invited to do and when it happened.</p>
+          <p id="completedHistoryCopy">As LEAP grows, this section can become a record of what the community was invited to do and when it happened.</p>
         </div>
       </div>
     </section>
@@ -327,9 +368,9 @@
     <section>
       <div class="wrap">
         <div class="return-box">
-          <h3>Challenges are the “go do it” part of LEAP.</h3>
-          <p>Watch for the first one when the opening season begins.</p>
-          <a class="button" href="index.html">Back to LEAP →</a>
+          <h3>Challenges are the temporary “go do it” part of LEAP.</h3>
+          <p id="challengeCtaCopy">When a challenge opens, this page is where you can see what is in play.</p>
+          <a class="button" id="backToCommunity" href="index.html">Back to community →</a>
         </div>
       </div>
     </section>
@@ -337,14 +378,116 @@
 
   <footer>
     <div class="wrap foot">
-      <div>Sailing Frog's Leap • LEAP Challenges</div>
+      <div id="footerLabel">Community • LEAP Challenges</div>
     </div>
   </footer>
 
+  <script src="js/communityConfig.js"></script>
   <script>
-    try {
-      sessionStorage.removeItem("sfl.xrpl.activeWallet");
-    } catch (_) {}
+    (() => {
+      const community = window.WILD_LEDGER_COMMUNITY || {
+        id:"sfl",
+        layout:"classic",
+        communityName:"Community",
+        memberSingular:"member",
+        memberPlural:"members",
+        groupName:"community",
+        historyLabel:"community history",
+        bannerDesktop:"images/bannerDesktop.png",
+        bannerMobile:"images/bannerMobile.png",
+        activeWalletKey:"sfl.xrpl.activeWallet"
+      };
+
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || community.id || "sfl";
+      const communityName = community.communityName || "Community";
+      const memberSingular = community.memberSingular || "member";
+      const memberPlural = community.memberPlural || "members";
+      const groupName = community.groupName || "community";
+      const historyLabel = community.historyLabel || "community history";
+      const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+
+      const theme = community.theme || {};
+      const themeVars = {
+        paper:"--paper", paper2:"--paper2", ink:"--ink", navy:"--navy", deep:"--deep",
+        sea:"--sea", foam:"--foam", rust:"--rust", gold:"--gold", line:"--line",
+        card:"--card", muted:"--muted", pageBackground:"--page-background",
+        pageOverlay:"--page-overlay", navBackground:"--nav-background",
+        headerBackground:"--header-background", sectionBackground:"--section-background",
+        darkFeatureBackground:"--dark-feature-background"
+      };
+      for (const [key, cssVar] of Object.entries(themeVars)) {
+        if (theme[key]) document.documentElement.style.setProperty(cssVar, theme[key]);
+      }
+
+      document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
+
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
+
+      document.title = `Challenges — ${communityName}`;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) {
+        meta.content = `Learn how LEAP challenges work inside ${communityName}.`;
+      }
+
+      const nameLabel = document.getElementById("communityNameLabel");
+      if (nameLabel) nameLabel.textContent = communityName;
+
+      const homeBrand = document.getElementById("communityHomeBrand");
+      const homeLink = document.getElementById("communityHomeLink");
+      const backLink = document.getElementById("backToCommunity");
+      if (homeBrand) homeBrand.href = homeHref;
+      if (homeLink) homeLink.href = homeHref;
+      if (backLink) {
+        backLink.href = homeHref;
+        backLink.textContent = `Back to ${communityName} →`;
+      }
+
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
+      const lede = document.getElementById("communityLede");
+      if (lede) {
+        lede.textContent =
+          `Challenges turn watching into doing. They give ${memberPlural} a clear objective and a temporary opportunity to participate, accomplish something, and add that accomplishment to their history with ${communityName}.`;
+      }
+
+      const counts = document.getElementById("challengeCountsCopy");
+      if (counts) {
+        counts.textContent =
+          `Every challenge should make the objective clear, say who can take part, and explain what a ${memberSingular} needs to do for the challenge to count. If a closing date or limit is known, that can be stated too.`;
+      }
+
+      const history = document.getElementById("historyCopy");
+      if (history) {
+        history.textContent =
+          `When a completed challenge is recognized, it can become part of that ${memberSingular}'s LEAP ${historyLabel} as a Challenge. The challenge itself may still remain open for other ${memberPlural} until it is closed.`;
+      }
+
+      const completed = document.getElementById("completedHistoryCopy");
+      if (completed) {
+        completed.textContent =
+          `As LEAP grows, this section can become a record of what the ${groupName} was invited to do and when it happened.`;
+      }
+
+      const ctaCopy = document.getElementById("challengeCtaCopy");
+      if (ctaCopy) {
+        ctaCopy.textContent =
+          `When ${communityName} opens a challenge, this page is where you can see what is in play.`;
+      }
+
+      const footer = document.getElementById("footerLabel");
+      if (footer) footer.textContent = `${communityName} • LEAP Challenges`;
+
+      try {
+        if (community.activeWalletKey) {
+          sessionStorage.removeItem(community.activeWalletKey);
+        }
+      } catch (_) {}
+    })();
   </script>
 </body>
 </html>
