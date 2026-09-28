@@ -153,8 +153,38 @@
 
 
 
+  .dashboard-group {
+    padding: 12px 24px 0;
+  }
+
+  .dashboard-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 10px;
+    min-width: 0;
+  }
+
+  .dashboard-title {
+    color: var(--ink);
+    font-size: .96rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .dashboard-subtitle {
+    color: rgba(236, 249, 247, .56);
+    font-size: .74rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
   .metrics {
-    padding: 18px 24px 4px;
+    padding: 0 0 4px;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
@@ -317,7 +347,7 @@
   }
 
   .metrics-secondary {
-    padding-top: 8px;
+    padding-top: 0;
     padding-bottom: 8px;
   }
 
@@ -491,8 +521,12 @@
     .console { border-radius: 25px; }
     .console-header { padding: 28px 22px 23px; }
     .brand-row { align-items: flex-start; }
-    .metrics { padding: 13px 12px 2px; gap: 5px; }
-    .metrics-secondary { padding-top: 6px; padding-bottom: 7px; }
+    .dashboard-group { padding: 10px 12px 0; }
+    .dashboard-heading { margin: 0 0 8px; gap: 6px; flex-wrap: wrap; }
+    .dashboard-title { font-size: .82rem; }
+    .dashboard-subtitle { font-size: .62rem; }
+    .metrics { padding: 0 0 2px; gap: 5px; }
+    .metrics-secondary { padding-top: 0; padding-bottom: 7px; }
     .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
     .metrics-secondary .metric { min-height: 82px; }
     .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
@@ -521,7 +555,12 @@
       </header>
 
 
-      <section class="metrics" aria-label="Wild Ledger LEAP dashboard">
+      <section class="dashboard-group" aria-labelledby="dashboard-state-title">
+        <div class="dashboard-heading">
+          <div class="dashboard-title" id="dashboard-state-title">State</div>
+          <div class="dashboard-subtitle">— What exists</div>
+        </div>
+        <section class="metrics" aria-label="Wild Ledger LEAP state dashboard">
         <div class="metric">
           <button class="metric-info" type="button" aria-label="About LEAP Outstanding" data-info-title="LEAP Outstanding" data-info-text="Total LEAP currently held outside the issuer account." data-info-why="This is issued supply. If it rises, more LEAP has been issued into the ecosystem; if it falls, LEAP has returned toward the issuer. Higher is not automatically better—healthy growth should also show up in circulation, holders, and activity.">i</button>
           <div class="metric-value" id="metricOutstanding" aria-live="polite">…</div>
@@ -546,9 +585,15 @@
           <div class="metric-label">Holders</div>
           <div class="metric-meaning">Reach</div>
         </div>
+        </section>
       </section>
 
-      <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem activity dashboard">
+      <section class="dashboard-group" aria-labelledby="dashboard-movement-title">
+        <div class="dashboard-heading">
+          <div class="dashboard-title" id="dashboard-movement-title">Movement</div>
+          <div class="dashboard-subtitle">— Are we moving?</div>
+        </div>
+        <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem movement dashboard">
         <div class="metric">
           <button class="metric-info" type="button" aria-label="About Circulation Rate" data-info-title="Circulation Rate" data-info-text="LEAP in the Wild divided by LEAP Outstanding." data-info-why="This shows how much issued LEAP has actually moved beyond community inventory. A rising rate generally means stronger deployment to members. You usually want it trending upward as participation grows, while still keeping enough Community LEAP available to operate.">i</button>
           <div class="metric-value" id="metricCirculationRate" aria-live="polite">—</div>
@@ -573,6 +618,40 @@
           <div class="metric-label">30-Day Distribution</div>
           <div class="metric-meaning">Momentum</div>
         </div>
+        </section>
+      </section>
+
+      <section class="dashboard-group" aria-labelledby="dashboard-breadth-title">
+        <div class="dashboard-heading">
+          <div class="dashboard-title" id="dashboard-breadth-title">Breadth &amp; Depth</div>
+          <div class="dashboard-subtitle">— How broad and how deep is the movement?</div>
+        </div>
+        <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem breadth and depth dashboard">
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-text="Live Wild Ledger communities currently operating and distributing LEAP." data-info-why="This is footprint. More active communities usually means the ecosystem is broadening. If this stays flat while other activity rises, growth may be concentrated in too few communities.">i</button>
+            <div class="metric-value" id="metricActiveCommunities" aria-live="polite">—</div>
+            <div class="metric-label">Active Communities</div>
+            <div class="metric-meaning">Footprint</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Recognition Cash Rate" data-info-title="Recognition Cash Rate" data-info-text="Percentage of awarded LEAP recognition Checks that recipients actually cash." data-info-why="This is completion. Higher generally means the recognition loop is working. A falling rate can signal friction, confusion, or low participant follow-through.">i</button>
+            <div class="metric-value" id="metricRecognitionCashRate" aria-live="polite">—</div>
+            <div class="metric-label">Recognition Cash Rate</div>
+            <div class="metric-meaning">Completion</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Inventory Runway" data-info-title="Inventory Runway" data-info-text="Estimated time community-controlled LEAP inventory would last at the current distribution pace." data-info-why="This is reserves. More runway gives operating comfort, but too much unused inventory can also mean LEAP is not moving. You want enough runway without stalling circulation.">i</button>
+            <div class="metric-value" id="metricInventoryRunway" aria-live="polite">—</div>
+            <div class="metric-label">Inventory Runway</div>
+            <div class="metric-meaning">Reserves</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Holder Concentration" data-info-title="Holder Concentration" data-info-text="How concentrated LEAP in the Wild is among the largest holders." data-info-why="This is distribution quality. Lower concentration generally means broader ownership. If a small number of holders dominate circulation, the ecosystem may look active while still being narrow.">i</button>
+            <div class="metric-value" id="metricHolderConcentration" aria-live="polite">—</div>
+            <div class="metric-label">Holder Concentration</div>
+            <div class="metric-meaning">Distribution</div>
+          </div>
+        </section>
       </section>
 
       <nav class="navigation" aria-label="Owner console navigation">
