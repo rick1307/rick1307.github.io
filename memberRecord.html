@@ -100,10 +100,6 @@
       color:var(--deep);
     }
 
-    body[data-community-theme="zach"] .discord-cta button{
-      background:var(--rust);
-    }
-
     *{box-sizing:border-box}
     html.community-pending body{visibility:hidden}
 
@@ -937,45 +933,12 @@
       white-space:nowrap;
     }
 
-    .discord-cta{
-      display:flex;
-      justify-content:center;
-      margin-top:20px;
-    }
-
-    .discord-cta button{
-      border:1px solid rgba(18,59,70,.16);
-      border-radius:12px;
-      padding:13px 22px;
-      background:var(--rust);
-      color:white;
-      font:inherit;
-      font-family:var(--community-ui-font);
-      font-size:.9rem;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow:0 10px 24px rgba(11,45,54,.10);
-    }
-
-    .discord-cta button:hover:not(:disabled){
-      transform:translateY(-1px);
-      box-shadow:0 13px 28px rgba(11,45,54,.14);
-    }
-
-    .discord-cta button:disabled{
-      opacity:.48;
-      cursor:not-allowed;
-      transform:none;
-      box-shadow:0 7px 16px rgba(11,45,54,.07);
-    }
-
     body[data-community-layout="garage"] .crew-console{border-radius:14px;}
     body[data-community-layout="garage"] .record-stat{border-radius:7px;}
     body[data-community-layout="garage"] .rank-progress{border-radius:9px;}
     body[data-community-layout="garage"] .crew-logbook{border-radius:9px;}
     body[data-community-layout="garage"] .crew-state-message{border-radius:8px;}
-    body[data-community-layout="garage"] .crew-state-action,
-    body[data-community-layout="garage"] .discord-cta button{border-radius:6px;}
+    body[data-community-layout="garage"] .crew-state-action{border-radius:6px;}
 
     @media(max-width:600px){
       header{padding-top:54px}
@@ -1180,15 +1143,6 @@
         </div>
       </aside>
 
-      <div class="discord-cta">
-        <button
-          id="discordCrewButton"
-          type="button"
-          disabled
-          aria-disabled="true"
-          title="Load a verified LEAP Member Record to unlock Discord."
-        >Connect Discord →</button>
-      </div>
     </div>
   </header>
 
@@ -1268,7 +1222,6 @@
         localStorage.removeItem(SFL_LEAP_SESSION_KEY);
       } catch (_) {}
 
-      const DISCORD_OAUTH_START_URL = wildLedger.discordOAuthStartUrl;
       const XRPL_WS = wildLedger.xrplWebSocket;
 
       const status = document.getElementById("crewRecordStatus");
@@ -1298,7 +1251,6 @@
       const pendingCheckCount = document.getElementById("pendingCheckCount");
       const pendingChecksCopy = document.getElementById("pendingChecksCopy");
       const pendingCheckList = document.getElementById("pendingCheckList");
-      const discordCrewButton = document.getElementById("discordCrewButton");
 
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 
@@ -1306,7 +1258,6 @@
       let personalLogbookSort = "newest";
       let currentLogbookRecords = [];
       let currentPendingLeapChecks = [];
-      let verifiedDiscordWallet = "";
 
       renderProgressRankScale();
 
@@ -1377,18 +1328,6 @@
         if (forgetWallet) {
           clearRememberedWallet();
         }
-      }
-
-      function setDiscordAccess(isVerifiedHolder) {
-        if (!isVerifiedHolder) {
-          verifiedDiscordWallet = "";
-        }
-
-        discordCrewButton.disabled = !isVerifiedHolder;
-        discordCrewButton.setAttribute("aria-disabled", String(!isVerifiedHolder));
-        discordCrewButton.title = isVerifiedHolder
-          ? "Connect this verified LEAP Member Record to Discord."
-          : "Load a verified LEAP Member Record to unlock Discord.";
       }
 
       function setStatus(message, kind = "") {
@@ -2974,7 +2913,6 @@
       async function loadCrewRecord(account) {
         if (!classicAddressPattern.test(account)) {
           clearIdentityState({ forgetWallet:true });
-          setDiscordAccess(false);
           resetRecord();
           setTrustlineStatus(null, "unavailable");
           setStateMessage(
@@ -2988,7 +2926,6 @@
           return;
         }
 
-        setDiscordAccess(false);
         resetRecord();
         setTrustlineStatus(null, "checking");
         setStateMessage(
@@ -3020,7 +2957,6 @@
             : [];
 
           if (safeBalance < 1) {
-            setDiscordAccess(false);
             resetRecord();
             setTrustlineStatus(leapLine);
 
@@ -3078,8 +3014,6 @@
 
           saveWallet(account);
           saveLeapSession(account, safeBalance);
-          verifiedDiscordWallet = account;
-          setDiscordAccess(true);
 
           if (checksResult.status === "fulfilled") {
             renderPendingChecks(pending);
@@ -3116,7 +3050,6 @@
         } catch (error) {
           const message = String(error?.message || "");
 
-          setDiscordAccess(false);
           resetRecord();
 
           if (message.includes("actNotFound")) {
@@ -3145,31 +3078,6 @@
         }
       }
 
-      function beginDiscordOAuth() {
-        if (discordCrewButton.disabled) return;
-        if (!classicAddressPattern.test(verifiedDiscordWallet)) return;
-
-        /*
-          Submit the verified wallet in a POST body rather than placing it in
-          the Discord OAuth URL. The Worker independently checks LEAP again
-          before starting Discord authorization.
-        */
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = DISCORD_OAUTH_START_URL;
-        form.acceptCharset = "UTF-8";
-        form.style.display = "none";
-
-        const walletInput = document.createElement("input");
-        walletInput.type = "hidden";
-        walletInput.name = "wallet";
-        walletInput.value = verifiedDiscordWallet;
-
-        form.appendChild(walletInput);
-        document.body.appendChild(form);
-        form.submit();
-      }
-
       pendingCheckList.addEventListener("click", event => {
         const dismissButton = event.target.closest(".pending-check-dismiss");
         if (!dismissButton) return;
@@ -3182,8 +3090,6 @@
         }
       }, 60000);
 
-
-      discordCrewButton.addEventListener("click", beginDiscordOAuth);
 
       personalChronologicalButton.addEventListener("click", () => {
         setPersonalLogbookView("chronological");
@@ -3216,7 +3122,6 @@
           clearLeapSession();
         }
 
-        setDiscordAccess(false);
         resetRecord();
         setTrustlineStatus(null, "unavailable");
         setStateMessage(
