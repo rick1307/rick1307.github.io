@@ -163,6 +163,8 @@
   .metric {
     --metric-accent: var(--lagoon);
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
     min-height: 96px;
     padding: 14px 12px 12px;
@@ -211,7 +213,8 @@
   }
 
   .metric-meaning {
-    margin-top: 5px;
+    margin-top: auto;
+    padding-top: 5px;
     color: var(--metric-accent);
     font-size: .56rem;
     line-height: 1;
@@ -379,7 +382,7 @@
     .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
     .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
     .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
-    .metric-meaning { margin-top: 4px; font-size: .44rem; letter-spacing: .04em; }
+    .metric-meaning { margin-top: auto; padding-top: 4px; font-size: .44rem; letter-spacing: .04em; }
     .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
     .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
     .nav-copy { margin-top: 28px; }
