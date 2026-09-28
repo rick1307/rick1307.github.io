@@ -277,28 +277,35 @@
     }
     .celebration.show{display:flex}
     .celebration-backdrop{
-      position:absolute;inset:0;background:radial-gradient(circle at center,rgba(210,163,79,.24),rgba(22,56,75,.10) 34%,rgba(11,32,40,0) 68%);
-      animation:celebrationGlow 2.8s ease-out both;
+      position:absolute;inset:0;background:rgba(11,32,40,.46);
+      animation:celebrationGlow 3.4s ease-out both;
     }
     .celebration-card{
-      position:relative;z-index:2;width:min(90vw,420px);padding:26px 24px 24px;
-      border:1px solid rgba(210,163,79,.62);border-radius:24px;text-align:center;
-      background:rgba(255,250,240,.97);box-shadow:0 28px 70px rgba(11,32,40,.28);
-      animation:celebrationPop 2.8s cubic-bezier(.2,.8,.2,1) both;
+      position:relative;z-index:3;width:min(91vw,440px);padding:30px 24px 28px;
+      border:2px solid rgba(210,163,79,.78);border-radius:26px;text-align:center;
+      background:rgba(255,250,240,.985);box-shadow:0 30px 86px rgba(11,32,40,.46),0 0 0 8px rgba(210,163,79,.10);
+      animation:celebrationPop 3.4s cubic-bezier(.2,.8,.2,1) both;
     }
-    .celebration-icon{font-size:2rem;line-height:1;margin-bottom:7px;filter:drop-shadow(0 3px 8px rgba(210,163,79,.3))}
+    .celebration-icon{font-size:2.45rem;line-height:1;margin-bottom:8px;filter:drop-shadow(0 3px 8px rgba(210,163,79,.35))}
     .celebration-kicker{
-      color:var(--rust);font-size:.72rem;font-weight:950;letter-spacing:.18em;text-transform:uppercase;
+      color:var(--rust);font-size:.78rem;font-weight:950;letter-spacing:.19em;text-transform:uppercase;
     }
-    .celebration-name{margin-top:7px;color:var(--navy);font-size:clamp(1.55rem,6vw,2.25rem);font-weight:900;line-height:1.05}
-    .celebration-copy{margin-top:6px;color:#65757b;font-size:.86rem;font-weight:750}
-    .celebration-amount{margin-top:5px;color:var(--navy);font-size:clamp(2.4rem,11vw,4.2rem);font-weight:950;line-height:.95;letter-spacing:-.04em}
-    .celebration.level-2 .celebration-card{transform-origin:center}
-    .celebration.level-3 .celebration-card{box-shadow:0 32px 82px rgba(11,32,40,.34),0 0 0 7px rgba(210,163,79,.08)}
-    .celebration-sparks{position:absolute;inset:0;z-index:1}
+    .celebration-name{margin-top:8px;color:var(--navy);font-size:clamp(1.8rem,7vw,2.6rem);font-weight:950;line-height:1.02}
+    .celebration-copy{margin-top:7px;color:#65757b;font-size:.92rem;font-weight:800}
+    .celebration-amount{margin-top:6px;color:var(--navy);font-size:clamp(3rem,14vw,5.1rem);font-weight:950;line-height:.92;letter-spacing:-.05em}
+    .celebration.level-2 .celebration-card{box-shadow:0 32px 92px rgba(11,32,40,.48),0 0 0 10px rgba(210,163,79,.11)}
+    .celebration.level-3 .celebration-card{box-shadow:0 35px 100px rgba(11,32,40,.52),0 0 0 12px rgba(210,163,79,.14)}
+    .celebration-sparks{position:absolute;inset:0;z-index:2;overflow:hidden}
     .celebration-spark{
       position:absolute;left:50%;top:50%;font-size:var(--spark-size,1rem);opacity:0;
-      transform:translate(-50%,-50%);animation:sparkBurst 1.35s ease-out var(--spark-delay,0s) both;
+      transform:translate(-50%,-50%);animation:sparkBurst 1.55s ease-out var(--spark-delay,0s) both;
+    }
+    .celebration-confetti{
+      position:absolute;top:-10vh;left:var(--confetti-left,50%);z-index:1;
+      width:var(--confetti-w,8px);height:var(--confetti-h,14px);border-radius:2px;
+      background:var(--confetti-color,#d2a34f);opacity:0;
+      transform:translate3d(0,0,0) rotate(var(--confetti-rotation,0deg));
+      animation:confettiFall var(--confetti-duration,2.6s) cubic-bezier(.22,.62,.34,1) var(--confetti-delay,0s) both;
     }
     .system-event{display:flex;justify-content:center;margin:5px 0 18px;padding:0 8px}
     .system-event-pill{
@@ -308,25 +315,39 @@
       font-size:.72rem;font-weight:800;line-height:1.35;
     }
     @keyframes celebrationGlow{
-      0%{opacity:0;transform:scale(.72)}
-      18%{opacity:1}
-      72%{opacity:1}
-      100%{opacity:0;transform:scale(1.15)}
+      0%{opacity:0}
+      10%{opacity:1}
+      82%{opacity:1}
+      100%{opacity:0}
     }
     @keyframes celebrationPop{
-      0%{opacity:0;transform:translateY(22px) scale(.72) rotate(-1deg)}
-      14%{opacity:1;transform:translateY(0) scale(1.06) rotate(.4deg)}
-      24%{transform:scale(.99)}
-      72%{opacity:1;transform:scale(1)}
-      100%{opacity:0;transform:translateY(-10px) scale(.96)}
+      0%{opacity:0;transform:translateY(30px) scale(.66) rotate(-1.2deg)}
+      10%{opacity:1;transform:translateY(0) scale(1.09) rotate(.5deg)}
+      20%{transform:scale(.98)}
+      29%{transform:scale(1.015)}
+      78%{opacity:1;transform:scale(1)}
+      100%{opacity:0;transform:translateY(-12px) scale(.96)}
     }
     @keyframes sparkBurst{
-      0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0deg)}
-      12%{opacity:1}
-      100%{opacity:0;transform:translate(calc(-50% + var(--spark-x)),calc(-50% + var(--spark-y))) scale(1.15) rotate(var(--spark-rotation))}
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(0deg)}
+      10%{opacity:1}
+      78%{opacity:.9}
+      100%{opacity:0;transform:translate(calc(-50% + var(--spark-x)),calc(-50% + var(--spark-y))) scale(1.25) rotate(var(--spark-rotation))}
+    }
+    @keyframes confettiFall{
+      0%{opacity:0;transform:translate3d(0,-8vh,0) rotate(var(--confetti-rotation,0deg))}
+      8%{opacity:1}
+      88%{opacity:1}
+      100%{opacity:0;transform:translate3d(var(--confetti-drift,0px),118vh,0) rotate(calc(var(--confetti-rotation,0deg) + 720deg))}
     }
     @media (prefers-reduced-motion:reduce){
-      .celebration-backdrop,.celebration-card,.celebration-spark{animation-duration:.01ms!important;animation-delay:0s!important}
+      .celebration.show .celebration-backdrop{
+        animation:none!important;opacity:1!important;background:rgba(11,32,40,.46)!important;
+      }
+      .celebration.show .celebration-card{
+        animation:none!important;opacity:1!important;transform:none!important;
+      }
+      .celebration-spark,.celebration-confetti{display:none!important;animation:none!important}
     }
 
     .recognize-btn{
@@ -737,20 +758,37 @@
       recognitionCelebration.className = `celebration level-${level}`;
       celebrationSparks.textContent = "";
 
-      // More LEAP = a slightly bigger burst, without changing the basic animation.
-      const sparkCount = 8 + (level * 6);
+      // More LEAP = a slightly bigger burst, while every award is still unmistakable.
+      const sparkCount = 12 + (level * 7);
       for (let i = 0; i < sparkCount; i += 1) {
-        const angle = (Math.PI * 2 * i / sparkCount) + ((i % 2) * 0.13);
-        const distance = 95 + (level * 24) + ((i % 4) * 13);
+        const angle = (Math.PI * 2 * i / sparkCount) + ((i % 2) * 0.12);
+        const distance = 120 + (level * 30) + ((i % 4) * 14);
         const spark = document.createElement("span");
         spark.className = "celebration-spark";
         spark.textContent = i % 3 === 0 ? "⚡" : "✦";
         spark.style.setProperty("--spark-x", `${Math.cos(angle) * distance}px`);
         spark.style.setProperty("--spark-y", `${Math.sin(angle) * distance}px`);
-        spark.style.setProperty("--spark-rotation", `${(i * 37) - 120}deg`);
-        spark.style.setProperty("--spark-delay", `${(i % 5) * 0.025}s`);
-        spark.style.setProperty("--spark-size", `${0.78 + (level * 0.08) + ((i % 3) * 0.11)}rem`);
+        spark.style.setProperty("--spark-rotation", `${(i * 41) - 140}deg`);
+        spark.style.setProperty("--spark-delay", `${(i % 6) * 0.03}s`);
+        spark.style.setProperty("--spark-size", `${0.88 + (level * 0.09) + ((i % 3) * 0.13)}rem`);
         celebrationSparks.appendChild(spark);
+      }
+
+      // Full-screen confetti makes the shared-room moment obvious even on a phone.
+      const confettiColors = ["#d2a34f", "#2f7481", "#b84f32", "#dbece8", "#16384b"];
+      const confettiCount = 24 + (level * 8);
+      for (let i = 0; i < confettiCount; i += 1) {
+        const confetti = document.createElement("span");
+        confetti.className = "celebration-confetti";
+        confetti.style.setProperty("--confetti-left", `${(i * 23 + (i % 5) * 7) % 100}%`);
+        confetti.style.setProperty("--confetti-drift", `${((i % 7) - 3) * 24}px`);
+        confetti.style.setProperty("--confetti-delay", `${(i % 9) * 0.055}s`);
+        confetti.style.setProperty("--confetti-duration", `${2.15 + ((i % 5) * 0.16) + (level * 0.08)}s`);
+        confetti.style.setProperty("--confetti-rotation", `${(i * 47) % 180}deg`);
+        confetti.style.setProperty("--confetti-w", `${6 + (i % 4) * 2}px`);
+        confetti.style.setProperty("--confetti-h", `${10 + (i % 3) * 4}px`);
+        confetti.style.setProperty("--confetti-color", confettiColors[i % confettiColors.length]);
+        celebrationSparks.appendChild(confetti);
       }
 
       if (celebrationTimer) clearTimeout(celebrationTimer);
@@ -759,7 +797,7 @@
       recognitionCelebration.classList.add("show");
       celebrationTimer = setTimeout(() => {
         recognitionCelebration.classList.remove("show");
-      }, 2850);
+      }, 3400);
     }
 
     // This is the important seam: today the prototype calls this locally.
