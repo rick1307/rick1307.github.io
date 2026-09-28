@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wild Ledger Communities</title>
+  <style>
+    :root{
+      --deep:#031c29;
+      --ocean:#063747;
+      --lagoon:#2fa8a0;
+      --sea-glass:#86d7c9;
+      --mango:#f3b64a;
+      --coral:#ef735f;
+      --ink:#f4fbfa;
+      --muted:rgba(236,249,247,.68);
+      --panel:rgba(7,43,57,.74);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 12% 10%,rgba(47,168,160,.26),transparent 31%),
+        radial-gradient(circle at 88% 8%,rgba(239,115,95,.13),transparent 25%),
+        radial-gradient(circle at 72% 82%,rgba(243,182,74,.12),transparent 28%),
+        linear-gradient(145deg,#021720 0%,var(--deep) 42%,#062f3d 100%);
+    }
+    body:before{
+      content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+      background-size:36px 36px;
+      mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%);
+    }
+    .shell{width:min(980px,100%);margin:0 auto;padding:28px 16px 48px}
+    .console{
+      overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:28px;
+      background:linear-gradient(155deg,rgba(8,56,70,.86),rgba(4,31,43,.84));
+      box-shadow:0 28px 80px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    }
+    header{padding:28px 28px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .back{display:inline-block;margin-bottom:22px;color:#9fddff;text-decoration:none;font-weight:800;font-size:.78rem}
+    .brand{display:flex;align-items:center;gap:9px;color:var(--sea-glass);font-size:.78rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    .brand:before{content:"";width:11px;height:11px;border-radius:50%;background:linear-gradient(145deg,var(--lagoon),var(--mango));box-shadow:0 0 20px rgba(47,168,160,.65)}
+    h1{margin:13px 0 0;font-size:clamp(2.2rem,8vw,4.5rem);line-height:.96;letter-spacing:-.055em}
+    .intro{max-width:760px;margin:16px 0 0;color:var(--muted);line-height:1.6;font-size:1rem}
+    .directory{padding:22px;display:grid;gap:12px}
+    .section-title{margin:0 2px 2px;color:rgba(236,249,247,.58);font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .community{
+      position:relative;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;
+      min-height:132px;padding:22px;border:1px solid rgba(255,255,255,.09);border-radius:20px;
+      background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),rgba(5,34,46,.42);
+    }
+    .community:nth-of-type(3){border-color:rgba(243,182,74,.17)}
+    .community-name{font-size:1.28rem;font-weight:900;letter-spacing:-.02em}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+    .chip{padding:5px 8px;border-radius:999px;background:rgba(47,168,160,.12);border:1px solid rgba(134,215,201,.18);color:rgba(236,249,247,.7);font-size:.64rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+    .chip.reference{background:rgba(243,182,74,.09);border-color:rgba(243,182,74,.18);color:#f5d38f}
+    .community-copy{margin:10px 0 0;color:rgba(236,249,247,.58);font-size:.84rem;line-height:1.45}
+    .open{
+      display:inline-flex;align-items:center;gap:8px;padding:11px 13px;border-radius:12px;
+      border:1px solid rgba(143,210,255,.18);background:rgba(77,167,235,.08);color:#a9dcff;
+      text-decoration:none;font-size:.74rem;font-weight:900;white-space:nowrap;
+    }
+    .future{
+      margin:2px 22px 24px;padding:16px 18px;border:1px dashed rgba(134,215,201,.2);border-radius:18px;
+      color:rgba(236,249,247,.58);font-size:.82rem;line-height:1.5;
+    }
+    .future strong{color:var(--sea-glass)}
+    @media(max-width:620px){
+      .shell{padding:20px 12px 34px}.console{border-radius:24px}header{padding:24px 20px 20px}.directory{padding:16px}
+      .community{grid-template-columns:1fr;min-height:0;padding:18px}.open{justify-content:center;width:100%}.future{margin:0 16px 18px}
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="console">
+      <header>
+        <a class="back" href="owner.html">← Owner Console</a>
+        <div class="brand">Wild Ledger</div>
+        <h1>Communities</h1>
+        <p class="intro">Owner access to every Wild Ledger community from one place. Select a community to drill down into its management context, then eventually view that same community as Manager, Member, or Public.</p>
+      </header>
+
+      <section class="directory" aria-label="Wild Ledger community directory">
+        <div class="section-title">Community Directory</div>
+
+        <article class="community">
+          <div>
+            <div class="community-name">Sailing Frog's Leap</div>
+            <div class="meta"><span class="chip">SFL</span><span class="chip">Current Community</span></div>
+            <p class="community-copy">The current working community and first live Wild Ledger implementation.</p>
+          </div>
+          <a class="open" href="manager.html?community=SFL">Open Community →</a>
+        </article>
+
+        <article class="community">
+          <div>
+            <div class="community-name">Zach's Hot Rods</div>
+            <div class="meta"><span class="chip reference">ZHR</span><span class="chip reference">Reference Community</span></div>
+            <p class="community-copy">A reference community used to prove that Wild Ledger's shared machinery is not tied to Sailing Frog's Leap.</p>
+          </div>
+          <a class="open" href="manager.html?community=ZHR">Open Community →</a>
+        </article>
+      </section>
+
+      <div class="future"><strong>Next:</strong> this page can become the owner community directory and provisioning point—select a community, create a new one, then drill into its real Manager / Member / Public perspectives.</div>
+    </section>
+  </main>
+</body>
+</html>
