@@ -636,7 +636,7 @@
         </div>
         <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem breadth and depth dashboard">
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-calc="Count of Wild Ledger communities currently marked live and operating." data-info-text="This is footprint: how broadly Wild Ledger has expanded across independent communities." data-info-action="More is useful only when those communities become active. If Active Communities rises while Holders and 30-Day Distribution do not, community onboarding is not yet turning into member activity. Improve manager activation before simply adding more communities.">i</button>
+            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-calc="Current implementation: count of configured Wild Ledger community/distribution accounts. When the Owner Console has a formal community registry, this will count communities marked live there." data-info-text="This is footprint: how broadly Wild Ledger has expanded across independent communities." data-info-action="More is useful only when those communities become active. If Active Communities rises while Holders and 30-Day Distribution do not, community onboarding is not yet turning into member activity. Improve manager activation before simply adding more communities.">i</button>
             <div class="metric-value" id="metricActiveCommunities" aria-live="polite">—</div>
             <div class="metric-label">Active Communities</div>
             <div class="metric-meaning">Footprint</div>
@@ -746,12 +746,21 @@
     const metricTrustlines = document.getElementById("metricTrustlines");
     const metricPendingRecognition = document.getElementById("metricPendingRecognition");
     const metricThirtyDayDistribution = document.getElementById("metricThirtyDayDistribution");
+    const metricActiveCommunities = document.getElementById("metricActiveCommunities");
+    const metricRecognitionCashRate = document.getElementById("metricRecognitionCashRate");
+    const metricInventoryRunway = document.getElementById("metricInventoryRunway");
+    const metricHolderConcentration = document.getElementById("metricHolderConcentration");
     const metricsSection = document.querySelector(".metrics");
     const allMetricValues = [
       metricOutstanding, metricCommunity, metricWild, metricHolders,
       metricCirculationRate, metricTrustlines, metricPendingRecognition,
-      metricThirtyDayDistribution
+      metricThirtyDayDistribution, metricActiveCommunities,
+      metricRecognitionCashRate, metricInventoryRunway,
+      metricHolderConcentration
     ].filter(Boolean);
+
+    const ACTIVITY_CACHE_MS = 5 * 60 * 1000;
+    let communityActivityCache = null;
 
     function decodeCurrency(code) {
       const value = String(code || "");
@@ -783,6 +792,12 @@
     function formatPercent(value) {
       if (!Number.isFinite(value)) return "—";
       return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}%`;
+    }
+
+    function formatRunwayDays(value) {
+      if (value === Infinity) return "∞";
+      if (!Number.isFinite(value) || value < 0) return "—";
+      return `${Math.round(value).toLocaleString()} d`;
     }
 
     // Keep exact dashboard numbers visible on narrow screens. Values start at
@@ -943,14 +958,40 @@
       return null;
     }
 
-    async function loadThirtyDayDistribution(ws, nextId) {
+    function findCreatedCheck(meta) {
+      const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
+      for (const wrapped of affected) {
+        const node = wrapped?.CreatedNode;
+        if (!node || node.LedgerEntryType !== "Check") continue;
+        return {
+          id: node.LedgerIndex || "",
+          fields: node.NewFields || node.FinalFields || {}
+        };
+      }
+      return null;
+    }
+
+    function rippleEpochNow() {
+      return Math.floor(Date.now() / 1000) - 946684800;
+    }
+
+    async function loadCommunityActivity(ws, nextId) {
+      if (
+        communityActivityCache &&
+        (Date.now() - communityActivityCache.loadedAt) < ACTIVITY_CACHE_MS
+      ) {
+        return communityActivityCache.data;
+      }
+
       const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000);
-      let distributed = 0;
-      const countedHashes = new Set();
+      const createdChecks = new Map();
+      const cashedCheckIds = new Set();
+      const cancelledCheckIds = new Set();
+      const countedDistributionHashes = new Set();
+      let distributed30 = 0;
 
       for (const account of communityAccounts) {
         let marker;
-        let done = false;
 
         do {
           const command = {
@@ -964,14 +1005,10 @@
           };
           if (marker !== undefined) command.marker = marker;
 
-          const result = await request(ws, command, nextId("owner-tx"));
+          const result = await request(ws, command, nextId("owner-activity"));
           const transactions = Array.isArray(result.transactions) ? result.transactions : [];
-          let oldestOnPage = Infinity;
 
           for (const entry of transactions) {
-            const when = transactionTimeMs(entry);
-            if (Number.isFinite(when)) oldestOnPage = Math.min(oldestOnPage, when);
-            if (!Number.isFinite(when) || when < cutoff) continue;
             if (entry.validated === false) continue;
 
             const tx = entry.tx_json || entry.tx || {};
@@ -979,41 +1016,99 @@
             const resultCode = meta.TransactionResult || meta.transaction_result;
             if (resultCode && resultCode !== "tesSUCCESS") continue;
 
-            const hash = entry.hash || tx.hash || tx.Hash;
-            if (hash && countedHashes.has(hash)) continue;
+            // 30-day distribution: count LEAP actually delivered from a
+            // configured community/distribution account to a non-community wallet.
+            const when = transactionTimeMs(entry);
+            if (Number.isFinite(when) && when >= cutoff) {
+              const hash = entry.hash || tx.hash || tx.Hash;
+              if (!hash || !countedDistributionHashes.has(hash)) {
+                const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+                if (isLeapAmount(delivered)) {
+                  let destination = null;
+                  let qualifies = false;
 
-            const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
-            if (!isLeapAmount(delivered)) continue;
+                  if (tx.TransactionType === "Payment" && tx.Account === account) {
+                    destination = tx.Destination;
+                    qualifies = Boolean(destination);
+                  } else if (tx.TransactionType === "CheckCash") {
+                    const check = findCashedCheck(meta, account);
+                    if (check && isLeapAmount(check.SendMax)) {
+                      destination = check.Destination;
+                      qualifies = Boolean(destination);
+                    }
+                  }
 
-            let destination = null;
-            let qualifies = false;
-
-            if (tx.TransactionType === "Payment" && tx.Account === account) {
-              destination = tx.Destination;
-              qualifies = Boolean(destination);
-            } else if (tx.TransactionType === "CheckCash") {
-              const check = findCashedCheck(meta, account);
-              if (check && isLeapAmount(check.SendMax)) {
-                destination = check.Destination;
-                qualifies = Boolean(destination);
+                  if (
+                    qualifies &&
+                    destination !== issuer &&
+                    !communityAccounts.has(destination)
+                  ) {
+                    distributed30 += leapAmountValue(delivered);
+                    if (hash) countedDistributionHashes.add(hash);
+                  }
+                }
               }
             }
 
-            if (!qualifies) continue;
-            if (destination === issuer || communityAccounts.has(destination)) continue;
-
-            distributed += leapAmountValue(delivered);
-            if (hash) countedHashes.add(hash);
+            // Recognition completion: reconstruct LEAP Checks created by a
+            // configured community account and their final outcomes.
+            if (
+              tx.TransactionType === "CheckCreate" &&
+              tx.Account === account &&
+              isLeapAmount(tx.SendMax)
+            ) {
+              const created = findCreatedCheck(meta);
+              if (created?.id) {
+                createdChecks.set(created.id, {
+                  expiration: Number(tx.Expiration ?? created.fields?.Expiration ?? 0) || 0
+                });
+              }
+            } else if (tx.TransactionType === "CheckCash" && tx.CheckID) {
+              cashedCheckIds.add(String(tx.CheckID));
+            } else if (tx.TransactionType === "CheckCancel" && tx.CheckID) {
+              cancelledCheckIds.add(String(tx.CheckID));
+            }
           }
 
-          // account_tx pages are ordered newest-to-oldest overall. Once the
-          // current page reaches beyond the 30-day cutoff, later pages are older.
-          if (oldestOnPage < cutoff) done = true;
-          marker = done ? undefined : result.marker;
+          marker = result.marker;
         } while (marker !== undefined && marker !== null);
       }
 
-      return distributed;
+      const nowRipple = rippleEpochNow();
+      let cashedRecognition = 0;
+      let finalRecognition = 0;
+      let cancelledRecognition = 0;
+      let expiredRecognition = 0;
+
+      for (const [checkId, check] of createdChecks) {
+        if (cashedCheckIds.has(checkId)) {
+          cashedRecognition += 1;
+          finalRecognition += 1;
+        } else if (cancelledCheckIds.has(checkId)) {
+          cancelledRecognition += 1;
+          finalRecognition += 1;
+        } else if (check.expiration > 0 && check.expiration <= nowRipple) {
+          expiredRecognition += 1;
+          finalRecognition += 1;
+        }
+      }
+
+      const recognitionCashRate = finalRecognition > 0
+        ? (cashedRecognition / finalRecognition) * 100
+        : NaN;
+
+      const data = {
+        distributed30,
+        recognitionCashRate,
+        cashedRecognition,
+        finalRecognition,
+        cancelledRecognition,
+        expiredRecognition,
+        recognitionCreated: createdChecks.size
+      };
+
+      communityActivityCache = { loadedAt: Date.now(), data };
+      return data;
     }
 
     async function loadLeapDashboard() {
@@ -1031,6 +1126,7 @@
         let wildLeap = 0;
         let holders = 0;
         let trustlines = 0;
+        const wildHoldings = [];
 
         do {
           const command = {
@@ -1062,6 +1158,7 @@
             } else {
               wildLeap += held;
               holders += 1;
+              wildHoldings.push(held);
             }
           }
 
@@ -1075,8 +1172,24 @@
         setMetric(metricTrustlines, trustlines.toLocaleString());
         setMetric(metricCirculationRate, formatPercent(outstanding > 0 ? (wildLeap / outstanding) * 100 : 0));
 
-        // These two metrics require additional validated ledger queries. Keep
-        // the state metrics visible even if a historical/Check query is unavailable.
+        // Footprint currently uses the configured Wild Ledger community/
+        // distribution accounts. When the Owner Console gains a formal
+        // community registry, this metric can move to that registry without
+        // changing the dashboard UI.
+        setMetric(metricActiveCommunities, communityAccounts.size.toLocaleString());
+
+        const sortedWildHoldings = wildHoldings.slice().sort((a, b) => b - a);
+        const topFiveWild = sortedWildHoldings.slice(0, 5).reduce((sum, value) => sum + value, 0);
+        const holderConcentration = wildLeap > 0 ? (topFiveWild / wildLeap) * 100 : 0;
+        setMetric(metricHolderConcentration, formatPercent(holderConcentration));
+
+        const concentrationInfo = document.querySelector('[data-info-title="Holder Concentration"]');
+        if (concentrationInfo) {
+          concentrationInfo.dataset.infoCalc = `Share of LEAP in the Wild held by the five largest non-community holders. With fewer than five holders, the calculation uses all current holders.`;
+          concentrationInfo.dataset.infoText = `The largest ${Math.min(5, holders).toLocaleString()} current ${holders === 1 ? "holder owns" : "holders own"} ${formatPercent(holderConcentration)} of LEAP in the Wild.`;
+        }
+
+        // Pending recognition uses current validated ledger objects.
         try {
           const pending = await loadPendingRecognition(ws, nextId);
           setMetric(metricPendingRecognition, formatLeap(pending.pendingLeap));
@@ -1089,12 +1202,36 @@
           setMetric(metricPendingRecognition, "—");
         }
 
+        // Historical activity powers Momentum, Completion, and Reserves.
+        // It is cached briefly because account_tx is the heaviest dashboard query.
         try {
-          const distributed30 = await loadThirtyDayDistribution(ws, nextId);
-          setMetric(metricThirtyDayDistribution, formatLeap(distributed30));
+          const activity = await loadCommunityActivity(ws, nextId);
+          setMetric(metricThirtyDayDistribution, formatLeap(activity.distributed30));
+          setMetric(metricRecognitionCashRate, formatPercent(activity.recognitionCashRate));
+
+          const cashInfo = document.querySelector('[data-info-title="Recognition Cash Rate"]');
+          if (cashInfo) {
+            cashInfo.dataset.infoText = Number.isFinite(activity.recognitionCashRate)
+              ? `${activity.cashedRecognition.toLocaleString()} of ${activity.finalRecognition.toLocaleString()} recognition Checks with a final outcome were cashed (${formatPercent(activity.recognitionCashRate)}). Pending Checks are not counted as failures.`
+              : `No recognition Checks have reached a final outcome yet, so there is not enough history to calculate a cash rate.`;
+          }
+
+          const runwayDays = activity.distributed30 > 0
+            ? communityLeap / (activity.distributed30 / 30)
+            : (communityLeap > 0 ? Infinity : NaN);
+          setMetric(metricInventoryRunway, formatRunwayDays(runwayDays));
+
+          const runwayInfo = document.querySelector('[data-info-title="Inventory Runway"]');
+          if (runwayInfo) {
+            runwayInfo.dataset.infoText = activity.distributed30 > 0
+              ? `At the last 30 days’ distribution pace, current community inventory would last about ${formatRunwayDays(runwayDays)}.`
+              : `There was no LEAP distribution during the last 30 days, so current inventory does not have a meaningful finite runway at the recent pace.`;
+          }
         } catch (error) {
-          console.error("Wild Ledger 30-day distribution:", error);
+          console.error("Wild Ledger historical activity:", error);
           setMetric(metricThirtyDayDistribution, "—");
+          setMetric(metricRecognitionCashRate, "—");
+          setMetric(metricInventoryRunway, "—");
         }
 
         if (metricsSection) {
