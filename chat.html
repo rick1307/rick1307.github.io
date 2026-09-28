@@ -176,6 +176,17 @@
     .message.me .meta{justify-content:flex-end}
     .message.me .text{text-align:left;background:#f7ead9;border-radius:13px 4px 13px 13px}
 
+    .arrival-event{
+      display:flex;align-items:center;gap:10px;margin:5px 0 19px;
+      color:#748187;font-size:.76rem;font-weight:750;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      text-align:center;
+    }
+    .arrival-event::before,.arrival-event::after{
+      content:"";height:1px;background:rgba(22,56,75,.14);flex:1;
+    }
+    .arrival-event span{max-width:78%}
+
     .legend{
       padding:8px 20px 13px;color:#748187;font-size:.74rem;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -407,6 +418,14 @@
       currentNickname = name;
       entryView.style.display = "none";
       chatView.style.display = "block";
+
+      const arrival = document.createElement("div");
+      arrival.className = "arrival-event";
+      const arrivalText = document.createElement("span");
+      arrivalText.textContent = `${currentNickname} joined ${community.loungeName}`;
+      arrival.appendChild(arrivalText);
+      messages.appendChild(arrival);
+
       messageInput.focus();
       messages.scrollTop = messages.scrollHeight;
     });
