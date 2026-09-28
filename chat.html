@@ -284,7 +284,7 @@
       position:relative;z-index:3;width:min(91vw,440px);padding:30px 24px 28px;
       border:2px solid rgba(210,163,79,.78);border-radius:26px;text-align:center;
       background:rgba(255,250,240,.985);box-shadow:0 30px 86px rgba(11,32,40,.46),0 0 0 8px rgba(210,163,79,.10);
-      animation:celebrationPop 2.10s cubic-bezier(.2,.82,.2,1) both;
+      animation:celebrationPop 2.22s cubic-bezier(.22,.78,.2,1) both;
       will-change:transform,opacity;
     }
     .celebration-icon{font-size:2.45rem;line-height:1;margin-bottom:8px;filter:drop-shadow(0 3px 8px rgba(210,163,79,.35))}
@@ -324,13 +324,12 @@
     }
     @keyframes celebrationPop{
       0%{opacity:0;transform:translateY(26px) scale(.34) rotate(-1.2deg)}
-      10%{opacity:1;transform:translateY(-8px) scale(1.20) rotate(.5deg)}
-      18%{opacity:1;transform:translateY(8px) scale(.95) rotate(0deg)}
-      27%{opacity:1;transform:translateY(-2px) scale(1.035)}
-      36%{opacity:1;transform:translateY(2px) scale(1)}
-      56%{opacity:1;transform:translateY(0) scale(1)}
-      66%{opacity:1;transform:translateY(-18px) scale(.99)}
-      78%{opacity:.96;transform:translateY(-32vh) scale(.92)}
+      10%{opacity:1;transform:translateY(-8px) scale(1.18) rotate(.45deg)}
+      18%{opacity:1;transform:translateY(6px) scale(.96) rotate(0deg)}
+      28%{opacity:1;transform:translateY(-1px) scale(1.025)}
+      40%{opacity:1;transform:translateY(0) scale(1)}
+      58%{opacity:1;transform:translateY(-4px) scale(.995)}
+      72%{opacity:.98;transform:translateY(-22vh) scale(.95)}
       100%{opacity:0;transform:translateY(-125vh) scale(.68)}
     }
     @keyframes sparkBurst{
@@ -802,7 +801,7 @@
       recognitionCelebration.classList.add("show");
       celebrationTimer = setTimeout(() => {
         recognitionCelebration.classList.remove("show");
-      }, 2150);
+      }, 2220);
     }
 
     // This is the important seam: today the prototype calls this locally.
