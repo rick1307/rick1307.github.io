@@ -319,19 +319,27 @@
     line-height: 1.55;
   }
 
-  .metric-info-why {
-    margin-top: 16px !important;
-    padding-top: 15px;
+  .metric-info-detail {
+    margin-top: 15px !important;
+    padding-top: 14px;
     border-top: 1px solid rgba(143, 210, 255, .16);
   }
 
-  .metric-info-why strong {
+  .metric-info-detail strong {
     display: block;
     margin-bottom: 5px;
     color: #9fddff;
     font-size: .72rem;
     letter-spacing: .08em;
     text-transform: uppercase;
+  }
+
+  .metric-info-action {
+    border-top-color: rgba(244, 187, 86, .22);
+  }
+
+  .metric-info-action strong {
+    color: #ffd27a;
   }
 
   .metric-info-close {
@@ -562,25 +570,25 @@
         </div>
         <section class="metrics" aria-label="Wild Ledger LEAP state dashboard">
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About LEAP Outstanding" data-info-title="LEAP Outstanding" data-info-text="Total LEAP currently held outside the issuer account." data-info-why="This is issued supply. If it rises, more LEAP has been issued into the ecosystem; if it falls, LEAP has returned toward the issuer. Higher is not automatically better—healthy growth should also show up in circulation, holders, and activity.">i</button>
+          <button class="metric-info" type="button" aria-label="About LEAP Outstanding" data-info-title="LEAP Outstanding" data-info-calc="Sum of all LEAP balances held outside the issuer account." data-info-text="This is issued supply: the amount of LEAP that currently exists in the ecosystem outside the issuer." data-info-action="Do not try to maximize this number. Increase issued supply when community inventory or operating needs justify it. If Outstanding rises while Holders and 30-Day Distribution stay flat, supply is growing faster than actual use.">i</button>
           <div class="metric-value" id="metricOutstanding" aria-live="polite">…</div>
           <div class="metric-label">LEAP Outstanding</div>
           <div class="metric-meaning">Supply</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-text="LEAP currently held by configured Wild Ledger community and distribution accounts." data-info-why="This is operating inventory available for future distribution and recognition. A lower number usually means more LEAP has moved into member hands, but inventory should not fall so low that communities cannot operate comfortably.">i</button>
+          <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Sum of LEAP held by configured Wild Ledger community and distribution accounts." data-info-text="This is operating inventory available for future awards, recognition, and community distribution." data-info-action="If inventory is falling while 30-Day Distribution is strong, prepare to replenish community accounts. If inventory stays high while distribution is weak, do not add more LEAP—focus on participation and distribution instead.">i</button>
           <div class="metric-value" id="metricCommunity" aria-live="polite">…</div>
           <div class="metric-label">Community LEAP</div>
           <div class="metric-meaning">Inventory</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About LEAP in the Wild" data-info-title="LEAP in the Wild" data-info-text="Outstanding LEAP held outside configured Wild Ledger community and distribution accounts." data-info-why="This is actual circulation outside Wild Ledger-controlled inventory. Higher generally means more LEAP has reached members. Compare it with Holders so growth is not merely concentrated in a small number of wallets.">i</button>
+          <button class="metric-info" type="button" aria-label="About LEAP in the Wild" data-info-title="LEAP in the Wild" data-info-calc="LEAP Outstanding minus Community LEAP." data-info-text="This is LEAP that has moved beyond Wild Ledger-controlled inventory into non-community wallets." data-info-action="Generally you want this to grow over time. Healthy growth should be accompanied by more Holders. If LEAP in the Wild rises but Holders do not, check Holder Concentration because circulation may be accumulating in only a few wallets.">i</button>
           <div class="metric-value" id="metricWild" aria-live="polite">…</div>
           <div class="metric-label">LEAP in the Wild</div>
           <div class="metric-meaning">Circulation</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-text="Non-community accounts currently holding a positive LEAP balance." data-info-why="This is current reach. Higher generally means LEAP is reaching more participants. It is stronger evidence of active ownership than Trustlines, because these accounts actually hold LEAP now.">i</button>
+          <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-calc="Count of non-community accounts with a positive LEAP balance." data-info-text="This is current reach: how many wallets actually hold LEAP now." data-info-action="Generally you want this rising over time. If 30-Day Distribution rises but Holders stay flat, existing holders are receiving more LEAP without reach expanding. Focus on bringing new participants into the ecosystem.">i</button>
           <div class="metric-value" id="metricHolders" aria-live="polite">…</div>
           <div class="metric-label">Holders</div>
           <div class="metric-meaning">Reach</div>
@@ -595,25 +603,25 @@
         </div>
         <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem movement dashboard">
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Circulation Rate" data-info-title="Circulation Rate" data-info-text="LEAP in the Wild divided by LEAP Outstanding." data-info-why="This shows how much issued LEAP has actually moved beyond community inventory. A rising rate generally means stronger deployment to members. You usually want it trending upward as participation grows, while still keeping enough Community LEAP available to operate.">i</button>
+          <button class="metric-info" type="button" aria-label="About Circulation Rate" data-info-title="Circulation Rate" data-info-calc="LEAP in the Wild ÷ LEAP Outstanding × 100." data-info-text="This shows what share of issued LEAP has actually moved beyond community inventory into participant wallets." data-info-action="Aim for a gradual upward trend as the ecosystem grows. Rising Circulation Rate plus rising Holders is healthy deployment. If the rate rises while Community LEAP gets uncomfortably low, replenish inventory. If it stays low despite plenty of inventory, focus on participation and distribution.">i</button>
           <div class="metric-value" id="metricCirculationRate" aria-live="polite">—</div>
           <div class="metric-label">Circulation Rate</div>
           <div class="metric-meaning">Deployment</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Trustlines" data-info-title="Trustlines" data-info-text="Total XRP Ledger trust lines established for LEAP, including accounts that currently have a zero LEAP balance." data-info-why="This is ecosystem capacity: accounts that are technically ready to hold LEAP. Higher generally means greater potential reach, but it does not prove active participation. Compare Trustlines with Holders to see how much of that capacity is actually being used.">i</button>
+          <button class="metric-info" type="button" aria-label="About Trustlines" data-info-title="Trustlines" data-info-calc="Count of XRP Ledger trust lines established for LEAP, including zero-balance accounts." data-info-text="This is capacity: wallets that are technically ready to receive and hold LEAP." data-info-action="Trustlines should generally grow ahead of or alongside Holders. If Trustlines rise but Holders stay flat, onboarding is creating capacity but not converting into participation. Focus on getting those ready wallets their first meaningful LEAP interaction.">i</button>
           <div class="metric-value" id="metricTrustlines" aria-live="polite">—</div>
           <div class="metric-label">Trustlines</div>
           <div class="metric-meaning">Capacity</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Pending Recognition" data-info-title="Pending Recognition" data-info-text="LEAP represented by outstanding recognition Checks that have been created but not yet cashed." data-info-why="This is the recognition pipeline. Some pending LEAP is healthy because awards naturally wait to be claimed. A persistently rising backlog can signal that recipients are not cashing Checks or that the claiming process has friction. The goal is active flow, not simply a higher number.">i</button>
+          <button class="metric-info" type="button" aria-label="About Pending Recognition" data-info-title="Pending Recognition" data-info-calc="Sum of LEAP in outstanding recognition Checks that have been created but not yet cashed." data-info-text="This is the recognition pipeline: awards that have been made but have not yet completed the trip into a member wallet." data-info-action="Watch both the amount and how long Checks remain pending. Some pipeline is normal. If Pending Recognition keeps growing faster than completed distribution, investigate cashing friction, reminders, wallet steps, or expirations.">i</button>
           <div class="metric-value" id="metricPendingRecognition" aria-live="polite">—</div>
           <div class="metric-label">Pending Recognition</div>
           <div class="metric-meaning">Pipeline</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-text="LEAP actually delivered from configured community and distribution accounts to non-community wallets during the last 30 days." data-info-why="This is current momentum. Higher generally means more LEAP has actually reached participants recently. Over time, sustainable upward movement is desirable, but interpret changes alongside the number of active communities and normal swings in community activity.">i</button>
+          <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-calc="Sum of validated LEAP actually delivered from configured community/distribution accounts to non-community wallets during the last 30 days." data-info-text="This is recent momentum: how much LEAP actually reached participants during the current operating period." data-info-action="You generally want sustainable growth as communities and participation expand. Do not overreact to one spike or one quiet month. Compare the trend with Holders and Active Communities to see whether movement is broadening or merely getting heavier in the same places.">i</button>
           <div class="metric-value" id="metricThirtyDayDistribution" aria-live="polite">—</div>
           <div class="metric-label">30-Day Distribution</div>
           <div class="metric-meaning">Momentum</div>
@@ -628,25 +636,25 @@
         </div>
         <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem breadth and depth dashboard">
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-text="Live Wild Ledger communities currently operating and distributing LEAP." data-info-why="This is footprint. More active communities usually means the ecosystem is broadening. If this stays flat while other activity rises, growth may be concentrated in too few communities.">i</button>
+            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-calc="Count of Wild Ledger communities currently marked live and operating." data-info-text="This is footprint: how broadly Wild Ledger has expanded across independent communities." data-info-action="More is useful only when those communities become active. If Active Communities rises while Holders and 30-Day Distribution do not, community onboarding is not yet turning into member activity. Improve manager activation before simply adding more communities.">i</button>
             <div class="metric-value" id="metricActiveCommunities" aria-live="polite">—</div>
             <div class="metric-label">Active Communities</div>
             <div class="metric-meaning">Footprint</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Recognition Cash Rate" data-info-title="Recognition Cash Rate" data-info-text="Percentage of awarded LEAP recognition Checks that recipients actually cash." data-info-why="This is completion. Higher generally means the recognition loop is working. A falling rate can signal friction, confusion, or low participant follow-through.">i</button>
+            <button class="metric-info" type="button" aria-label="About Recognition Cash Rate" data-info-title="Recognition Cash Rate" data-info-calc="Cashed recognition Checks ÷ all recognition Checks that reached a final outcome (cashed, expired, or cancelled) × 100 for the measurement period." data-info-text="This is completion: how reliably awarded recognition becomes LEAP actually received by participants." data-info-action="Aim for a high, stable rate. If it falls, investigate where people are dropping out—wallet handoff, trustline setup, unclear instructions, or expiration. Improving completion is usually more valuable than issuing more recognition into a broken pipeline.">i</button>
             <div class="metric-value" id="metricRecognitionCashRate" aria-live="polite">—</div>
             <div class="metric-label">Recognition Cash Rate</div>
             <div class="metric-meaning">Completion</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Inventory Runway" data-info-title="Inventory Runway" data-info-text="Estimated time community-controlled LEAP inventory would last at the current distribution pace." data-info-why="This is reserves. More runway gives operating comfort, but too much unused inventory can also mean LEAP is not moving. You want enough runway without stalling circulation.">i</button>
+            <button class="metric-info" type="button" aria-label="About Inventory Runway" data-info-title="Inventory Runway" data-info-calc="Community LEAP ÷ average daily 30-Day Distribution. The result is the estimated number of days current community inventory would last if the recent pace continued." data-info-text="This is a planning estimate, not a target. It tells you how long current operating inventory could support recent distribution activity before replenishment would be needed." data-info-action="Do not try to maximize runway. If runway is shrinking because distribution is accelerating, plan to replenish community inventory. If runway is very long because distribution is weak, adding inventory will not help—focus on getting communities and members active.">i</button>
             <div class="metric-value" id="metricInventoryRunway" aria-live="polite">—</div>
             <div class="metric-label">Inventory Runway</div>
             <div class="metric-meaning">Reserves</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Holder Concentration" data-info-title="Holder Concentration" data-info-text="How concentrated LEAP in the Wild is among the largest holders." data-info-why="This is distribution quality. Lower concentration generally means broader ownership. If a small number of holders dominate circulation, the ecosystem may look active while still being narrow.">i</button>
+            <button class="metric-info" type="button" aria-label="About Holder Concentration" data-info-title="Holder Concentration" data-info-calc="Share of LEAP in the Wild held by the largest non-community holders. The dashboard can use a consistent top-holder group, such as the top five wallets." data-info-text="This shows whether circulation is broadly distributed or concentrated in a small number of wallets." data-info-action="Generally you want concentration to fall as Reach grows. If concentration rises, new distribution is accumulating among relatively few holders. Focus on widening participation rather than simply increasing the amount of LEAP distributed.">i</button>
             <div class="metric-value" id="metricHolderConcentration" aria-live="polite">—</div>
             <div class="metric-label">Holder Concentration</div>
             <div class="metric-meaning">Distribution</div>
@@ -705,8 +713,9 @@
   <div class="metric-info-scrim" id="metricInfoScrim" role="dialog" aria-modal="true" aria-labelledby="metricInfoTitle">
     <div class="metric-info-panel">
       <h2 id="metricInfoTitle">Metric</h2>
-      <p id="metricInfoText"></p>
-      <p class="metric-info-why"><strong>Why it matters</strong><span id="metricInfoWhy"></span></p>
+      <p class="metric-info-detail"><strong>How it’s calculated</strong><span id="metricInfoCalc"></span></p>
+      <p class="metric-info-detail"><strong>What it tells you</strong><span id="metricInfoText"></span></p>
+      <p class="metric-info-detail metric-info-action"><strong>Owner action</strong><span id="metricInfoAction"></span></p>
       <button class="metric-info-close" id="metricInfoClose" type="button">Close</button>
     </div>
   </div>
@@ -1104,15 +1113,17 @@
 
     const metricInfoScrim = document.getElementById("metricInfoScrim");
     const metricInfoTitle = document.getElementById("metricInfoTitle");
+    const metricInfoCalc = document.getElementById("metricInfoCalc");
     const metricInfoText = document.getElementById("metricInfoText");
-    const metricInfoWhy = document.getElementById("metricInfoWhy");
+    const metricInfoAction = document.getElementById("metricInfoAction");
     const metricInfoClose = document.getElementById("metricInfoClose");
 
     document.querySelectorAll(".metric-info").forEach(button => {
       button.addEventListener("click", () => {
         metricInfoTitle.textContent = button.dataset.infoTitle || "Metric";
+        metricInfoCalc.textContent = button.dataset.infoCalc || "";
         metricInfoText.textContent = button.dataset.infoText || "";
-        metricInfoWhy.textContent = button.dataset.infoWhy || "";
+        metricInfoAction.textContent = button.dataset.infoAction || "";
         metricInfoScrim.classList.add("open");
         setTimeout(() => metricInfoClose.focus(), 0);
       });
