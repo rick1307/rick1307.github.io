@@ -98,6 +98,33 @@
     text-align: center;
   }
 
+
+  .owner-links {
+    margin-top: 18px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .owner-links a {
+    display: block;
+    padding: 13px 15px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(18,38,63,.08);
+    color: var(--blue);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .owner-links a:hover,
+  .owner-links a:focus-visible {
+    text-decoration: underline;
+    outline: none;
+  }
+
   @media (max-width: 560px) {
     body { padding: 20px 14px; }
     .owner-card { padding: 24px 20px 22px; border-radius: 20px; }
@@ -114,6 +141,10 @@
       <h1>Owner Console</h1>
       <p>This is the beginning of the Wild Ledger owner control room.</p>
       <div class="hello">Hello, World.</div>
+      <ul class="owner-links">
+        <li><a href="splash.html">Wild Ledger</a></li>
+        <li><a href="manager.html">Manager</a></li>
+      </ul>
     </section>
   </main>
 </body>
