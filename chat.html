@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Leaper Lounge prototype for Sailing Frog's Leap." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Leaper Lounge — Sailing Frog's Leap</title>
+
+  <style>
+    :root{
+      --paper:#efe8d8;
+      --paper2:#f8f3e8;
+      --ink:#1a252c;
+      --navy:#16384b;
+      --sea:#2f7481;
+      --foam:#dbece8;
+      --rust:#b84f32;
+      --gold:#d2a34f;
+      --line:rgba(26,37,44,.18);
+      --card:#fffaf0;
+      --max:900px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:Georgia,"Times New Roman",serif;
+      line-height:1.5;
+    }
+
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(calc(100% - 28px),var(--max));margin:auto}
+    .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+
+    nav{
+      position:sticky;top:0;z-index:20;
+      background:rgba(239,232,216,.93);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      min-height:64px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+    }
+    .powered-by{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.82rem;font-weight:800;color:#536067;
+    }
+    .back-link{
+      text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.82rem;font-weight:850;color:var(--navy);
+      border:1px solid var(--line);border-radius:999px;padding:7px 12px;
+      background:rgba(255,255,255,.35);
+    }
+
+    main{padding:46px 0 70px}
+    .kicker{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--rust);text-transform:uppercase;letter-spacing:.16em;
+      font-size:.76rem;font-weight:900;
+    }
+    h1{
+      margin:.12em 0 .12em;color:var(--navy);
+      font-size:clamp(3rem,10vw,5.6rem);line-height:.94;letter-spacing:-.055em;
+    }
+    .lede{
+      margin:0;color:#4d5d64;font-size:clamp(1.05rem,2.2vw,1.25rem);
+      max-width:700px;
+    }
+
+    .panel{
+      margin-top:28px;
+      border:1px solid rgba(26,37,44,.16);
+      border-radius:18px;
+      background:rgba(255,250,240,.90);
+      box-shadow:0 14px 34px rgba(26,37,44,.09);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel:before{
+      content:"";display:block;height:5px;
+      background:linear-gradient(90deg,var(--gold),var(--sea));
+    }
+
+    /* ENTRY */
+    #entryView{padding:34px}
+    .entry-card{max-width:560px;margin:auto;text-align:center;padding:20px 0 12px}
+    .entry-card h2{margin:0;color:var(--navy);font-size:2rem}
+    .entry-card p{color:#5b696f;margin:10px auto 22px;max-width:460px}
+    .nickname-row{display:grid;grid-template-columns:1fr auto;gap:10px}
+    .nickname-row input{
+      width:100%;min-width:0;padding:13px 14px;border-radius:10px;
+      border:1px solid rgba(22,56,75,.22);background:white;color:var(--ink);outline:none;
+    }
+    .nickname-row input:focus{
+      border-color:var(--gold);box-shadow:0 0 0 3px rgba(210,163,79,.17);
+    }
+    .primary{
+      border:0;border-radius:10px;padding:12px 17px;
+      background:var(--rust);color:white;font-weight:850;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      box-shadow:0 8px 20px rgba(184,79,50,.17);
+    }
+    .entry-note{
+      margin-top:14px!important;font-size:.82rem!important;color:#718087!important;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    /* CHAT */
+    #chatView{display:none}
+    .room-head{
+      padding:18px 20px;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      background:rgba(219,236,232,.38);
+    }
+    .room-title{display:flex;align-items:center;gap:10px}
+    .online-dot{
+      width:10px;height:10px;border-radius:50%;background:#3d8b69;
+      box-shadow:0 0 0 4px rgba(61,139,105,.12);
+    }
+    .room-title strong{
+      color:var(--navy);font-size:1.08rem;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .room-count{
+      color:#65757b;font-size:.78rem;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .messages{
+      height:min(54vh,500px);min-height:390px;overflow-y:auto;
+      padding:22px 20px 12px;scroll-behavior:smooth;
+    }
+    .message{display:flex;gap:11px;margin-bottom:19px;align-items:flex-start}
+    .avatar{
+      flex:0 0 38px;width:38px;height:38px;border-radius:50%;
+      display:grid;place-items:center;background:var(--foam);color:var(--navy);
+      border:1px solid rgba(22,56,75,.12);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:900;font-size:.83rem;
+    }
+    .bubble{min-width:0;max-width:80%}
+    .meta{
+      display:flex;align-items:center;gap:7px;margin-bottom:3px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .name{
+      appearance:none;border:0;background:none;padding:0;color:var(--navy);
+      font-weight:850;font-size:.87rem;text-align:left;
+    }
+    .name.tippable{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+    .bolt{
+      color:#b37a00;font-size:.98rem;line-height:1;
+      filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));
+    }
+    .time{color:#879298;font-size:.7rem}
+    .text{
+      display:inline-block;padding:9px 12px;border-radius:4px 13px 13px 13px;
+      background:white;border:1px solid rgba(26,37,44,.11);
+      box-shadow:0 4px 12px rgba(26,37,44,.04);
+      word-break:break-word;
+    }
+    .message.me{justify-content:flex-end}
+    .message.me .avatar{order:2;background:#e9dcc1}
+    .message.me .bubble{text-align:right}
+    .message.me .meta{justify-content:flex-end}
+    .message.me .text{text-align:left;background:#f7ead9;border-radius:13px 4px 13px 13px}
+
+    .legend{
+      padding:8px 20px 13px;color:#748187;font-size:.74rem;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .composer{
+      border-top:1px solid var(--line);padding:14px;
+      display:grid;grid-template-columns:1fr auto;gap:9px;background:rgba(248,243,232,.72);
+    }
+    .composer input{
+      width:100%;min-width:0;padding:12px 13px;border-radius:10px;
+      border:1px solid rgba(22,56,75,.20);background:white;outline:none;
+    }
+    .composer input:focus{border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.12)}
+
+    /* TIP SHEET */
+    .scrim{
+      display:none;position:fixed;inset:0;z-index:50;background:rgba(11,32,40,.42);
+      padding:18px;align-items:flex-end;justify-content:center;
+    }
+    .scrim.open{display:flex}
+    .tip-sheet{
+      width:min(100%,480px);background:var(--paper2);border-radius:20px;
+      border:1px solid rgba(26,37,44,.15);box-shadow:0 22px 60px rgba(0,0,0,.25);
+      padding:22px;
+    }
+    .tip-sheet h3{margin:0;color:var(--navy);font-size:1.5rem}
+    .tip-sheet p{margin:6px 0 17px;color:#617077}
+    .tip-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .tip-amount{
+      border:1px solid rgba(22,56,75,.18);border-radius:10px;padding:12px 8px;
+      background:white;color:var(--navy);font-weight:850;
+    }
+    .tip-amount:hover{border-color:var(--gold)}
+    .tip-actions{display:flex;justify-content:flex-end;margin-top:16px}
+    .secondary{
+      border:1px solid var(--line);border-radius:9px;padding:9px 13px;
+      background:transparent;color:var(--navy);font-weight:800;
+    }
+    .prototype-note{
+      margin-top:18px;padding:14px 16px;border-left:4px solid var(--gold);
+      background:rgba(255,250,240,.62);color:#5c696f;font-size:.9rem;
+    }
+
+    .toast{
+      position:fixed;left:50%;bottom:22px;z-index:80;transform:translate(-50%,20px);
+      background:#183640;color:white;border-radius:999px;padding:10px 15px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.8rem;font-weight:750;opacity:0;pointer-events:none;transition:.2s ease;
+      box-shadow:0 8px 25px rgba(0,0,0,.18);
+    }
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+
+    @media(max-width:620px){
+      main{padding-top:34px}
+      #entryView{padding:25px 18px}
+      .nickname-row{grid-template-columns:1fr}
+      .nickname-row .primary{width:100%}
+      .messages{height:56vh;min-height:350px;padding-left:14px;padding-right:14px}
+      .bubble{max-width:84%}
+      .composer{padding:10px}
+      .room-head{padding:15px 14px}
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="wrap nav-inner">
+      <span class="powered-by">Powered by the XRP Ledger</span>
+      <a class="back-link" href="home.html">Back</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <div class="kicker">Sailing Frog's Leap</div>
+      <h1>Leaper Lounge</h1>
+      <p class="lede">A place for Leapers to pull up a chair, pick a name, and join the conversation.</p>
+
+      <section class="panel" aria-label="Leaper Lounge prototype">
+        <div id="entryView">
+          <div class="entry-card">
+            <h2>Come on in.</h2>
+            <p>Pick a nickname for this visit. It disappears when you leave the Lounge.</p>
+
+            <form id="entryForm">
+              <div class="nickname-row">
+                <input id="nickname" maxlength="24" autocomplete="off" placeholder="Choose a nickname" aria-label="Choose a nickname" required />
+                <button class="primary" type="submit">Enter the Lounge</button>
+              </div>
+            </form>
+
+            <p class="entry-note">No account. No password. Pick a different name next time if you want.</p>
+          </div>
+        </div>
+
+        <div id="chatView">
+          <div class="room-head">
+            <div class="room-title">
+              <span class="online-dot" aria-hidden="true"></span>
+              <strong>Leaper Lounge</strong>
+            </div>
+            <span class="room-count">8 Leapers aboard</span>
+          </div>
+
+          <div class="messages" id="messages" aria-live="polite">
+            <div class="message">
+              <div class="avatar">R</div>
+              <div class="bubble">
+                <div class="meta">
+                  <button class="name tippable" data-tip-name="Rick">Rick</button>
+                  <span class="bolt" title="LEAP tips enabled">⚡</span>
+                  <span class="time">8:42 PM</span>
+                </div>
+                <div class="text">Welcome aboard. Make yourselves comfortable.</div>
+              </div>
+            </div>
+
+            <div class="message">
+              <div class="avatar">SD</div>
+              <div class="bubble">
+                <div class="meta">
+                  <button class="name tippable" data-tip-name="SaltyDog">SaltyDog</button>
+                  <span class="bolt" title="LEAP tips enabled">⚡</span>
+                  <span class="time">8:43 PM</span>
+                </div>
+                <div class="text">That sunset behind the boat is incredible.</div>
+              </div>
+            </div>
+
+            <div class="message">
+              <div class="avatar">PP</div>
+              <div class="bubble">
+                <div class="meta">
+                  <span class="name">PanamaPete</span>
+                  <span class="time">8:44 PM</span>
+                </div>
+                <div class="text">How deep is the water where you're anchored?</div>
+              </div>
+            </div>
+
+            <div class="message">
+              <div class="avatar">FF</div>
+              <div class="bubble">
+                <div class="meta">
+                  <button class="name tippable" data-tip-name="FrogFan">FrogFan</button>
+                  <span class="bolt" title="LEAP tips enabled">⚡</span>
+                  <span class="time">8:45 PM</span>
+                </div>
+                <div class="text">I could watch this all evening.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend"><span class="bolt">⚡</span> LEAP tips enabled — tap a lightning-bolt Leaper's name.</div>
+
+          <form class="composer" id="messageForm">
+            <input id="messageInput" maxlength="280" autocomplete="off" placeholder="Say something..." aria-label="Message" />
+            <button class="primary" type="submit">Send</button>
+          </form>
+        </div>
+      </section>
+
+      <div class="prototype-note">
+        <strong class="sans">Prototype only.</strong>
+        This page does not connect to a chat server, wallet, or the XRP Ledger. Messages and LEAP tips are simulated so we can decide what the Lounge should feel like first.
+      </div>
+    </div>
+  </main>
+
+  <div class="scrim" id="tipScrim" role="dialog" aria-modal="true" aria-labelledby="tipTitle">
+    <div class="tip-sheet">
+      <h3 id="tipTitle">Tip <span id="tipName">Leaper</span> ⚡</h3>
+      <p>This Leaper has LEAP transfers enabled.</p>
+      <div class="tip-amounts">
+        <button class="tip-amount" data-amount="1">1 LEAP</button>
+        <button class="tip-amount" data-amount="5">5 LEAP</button>
+        <button class="tip-amount" data-amount="10">10 LEAP</button>
+      </div>
+      <div class="tip-actions">
+        <button class="secondary" id="closeTip" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Prototype tip simulated.</div>
+
+  <script>
+    // Deliberately session-only: nickname is never written to localStorage or sessionStorage.
+    let currentNickname = "";
+    let currentTipName = "";
+
+    const entryView = document.getElementById("entryView");
+    const chatView = document.getElementById("chatView");
+    const entryForm = document.getElementById("entryForm");
+    const nicknameInput = document.getElementById("nickname");
+    const messageForm = document.getElementById("messageForm");
+    const messageInput = document.getElementById("messageInput");
+    const messages = document.getElementById("messages");
+    const tipScrim = document.getElementById("tipScrim");
+    const tipName = document.getElementById("tipName");
+    const toast = document.getElementById("toast");
+
+    entryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = nicknameInput.value.trim();
+      if (!name) return;
+
+      currentNickname = name;
+      entryView.style.display = "none";
+      chatView.style.display = "block";
+      messageInput.focus();
+      messages.scrollTop = messages.scrollHeight;
+    });
+
+    messageForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = messageInput.value.trim();
+      if (!text || !currentNickname) return;
+
+      const row = document.createElement("div");
+      row.className = "message me";
+
+      const initials = currentNickname
+        .split(/\s+/)
+        .map(part => part.charAt(0))
+        .join("")
+        .slice(0,2)
+        .toUpperCase() || "?";
+
+      const time = new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+
+      row.innerHTML = `
+        <div class="avatar"></div>
+        <div class="bubble">
+          <div class="meta">
+            <span class="name"></span>
+            <span class="time"></span>
+          </div>
+          <div class="text"></div>
+        </div>`;
+
+      row.querySelector(".avatar").textContent = initials;
+      row.querySelector(".name").textContent = currentNickname;
+      row.querySelector(".time").textContent = time;
+      row.querySelector(".text").textContent = text;
+
+      messages.appendChild(row);
+      messageInput.value = "";
+      messages.scrollTop = messages.scrollHeight;
+    });
+
+    document.querySelectorAll("[data-tip-name]").forEach(button => {
+      button.addEventListener("click", () => {
+        currentTipName = button.dataset.tipName;
+        tipName.textContent = currentTipName;
+        tipScrim.classList.add("open");
+      });
+    });
+
+    document.getElementById("closeTip").addEventListener("click", () => {
+      tipScrim.classList.remove("open");
+    });
+
+    tipScrim.addEventListener("click", (event) => {
+      if (event.target === tipScrim) tipScrim.classList.remove("open");
+    });
+
+    document.querySelectorAll(".tip-amount").forEach(button => {
+      button.addEventListener("click", () => {
+        const amount = button.dataset.amount;
+        tipScrim.classList.remove("open");
+        toast.textContent = `${amount} LEAP tip to ${currentTipName} simulated — nothing was sent.`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2600);
+      });
+    });
+  </script>
+</body>
+</html>
