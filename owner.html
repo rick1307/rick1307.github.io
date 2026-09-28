@@ -210,6 +210,16 @@
     text-transform: uppercase;
   }
 
+  .metric-meaning {
+    margin-top: 5px;
+    color: var(--metric-accent);
+    font-size: .56rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+  }
+
   .navigation {
     padding: 24px;
     display: grid;
@@ -369,6 +379,7 @@
     .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
     .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
     .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
+    .metric-meaning { margin-top: 4px; font-size: .44rem; letter-spacing: .04em; }
     .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
     .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
     .nav-copy { margin-top: 28px; }
@@ -396,18 +407,22 @@
         <div class="metric">
           <div class="metric-value" id="metricOutstanding" aria-live="polite">…</div>
           <div class="metric-label">LEAP Outstanding</div>
+          <div class="metric-meaning">Supply</div>
         </div>
         <div class="metric">
           <div class="metric-value" id="metricCommunity" aria-live="polite">…</div>
           <div class="metric-label">Community LEAP</div>
+          <div class="metric-meaning">Inventory</div>
         </div>
         <div class="metric">
           <div class="metric-value" id="metricWild" aria-live="polite">…</div>
           <div class="metric-label">LEAP in the Wild</div>
+          <div class="metric-meaning">Circulation</div>
         </div>
         <div class="metric">
           <div class="metric-value" id="metricHolders" aria-live="polite">…</div>
           <div class="metric-label">Holders</div>
+          <div class="metric-meaning">Reach</div>
         </div>
       </section>
 
