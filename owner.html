@@ -439,34 +439,10 @@
 
   .nav-card:active { transform: translateY(-1px) scale(.995); }
 
-  .icon-wrap {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    width: 54px;
-    height: 54px;
-    border-radius: 17px;
-    border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
-    background: color-mix(in srgb, var(--accent) 13%, transparent);
-    color: var(--accent);
-    box-shadow: 0 12px 25px rgba(0,0,0,.12);
-  }
-
-  .icon-wrap svg {
-    width: 26px;
-    height: 26px;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
   .nav-copy {
     position: relative;
     z-index: 1;
-    margin-top: 38px;
+    margin-top: 0;
   }
 
   .nav-kicker {
@@ -520,8 +496,6 @@
   @supports not (color: color-mix(in srgb, red, blue)) {
     .nav-card::before { background: radial-gradient(circle, rgba(41,184,177,.28), transparent 68%); }
     .nav-card.manager::before { background: radial-gradient(circle, rgba(239,118,93,.27), transparent 68%); }
-    .icon-wrap { border-color: rgba(121,213,194,.25); background: rgba(121,213,194,.08); }
-    .nav-card.manager .icon-wrap { border-color: rgba(239,118,93,.25); background: rgba(239,118,93,.08); }
   }
 
   @media (max-width: 700px) {
@@ -542,7 +516,7 @@
     .metric-meaning { margin-top: auto; padding-top: 4px; font-size: .44rem; letter-spacing: .04em; }
     .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
     .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
-    .nav-copy { margin-top: 28px; }
+    .nav-copy { margin-top: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -664,15 +638,6 @@
 
       <nav class="navigation" aria-label="Owner console navigation">
         <a class="nav-card" href="splash.html">
-          <div class="icon-wrap" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 14.5c2.7-3.1 5.3-4.7 8-4.7s5.3 1.6 8 4.7" />
-              <path d="M5.5 18c2.2-1.7 4.4-2.6 6.5-2.6s4.3.9 6.5 2.6" />
-              <path d="M12 5v2.2" />
-              <path d="M8.9 6.2 10 8" />
-              <path d="m15.1 6.2-1.1 1.8" />
-            </svg>
-          </div>
           <div class="nav-copy">
             <div class="nav-kicker">Public Experience</div>
             <div class="nav-title-row">
@@ -684,19 +649,6 @@
         </a>
 
         <a class="nav-card manager" href="manager.html">
-          <div class="icon-wrap" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 7h10" />
-              <path d="M18 7h2" />
-              <path d="M4 12h3" />
-              <path d="M11 12h9" />
-              <path d="M4 17h8" />
-              <path d="M16 17h4" />
-              <circle cx="16" cy="7" r="2" />
-              <circle cx="9" cy="12" r="2" />
-              <circle cx="14" cy="17" r="2" />
-            </svg>
-          </div>
           <div class="nav-copy">
             <div class="nav-kicker">Community Operations</div>
             <div class="nav-title-row">
