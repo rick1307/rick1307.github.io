@@ -194,12 +194,17 @@
 
   .metric-value {
     margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 9px;
     color: var(--ink);
     font-size: clamp(1.4rem, 4vw, 2.05rem);
     line-height: 1;
     letter-spacing: -.045em;
     font-weight: 900;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .metric-label {
@@ -531,25 +536,25 @@
       <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem activity dashboard">
         <div class="metric">
           <button class="metric-info" type="button" aria-label="About Circulation Rate" data-info-title="Circulation Rate" data-info-text="LEAP in the Wild divided by LEAP Outstanding.">i</button>
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricCirculationRate" aria-live="polite">—</div>
           <div class="metric-label">Circulation Rate</div>
           <div class="metric-meaning">Deployment</div>
         </div>
         <div class="metric">
           <button class="metric-info" type="button" aria-label="About Trustlines" data-info-title="Trustlines" data-info-text="Total XRP Ledger trust lines established for LEAP, including accounts that currently have a zero LEAP balance.">i</button>
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricTrustlines" aria-live="polite">—</div>
           <div class="metric-label">Trustlines</div>
           <div class="metric-meaning">Capacity</div>
         </div>
         <div class="metric">
           <button class="metric-info" type="button" aria-label="About Pending Recognition" data-info-title="Pending Recognition" data-info-text="LEAP represented by outstanding recognition Checks that have been created but not yet cashed.">i</button>
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricPendingRecognition" aria-live="polite">—</div>
           <div class="metric-label">Pending Recognition</div>
           <div class="metric-meaning">Pipeline</div>
         </div>
         <div class="metric">
           <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-text="LEAP actually delivered from configured community and distribution accounts to non-community wallets during the last 30 days.">i</button>
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricThirtyDayDistribution" aria-live="polite">—</div>
           <div class="metric-label">30-Day Distribution</div>
           <div class="metric-meaning">Momentum</div>
         </div>
@@ -633,7 +638,16 @@
     const metricCommunity = document.getElementById("metricCommunity");
     const metricWild = document.getElementById("metricWild");
     const metricHolders = document.getElementById("metricHolders");
+    const metricCirculationRate = document.getElementById("metricCirculationRate");
+    const metricTrustlines = document.getElementById("metricTrustlines");
+    const metricPendingRecognition = document.getElementById("metricPendingRecognition");
+    const metricThirtyDayDistribution = document.getElementById("metricThirtyDayDistribution");
     const metricsSection = document.querySelector(".metrics");
+    const allMetricValues = [
+      metricOutstanding, metricCommunity, metricWild, metricHolders,
+      metricCirculationRate, metricTrustlines, metricPendingRecognition,
+      metricThirtyDayDistribution
+    ].filter(Boolean);
 
     function decodeCurrency(code) {
       const value = String(code || "");
@@ -662,15 +676,56 @@
       });
     }
 
+    function formatPercent(value) {
+      if (!Number.isFinite(value)) return "—";
+      return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}%`;
+    }
+
+    // Keep exact dashboard numbers visible on narrow screens. Values start at
+    // the normal responsive size and step down only when their text is wider
+    // than the space available in the metric card.
+    function fitMetricValue(el) {
+      if (!el) return;
+      el.style.fontSize = "";
+      const startingSize = parseFloat(getComputedStyle(el).fontSize) || 20;
+      let size = startingSize;
+      const minimumSize = 10;
+      while (el.scrollWidth > el.clientWidth && size > minimumSize) {
+        size -= 0.5;
+        el.style.fontSize = `${size}px`;
+      }
+    }
+
+    function fitAllMetricValues() {
+      allMetricValues.forEach(fitMetricValue);
+    }
+
+    function setMetric(el, text) {
+      if (!el) return;
+      el.textContent = text;
+      requestAnimationFrame(() => fitMetricValue(el));
+    }
+
+    function isLeapAmount(amount) {
+      return Boolean(
+        amount && typeof amount === "object" &&
+        isLeapCurrency(amount.currency) &&
+        String(amount.issuer || "") === issuer &&
+        Number.isFinite(Number(amount.value))
+      );
+    }
+
+    function leapAmountValue(amount) {
+      return isLeapAmount(amount) ? Number(amount.value) : 0;
+    }
+
     function setLoading() {
-      [metricOutstanding, metricCommunity, metricWild, metricHolders]
-        .forEach(el => { if (el) el.textContent = "…"; });
+      allMetricValues.forEach(el => setMetric(el, "…"));
       if (metricsSection) metricsSection.title = "Loading validated XRP Ledger data…";
     }
 
     function setUnavailable(message) {
-      [metricOutstanding, metricCommunity, metricWild, metricHolders]
-        .forEach(el => { if (el) el.textContent = "—"; });
+      allMetricValues.forEach(el => setMetric(el, "—"));
       if (metricsSection) metricsSection.title = message || "XRPL data unavailable.";
     }
 
@@ -724,6 +779,139 @@
       });
     }
 
+    async function loadPendingRecognition(ws, nextId) {
+      let pendingLeap = 0;
+      let checkCount = 0;
+
+      for (const account of communityAccounts) {
+        let marker;
+        do {
+          const command = {
+            command: "account_objects",
+            account,
+            ledger_index: "validated",
+            type: "check",
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-checks"));
+          const objects = Array.isArray(result.account_objects) ? result.account_objects : [];
+
+          for (const check of objects) {
+            // account_objects can include incoming Checks linked to the account,
+            // so count only Checks actually sent by this community account.
+            if (check?.LedgerEntryType !== "Check" || check.Account !== account) continue;
+            if (!isLeapAmount(check.SendMax)) continue;
+            pendingLeap += leapAmountValue(check.SendMax);
+            checkCount += 1;
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      return { pendingLeap, checkCount };
+    }
+
+    function transactionTimeMs(entry) {
+      if (entry?.close_time_iso) {
+        const parsed = Date.parse(entry.close_time_iso);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+
+      const tx = entry?.tx_json || entry?.tx || {};
+      if (Number.isFinite(Number(tx.date))) {
+        // XRPL/Ripple Epoch begins 2000-01-01T00:00:00Z.
+        return (Number(tx.date) + 946684800) * 1000;
+      }
+      return NaN;
+    }
+
+    function findCashedCheck(meta, senderAccount) {
+      const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
+      for (const wrapped of affected) {
+        const node = wrapped?.DeletedNode;
+        if (!node || node.LedgerEntryType !== "Check") continue;
+        const fields = node.FinalFields || node.NewFields || {};
+        if (fields.Account === senderAccount) return fields;
+      }
+      return null;
+    }
+
+    async function loadThirtyDayDistribution(ws, nextId) {
+      const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000);
+      let distributed = 0;
+      const countedHashes = new Set();
+
+      for (const account of communityAccounts) {
+        let marker;
+        let done = false;
+
+        do {
+          const command = {
+            command: "account_tx",
+            account,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            binary: false,
+            forward: false,
+            limit: 200
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-tx"));
+          const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+          let oldestOnPage = Infinity;
+
+          for (const entry of transactions) {
+            const when = transactionTimeMs(entry);
+            if (Number.isFinite(when)) oldestOnPage = Math.min(oldestOnPage, when);
+            if (!Number.isFinite(when) || when < cutoff) continue;
+            if (entry.validated === false) continue;
+
+            const tx = entry.tx_json || entry.tx || {};
+            const meta = entry.meta || {};
+            const resultCode = meta.TransactionResult || meta.transaction_result;
+            if (resultCode && resultCode !== "tesSUCCESS") continue;
+
+            const hash = entry.hash || tx.hash || tx.Hash;
+            if (hash && countedHashes.has(hash)) continue;
+
+            const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+            if (!isLeapAmount(delivered)) continue;
+
+            let destination = null;
+            let qualifies = false;
+
+            if (tx.TransactionType === "Payment" && tx.Account === account) {
+              destination = tx.Destination;
+              qualifies = Boolean(destination);
+            } else if (tx.TransactionType === "CheckCash") {
+              const check = findCashedCheck(meta, account);
+              if (check && isLeapAmount(check.SendMax)) {
+                destination = check.Destination;
+                qualifies = Boolean(destination);
+              }
+            }
+
+            if (!qualifies) continue;
+            if (destination === issuer || communityAccounts.has(destination)) continue;
+
+            distributed += leapAmountValue(delivered);
+            if (hash) countedHashes.add(hash);
+          }
+
+          // account_tx pages are ordered newest-to-oldest overall. Once the
+          // current page reaches beyond the 30-day cutoff, later pages are older.
+          if (oldestOnPage < cutoff) done = true;
+          marker = done ? undefined : result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      return distributed;
+    }
+
     async function loadLeapDashboard() {
       setLoading();
       let ws;
@@ -733,10 +921,12 @@
         let marker;
         let ledgerIndex = "validated";
         let requestNumber = 0;
+        const nextId = prefix => `${prefix}-${++requestNumber}`;
         let outstanding = 0;
         let communityLeap = 0;
         let wildLeap = 0;
         let holders = 0;
+        let trustlines = 0;
 
         do {
           const command = {
@@ -747,12 +937,13 @@
           };
           if (marker !== undefined) command.marker = marker;
 
-          const result = await request(ws, command, `owner-leap-${++requestNumber}`);
+          const result = await request(ws, command, nextId("owner-leap"));
           if (Number.isInteger(result.ledger_index)) ledgerIndex = result.ledger_index;
 
           const lines = Array.isArray(result.lines) ? result.lines : [];
           for (const line of lines) {
             if (!isLeapCurrency(line.currency)) continue;
+            trustlines += 1;
 
             // account_lines is from the issuer's perspective. A negative issuer
             // balance means the counterparty holds that amount of issued LEAP.
@@ -773,14 +964,39 @@
           marker = result.marker;
         } while (marker !== undefined && marker !== null);
 
-        metricOutstanding.textContent = formatLeap(outstanding);
-        metricCommunity.textContent = formatLeap(communityLeap);
-        metricWild.textContent = formatLeap(wildLeap);
-        metricHolders.textContent = holders.toLocaleString();
+        setMetric(metricOutstanding, formatLeap(outstanding));
+        setMetric(metricCommunity, formatLeap(communityLeap));
+        setMetric(metricWild, formatLeap(wildLeap));
+        setMetric(metricHolders, holders.toLocaleString());
+        setMetric(metricTrustlines, trustlines.toLocaleString());
+        setMetric(metricCirculationRate, formatPercent(outstanding > 0 ? (wildLeap / outstanding) * 100 : 0));
+
+        // These two metrics require additional validated ledger queries. Keep
+        // the state metrics visible even if a historical/Check query is unavailable.
+        try {
+          const pending = await loadPendingRecognition(ws, nextId);
+          setMetric(metricPendingRecognition, formatLeap(pending.pendingLeap));
+          const pendingInfo = document.querySelector('[data-info-title="Pending Recognition"]');
+          if (pendingInfo) {
+            pendingInfo.dataset.infoText = `${formatLeap(pending.pendingLeap)} LEAP across ${pending.checkCount.toLocaleString()} outstanding recognition ${pending.checkCount === 1 ? "Check" : "Checks"}. These Checks have been created but not yet cashed.`;
+          }
+        } catch (error) {
+          console.error("Wild Ledger pending recognition:", error);
+          setMetric(metricPendingRecognition, "—");
+        }
+
+        try {
+          const distributed30 = await loadThirtyDayDistribution(ws, nextId);
+          setMetric(metricThirtyDayDistribution, formatLeap(distributed30));
+        } catch (error) {
+          console.error("Wild Ledger 30-day distribution:", error);
+          setMetric(metricThirtyDayDistribution, "—");
+        }
 
         if (metricsSection) {
           metricsSection.title = `Validated XRPL ledger ${ledgerIndex}. Community LEAP uses configured Wild Ledger distributor/community accounts.`;
         }
+        fitAllMetricValues();
       } catch (error) {
         console.error("Wild Ledger owner dashboard:", error);
         setUnavailable(error?.message || "XRPL data unavailable.");
@@ -818,6 +1034,8 @@
     });
 
     loadLeapDashboard();
+    window.addEventListener("resize", fitAllMetricValues);
+    window.addEventListener("orientationchange", () => setTimeout(fitAllMetricValues, 120));
 
     // Keep the dashboard fresh without turning the static owner page into a
     // constantly connected client. Refresh only while the page is visible.
