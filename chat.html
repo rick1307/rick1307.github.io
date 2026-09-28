@@ -78,6 +78,24 @@
       max-width:700px;
     }
 
+    .prototype-role-switch{
+      margin-top:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .prototype-role-label{
+      color:#718087;font-size:.72rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em;
+      margin-right:2px;
+    }
+    .role-toggle{
+      appearance:none;border:1px solid rgba(22,56,75,.18);border-radius:999px;padding:7px 11px;
+      background:rgba(255,255,255,.38);color:var(--navy);font-size:.72rem;font-weight:850;
+    }
+    .role-toggle[aria-pressed="true"]{
+      background:var(--navy);border-color:var(--navy);color:white;box-shadow:0 5px 14px rgba(22,56,75,.14);
+    }
+    body[data-prototype-role="member"] .recognize-btn[data-recognize-name]{display:none}
+    body[data-prototype-role="manager"] .manager-tip{display:none}
+
     .panel{
       margin-top:28px;
       border:1px solid rgba(26,37,44,.16);
@@ -364,7 +382,7 @@
   </style>
 </head>
 
-<body>
+<body data-prototype-role="manager">
   <nav>
     <div class="wrap nav-inner">
       <span class="powered-by">Powered by the XRP Ledger</span>
@@ -377,6 +395,12 @@
       <div class="kicker">Sailing Frog's Leap</div>
       <h1>Leaper Lounge</h1>
       <p class="lede">A place for Leapers to pull up a chair, pick a name, and join the conversation.</p>
+
+      <div class="prototype-role-switch" aria-label="Prototype view">
+        <span class="prototype-role-label">Prototype view</span>
+        <button class="role-toggle" type="button" data-role-view="member" aria-pressed="false">Member</button>
+        <button class="role-toggle" type="button" data-role-view="manager" aria-pressed="true">Community Manager</button>
+      </div>
 
       <section class="panel" aria-label="Leaper Lounge prototype">
         <div id="entryView">
@@ -546,7 +570,30 @@
     const celebrationAmount = document.getElementById("celebrationAmount");
     const celebrationSparks = document.getElementById("celebrationSparks");
     const toast = document.getElementById("toast");
+    const roleViewButtons = Array.from(document.querySelectorAll("[data-role-view]"));
     let celebrationTimer = null;
+
+    function applyPrototypeRole(role) {
+      const nextRole = role === "member" ? "member" : "manager";
+      document.body.dataset.prototypeRole = nextRole;
+      roleViewButtons.forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.roleView === nextRole));
+      });
+
+      // Switching perspectives should never leave an action sheet open that
+      // belongs to the other role. The room itself remains unchanged.
+      if (nextRole === "member") {
+        recognitionScrim.classList.remove("open");
+      } else {
+        xrpTipScrim.classList.remove("open");
+      }
+    }
+
+    roleViewButtons.forEach(button => {
+      button.addEventListener("click", () => applyPrototypeRole(button.dataset.roleView));
+    });
+
+    applyPrototypeRole(document.body.dataset.prototypeRole);
 
     entryForm.addEventListener("submit", (event) => {
       event.preventDefault();
