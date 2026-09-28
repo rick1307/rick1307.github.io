@@ -1282,7 +1282,7 @@
       } catch (_) {}
 
       try {
-        const rememberedWallet = localStorage.getItem(walletStorageKey);
+        const rememberedWallet = sessionStorage.getItem(walletStorageKey);
         if (rememberedWallet && classicAddressPattern.test(rememberedWallet)) {
           walletInput.value = rememberedWallet;
         }
