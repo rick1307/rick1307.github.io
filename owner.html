@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wild Ledger Owner</title>
+<style>
+  :root {
+    --bg-top: #eef3f8;
+    --bg-bottom: #dfe6ee;
+    --panel: rgba(255, 255, 255, 0.82);
+    --panel-border: rgba(255, 255, 255, 0.72);
+    --text: #12263f;
+    --muted: #5d728b;
+    --blue: #2c5ea4;
+    --shadow: 0 16px 36px rgba(25, 46, 77, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 28px 18px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  }
+
+  .shell {
+    width: min(100%, 560px);
+  }
+
+  .owner-card {
+    position: relative;
+    padding: 28px 24px 26px;
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .home-link {
+    position: absolute;
+    top: 26px;
+    right: 24px;
+    color: var(--blue);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .home-link:hover,
+  .home-link:focus-visible {
+    text-decoration: underline;
+    outline: none;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(44, 94, 164, 0.12);
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0 0 10px;
+    font-size: 32px;
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .hello {
+    margin-top: 24px;
+    padding: 22px;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid rgba(18, 38, 63, 0.08);
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  @media (max-width: 560px) {
+    body { padding: 20px 14px; }
+    .owner-card { padding: 24px 20px 22px; border-radius: 20px; }
+    .home-link { top: 22px; right: 20px; }
+    h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <section class="owner-card">
+      <a class="home-link" href="index.html">Home →</a>
+      <div class="eyebrow">Wild Ledger Owner</div>
+      <h1>Owner Console</h1>
+      <p>This is the beginning of the Wild Ledger owner control room.</p>
+      <div class="hello">Hello, World.</div>
+    </section>
+  </main>
+</body>
+</html>
