@@ -394,19 +394,19 @@
 
       <section class="metrics" aria-label="Wild Ledger LEAP dashboard">
         <div class="metric">
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricOutstanding" aria-live="polite">…</div>
           <div class="metric-label">LEAP Outstanding</div>
         </div>
         <div class="metric">
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricCommunity" aria-live="polite">…</div>
           <div class="metric-label">Community LEAP</div>
         </div>
         <div class="metric">
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricWild" aria-live="polite">…</div>
           <div class="metric-label">LEAP in the Wild</div>
         </div>
         <div class="metric">
-          <div class="metric-value">—</div>
+          <div class="metric-value" id="metricHolders" aria-live="polite">…</div>
           <div class="metric-label">Holders</div>
         </div>
       </section>
@@ -458,5 +458,196 @@
       </nav>
     </section>
   </main>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script>
+  (() => {
+    const FALLBACK_CONFIG = Object.freeze({
+      leapIssuer: "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq",
+      leapCurrency: "4C45415000000000000000000000000000000000",
+      leapDistributors: Object.freeze([
+        "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
+      ]),
+      xrplWebSocket: "wss://s1.ripple.com/"
+    });
+
+    const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;
+    const issuer = config.leapIssuer;
+    const leapCurrency = String(config.leapCurrency || "LEAP").toUpperCase();
+    const communityAccounts = new Set(config.leapDistributors || []);
+    const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
+
+    const metricOutstanding = document.getElementById("metricOutstanding");
+    const metricCommunity = document.getElementById("metricCommunity");
+    const metricWild = document.getElementById("metricWild");
+    const metricHolders = document.getElementById("metricHolders");
+    const metricsSection = document.querySelector(".metrics");
+
+    function decodeCurrency(code) {
+      const value = String(code || "");
+      if (/^[A-Za-z0-9?!@#$%^&*<>(){}\[\]|]{3}$/.test(value)) return value;
+      if (!/^[A-Fa-f0-9]{40}$/.test(value)) return value;
+
+      let text = "";
+      for (let i = 0; i < value.length; i += 2) {
+        const n = parseInt(value.slice(i, i + 2), 16);
+        if (!n) break;
+        text += String.fromCharCode(n);
+      }
+      return text;
+    }
+
+    function isLeapCurrency(code) {
+      const raw = String(code || "").toUpperCase();
+      const decoded = decodeCurrency(raw).toUpperCase();
+      return raw === leapCurrency || decoded === "LEAP";
+    }
+
+    function formatLeap(value) {
+      if (!Number.isFinite(value)) return "—";
+      return value.toLocaleString(undefined, {
+        maximumFractionDigits: 6
+      });
+    }
+
+    function setLoading() {
+      [metricOutstanding, metricCommunity, metricWild, metricHolders]
+        .forEach(el => { if (el) el.textContent = "…"; });
+      if (metricsSection) metricsSection.title = "Loading validated XRP Ledger data…";
+    }
+
+    function setUnavailable(message) {
+      [metricOutstanding, metricCommunity, metricWild, metricHolders]
+        .forEach(el => { if (el) el.textContent = "—"; });
+      if (metricsSection) metricsSection.title = message || "XRPL data unavailable.";
+    }
+
+    function openSocket() {
+      return new Promise((resolve, reject) => {
+        const ws = new WebSocket(xrplWebSocket);
+        const timer = setTimeout(() => {
+          try { ws.close(); } catch (_) {}
+          reject(new Error("XRPL connection timed out."));
+        }, 12000);
+
+        ws.addEventListener("open", () => {
+          clearTimeout(timer);
+          resolve(ws);
+        }, { once: true });
+
+        ws.addEventListener("error", () => {
+          clearTimeout(timer);
+          reject(new Error("Could not connect to the XRP Ledger."));
+        }, { once: true });
+      });
+    }
+
+    function request(ws, command, id) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error("XRPL request timed out."));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timer);
+          ws.removeEventListener("message", onMessage);
+        }
+
+        function onMessage(event) {
+          let response;
+          try { response = JSON.parse(event.data); } catch (_) { return; }
+          if (response.id !== id) return;
+          cleanup();
+
+          if (response.status === "error" || response.error || response.result?.error) {
+            reject(new Error(response.error || response.result?.error || "XRPL error"));
+            return;
+          }
+          resolve(response.result || {});
+        }
+
+        ws.addEventListener("message", onMessage);
+        ws.send(JSON.stringify({ id, api_version: 2, ...command }));
+      });
+    }
+
+    async function loadLeapDashboard() {
+      setLoading();
+      let ws;
+
+      try {
+        ws = await openSocket();
+        let marker;
+        let ledgerIndex = "validated";
+        let requestNumber = 0;
+        let outstanding = 0;
+        let communityLeap = 0;
+        let wildLeap = 0;
+        let holders = 0;
+
+        do {
+          const command = {
+            command: "account_lines",
+            account: issuer,
+            ledger_index: ledgerIndex,
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, `owner-leap-${++requestNumber}`);
+          if (Number.isInteger(result.ledger_index)) ledgerIndex = result.ledger_index;
+
+          const lines = Array.isArray(result.lines) ? result.lines : [];
+          for (const line of lines) {
+            if (!isLeapCurrency(line.currency)) continue;
+
+            // account_lines is from the issuer's perspective. A negative issuer
+            // balance means the counterparty holds that amount of issued LEAP.
+            const issuerPerspectiveBalance = Number(line.balance);
+            if (!Number.isFinite(issuerPerspectiveBalance) || issuerPerspectiveBalance >= 0) continue;
+
+            const held = -issuerPerspectiveBalance;
+            outstanding += held;
+
+            if (communityAccounts.has(line.account)) {
+              communityLeap += held;
+            } else {
+              wildLeap += held;
+              holders += 1;
+            }
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+
+        metricOutstanding.textContent = formatLeap(outstanding);
+        metricCommunity.textContent = formatLeap(communityLeap);
+        metricWild.textContent = formatLeap(wildLeap);
+        metricHolders.textContent = holders.toLocaleString();
+
+        if (metricsSection) {
+          metricsSection.title = `Validated XRPL ledger ${ledgerIndex}. Community LEAP uses configured Wild Ledger distributor/community accounts.`;
+        }
+      } catch (error) {
+        console.error("Wild Ledger owner dashboard:", error);
+        setUnavailable(error?.message || "XRPL data unavailable.");
+      } finally {
+        if (ws) {
+          try { ws.close(); } catch (_) {}
+        }
+      }
+    }
+
+    loadLeapDashboard();
+
+    // Keep the dashboard fresh without turning the static owner page into a
+    // constantly connected client. Refresh only while the page is visible.
+    setInterval(() => {
+      if (!document.hidden) loadLeapDashboard();
+    }, 60000);
+  })();
+  </script>
+
 </body>
 </html>
