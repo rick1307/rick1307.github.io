@@ -318,6 +318,11 @@
       font-size:.64rem;font-weight:850;line-height:1.35;white-space:nowrap;
     }
     .recognize-btn:hover{background:rgba(210,163,79,.18);border-color:rgba(210,163,79,.7)}
+    .recognize-btn:disabled{
+      background:rgba(210,163,79,.06);border-color:rgba(210,163,79,.24);color:rgba(138,100,23,.44);
+      cursor:not-allowed;box-shadow:none;filter:saturate(.72);
+    }
+    .recognize-btn:disabled:hover{background:rgba(210,163,79,.06);border-color:rgba(210,163,79,.24)}
     .recognize-example{
       display:inline-block;vertical-align:middle;pointer-events:none;cursor:default;
       opacity:.72;margin-left:2px;
@@ -624,8 +629,20 @@
       setTimeout(() => toast.classList.remove("show"), 3200);
     });
 
+    document.querySelectorAll(".meta").forEach(meta => {
+      const recognizeButton = meta.querySelector(".recognize-btn[data-recognize-name]");
+      if (!recognizeButton) return;
+      const hasLeapTransfersEnabled = Boolean(meta.querySelector(".bolt"));
+      if (!hasLeapTransfersEnabled) {
+        recognizeButton.disabled = true;
+        recognizeButton.setAttribute("aria-disabled", "true");
+        recognizeButton.title = "LEAP transfers not enabled";
+      }
+    });
+
     document.querySelectorAll("[data-recognize-name]").forEach(button => {
       button.addEventListener("click", () => {
+        if (button.disabled) return;
         currentRecognitionName = button.dataset.recognizeName || "Leaper";
         selectedRecognitionAmount = "";
         recognitionName.textContent = currentRecognitionName;
