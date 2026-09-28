@@ -66,15 +66,15 @@ footer{text-align:center;color:#5f6c70;padding:35px 20px;font-size:.85rem}
 <h2>1. What are we actually building?</h2>
 
 <div class="qa">
-<h3>Are we building a Leaper Lounge chat application?</h3>
-<p>Not exactly. Leaper Lounge is the first community experience built on a shared Wild Ledger community-room engine. The underlying system should not be hard-coded for Sailing Frog's Leap.</p>
+<h3>Are we building a community-specific chat application?</h3>
+<p>Not exactly. A community Lounge is one experience built on a shared Wild Ledger community-room engine. The underlying system should not be hard-coded for any particular community.</p>
 </div>
 
 <div class="qa">
 <h3>So is there one Wild Ledger chat room?</h3>
 <p>There is one shared <strong>chat system</strong>, but users experience separate community rooms. Every message, presence record, event, and permission belongs to a community ID. The system only delivers the records belonging to the community the member has entered.</p>
-<div class="code">SFL → LEAPER-LOUNGE → "Great sunset tonight!"
-ZHR → GEAR-NUT-GARAGE → "What engine is in that car?"</div>
+<div class="code">COMMUNITY-A → LOUNGE → "Great sunset tonight!"
+COMMUNITY-B → LOUNGE → "Hello from another community."</div>
 <p>Those conversations can happen at the same time on the same Wild Ledger infrastructure without either community seeing the other.</p>
 </div>
 
@@ -89,7 +89,7 @@ ZHR → GEAR-NUT-GARAGE → "What engine is in that car?"</div>
 <div class="two">
 <div class="card">
 <h3>Wild Ledger owns the machinery</h3>
-<p>Community isolation, realtime messaging, presence, manager authorization, Member Record gating, XRPL account association, awards, tipping infrastructure, events, moderation, and other shared capabilities.</p>
+<p>Community isolation, realtime messaging, presence, manager authorization, Member Record gating, awards, tipping infrastructure, events, moderation, and other shared capabilities.</p>
 </div>
 <div class="card">
 <h3>The community owns the experience</h3>
@@ -99,55 +99,70 @@ ZHR → GEAR-NUT-GARAGE → "What engine is in that car?"</div>
 
 <div class="flow">
 <div>Wild Ledger</div><div class="arrow">↓</div>
-<div>Community — e.g. Sailing Frog's Leap</div><div class="arrow">↓</div>
+<div>Community</div><div class="arrow">↓</div>
 <div>Member Record</div><div class="arrow">↓</div>
-<div>Community Room — e.g. Leaper Lounge</div>
+<div>Community Room</div>
 </div>
 
-<div class="callout"><strong>Important:</strong> A Leaper should feel like they are still inside Sailing Frog's Leap. Wild Ledger can power the experience without forcing the user to leave the community experience.</div>
+<div class="callout"><strong>Important:</strong> A member should feel like they are still inside their community. Wild Ledger can power the experience without forcing the user to leave that community experience.</div>
 </section>
 
 <section>
 <h2>3. What controls the door?</h2>
 <div class="qa">
-<h3>Can anybody simply browse into Leaper Lounge?</h3>
+<h3>Can anybody simply browse into a community Lounge?</h3>
 <p>No. In the intended model, the <strong>Member Record is the gate</strong>. Wild Ledger must establish that the XRPL account belongs to a legitimate member of that specific community before granting access to its room.</p>
 </div>
 
 <div class="qa">
-<h3>If someone is a Sailing Frog's Leap member, can they enter Zach's room?</h3>
-<p>Not because of their SFL membership. Membership is community-specific. An account that legitimately belongs to both communities can enter both, but each community relationship stands on its own.</p>
+<h3>If someone belongs to one community, can they enter another community's room?</h3>
+<p>Not because of membership in the first community. Membership is community-specific. An account that legitimately belongs to both communities can enter both, but each community relationship stands on its own.</p>
 </div>
 
-<div class="code">XRPL account + valid SFL Member Record → Leaper Lounge access
-XRPL account + valid ZHR Member Record → Gear Nut Garage access</div>
+<div class="code">XRPL account + valid community Member Record → community Lounge access
+XRPL account + valid Community B Member Record → Community B Lounge access</div>
 </section>
 
 <section>
-<h2>4. What identity do people see?</h2>
+<h2>4. Participant identity and anonymity</h2>
 <div class="qa">
-<h3>Does the room show a member's XRPL address?</h3>
-<p>No. The XRPL account can be the persistent machinery underneath the experience without becoming the person's public social identity.</p>
+<h3>What is the privacy objective?</h3>
+<p><strong>Wild Ledger is designed to maximize participant anonymity.</strong> We engineer toward that objective by minimizing identity linkage.</p>
 </div>
 
 <div class="qa">
-<h3>What does everyone else see?</h3>
-<p>A temporary nickname chosen for that visit. It does not need to persist. Leave the room and the nickname can disappear.</p>
+<h3>What identity does the room use?</h3>
+<p>The Lounge uses a temporary alias chosen for that visit. The alias is the participant's social identity inside the room. It does not need to persist after the session ends.</p>
+</div>
+
+<div class="qa">
+<h3>Does the Lounge expose the participant's XRPL address?</h3>
+<p>No. An XRPL address must not become shared Lounge data, appear with messages, or be published as the identity behind an alias. Other participants should see the alias, not the ledger identity underneath it.</p>
+</div>
+
+<div class="qa">
+<h3>Can an XRPL address ever move through the system?</h3>
+<p>Yes, when an authorized XRPL action actually requires a destination. The address may move transiently through the encrypted transaction conduit so the transaction can be prepared and signed. That necessary transaction path is different from making the address part of the Lounge identity.</p>
+</div>
+
+<div class="qa">
+<h3>What linkage should Wild Ledger avoid?</h3>
+<p>Wild Ledger should not create or preserve an unnecessary identity record such as <strong>RoomAlias ↔ rXXXXXXXX</strong>. The temporary alias and the public ledger address serve different purposes and should remain separated wherever possible.</p>
 </div>
 
 <div class="qa">
 <h3>Could the same person use different names in different communities?</h3>
-<p>Yes. Someone could be <strong>SaltyDog</strong> in Leaper Lounge and <strong>BigBlockBob</strong> in Gear Nut Garage. Wild Ledger may know which authorized account is behind each session when necessary, but the communities should not be given a public cross-community identity link.</p>
+<p>Yes. Someone could use one alias in one community Lounge and a different alias in another. Wild Ledger should not create a public cross-community identity link between those aliases.</p>
 </div>
 
-<div class="rule">Persistent ledger identity underneath. Temporary social identity on top.</div>
+<div class="rule">Maximize participant anonymity by minimizing identity linkage.</div>
 </section>
 
 <section>
 <h2>5. What is a Community Manager?</h2>
 <div class="qa">
 <h3>Who is the Community Manager?</h3>
-<p>The Community Manager is an authorized role in Wild Ledger. For Sailing Frog's Leap, that role is held by the authorized Sailing Frog's Leap manager account. Another community has its own manager or managers.</p>
+<p>The Community Manager is an authorized role in Wild Ledger. Each community has its own authorized manager or managers.</p>
 </div>
 
 <div class="qa">
@@ -167,15 +182,25 @@ XRPL account + valid ZHR Member Record → Gear Nut Garage access</div>
 </section>
 
 <section>
-<h2>6. What does manager presence mean?</h2>
+<h2>6. How do arrival and presence work?</h2>
 <div class="qa">
-<h3>Can members tell when the Community Manager is in the room?</h3>
-<p>Yes. Presence is a shared Wild Ledger capability that each community can express in its own voice. Sailing Frog's Leap might say <strong>“Sailing Frog's Leap is aboard.”</strong> Zach's Hot Rods might say <strong>“Zach is in the Garage.”</strong></p>
+<h3>Whose arrival is announced?</h3>
+<p><strong>Every participant.</strong> When someone enters a community room, a simple system event appears in that room's current conversation, for example <strong>“RoomAlias joined the Lounge.”</strong> The Community Manager uses the same arrival mechanism as everyone else.</p>
 </div>
 
 <div class="qa">
-<h3>Is manager presence the same as being live on video?</h3>
-<p>No. Presence and broadcasting are separate states. The manager can enter the room, type, moderate, or award recognition without automatically starting a broadcast.</p>
+<h3>Is a Community Manager arrival treated specially?</h3>
+<p>No. A scheduled manager appearance may make the arrival important to the community, but the chat engine does not manufacture fanfare or an automatic greeting. If the manager wants to say hello, that is a real message from the manager.</p>
+</div>
+
+<div class="qa">
+<h3>Does the room close when the manager leaves?</h3>
+<p>No. The room belongs to the community and remains available whether or not a Community Manager is present.</p>
+</div>
+
+<div class="qa">
+<h3>Do we need departure announcements?</h3>
+<p>No. The design does not require a “left the room” event in the conversation. Live presence can eventually show who is currently connected without cluttering the chat stream with departures.</p>
 </div>
 </section>
 
@@ -198,9 +223,9 @@ XRPL account + valid ZHR Member Record → Gear Nut Garage access</div>
 <h2>8. How does value move?</h2>
 <div class="qa">
 <h3>What moves from the Community Manager to a member?</h3>
-<p><strong>Recognition moves outward.</strong> In Sailing Frog's Leap, the manager can recognize participation by issuing LEAP using an XRPL Check. A Great Chat recognition uses the agreed protocol meaning:</p>
-<div class="code">SFL-LEAP/BADGE = GREAT-CHAT</div>
-<p>The member's XRPL destination is already associated with the authorized Member Record, so the manager should not have to copy and paste an address while participating in the room.</p>
+<p><strong>Recognition moves outward.</strong> A Community Manager can recognize participation using the community's configured XRPL recognition mechanism. A community-specific badge or recognition can carry an agreed protocol meaning.</p>
+<div class="code">COMMUNITY-ASSET/BADGE = RECOGNITION-ID</div>
+<p>The participant's XRPL destination can be supplied through the private transaction path when the award is initiated. The manager should not have to copy and paste a Lounge participant's address, and the alias-to-address relationship should not become shared Lounge data or an unnecessary persistent Wild Ledger identity record.</p>
 </div>
 
 <div class="qa">
@@ -230,25 +255,43 @@ XRPL account + valid ZHR Member Record → Gear Nut Garage access</div>
 <h2>9. What happens when the manager sees a great comment?</h2>
 <div class="qa">
 <h3>What should the interaction feel like?</h3>
-<p>Fast. The manager taps the member and chooses a standardized recognition such as <strong>Great Chat</strong>. Wild Ledger already knows the eligible recipient account and prepares the correct award transaction and protocol data. The manager approves it in the wallet and returns to the conversation.</p>
+<p>Fast. The manager taps the member and chooses a standardized recognition such as <strong>Great Chat</strong>. Wild Ledger initiates the award for that live participant session. The recipient address can move through the encrypted transaction conduit when needed to prepare the XRPL Check and protocol data. The manager then approves the transaction in the wallet and returns to the conversation.</p>
 </div>
 
 <div class="qa">
 <h3>Can the recognition become part of the member's history?</h3>
-<p>Yes. Once the relevant XRPL transaction is validated and recognized by the Wild Ledger/SFL protocol, that participation can be reflected in the member's Crew Record rather than disappearing as a disposable chat moment.</p>
+<p>Yes. Once the relevant XRPL transaction is validated and recognized by the applicable Wild Ledger community protocol, that participation can be reflected in the member's Member Record rather than disappearing as a disposable chat moment.</p>
 </div>
 </section>
 
 <section>
-<h2>10. How separate are communities really?</h2>
+<h2>10. Realtime architecture and community isolation</h2>
 <div class="qa">
-<h3>Is filtering messages in JavaScript enough?</h3>
-<p>No. Community isolation belongs in the backend authorization and data rules. An SFL browser should not receive ZHR messages and merely hide them. It should only be permitted to receive the community data it is authorized to access.</p>
+<h3>Does the Lounge need a persistent chat database?</h3>
+<p>No. The Lounge is intentionally a live, ephemeral space rather than a message board. Conversation history does not need to survive after the live experience. Messages, arrival events, and presence are temporary room state.</p>
 </div>
 
 <div class="qa">
-<h3>What should remain separate?</h3>
-<p>Messages, temporary nicknames, presence, manager status, live status, events, community-specific awards, moderation controls, and other community activity should all be scoped to the appropriate community.</p>
+<h3>How do different browsers communicate?</h3>
+<p>The planned production path is a <strong>Cloudflare Worker with Durable Objects and WebSockets</strong>. This provides the realtime conduit that lets currently connected browsers exchange room activity without requiring a permanent chat transcript.</p>
+</div>
+
+<div class="flow">
+<div>Member Record</div><div class="arrow">↓</div>
+<div>Community Room in the browser</div><div class="arrow">↓</div>
+<div>Encrypted WebSocket connection</div><div class="arrow">↓</div>
+<div>Cloudflare Worker + Durable Object realtime room</div><div class="arrow">↓</div>
+<div>Other currently connected participants in that Community ID + Room ID</div>
+</div>
+
+<div class="qa">
+<h3>How is community traffic isolated?</h3>
+<p>Every live connection and room event is scoped by <strong>Community ID + Room ID</strong>. A browser connected to one community should never receive another community's room traffic and merely hide it with JavaScript. The realtime layer should deliver only activity belonging to the authorized community and room.</p>
+</div>
+
+<div class="qa">
+<h3>What is temporary?</h3>
+<p>Conversation, arrival events, temporary aliases, and live presence are temporary. They exist to support the people who are together in the room now, not to create a permanent social transcript.</p>
 </div>
 </section>
 
@@ -272,16 +315,18 @@ XRPL account + valid ZHR Member Record → Gear Nut Garage access</div>
 </section>
 
 <section>
-<h2>12. Why “Powered by the XRP Ledger”?</h2>
+<h2>12. What belongs on XRPL?</h2>
 <div class="qa">
-<h3>Is that just branding?</h3>
-<p>The intent is for it to describe the underlying architecture. Wild Ledger can use the XRP Ledger for the durable value and participation layer while keeping the visible community experience approachable and community-specific.</p>
+<h3>Does every Lounge interaction belong on the XRP Ledger?</h3>
+<p>No. Realtime conversation, temporary aliases, arrival events, presence, and similar social activity are intentionally ephemeral and belong in the realtime layer.</p>
 </div>
 
 <div class="qa">
-<h3>Does every interaction have to be on-ledger?</h3>
-<p>No. Realtime chat, temporary nicknames, presence, interface state, and similar social functions belong off-ledger. XRPL is used where a durable ledger action has meaning—for example XRP transfers and protocol-defined community recognition.</p>
+<h3>What should survive?</h3>
+<p>XRPL is the durable layer for actions that have lasting meaning: XRP transfers, LEAP delivery, protocol-defined badges, and other community recognition intended to become part of a member's ledger history.</p>
 </div>
+
+<div class="callout"><strong>Design principle:</strong> Conversation disappears. Recognition survives.</div>
 </section>
 
 <section>
@@ -290,25 +335,30 @@ XRPL account + valid ZHR Member Record → Gear Nut Garage access</div>
 <strong>Wild Ledger owns the machinery.</strong><br>
 The community owns the experience.<br>
 The Member Record controls the door.<br>
-The temporary nickname controls what people see.<br>
+The temporary nickname controls what people see.<br>Wild Ledger maximizes participant anonymity by minimizing identity linkage.<br>
 The Community Manager is a role, not a hard-coded person.<br>
 Communities share infrastructure but not their conversations.<br>
 Recognition can flow Manager → Member in the community asset.<br>
 Appreciation can flow Member → Manager in XRP.<br>
-The XRP Ledger carries durable value and recognition; the room carries the conversation.
+The realtime room carries the temporary conversation; the XRP Ledger carries durable value and recognition.<br><strong>Conversation disappears. Recognition survives.</strong>
 </div>
 </section>
 
 <section>
-<h2>14. What this means for the first build</h2>
+<h2>14. What this means for the production path</h2>
 <div class="qa">
-<h3>Do we throw away the Leaper Lounge prototype?</h3>
-<p>No. Its visible experience remains the foundation. What changes is our understanding of the machinery behind it: the production version should be the first community implementation of a reusable Wild Ledger room engine.</p>
+<h3>Do we throw away the community Lounge prototype?</h3>
+<p>No. Its visible experience remains the foundation. The production version becomes the first configured community implementation of a reusable Wild Ledger realtime room engine.</p>
 </div>
 
 <div class="qa">
 <h3>What is the architectural target?</h3>
-<p>Build the shared Wild Ledger community-room backend from the beginning, with Sailing Frog's Leap as the first configured community and Leaper Lounge as its first room. Keep community isolation, Member Record gating, manager authorization, and ledger/social identity separation foundational rather than adding them later.</p>
+<p>Keep the website as the community experience, use Cloudflare Worker + Durable Objects/WebSockets as the planned ephemeral realtime layer, and use XRPL for durable value and recognition. Keep Community ID + Room ID isolation, Member Record gating, manager authorization, and alias/XRPL identity separation foundational.</p>
+</div>
+
+<div class="qa">
+<h3>What is deliberately not fixed yet?</h3>
+<p>Implementation details such as Durable Object naming, heartbeat timing, reconnection rules, and exact presence mechanics remain design work for the production realtime layer. This document records the requirements without pretending those details have already been engineered.</p>
 </div>
 </section>
 </main>

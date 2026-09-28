@@ -412,11 +412,11 @@
 
 <section>
 <div class="wrap">
-<span class="category" id="loungeCategory">Community Lounge</span>
-<h2 id="loungeHeading">The community Lounge</h2>
+<span class="category">Community Lounge</span>
+<h2>The community Lounge</h2>
 <div class="faq">
-<div class="row"><b id="loungeWhatQuestion">What is the community Lounge?</b><span id="loungeWhatCopy">The Lounge is this community's live gathering place. Members can drop in, choose a temporary alias, and talk with whoever is there.</span></div>
-<div class="row"><b>How do I enter?</b><span id="loungeEntryCopy">Enter through your Member Record. The Member Record confirms your community membership before opening the Lounge.</span></div>
+<div class="row"><b>What is the community Lounge?</b><span>The community Lounge is a live gathering place. Members can drop in, choose a temporary alias, and talk with whoever is there.</span></div>
+<div class="row"><b>How do I enter?</b><span>Enter through your Member Record. The Member Record confirms your community membership before opening the community Lounge.</span></div>
 <div class="row"><b>Does the conversation become part of my Member Record?</b><span>No. Lounge conversation is temporary. If the community separately recognizes something you did with an official LEAP award, that recognition can become part of your community history.</span></div>
 <div class="row"><b>Where can I learn about aliases and privacy?</b><span>Those protections are part of Wild Ledger and apply across participating communities. See the <a href="wildLedgerFaq.html">Wild Ledger FAQ</a> for how Lounge identity and XRP Ledger identity are kept separate.</span></div>
 </div>
@@ -516,7 +516,6 @@
       const groupName = community.groupName || "community";
       const recordLabel = community.recordLabel || "Member Record";
       const historyLabel = community.historyLabel || "community history";
-      const loungeName = community.loungeName || (communityId === "sailing-frogs-leap" ? "Leaper Lounge" : "community Lounge");
       const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
 
       const theme = community.theme || {};
@@ -590,27 +589,6 @@
 
       const historyHeading = document.getElementById("historyHeading");
       if (historyHeading) historyHeading.textContent = `Your ${historyLabel}`;
-
-      const loungeCategory = document.getElementById("loungeCategory");
-      if (loungeCategory) loungeCategory.textContent = loungeName;
-
-      const loungeHeading = document.getElementById("loungeHeading");
-      if (loungeHeading) loungeHeading.textContent = loungeName;
-
-      const loungeWhatQuestion = document.getElementById("loungeWhatQuestion");
-      if (loungeWhatQuestion) loungeWhatQuestion.textContent = `What is ${loungeName}?`;
-
-      const loungeWhatCopy = document.getElementById("loungeWhatCopy");
-      if (loungeWhatCopy) {
-        loungeWhatCopy.textContent =
-          `${loungeName} is ${communityName}'s live gathering place. ${memberPlural.charAt(0).toUpperCase() + memberPlural.slice(1)} can drop in, choose a temporary alias, and talk with whoever is there.`;
-      }
-
-      const loungeEntryCopy = document.getElementById("loungeEntryCopy");
-      if (loungeEntryCopy) {
-        loungeEntryCopy.textContent =
-          `Enter through your ${recordLabel}. The ${recordLabel} confirms your ${communityName} membership before opening ${loungeName}.`;
-      }
 
       const recordShow = document.getElementById("recordShowCopy");
       if (recordShow) {
