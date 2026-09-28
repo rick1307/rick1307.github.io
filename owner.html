@@ -223,6 +223,99 @@
     text-transform: uppercase;
   }
 
+  .metric-info {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid rgba(126, 202, 255, .55);
+    border-radius: 50%;
+    background: rgba(77, 167, 235, .16);
+    color: #8fd2ff;
+    font: 900 .68rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .metric-info:focus-visible {
+    outline: 2px solid #8fd2ff;
+    outline-offset: 2px;
+  }
+
+  .metric-info-scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    padding: 22px;
+    background: rgba(2, 19, 28, .72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metric-info-scrim.open { display: flex; }
+
+  .metric-info-panel {
+    width: min(92vw, 430px);
+    border: 1px solid rgba(143, 210, 255, .25);
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(17, 63, 75, .98), rgba(6, 35, 48, .98));
+    box-shadow: 0 24px 70px rgba(0,0,0,.34);
+    padding: 22px;
+    color: var(--ink);
+  }
+
+  .metric-info-panel h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .metric-info-panel p {
+    margin: 10px 0 0;
+    color: rgba(236, 249, 247, .74);
+    font-size: .96rem;
+    line-height: 1.55;
+  }
+
+  .metric-info-close {
+    margin-top: 18px;
+    width: 100%;
+    border: 1px solid rgba(143, 210, 255, .28);
+    border-radius: 14px;
+    background: rgba(77, 167, 235, .12);
+    color: #b8e3ff;
+    padding: 10px 14px;
+    font: 800 .88rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    cursor: pointer;
+  }
+
+  .metrics-secondary {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .metrics-secondary .metric {
+    min-height: 88px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.04), rgba(255,255,255,.008)),
+      rgba(5, 34, 46, .34);
+  }
+
+  .metrics-secondary .metric-value {
+    color: rgba(246,252,251,.86);
+  }
+
+  .metrics-secondary .metric-label {
+    color: rgba(236,249,247,.58);
+  }
+
   .navigation {
     padding: 24px;
     display: grid;
@@ -379,7 +472,9 @@
     .console-header { padding: 28px 22px 23px; }
     .brand-row { align-items: flex-start; }
     .metrics { padding: 13px 12px 2px; gap: 5px; }
+    .metrics-secondary { padding-top: 6px; padding-bottom: 7px; }
     .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
+    .metrics-secondary .metric { min-height: 82px; }
     .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
     .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
     .metric-meaning { margin-top: auto; padding-top: 4px; font-size: .44rem; letter-spacing: .04em; }
@@ -408,24 +503,55 @@
 
       <section class="metrics" aria-label="Wild Ledger LEAP dashboard">
         <div class="metric">
+          <button class="metric-info" type="button" aria-label="About LEAP Outstanding" data-info-title="LEAP Outstanding" data-info-text="Total LEAP currently held outside the issuer account.">i</button>
           <div class="metric-value" id="metricOutstanding" aria-live="polite">…</div>
           <div class="metric-label">LEAP Outstanding</div>
           <div class="metric-meaning">Supply</div>
         </div>
         <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-text="LEAP currently held by configured Wild Ledger community and distribution accounts.">i</button>
           <div class="metric-value" id="metricCommunity" aria-live="polite">…</div>
           <div class="metric-label">Community LEAP</div>
           <div class="metric-meaning">Inventory</div>
         </div>
         <div class="metric">
+          <button class="metric-info" type="button" aria-label="About LEAP in the Wild" data-info-title="LEAP in the Wild" data-info-text="Outstanding LEAP held outside configured Wild Ledger community and distribution accounts.">i</button>
           <div class="metric-value" id="metricWild" aria-live="polite">…</div>
           <div class="metric-label">LEAP in the Wild</div>
           <div class="metric-meaning">Circulation</div>
         </div>
         <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-text="Non-community accounts currently holding a positive LEAP balance.">i</button>
           <div class="metric-value" id="metricHolders" aria-live="polite">…</div>
           <div class="metric-label">Holders</div>
           <div class="metric-meaning">Reach</div>
+        </div>
+      </section>
+
+      <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem activity dashboard">
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Circulation Rate" data-info-title="Circulation Rate" data-info-text="LEAP in the Wild divided by LEAP Outstanding.">i</button>
+          <div class="metric-value">—</div>
+          <div class="metric-label">Circulation Rate</div>
+          <div class="metric-meaning">Deployment</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Trustlines" data-info-title="Trustlines" data-info-text="Total XRP Ledger trust lines established for LEAP, including accounts that currently have a zero LEAP balance.">i</button>
+          <div class="metric-value">—</div>
+          <div class="metric-label">Trustlines</div>
+          <div class="metric-meaning">Capacity</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Pending Recognition" data-info-title="Pending Recognition" data-info-text="LEAP represented by outstanding recognition Checks that have been created but not yet cashed.">i</button>
+          <div class="metric-value">—</div>
+          <div class="metric-label">Pending Recognition</div>
+          <div class="metric-meaning">Pipeline</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-text="LEAP actually delivered from configured community and distribution accounts to non-community wallets during the last 30 days.">i</button>
+          <div class="metric-value">—</div>
+          <div class="metric-label">30-Day Distribution</div>
+          <div class="metric-meaning">Momentum</div>
         </div>
       </section>
 
@@ -476,6 +602,14 @@
       </nav>
     </section>
   </main>
+
+  <div class="metric-info-scrim" id="metricInfoScrim" role="dialog" aria-modal="true" aria-labelledby="metricInfoTitle">
+    <div class="metric-info-panel">
+      <h2 id="metricInfoTitle">Metric</h2>
+      <p id="metricInfoText"></p>
+      <button class="metric-info-close" id="metricInfoClose" type="button">Close</button>
+    </div>
+  </div>
 
   <script src="js/wildLedgerConfig.js"></script>
   <script>
@@ -656,6 +790,32 @@
         }
       }
     }
+
+    const metricInfoScrim = document.getElementById("metricInfoScrim");
+    const metricInfoTitle = document.getElementById("metricInfoTitle");
+    const metricInfoText = document.getElementById("metricInfoText");
+    const metricInfoClose = document.getElementById("metricInfoClose");
+
+    document.querySelectorAll(".metric-info").forEach(button => {
+      button.addEventListener("click", () => {
+        metricInfoTitle.textContent = button.dataset.infoTitle || "Metric";
+        metricInfoText.textContent = button.dataset.infoText || "";
+        metricInfoScrim.classList.add("open");
+        setTimeout(() => metricInfoClose.focus(), 0);
+      });
+    });
+
+    function closeMetricInfo() {
+      metricInfoScrim.classList.remove("open");
+    }
+
+    metricInfoClose.addEventListener("click", closeMetricInfo);
+    metricInfoScrim.addEventListener("click", event => {
+      if (event.target === metricInfoScrim) closeMetricInfo();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && metricInfoScrim.classList.contains("open")) closeMetricInfo();
+    });
 
     loadLeapDashboard();
 
