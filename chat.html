@@ -252,9 +252,9 @@
 
   <main>
     <div class="wrap">
-      <div class="kicker">Sailing Frog's Leap</div>
-      <h1>Leaper Lounge</h1>
-      <p class="lede">A place for Leapers to pull up a chair, pick a name, and join the conversation.</p>
+      <div class="kicker" id="communityName">Sailing Frog's Leap</div>
+      <h1 id="loungeName">Leaper Lounge</h1>
+      <p class="lede" id="loungeLede">A place for Leapers to pull up a chair, pick a name, and join the conversation.</p>
 
       <section class="panel" aria-label="Leaper Lounge prototype">
         <div id="entryView">
@@ -277,7 +277,7 @@
           <div class="room-head">
             <div class="room-title">
               <span class="online-dot" aria-hidden="true"></span>
-              <strong>Leaper Lounge</strong>
+              <strong id="roomName">Leaper Lounge</strong>
             </div>
             <span class="room-count">8 Leapers aboard</span>
           </div>
@@ -365,6 +365,25 @@
   <div class="toast" id="toast">Prototype tip simulated.</div>
 
   <script>
+    // Community context comes from the Member Record URL. The shared Lounge machinery
+    // stays generic; each community supplies its own presentation here.
+    const communityKey = new URLSearchParams(window.location.search).get("community") || "sailing-frogs-leap";
+    const communities = {
+      "sailing-frogs-leap": {
+        communityName: "Sailing Frog's Leap",
+        loungeName: "Leaper Lounge",
+        lede: "A place for Leapers to pull up a chair, pick a name, and join the conversation."
+      }
+    };
+    const community = communities[communityKey] || communities["sailing-frogs-leap"];
+
+    document.body.dataset.community = communityKey;
+    document.getElementById("communityName").textContent = community.communityName;
+    document.getElementById("loungeName").textContent = community.loungeName;
+    document.getElementById("roomName").textContent = community.loungeName;
+    document.getElementById("loungeLede").textContent = community.lede;
+    document.title = `${community.loungeName} — ${community.communityName}`;
+
     // Deliberately session-only: nickname is never written to localStorage or sessionStorage.
     let currentNickname = "";
     let currentTipName = "";
