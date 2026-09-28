@@ -315,6 +315,9 @@
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       font-size:.72rem;font-weight:800;line-height:1.35;
     }
+    .appreciation-event .system-event-pill{
+      border-color:rgba(47,116,129,.20);background:rgba(47,116,129,.08);color:#4d6570;
+    }
     @keyframes celebrationGlow{
       0%{opacity:0}
       8%{opacity:1}
@@ -352,6 +355,61 @@
         animation:none!important;opacity:1!important;transform:none!important;
       }
       .celebration-spark,.celebration-confetti{display:none!important;animation:none!important}
+    }
+
+    .appreciation{
+      display:none;position:fixed;inset:0;z-index:74;pointer-events:none;
+      align-items:center;justify-content:center;padding:20px;overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .appreciation.show{display:flex}
+    .appreciation-backdrop{
+      position:absolute;inset:0;background:radial-gradient(circle at center,rgba(47,116,129,.16),rgba(11,32,40,0) 62%);
+      animation:appreciationGlow 1.82s ease-out both;
+    }
+    .appreciation-ripples{position:absolute;inset:0;z-index:1;overflow:hidden}
+    .appreciation-ripple{
+      position:absolute;left:50%;top:56%;width:22px;height:22px;border-radius:50%;
+      border:2px solid rgba(47,116,129,.28);opacity:0;
+      transform:translate(-50%,-50%) scale(.22);
+      animation:appreciationRipple 1.32s ease-out var(--ripple-delay,0s) both;
+    }
+    .appreciation-card{
+      position:relative;z-index:2;width:min(88vw,390px);padding:18px 20px 17px;
+      border:1px solid rgba(47,116,129,.22);border-radius:22px;text-align:center;
+      background:rgba(255,255,255,.97);box-shadow:0 20px 52px rgba(11,32,40,.18);
+      animation:appreciationFloat 1.82s cubic-bezier(.22,.78,.22,1) both;
+      will-change:transform,opacity;
+    }
+    .appreciation-icon{font-size:1.3rem;line-height:1;color:var(--sea);margin-bottom:6px}
+    .appreciation-title{color:var(--navy);font-size:clamp(1.2rem,5.8vw,1.7rem);font-weight:900;line-height:1.06}
+    .appreciation-copy{margin-top:7px;color:rgba(26,37,44,.5);font-size:.82rem;font-weight:700;line-height:1.3}
+    @keyframes appreciationGlow{
+      0%{opacity:0}
+      14%{opacity:1}
+      68%{opacity:1}
+      100%{opacity:0}
+    }
+    @keyframes appreciationRipple{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.22)}
+      12%{opacity:.42}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(14)}
+    }
+    @keyframes appreciationFloat{
+      0%{opacity:0;transform:translateY(16px) scale(.76)}
+      16%{opacity:1;transform:translateY(-4px) scale(1.02)}
+      30%{opacity:1;transform:translateY(0) scale(1)}
+      58%{opacity:1;transform:translateY(0) scale(1)}
+      100%{opacity:0;transform:translateY(-108vh) scale(.93)}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .appreciation.show .appreciation-backdrop{
+        animation:none!important;opacity:1!important;
+      }
+      .appreciation.show .appreciation-card{
+        animation:none!important;opacity:1!important;transform:none!important;
+      }
+      .appreciation-ripple{display:none!important;animation:none!important}
     }
 
     .recognize-btn{
@@ -459,7 +517,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name">Rick</span>
-                  <button class="manager-tip" type="button" data-manager-tip-name="Rick">Community Manager · Tip XRP</button>
+                  <button class="manager-tip" type="button" data-manager-tip-name="Rick">Tip Rick in XRP</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:42 PM</span>
                 </div>
@@ -524,8 +582,8 @@
 
   <div class="scrim" id="xrpTipScrim" role="dialog" aria-modal="true" aria-labelledby="xrpTipTitle">
     <div class="tip-sheet">
-      <h3 id="xrpTipTitle">Tip <span id="xrpManagerName">Community Manager</span> in XRP</h3>
-      <p>Voluntary appreciation for the Community Manager.</p>
+      <h3 id="xrpTipTitle">Tip <span id="xrpManagerName">Rick</span> in XRP</h3>
+      <p>Voluntary appreciation for <span id="xrpManagerNameSecondary">Rick</span>.</p>
       <div class="xrp-entry">
         <input id="xrpAmount" type="number" min="0.000001" step="0.000001" inputmode="decimal" placeholder="XRP amount" aria-label="XRP tip amount" />
         <button class="primary" id="simulateXrpTip" type="button">Continue to wallet</button>
@@ -567,6 +625,16 @@
     </div>
   </div>
 
+  <div class="appreciation" id="xrpCelebration" aria-live="polite" aria-atomic="true">
+    <div class="appreciation-backdrop" aria-hidden="true"></div>
+    <div class="appreciation-ripples" id="appreciationRipples" aria-hidden="true"></div>
+    <div class="appreciation-card">
+      <div class="appreciation-icon" aria-hidden="true">✦</div>
+      <div class="appreciation-title">Thanks, <span id="appreciationTipper">Leaper</span>!</div>
+      <div class="appreciation-copy"><span id="appreciationAmount">2</span> XRP sent to <span id="appreciationRecipient">Rick</span></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">Prototype action simulated.</div>
 
   <script>
@@ -585,6 +653,7 @@
     const messages = document.getElementById("messages");
     const xrpTipScrim = document.getElementById("xrpTipScrim");
     const xrpManagerName = document.getElementById("xrpManagerName");
+    const xrpManagerNameSecondary = document.getElementById("xrpManagerNameSecondary");
     const xrpAmount = document.getElementById("xrpAmount");
     const recognitionScrim = document.getElementById("recognitionScrim");
     const recognitionName = document.getElementById("recognitionName");
@@ -594,9 +663,15 @@
     const celebrationName = document.getElementById("celebrationName");
     const celebrationAmount = document.getElementById("celebrationAmount");
     const celebrationSparks = document.getElementById("celebrationSparks");
+    const xrpCelebration = document.getElementById("xrpCelebration");
+    const appreciationRipples = document.getElementById("appreciationRipples");
+    const appreciationTipper = document.getElementById("appreciationTipper");
+    const appreciationAmount = document.getElementById("appreciationAmount");
+    const appreciationRecipient = document.getElementById("appreciationRecipient");
     const toast = document.getElementById("toast");
     const roleViewButtons = Array.from(document.querySelectorAll("[data-role-view]"));
     let celebrationTimer = null;
+    let xrpCelebrationTimer = null;
 
     function applyPrototypeRole(role) {
       const nextRole = role === "member" ? "member" : "manager";
@@ -612,6 +687,7 @@
       } else {
         xrpTipScrim.classList.remove("open");
       }
+      xrpCelebration.classList.remove("show");
     }
 
     roleViewButtons.forEach(button => {
@@ -671,8 +747,9 @@
 
     document.querySelectorAll("[data-manager-tip-name]").forEach(button => {
       button.addEventListener("click", () => {
-        currentXrpManagerName = button.dataset.managerTipName || "Community Manager";
+        currentXrpManagerName = button.dataset.managerTipName || "Rick";
         xrpManagerName.textContent = currentXrpManagerName;
+        xrpManagerNameSecondary.textContent = currentXrpManagerName;
         xrpAmount.value = "";
         xrpTipScrim.classList.add("open");
         setTimeout(() => xrpAmount.focus(), 0);
@@ -695,10 +772,15 @@
       }
 
       const shownAmount = xrpAmount.value.trim();
+      const prototypeEvent = {
+        type: "xrp-tip-awarded",
+        tipper: currentNickname || "A Leaper",
+        amount: shownAmount,
+        recipient: currentXrpManagerName || "Rick"
+      };
+
       xrpTipScrim.classList.remove("open");
-      toast.textContent = `${shownAmount} XRP tip to ${currentXrpManagerName} simulated — your wallet would open here. Nothing was sent.`;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3200);
+      setTimeout(() => handleXrpTipCelebrated(prototypeEvent), 520);
     });
 
     document.querySelectorAll(".meta").forEach(meta => {
@@ -741,6 +823,53 @@
     recognitionScrim.addEventListener("click", (event) => {
       if (event.target === recognitionScrim) recognitionScrim.classList.remove("open");
     });
+
+    function formatXrpAmount(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return String(value);
+      if (Number.isInteger(numeric)) return String(numeric);
+      return numeric.toLocaleString([], { maximumFractionDigits: 6 });
+    }
+
+    function addXrpSystemEvent({ tipper, amount, recipient }) {
+      const row = document.createElement("div");
+      row.className = "system-event appreciation-event";
+
+      const pill = document.createElement("div");
+      pill.className = "system-event-pill";
+      pill.textContent = `✦ ${tipper} sent ${formatXrpAmount(amount)} XRP to ${recipient}.`;
+
+      row.appendChild(pill);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function playXrpCelebration({ tipper, amount, recipient }) {
+      appreciationTipper.textContent = tipper;
+      appreciationAmount.textContent = formatXrpAmount(amount);
+      appreciationRecipient.textContent = recipient;
+      appreciationRipples.textContent = "";
+
+      for (let i = 0; i < 3; i += 1) {
+        const ripple = document.createElement("span");
+        ripple.className = "appreciation-ripple";
+        ripple.style.setProperty("--ripple-delay", `${i * 0.15}s`);
+        appreciationRipples.appendChild(ripple);
+      }
+
+      if (xrpCelebrationTimer) clearTimeout(xrpCelebrationTimer);
+      xrpCelebration.classList.remove("show");
+      void xrpCelebration.offsetWidth;
+      xrpCelebration.classList.add("show");
+      xrpCelebrationTimer = setTimeout(() => {
+        xrpCelebration.classList.remove("show");
+      }, 1820);
+    }
+
+    function handleXrpTipCelebrated(event) {
+      playXrpCelebration(event);
+      addXrpSystemEvent(event);
+    }
 
     function addRecognitionSystemEvent({ nickname, amount }) {
       const row = document.createElement("div");
