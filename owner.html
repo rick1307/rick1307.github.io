@@ -3,148 +3,389 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wild Ledger Owner</title>
+<title>Wild Ledger Owner Console</title>
 <style>
   :root {
-    --bg-top: #eef3f8;
-    --bg-bottom: #dfe6ee;
-    --panel: rgba(255, 255, 255, 0.82);
-    --panel-border: rgba(255, 255, 255, 0.72);
-    --text: #12263f;
-    --muted: #5d728b;
-    --blue: #2c5ea4;
-    --shadow: 0 16px 36px rgba(25, 46, 77, 0.14);
+    --ink: #f5fbfa;
+    --muted: rgba(236, 249, 247, .72);
+    --deep: #071f2c;
+    --navy: #0b2f40;
+    --lagoon: #29b8b1;
+    --sea-glass: #79d5c2;
+    --mango: #f4bd58;
+    --coral: #ef765d;
+    --panel: rgba(10, 45, 58, .70);
+    --panel-strong: rgba(10, 49, 63, .90);
+    --line: rgba(219, 248, 244, .14);
+    --shadow: 0 28px 78px rgba(0, 16, 24, .38);
   }
 
   * { box-sizing: border-box; }
 
+  html { min-height: 100%; }
+
   body {
     margin: 0;
     min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 28px 18px;
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--text);
-    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 12% 14%, rgba(41, 184, 177, .34) 0, rgba(41, 184, 177, .12) 22%, transparent 44%),
+      radial-gradient(circle at 87% 15%, rgba(244, 189, 88, .24) 0, rgba(244, 189, 88, .07) 21%, transparent 42%),
+      radial-gradient(circle at 88% 86%, rgba(239, 118, 93, .24) 0, rgba(239, 118, 93, .07) 23%, transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(121, 213, 194, .19) 0, transparent 42%),
+      linear-gradient(145deg, #06202e 0%, #0a3444 48%, #071d2a 100%);
+    overflow-x: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::before {
+    inset: 0;
+    opacity: .28;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+  }
+
+  body::after {
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    top: 35%;
+    border-radius: 50%;
+    border: 1px solid rgba(121, 213, 194, .13);
+    box-shadow:
+      0 0 0 54px rgba(121, 213, 194, .035),
+      0 0 0 108px rgba(121, 213, 194, .025),
+      0 0 0 162px rgba(121, 213, 194, .015);
   }
 
   .shell {
-    width: min(100%, 560px);
-  }
-
-  .owner-card {
     position: relative;
-    padding: 28px 24px 26px;
-    border: 1px solid var(--panel-border);
-    border-radius: 24px;
-    background: var(--panel);
+    z-index: 1;
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: 46px 22px 56px;
+  }
+
+  .console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 32px;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.018)),
+      var(--panel);
     box-shadow: var(--shadow);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
-  .home-link {
+  .console::before {
+    content: "";
     position: absolute;
-    top: 26px;
-    right: 24px;
-    color: var(--blue);
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--lagoon), var(--sea-glass), var(--mango), var(--coral));
   }
 
-  .home-link:hover,
-  .home-link:focus-visible {
-    text-decoration: underline;
-    outline: none;
+  .console-header {
+    position: relative;
+    padding: 34px 34px 26px;
+    border-bottom: 1px solid var(--line);
   }
 
-  .eyebrow {
-    display: inline-block;
-    margin-bottom: 14px;
-    padding: 7px 10px;
-    border-radius: 999px;
-    background: rgba(44, 94, 164, 0.12);
-    color: var(--blue);
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 21px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--sea-glass);
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
+    font-weight: 850;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  .brand-mark {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--mango);
+    box-shadow:
+      0 0 0 5px rgba(244, 189, 88, .12),
+      0 0 22px rgba(244, 189, 88, .48);
+  }
+
+  .console-label {
+    padding: 7px 10px;
+    border: 1px solid rgba(121, 213, 194, .18);
+    border-radius: 999px;
+    background: rgba(121, 213, 194, .06);
+    color: rgba(231, 250, 246, .74);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .13em;
     text-transform: uppercase;
   }
 
   h1 {
-    margin: 0 0 10px;
-    font-size: 32px;
-    line-height: 1.1;
-  }
-
-  p {
     margin: 0;
+    max-width: 720px;
+    font-size: clamp(2.25rem, 7vw, 4.75rem);
+    line-height: .96;
+    letter-spacing: -.055em;
+    font-weight: 900;
+  }
+
+  .intro {
+    margin: 18px 0 0;
+    max-width: 710px;
     color: var(--muted);
-    font-size: 16px;
-    line-height: 1.55;
+    font-size: clamp(1rem, 2.3vw, 1.13rem);
+    line-height: 1.65;
   }
 
-  .hello {
-    margin-top: 24px;
-    padding: 22px;
-    border-radius: 18px;
-    background: #ffffff;
-    border: 1px solid rgba(18, 38, 63, 0.08);
-    font-size: 24px;
-    font-weight: 700;
-    text-align: center;
-  }
-
-
-  .owner-links {
-    margin-top: 18px;
-    padding: 0;
-    list-style: none;
+  .navigation {
+    padding: 24px;
     display: grid;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
   }
 
-  .owner-links a {
-    display: block;
-    padding: 13px 15px;
-    border-radius: 14px;
-    background: rgba(255,255,255,.78);
-    border: 1px solid rgba(18,38,63,.08);
-    color: var(--blue);
-    font-size: 15px;
-    font-weight: 700;
+  .nav-card {
+    --accent: var(--lagoon);
+    position: relative;
+    display: flex;
+    min-height: 244px;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 25px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    color: var(--ink);
     text-decoration: none;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.016)),
+      rgba(5, 34, 46, .54);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
   }
 
-  .owner-links a:hover,
-  .owner-links a:focus-visible {
-    text-decoration: underline;
+  .nav-card::before {
+    content: "";
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    right: -70px;
+    top: -75px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent) 0%, transparent 68%);
+    opacity: .9;
+  }
+
+  .nav-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 78%);
+    opacity: .85;
+  }
+
+  .nav-card.manager { --accent: var(--coral); }
+
+  .nav-card:hover,
+  .nav-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.025)),
+      rgba(5, 34, 46, .70);
+    box-shadow: 0 18px 34px rgba(0, 15, 23, .24), inset 0 1px 0 rgba(255,255,255,.08);
     outline: none;
   }
 
-  @media (max-width: 560px) {
-    body { padding: 20px 14px; }
-    .owner-card { padding: 24px 20px 22px; border-radius: 20px; }
-    .home-link { top: 22px; right: 20px; }
-    h1 { font-size: 28px; }
+  .nav-card:active { transform: translateY(-1px) scale(.995); }
+
+  .icon-wrap {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+    border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+    color: var(--accent);
+    box-shadow: 0 12px 25px rgba(0,0,0,.12);
+  }
+
+  .icon-wrap svg {
+    width: 26px;
+    height: 26px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .nav-copy {
+    position: relative;
+    z-index: 1;
+    margin-top: 38px;
+  }
+
+  .nav-kicker {
+    color: color-mix(in srgb, var(--accent) 80%, white 20%);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .nav-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 7px;
+  }
+
+  .nav-title {
+    font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+    line-height: 1.05;
+    letter-spacing: -.035em;
+    font-weight: 880;
+  }
+
+  .nav-arrow {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.11);
+    color: rgba(255,255,255,.78);
+    transition: transform .22s ease, background .22s ease;
+  }
+
+  .nav-card:hover .nav-arrow,
+  .nav-card:focus-visible .nav-arrow {
+    transform: translateX(3px);
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  .nav-description {
+    margin: 10px 0 0;
+    color: rgba(234, 247, 245, .64);
+    font-size: .91rem;
+    line-height: 1.5;
+  }
+
+  @supports not (color: color-mix(in srgb, red, blue)) {
+    .nav-card::before { background: radial-gradient(circle, rgba(41,184,177,.28), transparent 68%); }
+    .nav-card.manager::before { background: radial-gradient(circle, rgba(239,118,93,.27), transparent 68%); }
+    .icon-wrap { border-color: rgba(121,213,194,.25); background: rgba(121,213,194,.08); }
+    .nav-card.manager .icon-wrap { border-color: rgba(239,118,93,.25); background: rgba(239,118,93,.08); }
+  }
+
+  @media (max-width: 700px) {
+    .shell { padding: 22px 14px 34px; }
+    .console { border-radius: 25px; }
+    .console-header { padding: 28px 22px 23px; }
+    .brand-row { align-items: flex-start; }
+    .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
+    .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
+    .nav-copy { margin-top: 28px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-card,
+    .nav-arrow { transition: none; }
   }
 </style>
 </head>
 <body>
   <main class="shell">
-    <section class="owner-card">
-      <a class="home-link" href="index.html">Home →</a>
-      <div class="eyebrow">Wild Ledger Owner</div>
-      <h1>Owner Console</h1>
-      <p>This is the beginning of the Wild Ledger owner control room.</p>
-      <div class="hello">Hello, World.</div>
-      <ul class="owner-links">
-        <li><a href="splash.html">Wild Ledger</a></li>
-        <li><a href="manager.html">Manager</a></li>
-      </ul>
+    <section class="console" aria-labelledby="owner-title">
+      <header class="console-header">
+        <div class="brand-row">
+          <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
+          <div class="console-label">Owner Console</div>
+        </div>
+        <h1 id="owner-title">Owner Console</h1>
+        <p class="intro">Central administration for Wild Ledger. Manage communities, platform settings, operations, and oversight from one place.</p>
+      </header>
+
+      <nav class="navigation" aria-label="Owner console navigation">
+        <a class="nav-card" href="splash.html">
+          <div class="icon-wrap" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 14.5c2.7-3.1 5.3-4.7 8-4.7s5.3 1.6 8 4.7" />
+              <path d="M5.5 18c2.2-1.7 4.4-2.6 6.5-2.6s4.3.9 6.5 2.6" />
+              <path d="M12 5v2.2" />
+              <path d="M8.9 6.2 10 8" />
+              <path d="m15.1 6.2-1.1 1.8" />
+            </svg>
+          </div>
+          <div class="nav-copy">
+            <div class="nav-kicker">Public Experience</div>
+            <div class="nav-title-row">
+              <div class="nav-title">Wild Ledger</div>
+              <span class="nav-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="nav-description">Open the public Wild Ledger experience and community entry point.</p>
+          </div>
+        </a>
+
+        <a class="nav-card manager" href="manager.html">
+          <div class="icon-wrap" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h10" />
+              <path d="M18 7h2" />
+              <path d="M4 12h3" />
+              <path d="M11 12h9" />
+              <path d="M4 17h8" />
+              <path d="M16 17h4" />
+              <circle cx="16" cy="7" r="2" />
+              <circle cx="9" cy="12" r="2" />
+              <circle cx="14" cy="17" r="2" />
+            </svg>
+          </div>
+          <div class="nav-copy">
+            <div class="nav-kicker">Community Operations</div>
+            <div class="nav-title-row">
+              <div class="nav-title">Manager</div>
+              <span class="nav-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="nav-description">Open the community management interface and operating controls.</p>
+          </div>
+        </a>
+      </nav>
     </section>
   </main>
 </body>
