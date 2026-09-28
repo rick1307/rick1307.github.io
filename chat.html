@@ -158,7 +158,6 @@
       appearance:none;border:0;background:none;padding:0;color:var(--navy);
       font-weight:850;font-size:.87rem;text-align:left;
     }
-    .name.tippable{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
     .manager-tip{
       appearance:none;border:1px solid rgba(47,116,129,.24);border-radius:999px;
       background:rgba(219,236,232,.62);color:var(--sea);padding:2px 7px;
@@ -258,6 +257,10 @@
       font-size:.64rem;font-weight:850;line-height:1.35;white-space:nowrap;
     }
     .recognize-btn:hover{background:rgba(210,163,79,.18);border-color:rgba(210,163,79,.7)}
+    .recognize-example{
+      display:inline-block;vertical-align:middle;pointer-events:none;cursor:default;
+      opacity:.72;margin-left:2px;
+    }
     .recognition-code{
       margin:12px 0 14px;padding:9px 11px;border-radius:10px;
       background:rgba(22,56,75,.06);border:1px solid rgba(22,56,75,.11);
@@ -340,7 +343,7 @@
               <div class="avatar">R</div>
               <div class="bubble">
                 <div class="meta">
-                  <button class="name tippable" data-tip-name="Rick">Rick</button>
+                  <span class="name">Rick</span>
                   <button class="manager-tip" type="button" data-manager-tip-name="Rick">Community Manager · Tip XRP</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:42 PM</span>
@@ -353,7 +356,7 @@
               <div class="avatar">SD</div>
               <div class="bubble">
                 <div class="meta">
-                  <button class="name tippable" data-tip-name="SaltyDog">SaltyDog</button>
+                  <span class="name">SaltyDog</span>
                   <button class="recognize-btn" type="button" data-recognize-name="SaltyDog">Recognize</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:43 PM</span>
@@ -378,7 +381,7 @@
               <div class="avatar">FF</div>
               <div class="bubble">
                 <div class="meta">
-                  <button class="name tippable" data-tip-name="FrogFan">FrogFan</button>
+                  <span class="name">FrogFan</span>
                   <button class="recognize-btn" type="button" data-recognize-name="FrogFan">Recognize</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:45 PM</span>
@@ -388,7 +391,7 @@
             </div>
           </div>
 
-          <div class="legend"><span class="bolt">⚡</span> LEAP tips enabled — tap a lightning-bolt Leaper's name.</div>
+          <div class="legend"><span class="bolt">⚡</span> LEAP tips enabled — press <span class="recognize-btn recognize-example">Recognize</span></div>
 
           <form class="composer" id="messageForm">
             <input id="messageInput" maxlength="280" autocomplete="off" placeholder="Say something..." aria-label="Message" />
@@ -403,21 +406,6 @@
       </div>
     </div>
   </main>
-
-  <div class="scrim" id="tipScrim" role="dialog" aria-modal="true" aria-labelledby="tipTitle">
-    <div class="tip-sheet">
-      <h3 id="tipTitle">Tip <span id="tipName">Leaper</span> ⚡</h3>
-      <p>This Leaper has LEAP transfers enabled.</p>
-      <div class="tip-amounts">
-        <button class="tip-amount" data-amount="1">1 LEAP</button>
-        <button class="tip-amount" data-amount="5">5 LEAP</button>
-        <button class="tip-amount" data-amount="10">10 LEAP</button>
-      </div>
-      <div class="tip-actions">
-        <button class="secondary" id="closeTip" type="button">Cancel</button>
-      </div>
-    </div>
-  </div>
 
   <div class="scrim" id="xrpTipScrim" role="dialog" aria-modal="true" aria-labelledby="xrpTipTitle">
     <div class="tip-sheet">
@@ -457,7 +445,6 @@
   <script>
     // Deliberately session-only: nickname is never written to localStorage or sessionStorage.
     let currentNickname = "";
-    let currentTipName = "";
     let currentXrpManagerName = "";
     let currentRecognitionName = "";
     let selectedRecognitionAmount = "";
@@ -469,8 +456,6 @@
     const messageForm = document.getElementById("messageForm");
     const messageInput = document.getElementById("messageInput");
     const messages = document.getElementById("messages");
-    const tipScrim = document.getElementById("tipScrim");
-    const tipName = document.getElementById("tipName");
     const xrpTipScrim = document.getElementById("xrpTipScrim");
     const xrpManagerName = document.getElementById("xrpManagerName");
     const xrpAmount = document.getElementById("xrpAmount");
@@ -527,32 +512,6 @@
       messages.appendChild(row);
       messageInput.value = "";
       messages.scrollTop = messages.scrollHeight;
-    });
-
-    document.querySelectorAll("[data-tip-name]").forEach(button => {
-      button.addEventListener("click", () => {
-        currentTipName = button.dataset.tipName;
-        tipName.textContent = currentTipName;
-        tipScrim.classList.add("open");
-      });
-    });
-
-    document.getElementById("closeTip").addEventListener("click", () => {
-      tipScrim.classList.remove("open");
-    });
-
-    tipScrim.addEventListener("click", (event) => {
-      if (event.target === tipScrim) tipScrim.classList.remove("open");
-    });
-
-    document.querySelectorAll(".tip-amount").forEach(button => {
-      button.addEventListener("click", () => {
-        const amount = button.dataset.amount;
-        tipScrim.classList.remove("open");
-        toast.textContent = `${amount} LEAP tip to ${currentTipName} simulated — nothing was sent.`;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 2600);
-      });
     });
 
     document.querySelectorAll("[data-manager-tip-name]").forEach(button => {
