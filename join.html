@@ -711,8 +711,9 @@
       if (firstLeapOperatorName) firstLeapOperatorName.value = operatorName;
 
       try {
+        localStorage.removeItem(walletStorageKey);
         sessionStorage.removeItem(activeWalletKey);
-        const rememberedWallet = localStorage.getItem(walletStorageKey) || "";
+        const rememberedWallet = sessionStorage.getItem(walletStorageKey) || "";
         if (rememberedWallet && classicAddressPattern.test(rememberedWallet) && memberRecordWallet) {
           memberRecordWallet.value = rememberedWallet;
         }
@@ -730,7 +731,7 @@
           }
 
           // Remember only the public address. This does not mark the member as joined.
-          try { localStorage.setItem(walletStorageKey, account); } catch (_) {}
+          try { sessionStorage.setItem(walletStorageKey, account); } catch (_) {}
           if (memberRecordWallet && !memberRecordWallet.value.trim()) memberRecordWallet.value = account;
         });
       }
@@ -749,7 +750,7 @@
         }
 
         try {
-          localStorage.setItem(walletStorageKey, account);
+          sessionStorage.setItem(walletStorageKey, account);
           sessionStorage.setItem(activeWalletKey, account);
         } catch (_) {}
 
