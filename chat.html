@@ -250,6 +250,67 @@
     }
     .toast.show{opacity:1;transform:translate(-50%,0)}
 
+    /* Shared recognition celebration. In production the Worker/WebSocket will trigger
+       the same front-end handler after the XRPL recognition transaction validates. */
+    .celebration{
+      display:none;position:fixed;inset:0;z-index:75;pointer-events:none;
+      align-items:center;justify-content:center;padding:20px;overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .celebration.show{display:flex}
+    .celebration-backdrop{
+      position:absolute;inset:0;background:radial-gradient(circle at center,rgba(210,163,79,.24),rgba(22,56,75,.10) 34%,rgba(11,32,40,0) 68%);
+      animation:celebrationGlow 2.8s ease-out both;
+    }
+    .celebration-card{
+      position:relative;z-index:2;width:min(90vw,420px);padding:26px 24px 24px;
+      border:1px solid rgba(210,163,79,.62);border-radius:24px;text-align:center;
+      background:rgba(255,250,240,.97);box-shadow:0 28px 70px rgba(11,32,40,.28);
+      animation:celebrationPop 2.8s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .celebration-icon{font-size:2rem;line-height:1;margin-bottom:7px;filter:drop-shadow(0 3px 8px rgba(210,163,79,.3))}
+    .celebration-kicker{
+      color:var(--rust);font-size:.72rem;font-weight:950;letter-spacing:.18em;text-transform:uppercase;
+    }
+    .celebration-name{margin-top:7px;color:var(--navy);font-size:clamp(1.55rem,6vw,2.25rem);font-weight:900;line-height:1.05}
+    .celebration-copy{margin-top:6px;color:#65757b;font-size:.86rem;font-weight:750}
+    .celebration-amount{margin-top:5px;color:var(--navy);font-size:clamp(2.4rem,11vw,4.2rem);font-weight:950;line-height:.95;letter-spacing:-.04em}
+    .celebration.level-2 .celebration-card{transform-origin:center}
+    .celebration.level-3 .celebration-card{box-shadow:0 32px 82px rgba(11,32,40,.34),0 0 0 7px rgba(210,163,79,.08)}
+    .celebration-sparks{position:absolute;inset:0;z-index:1}
+    .celebration-spark{
+      position:absolute;left:50%;top:50%;font-size:var(--spark-size,1rem);opacity:0;
+      transform:translate(-50%,-50%);animation:sparkBurst 1.35s ease-out var(--spark-delay,0s) both;
+    }
+    .system-event{display:flex;justify-content:center;margin:5px 0 18px;padding:0 8px}
+    .system-event-pill{
+      max-width:92%;padding:7px 11px;border:1px solid rgba(210,163,79,.28);border-radius:999px;
+      background:rgba(210,163,79,.10);color:#6f571f;text-align:center;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.72rem;font-weight:800;line-height:1.35;
+    }
+    @keyframes celebrationGlow{
+      0%{opacity:0;transform:scale(.72)}
+      18%{opacity:1}
+      72%{opacity:1}
+      100%{opacity:0;transform:scale(1.15)}
+    }
+    @keyframes celebrationPop{
+      0%{opacity:0;transform:translateY(22px) scale(.72) rotate(-1deg)}
+      14%{opacity:1;transform:translateY(0) scale(1.06) rotate(.4deg)}
+      24%{transform:scale(.99)}
+      72%{opacity:1;transform:scale(1)}
+      100%{opacity:0;transform:translateY(-10px) scale(.96)}
+    }
+    @keyframes sparkBurst{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0deg)}
+      12%{opacity:1}
+      100%{opacity:0;transform:translate(calc(-50% + var(--spark-x)),calc(-50% + var(--spark-y))) scale(1.15) rotate(var(--spark-rotation))}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .celebration-backdrop,.celebration-card,.celebration-spark{animation-duration:.01ms!important;animation-delay:0s!important}
+    }
+
     .recognize-btn{
       appearance:none;border:1px solid rgba(210,163,79,.45);border-radius:999px;
       padding:2px 7px;background:rgba(210,163,79,.11);color:#8a6417;
@@ -440,6 +501,18 @@
     </div>
   </div>
 
+  <div class="celebration" id="recognitionCelebration" aria-live="polite" aria-atomic="true">
+    <div class="celebration-backdrop" aria-hidden="true"></div>
+    <div class="celebration-sparks" id="celebrationSparks" aria-hidden="true"></div>
+    <div class="celebration-card">
+      <div class="celebration-icon" aria-hidden="true">⚡</div>
+      <div class="celebration-kicker">Great Chat</div>
+      <div class="celebration-name" id="celebrationName">Leaper</div>
+      <div class="celebration-copy">was awarded</div>
+      <div class="celebration-amount"><span id="celebrationAmount">1</span> LEAP</div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">Prototype action simulated.</div>
 
   <script>
@@ -463,7 +536,12 @@
     const recognitionName = document.getElementById("recognitionName");
     const recognitionAmountButtons = Array.from(document.querySelectorAll("[data-recognition-amount]"));
     const simulateRecognition = document.getElementById("simulateRecognition");
+    const recognitionCelebration = document.getElementById("recognitionCelebration");
+    const celebrationName = document.getElementById("celebrationName");
+    const celebrationAmount = document.getElementById("celebrationAmount");
+    const celebrationSparks = document.getElementById("celebrationSparks");
     const toast = document.getElementById("toast");
+    let celebrationTimer = null;
 
     entryForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -575,13 +653,74 @@
       if (event.target === recognitionScrim) recognitionScrim.classList.remove("open");
     });
 
+    function addRecognitionSystemEvent({ nickname, amount }) {
+      const row = document.createElement("div");
+      row.className = "system-event";
+
+      const pill = document.createElement("div");
+      pill.className = "system-event-pill";
+      pill.textContent = `⚡ ${nickname} was awarded ${amount} LEAP — Great Chat!`;
+
+      row.appendChild(pill);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function playRecognitionCelebration({ nickname, amount }) {
+      const level = Math.max(1, Math.min(3, Number(amount) || 1));
+      celebrationName.textContent = nickname;
+      celebrationAmount.textContent = String(level);
+      recognitionCelebration.className = `celebration level-${level}`;
+      celebrationSparks.textContent = "";
+
+      // More LEAP = a slightly bigger burst, without changing the basic animation.
+      const sparkCount = 8 + (level * 6);
+      for (let i = 0; i < sparkCount; i += 1) {
+        const angle = (Math.PI * 2 * i / sparkCount) + ((i % 2) * 0.13);
+        const distance = 95 + (level * 24) + ((i % 4) * 13);
+        const spark = document.createElement("span");
+        spark.className = "celebration-spark";
+        spark.textContent = i % 3 === 0 ? "⚡" : "✦";
+        spark.style.setProperty("--spark-x", `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty("--spark-y", `${Math.sin(angle) * distance}px`);
+        spark.style.setProperty("--spark-rotation", `${(i * 37) - 120}deg`);
+        spark.style.setProperty("--spark-delay", `${(i % 5) * 0.025}s`);
+        spark.style.setProperty("--spark-size", `${0.78 + (level * 0.08) + ((i % 3) * 0.11)}rem`);
+        celebrationSparks.appendChild(spark);
+      }
+
+      if (celebrationTimer) clearTimeout(celebrationTimer);
+      recognitionCelebration.classList.remove("show");
+      void recognitionCelebration.offsetWidth;
+      recognitionCelebration.classList.add("show");
+      celebrationTimer = setTimeout(() => {
+        recognitionCelebration.classList.remove("show");
+      }, 2850);
+    }
+
+    // This is the important seam: today the prototype calls this locally.
+    // Later the Cloudflare Worker/WebSocket can send the same event to every
+    // connected browser after it verifies XRPL validation.
+    function handleRecognitionAwarded(event) {
+      playRecognitionCelebration(event);
+      addRecognitionSystemEvent(event);
+    }
+
     simulateRecognition.addEventListener("click", () => {
       if (!selectedRecognitionAmount || !currentRecognitionName) return;
 
+      const prototypeEvent = {
+        type: "recognition-awarded",
+        nickname: currentRecognitionName,
+        amount: Number(selectedRecognitionAmount),
+        recognition: "Great Chat"
+      };
+
       recognitionScrim.classList.remove("open");
-      toast.textContent = `${selectedRecognitionAmount} LEAP Great Chat recognition for ${currentRecognitionName} simulated — the Community Manager wallet would open here. Nothing was sent.`;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3600);
+
+      // Prototype only: pretend the wallet was approved and the XRPL transaction
+      // validated. Production will replace this timer with the Worker's broadcast.
+      setTimeout(() => handleRecognitionAwarded(prototypeEvent), 700);
     });
   </script>
 </body>
