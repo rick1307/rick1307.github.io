@@ -1262,6 +1262,12 @@
       const SFL_DISMISSED_EXPIRED_CHECKS_KEY = `${communityId}.leap.dismissedExpiredChecks`;
       const PENDING_CHECK_VISIBLE_MS = 7 * 24 * 60 * 60 * 1000;
 
+      // Remove any address-bearing values left by older versions that used localStorage.
+      try {
+        localStorage.removeItem(SFL_WALLET_STORAGE_KEY);
+        localStorage.removeItem(SFL_LEAP_SESSION_KEY);
+      } catch (_) {}
+
       const DISCORD_OAUTH_START_URL = wildLedger.discordOAuthStartUrl;
       const XRPL_WS = wildLedger.xrplWebSocket;
 
@@ -1321,7 +1327,7 @@
         if (!classicAddressPattern.test(account)) return;
 
         try {
-          localStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
+          sessionStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
         } catch (_) {}
 
         try {
@@ -1337,7 +1343,7 @@
 
       function clearRememberedWallet() {
         try {
-          localStorage.removeItem(SFL_WALLET_STORAGE_KEY);
+          sessionStorage.removeItem(SFL_WALLET_STORAGE_KEY);
         } catch (_) {}
       }
 
@@ -1354,13 +1360,13 @@
         };
 
         try {
-          localStorage.setItem(SFL_LEAP_SESSION_KEY, JSON.stringify(leapSession));
+          sessionStorage.setItem(SFL_LEAP_SESSION_KEY, JSON.stringify(leapSession));
         } catch (_) {}
       }
 
       function clearLeapSession() {
         try {
-          localStorage.removeItem(SFL_LEAP_SESSION_KEY);
+          sessionStorage.removeItem(SFL_LEAP_SESSION_KEY);
         } catch (_) {}
       }
 
