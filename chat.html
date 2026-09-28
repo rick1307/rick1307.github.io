@@ -159,6 +159,13 @@
       font-weight:850;font-size:.87rem;text-align:left;
     }
     .name.tippable{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+    .manager-tip{
+      appearance:none;border:1px solid rgba(47,116,129,.24);border-radius:999px;
+      background:rgba(219,236,232,.62);color:var(--sea);padding:2px 7px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.66rem;font-weight:850;line-height:1.25;
+    }
+    .manager-tip:hover{border-color:var(--sea);background:rgba(219,236,232,.92)}
     .bolt{
       color:#b37a00;font-size:.98rem;line-height:1;
       filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));
@@ -175,17 +182,6 @@
     .message.me .bubble{text-align:right}
     .message.me .meta{justify-content:flex-end}
     .message.me .text{text-align:left;background:#f7ead9;border-radius:13px 4px 13px 13px}
-
-    .arrival-event{
-      display:flex;align-items:center;gap:10px;margin:5px 0 19px;
-      color:#748187;font-size:.76rem;font-weight:750;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      text-align:center;
-    }
-    .arrival-event::before,.arrival-event::after{
-      content:"";height:1px;background:rgba(22,56,75,.14);flex:1;
-    }
-    .arrival-event span{max-width:78%}
 
     .legend{
       padding:8px 20px 13px;color:#748187;font-size:.74rem;
@@ -221,6 +217,21 @@
       background:white;color:var(--navy);font-weight:850;
     }
     .tip-amount:hover{border-color:var(--gold)}
+    .xrp-entry{
+      display:grid;grid-template-columns:1fr auto;gap:9px;align-items:stretch;
+      margin-top:4px;
+    }
+    .xrp-entry input{
+      width:100%;min-width:0;padding:12px 13px;border-radius:10px;
+      border:1px solid rgba(22,56,75,.20);background:white;color:var(--ink);outline:none;
+    }
+    .xrp-entry input:focus{
+      border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.12);
+    }
+    .xrp-note{
+      margin:11px 0 0!important;color:#748187!important;font-size:.76rem!important;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
     .tip-actions{display:flex;justify-content:flex-end;margin-top:16px}
     .secondary{
       border:1px solid var(--line);border-radius:9px;padding:9px 13px;
@@ -249,6 +260,8 @@
       .bubble{max-width:84%}
       .composer{padding:10px}
       .room-head{padding:15px 14px}
+      .xrp-entry{grid-template-columns:1fr}
+      .xrp-entry .primary{width:100%}
     }
   </style>
 </head>
@@ -263,9 +276,9 @@
 
   <main>
     <div class="wrap">
-      <div class="kicker" id="communityName">Sailing Frog's Leap</div>
-      <h1 id="loungeName">Leaper Lounge</h1>
-      <p class="lede" id="loungeLede">A place for Leapers to pull up a chair, pick a name, and join the conversation.</p>
+      <div class="kicker">Sailing Frog's Leap</div>
+      <h1>Leaper Lounge</h1>
+      <p class="lede">A place for Leapers to pull up a chair, pick a name, and join the conversation.</p>
 
       <section class="panel" aria-label="Leaper Lounge prototype">
         <div id="entryView">
@@ -288,7 +301,7 @@
           <div class="room-head">
             <div class="room-title">
               <span class="online-dot" aria-hidden="true"></span>
-              <strong id="roomName">Leaper Lounge</strong>
+              <strong>Leaper Lounge</strong>
             </div>
             <span class="room-count">8 Leapers aboard</span>
           </div>
@@ -299,6 +312,7 @@
               <div class="bubble">
                 <div class="meta">
                   <button class="name tippable" data-tip-name="Rick">Rick</button>
+                  <button class="manager-tip" type="button" data-manager-tip-name="Rick">Community Manager · Tip XRP</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:42 PM</span>
                 </div>
@@ -353,7 +367,7 @@
 
       <div class="prototype-note">
         <strong class="sans">Prototype only.</strong>
-        This page does not connect to a chat server, wallet, or the XRP Ledger. Messages and LEAP tips are simulated so we can decide what the Lounge should feel like first.
+        This page does not connect to a chat server, wallet, or the XRP Ledger. Messages, LEAP tips, and Community Manager XRP tips are simulated so we can decide what the Lounge should feel like first.
       </div>
     </div>
   </main>
@@ -373,31 +387,28 @@
     </div>
   </div>
 
+  <div class="scrim" id="xrpTipScrim" role="dialog" aria-modal="true" aria-labelledby="xrpTipTitle">
+    <div class="tip-sheet">
+      <h3 id="xrpTipTitle">Tip <span id="xrpManagerName">Community Manager</span> in XRP</h3>
+      <p>Voluntary appreciation for the Community Manager.</p>
+      <div class="xrp-entry">
+        <input id="xrpAmount" type="number" min="0.000001" step="0.000001" inputmode="decimal" placeholder="XRP amount" aria-label="XRP tip amount" />
+        <button class="primary" id="simulateXrpTip" type="button">Continue to wallet</button>
+      </div>
+      <p class="xrp-note">Prototype only. In the live version, your own wallet would open so you could review and approve the transaction.</p>
+      <div class="tip-actions">
+        <button class="secondary" id="closeXrpTip" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">Prototype tip simulated.</div>
 
   <script>
-    // Community context comes from the Member Record URL. The shared Lounge machinery
-    // stays generic; each community supplies its own presentation here.
-    const communityKey = new URLSearchParams(window.location.search).get("community") || "sailing-frogs-leap";
-    const communities = {
-      "sailing-frogs-leap": {
-        communityName: "Sailing Frog's Leap",
-        loungeName: "Leaper Lounge",
-        lede: "A place for Leapers to pull up a chair, pick a name, and join the conversation."
-      }
-    };
-    const community = communities[communityKey] || communities["sailing-frogs-leap"];
-
-    document.body.dataset.community = communityKey;
-    document.getElementById("communityName").textContent = community.communityName;
-    document.getElementById("loungeName").textContent = community.loungeName;
-    document.getElementById("roomName").textContent = community.loungeName;
-    document.getElementById("loungeLede").textContent = community.lede;
-    document.title = `${community.loungeName} — ${community.communityName}`;
-
     // Deliberately session-only: nickname is never written to localStorage or sessionStorage.
     let currentNickname = "";
     let currentTipName = "";
+    let currentXrpManagerName = "";
 
     const entryView = document.getElementById("entryView");
     const chatView = document.getElementById("chatView");
@@ -408,6 +419,9 @@
     const messages = document.getElementById("messages");
     const tipScrim = document.getElementById("tipScrim");
     const tipName = document.getElementById("tipName");
+    const xrpTipScrim = document.getElementById("xrpTipScrim");
+    const xrpManagerName = document.getElementById("xrpManagerName");
+    const xrpAmount = document.getElementById("xrpAmount");
     const toast = document.getElementById("toast");
 
     entryForm.addEventListener("submit", (event) => {
@@ -418,14 +432,6 @@
       currentNickname = name;
       entryView.style.display = "none";
       chatView.style.display = "block";
-
-      const arrival = document.createElement("div");
-      arrival.className = "arrival-event";
-      const arrivalText = document.createElement("span");
-      arrivalText.textContent = `${currentNickname} joined ${community.loungeName}`;
-      arrival.appendChild(arrivalText);
-      messages.appendChild(arrival);
-
       messageInput.focus();
       messages.scrollTop = messages.scrollHeight;
     });
@@ -491,6 +497,38 @@
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 2600);
       });
+    });
+
+    document.querySelectorAll("[data-manager-tip-name]").forEach(button => {
+      button.addEventListener("click", () => {
+        currentXrpManagerName = button.dataset.managerTipName || "Community Manager";
+        xrpManagerName.textContent = currentXrpManagerName;
+        xrpAmount.value = "";
+        xrpTipScrim.classList.add("open");
+        setTimeout(() => xrpAmount.focus(), 0);
+      });
+    });
+
+    document.getElementById("closeXrpTip").addEventListener("click", () => {
+      xrpTipScrim.classList.remove("open");
+    });
+
+    xrpTipScrim.addEventListener("click", (event) => {
+      if (event.target === xrpTipScrim) xrpTipScrim.classList.remove("open");
+    });
+
+    document.getElementById("simulateXrpTip").addEventListener("click", () => {
+      const amount = Number(xrpAmount.value);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        xrpAmount.focus();
+        return;
+      }
+
+      const shownAmount = xrpAmount.value.trim();
+      xrpTipScrim.classList.remove("open");
+      toast.textContent = `${shownAmount} XRP tip to ${currentXrpManagerName} simulated — your wallet would open here. Nothing was sent.`;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3200);
     });
   </script>
 </body>
