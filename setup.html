@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a34">
+  <title>Community Setup — Wild Ledger</title>
+  <style>
+    :root {
+      --bg: #071b22;
+      --bg2: #0d2b34;
+      --panel: rgba(255,255,255,.075);
+      --panel-strong: rgba(255,255,255,.11);
+      --line: rgba(255,255,255,.14);
+      --text: #f4f1e9;
+      --muted: #b8c6c8;
+      --accent: #d7ae62;
+      --accent2: #7fc1c4;
+      --danger: #e88f7f;
+      --ok: #91d2a4;
+      --shadow: 0 20px 50px rgba(0,0,0,.24);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 14% -8%, rgba(215,174,98,.20), transparent 30%),
+        radial-gradient(circle at 88% 2%, rgba(127,193,196,.15), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 58%, #092028 100%);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    a { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7,27,34,.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ghost-link {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 12px;
+      border-radius: 999px;
+    }
+
+    .ghost-link:hover { background: rgba(255,255,255,.06); color: var(--text); }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 46px 0 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 26px;
+    }
+
+    .hero-card,
+    .access-card,
+    .section-card,
+    .preview-card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card { padding: 34px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: .98;
+      letter-spacing: -.045em;
+      max-width: 800px;
+    }
+
+    .hero-copy {
+      margin: 18px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    .access-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(155deg, rgba(255,255,255,.11), rgba(255,255,255,.055));
+    }
+
+    .access-card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .access-card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-top: 10px;
+      min-height: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status.ok { color: var(--ok); }
+    .status.error { color: var(--danger); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 26px;
+      align-items: start;
+    }
+
+    .form-column { min-width: 0; }
+
+    .section-card {
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: -.02em;
+    }
+
+    .section-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 680px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-5 {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label,
+    .label {
+      color: #dbe4e3;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .025em;
+    }
+
+    .hint {
+      margin-top: -2px;
+      color: #8fa5a8;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 88px;
+      line-height: 1.5;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(127,193,196,.12);
+    }
+
+    input[type="color"] {
+      min-height: 43px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .color-field {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .rank-row,
+    .badge-row {
+      display: grid;
+      gap: 10px;
+      align-items: end;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+      margin-bottom: 10px;
+    }
+
+    .rank-row { grid-template-columns: 110px minmax(0, 1fr); }
+    .badge-row { grid-template-columns: 1.1fr 1fr 84px 2fr auto; }
+
+    .small-button,
+    .primary-button,
+    .secondary-button,
+    .danger-button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary-button {
+      background: var(--accent);
+      color: #172327;
+    }
+
+    .secondary-button,
+    .small-button {
+      color: var(--text);
+      background: rgba(255,255,255,.11);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .danger-button {
+      color: #ffd9d2;
+      background: rgba(232,143,127,.13);
+      border: 1px solid rgba(232,143,127,.22);
+      padding: 10px 12px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    details {
+      border-top: 1px solid rgba(255,255,255,.10);
+      margin-top: 20px;
+      padding-top: 16px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: #dce5e4;
+      margin-bottom: 14px;
+    }
+
+    .preview-column {
+      position: sticky;
+      top: 90px;
+      min-width: 0;
+    }
+
+    .preview-card {
+      overflow: hidden;
+    }
+
+    .preview-stage {
+      padding: 24px;
+      min-height: 250px;
+      background: #efe8d8;
+      color: #17313a;
+      transition: background .2s ease, color .2s ease;
+    }
+
+    .preview-kicker {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .68;
+    }
+
+    .preview-stage h3 {
+      margin: 8px 0 5px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .preview-stage p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: .76;
+    }
+
+    .preview-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 18px;
+    }
+
+    .preview-pill {
+      padding: 7px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(255,255,255,.45);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+
+    .preview-meta {
+      padding: 16px 18px 18px;
+      background: rgba(0,0,0,.15);
+      border-top: 1px solid var(--line);
+    }
+
+    .preview-meta strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .preview-meta span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .output-card textarea {
+      min-height: 290px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      white-space: pre;
+    }
+
+    .notice {
+      border: 1px solid rgba(215,174,98,.24);
+      background: rgba(215,174,98,.08);
+      color: #ead9ae;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 14px;
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      text-align: center;
+      color: #7f969a;
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .preview-column { position: static; }
+      .preview-card { max-width: none; }
+    }
+
+    @media (max-width: 720px) {
+      main { width: min(100% - 22px, 1180px); padding-top: 28px; }
+      .topbar-inner { width: min(100% - 22px, 1180px); }
+      .hero-card { padding: 25px 21px; }
+      .access-card, .section-card { padding: 20px; }
+      .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+      .rank-row, .badge-row { grid-template-columns: 1fr; }
+      .top-actions .ghost-link:first-child { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <img src="leap-logo.png" alt="LEAP logo">
+        <span>Wild Ledger<small>Community Operator</small></span>
+      </a>
+      <nav class="top-actions" aria-label="Setup navigation">
+        <a class="ghost-link" href="wildLedgerFaq.html">Wild Ledger FAQ</a>
+        <a class="ghost-link" href="index.html">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Community Operator Workspace</div>
+        <h1>Community Setup</h1>
+        <p class="hero-copy">Build the identity and experience for a Wild Ledger community. This first version edits every value currently used by the shared community system, keeps a browser draft, and produces a clean configuration for review.</p>
+      </div>
+
+      <div class="access-card">
+        <h2>Choose a community</h2>
+        <p>Operator-token access will be wired here later. For now, select an existing community or start a new draft.</p>
+        <div class="field">
+          <label for="communityPicker">Community</label>
+          <select id="communityPicker"></select>
+        </div>
+        <div class="button-row">
+          <button class="secondary-button" id="newCommunityButton" type="button">New community</button>
+        </div>
+        <div class="status" id="draftStatus" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <form class="form-column" id="setupForm" autocomplete="off">
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Identity</h2>
+              <p>The permanent keys Wild Ledger uses to know who this community is.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="id">Community ID</label>
+              <input id="id" data-path="id" placeholder="zach">
+              <div class="hint">Short lowercase key used in URLs and storage.</div>
+            </div>
+            <div class="field">
+              <label for="layout">Layout</label>
+              <select id="layout" data-path="layout">
+                <option value="classic">Classic</option>
+                <option value="garage">Garage</option>
+              </select>
+              <div class="hint">More layout choices can be added without changing the theme.</div>
+            </div>
+            <div class="field full">
+              <label for="communityName">Community name</label>
+              <input id="communityName" data-path="communityName" placeholder="Zach's Hot Rods">
+            </div>
+            <div class="field">
+              <label for="leapNamespace">LEAP namespace</label>
+              <input id="leapNamespace" data-path="leapNamespace" placeholder="ZHR-LEAP">
+            </div>
+            <div class="field">
+              <label for="managerName">Manager display name</label>
+              <input id="managerName" data-path="managerName" placeholder="Zach">
+            </div>
+            <div class="field">
+              <label for="operatorName">Community operator</label>
+              <input id="operatorName" data-path="operatorName" placeholder="Zach">
+            </div>
+            <div class="field">
+              <label for="operatorPossessive">Operator possessive</label>
+              <input id="operatorPossessive" data-path="operatorPossessive" placeholder="Zach's">
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Community language</h2>
+              <p>Words and labels that make the shared system sound like this community.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="membershipLabel">Membership label</label><input id="membershipLabel" data-path="membershipLabel" placeholder="Membership"></div>
+            <div class="field"><label for="recordLabel">Record label</label><input id="recordLabel" data-path="recordLabel" placeholder="Member Record"></div>
+            <div class="field"><label for="memberSingular">Member — singular</label><input id="memberSingular" data-path="memberSingular" placeholder="member"></div>
+            <div class="field"><label for="memberPlural">Member — plural</label><input id="memberPlural" data-path="memberPlural" placeholder="members"></div>
+            <div class="field"><label for="groupName">Group name</label><input id="groupName" data-path="groupName" placeholder="community"></div>
+            <div class="field"><label for="historyLabel">History label</label><input id="historyLabel" data-path="historyLabel" placeholder="community history"></div>
+            <div class="field"><label for="joinLabel">Join button label</label><input id="joinLabel" data-path="joinLabel" placeholder="Join →"></div>
+            <div class="field"><label for="unrankedRankLabel">Unranked label</label><input id="unrankedRankLabel" data-path="unrankedRankLabel" placeholder="Not ranked"></div>
+            <div class="field full"><label for="heading">Main heading</label><input id="heading" data-path="heading" placeholder="Start Your Engines"></div>
+            <div class="field full"><label for="intro">Community introduction</label><textarea id="intro" data-path="intro"></textarea></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Images</h2>
+              <p>Photographic community assets should normally be JPG. Transparent graphics such as the LEAP logo stay PNG.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="bannerDesktop">Desktop banner</label><input id="bannerDesktop" data-path="bannerDesktop" placeholder="images/zachBannerDesktop.jpg"></div>
+            <div class="field"><label for="bannerMobile">Mobile banner</label><input id="bannerMobile" data-path="bannerMobile" placeholder="images/zachBannerMobile.jpg"><div class="hint">Current mobile banner standard: 1200 × 480 JPG.</div></div>
+            <div class="field"><label for="profileImage">Profile image</label><input id="profileImage" data-path="profileImage" placeholder="images/zachProfileImage.jpg"></div>
+            <div class="field"><label for="heroImage">Hero image</label><input id="heroImage" data-path="heroImage" placeholder="images/zachHeroImage.jpg"></div>
+            <div class="field full"><label for="eventHeroImage">Event hero image</label><input id="eventHeroImage" data-path="eventHeroImage" placeholder="images/zachEventHero.jpg"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Experience</h2>
+              <p>The simple idea members see for how participation works in this community.</p>
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="field full"><label for="experienceLine">Experience line</label><input id="experienceLine" data-path="experienceLine" placeholder="Show up. Get your hands dirty. Leave inspired."></div>
+            <div class="field"><label for="experienceStep1">Step 1</label><input id="experienceStep1" data-array="experienceSteps" data-index="0"></div>
+            <div class="field"><label for="experienceStep2">Step 2</label><input id="experienceStep2" data-array="experienceSteps" data-index="1"></div>
+            <div class="field"><label for="experienceStep3">Step 3</label><input id="experienceStep3" data-array="experienceSteps" data-index="2"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Ranks</h2>
+              <p>Each threshold is the community-earned LEAP required to reach that rank.</p>
+            </div>
+          </div>
+          <div id="ranksEditor"></div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Badges</h2>
+              <p>Reusable recognitions a community operator can award to members.</p>
+            </div>
+            <button class="small-button" id="addBadgeButton" type="button">Add badge</button>
+          </div>
+          <div id="badgesEditor"></div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Browser storage</h2>
+              <p>Keys used to remember the public XRPL address for this community.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="walletStorageKey">Wallet storage key</label><input id="walletStorageKey" data-path="walletStorageKey" placeholder="zach.xrpl.wallet"></div>
+            <div class="field"><label for="activeWalletKey">Active wallet key</label><input id="activeWalletKey" data-path="activeWalletKey" placeholder="zach.xrpl.activeWallet"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Theme</h2>
+              <p>Theme controls color and visual atmosphere. Layout can remain independent.</p>
+            </div>
+          </div>
+
+          <div class="grid-3" id="colorEditor"></div>
+
+          <details>
+            <summary>Advanced theme CSS</summary>
+            <div class="grid-2" id="advancedThemeEditor"></div>
+          </details>
+        </section>
+
+        <section class="section-card output-card">
+          <div class="section-head">
+            <div>
+              <h2>Configuration output</h2>
+              <p>This is the operator's current draft. It does not publish to Wild Ledger yet.</p>
+            </div>
+          </div>
+          <textarea id="configOutput" readonly spellcheck="false"></textarea>
+          <div class="button-row">
+            <button class="primary-button" id="saveDraftButton" type="button">Save draft</button>
+            <button class="secondary-button" id="copyConfigButton" type="button">Copy config</button>
+            <button class="secondary-button" id="downloadConfigButton" type="button">Download JSON</button>
+            <button class="danger-button" id="clearDraftButton" type="button">Clear saved draft</button>
+          </div>
+          <div class="notice"><strong>Not publishing yet:</strong> this first version intentionally stops before authentication and server-side writes. A future operator token can determine which community appears in the selector and authorize publishing.</div>
+        </section>
+      </form>
+
+      <aside class="preview-column">
+        <div class="preview-card">
+          <div class="preview-stage" id="previewStage">
+            <div class="preview-kicker" id="previewLayout">Classic layout</div>
+            <h3 id="previewName">Community Name</h3>
+            <p id="previewIntro">The community's introduction will appear here as the operator edits it.</p>
+            <div class="preview-pill-row" id="previewRanks"></div>
+          </div>
+          <div class="preview-meta">
+            <strong>Live setup preview</strong>
+            <span>Theme colors, community name, copy, and rank labels update while you type.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer-note">Wild Ledger • Community Setup</div>
+  </main>
+
+  <script src="js/communityConfig.js"></script>
+  <script>
+    (() => {
+      const communities = window.WILD_LEDGER_COMMUNITIES || {};
+      const picker = document.getElementById("communityPicker");
+      const form = document.getElementById("setupForm");
+      const status = document.getElementById("draftStatus");
+      const output = document.getElementById("configOutput");
+      const ranksEditor = document.getElementById("ranksEditor");
+      const badgesEditor = document.getElementById("badgesEditor");
+      const colorEditor = document.getElementById("colorEditor");
+      const advancedThemeEditor = document.getElementById("advancedThemeEditor");
+
+      const colorKeys = [
+        ["paper", "Paper"], ["paper2", "Paper 2"], ["ink", "Ink"],
+        ["navy", "Primary dark"], ["deep", "Deep"], ["sea", "Secondary"],
+        ["foam", "Light accent"], ["rust", "Warm accent"], ["gold", "Gold"],
+        ["muted", "Muted text"], ["themeColor", "Browser theme"]
+      ];
+
+      const advancedThemeKeys = [
+        ["line", "Border / line"],
+        ["card", "Card background"],
+        ["pageBackground", "Page background"],
+        ["pageOverlay", "Page overlay"],
+        ["navBackground", "Navigation background"],
+        ["headerBackground", "Header background"],
+        ["sectionBackground", "Section background"],
+        ["manifestoBackground", "Manifesto background"],
+        ["darkFeatureBackground", "Dark feature background"],
+        ["badgeBackground", "Badge background"],
+        ["portraitBackground", "Portrait background"]
+      ];
+
+      const blankCommunity = () => ({
+        id: "",
+        layout: "classic",
+        communityName: "",
+        leapNamespace: "",
+        managerName: "",
+        operatorName: "",
+        operatorPossessive: "",
+        membershipLabel: "Membership",
+        memberSingular: "member",
+        memberPlural: "members",
+        groupName: "community",
+        recordLabel: "Member Record",
+        historyLabel: "community history",
+        joinLabel: "Join →",
+        heading: "Welcome",
+        intro: "",
+        bannerDesktop: "images/bannerDesktop.jpg",
+        bannerMobile: "images/bannerMobile.jpg",
+        profileImage: "images/profileImage.jpg",
+        heroImage: "images/heroImage.jpg",
+        eventHeroImage: "images/eventHero.jpg",
+        experienceLine: "Show up. Participate. Build a history.",
+        experienceSteps: ["Show up", "Participate", "Build a history"],
+        walletStorageKey: "",
+        activeWalletKey: "",
+        unrankedRankLabel: "Not ranked",
+        ranks: [
+          { min: 1, name: "Rank 1" },
+          { min: 5, name: "Rank 2" },
+          { min: 10, name: "Rank 3" },
+          { min: 25, name: "Rank 4" },
+          { min: 51, name: "Rank 5" }
+        ],
+        badges: [],
+        theme: {
+          paper: "#efe8d8", paper2: "#f8f3e8", ink: "#17313a", navy: "#123b46",
+          deep: "#0b2d36", sea: "#2f7481", foam: "#d7ebe7", rust: "#b85a40",
+          gold: "#d7ae62", line: "rgba(15,52,64,.16)", card: "rgba(250,252,247,.80)",
+          muted: "#526a70", pageBackground: "linear-gradient(180deg,#eee8dc,#bfd6d4)",
+          pageOverlay: "none", navBackground: "rgba(226,235,230,.88)",
+          headerBackground: "linear-gradient(180deg,rgba(239,232,216,.68),transparent)",
+          sectionBackground: "rgba(255,255,255,.06)", manifestoBackground: "linear-gradient(135deg,#0b2d36,#184d58)",
+          darkFeatureBackground: "linear-gradient(135deg,#103a45,#25606a)",
+          badgeBackground: "rgba(211,235,230,.94)", portraitBackground: "rgba(250,252,247,.84)",
+          themeColor: "#efe8d8"
+        }
+      });
+
+      let current = blankCommunity();
+      let currentSourceId = "new";
+
+      const deepCopy = value => JSON.parse(JSON.stringify(value));
+
+      function populatePicker() {
+        picker.innerHTML = "";
+        Object.values(communities).forEach((community) => {
+          const option = document.createElement("option");
+          option.value = community.id;
+          option.textContent = community.communityName;
+          picker.appendChild(option);
+        });
+        const newOption = document.createElement("option");
+        newOption.value = "__new__";
+        newOption.textContent = "+ New community draft";
+        picker.appendChild(newOption);
+      }
+
+      function draftKey(id) {
+        return `wildLedger.operatorDraft.${id || "new"}`;
+      }
+
+      function readSavedDraft(id) {
+        try {
+          const raw = localStorage.getItem(draftKey(id));
+          return raw ? JSON.parse(raw) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function saveDraft() {
+        syncFromForm();
+        const id = current.id || currentSourceId || "new";
+        try {
+          localStorage.setItem(draftKey(id), JSON.stringify(current));
+          status.textContent = "Draft saved in this browser.";
+          status.className = "status ok";
+        } catch (_) {
+          status.textContent = "This browser could not save the draft.";
+          status.className = "status error";
+        }
+      }
+
+      function setSimpleFields() {
+        form.querySelectorAll("[data-path]").forEach((element) => {
+          const key = element.dataset.path;
+          element.value = current[key] ?? "";
+        });
+        form.querySelectorAll("[data-array='experienceSteps']").forEach((element) => {
+          const index = Number(element.dataset.index);
+          element.value = current.experienceSteps?.[index] ?? "";
+        });
+      }
+
+      function renderRanks() {
+        ranksEditor.innerHTML = "";
+        const ranks = Array.isArray(current.ranks) ? current.ranks : [];
+        ranks.forEach((rank, index) => {
+          const row = document.createElement("div");
+          row.className = "rank-row";
+          row.innerHTML = `
+            <div class="field">
+              <label for="rankMin${index}">LEAP</label>
+              <input id="rankMin${index}" type="number" min="0" step="1" value="${escapeHtml(rank.min)}" data-rank-index="${index}" data-rank-key="min">
+            </div>
+            <div class="field">
+              <label for="rankName${index}">Rank name</label>
+              <input id="rankName${index}" value="${escapeHtml(rank.name)}" data-rank-index="${index}" data-rank-key="name">
+            </div>`;
+          ranksEditor.appendChild(row);
+        });
+      }
+
+      function renderBadges() {
+        badgesEditor.innerHTML = "";
+        const badges = Array.isArray(current.badges) ? current.badges : [];
+        if (!badges.length) {
+          const empty = document.createElement("div");
+          empty.className = "hint";
+          empty.textContent = "No badges configured yet.";
+          badgesEditor.appendChild(empty);
+          return;
+        }
+        badges.forEach((badge, index) => {
+          const row = document.createElement("div");
+          row.className = "badge-row";
+          row.innerHTML = `
+            <div class="field"><label>Name</label><input value="${escapeHtml(badge.name)}" data-badge-index="${index}" data-badge-key="name"></div>
+            <div class="field"><label>Type</label><input value="${escapeHtml(badge.type)}" data-badge-index="${index}" data-badge-key="type"></div>
+            <div class="field"><label>Icon</label><input value="${escapeHtml(badge.icon)}" data-badge-index="${index}" data-badge-key="icon"></div>
+            <div class="field"><label>Description</label><textarea data-badge-index="${index}" data-badge-key="description">${escapeHtml(badge.description)}</textarea></div>
+            <button class="danger-button" type="button" data-remove-badge="${index}">Remove</button>`;
+          badgesEditor.appendChild(row);
+        });
+      }
+
+      function renderThemeEditors() {
+        colorEditor.innerHTML = "";
+        colorKeys.forEach(([key, label]) => {
+          const value = current.theme?.[key] || "#000000";
+          const wrapper = document.createElement("div");
+          wrapper.className = "field";
+          wrapper.innerHTML = `
+            <label>${label}</label>
+            <div class="color-field">
+              <input type="color" value="${normalizeColor(value)}" data-theme-color-picker="${key}" aria-label="${label} color picker">
+              <input value="${escapeHtml(value)}" data-theme-key="${key}" aria-label="${label} value">
+            </div>`;
+          colorEditor.appendChild(wrapper);
+        });
+
+        advancedThemeEditor.innerHTML = "";
+        advancedThemeKeys.forEach(([key, label]) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "field";
+          wrapper.innerHTML = `<label>${label}</label><textarea data-theme-key="${key}">${escapeHtml(current.theme?.[key] || "")}</textarea>`;
+          advancedThemeEditor.appendChild(wrapper);
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function normalizeColor(value) {
+        return /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#000000";
+      }
+
+      function loadCommunity(id, preferDraft = true) {
+        currentSourceId = id;
+        let value;
+        if (id === "__new__" || id === "new") {
+          value = blankCommunity();
+          currentSourceId = "new";
+        } else {
+          value = deepCopy(communities[id] || blankCommunity());
+        }
+
+        const saved = preferDraft ? readSavedDraft(id === "__new__" ? "new" : id) : null;
+        current = saved || value;
+        ensureShape();
+        renderAll();
+        status.textContent = saved ? "Loaded saved browser draft." : "Loaded community configuration.";
+        status.className = saved ? "status ok" : "status";
+      }
+
+      function ensureShape() {
+        current.experienceSteps = Array.isArray(current.experienceSteps) ? current.experienceSteps.slice(0,3) : [];
+        while (current.experienceSteps.length < 3) current.experienceSteps.push("");
+        current.ranks = Array.isArray(current.ranks) ? current.ranks : [];
+        current.badges = Array.isArray(current.badges) ? current.badges : [];
+        current.theme = { ...blankCommunity().theme, ...(current.theme || {}) };
+      }
+
+      function renderAll() {
+        setSimpleFields();
+        renderRanks();
+        renderBadges();
+        renderThemeEditors();
+        updateOutputAndPreview();
+      }
+
+      function syncFromForm() {
+        form.querySelectorAll("[data-path]").forEach((element) => {
+          current[element.dataset.path] = element.value;
+        });
+
+        current.experienceSteps = [0,1,2].map((index) => {
+          return form.querySelector(`[data-array='experienceSteps'][data-index='${index}']`)?.value || "";
+        });
+
+        ranksEditor.querySelectorAll("[data-rank-index]").forEach((element) => {
+          const index = Number(element.dataset.rankIndex);
+          const key = element.dataset.rankKey;
+          current.ranks[index] ||= { min: 0, name: "" };
+          current.ranks[index][key] = key === "min" ? Number(element.value || 0) : element.value;
+        });
+
+        badgesEditor.querySelectorAll("[data-badge-index]").forEach((element) => {
+          const index = Number(element.dataset.badgeIndex);
+          const key = element.dataset.badgeKey;
+          current.badges[index] ||= { name: "", type: "", icon: "", description: "" };
+          current.badges[index][key] = element.value;
+        });
+
+        form.querySelectorAll("[data-theme-key]").forEach((element) => {
+          current.theme[element.dataset.themeKey] = element.value;
+        });
+      }
+
+      function updateOutputAndPreview() {
+        syncFromForm();
+        output.value = JSON.stringify(current, null, 2);
+
+        document.getElementById("previewName").textContent = current.communityName || "Community Name";
+        document.getElementById("previewIntro").textContent = current.intro || "The community's introduction will appear here as the operator edits it.";
+        document.getElementById("previewLayout").textContent = `${current.layout || "classic"} layout`;
+
+        const stage = document.getElementById("previewStage");
+        stage.style.background = current.theme.pageBackground || current.theme.paper || "#efe8d8";
+        stage.style.color = current.theme.ink || "#17313a";
+
+        const rankWrap = document.getElementById("previewRanks");
+        rankWrap.innerHTML = "";
+        current.ranks.slice(0,5).forEach((rank) => {
+          const pill = document.createElement("span");
+          pill.className = "preview-pill";
+          pill.textContent = rank.name || "Rank";
+          rankWrap.appendChild(pill);
+        });
+      }
+
+      form.addEventListener("input", (event) => {
+        const target = event.target;
+        if (target.matches("[data-theme-color-picker]")) {
+          const key = target.dataset.themeColorPicker;
+          const textInput = form.querySelector(`[data-theme-key='${key}']`);
+          if (textInput) textInput.value = target.value;
+        }
+        if (target.matches("[data-theme-key]")) {
+          const key = target.dataset.themeKey;
+          const pickerInput = form.querySelector(`[data-theme-color-picker='${key}']`);
+          if (pickerInput && /^#[0-9a-f]{6}$/i.test(target.value)) pickerInput.value = target.value;
+        }
+        updateOutputAndPreview();
+      });
+
+      form.addEventListener("change", updateOutputAndPreview);
+
+      picker.addEventListener("change", () => loadCommunity(picker.value));
+
+      document.getElementById("newCommunityButton").addEventListener("click", () => {
+        picker.value = "__new__";
+        loadCommunity("__new__");
+      });
+
+      document.getElementById("addBadgeButton").addEventListener("click", () => {
+        syncFromForm();
+        current.badges.push({ name: "New badge", type: "Standard badge", icon: "★", description: "" });
+        renderBadges();
+        updateOutputAndPreview();
+      });
+
+      badgesEditor.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-remove-badge]");
+        if (!button) return;
+        syncFromForm();
+        current.badges.splice(Number(button.dataset.removeBadge), 1);
+        renderBadges();
+        updateOutputAndPreview();
+      });
+
+      document.getElementById("saveDraftButton").addEventListener("click", saveDraft);
+
+      document.getElementById("copyConfigButton").addEventListener("click", async () => {
+        syncFromForm();
+        const text = JSON.stringify(current, null, 2);
+        try {
+          await navigator.clipboard.writeText(text);
+          status.textContent = "Configuration copied.";
+          status.className = "status ok";
+        } catch (_) {
+          output.focus();
+          output.select();
+          status.textContent = "Select and copy the configuration below.";
+          status.className = "status";
+        }
+      });
+
+      document.getElementById("downloadConfigButton").addEventListener("click", () => {
+        syncFromForm();
+        const blob = new Blob([JSON.stringify(current, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${current.id || "community"}-config.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById("clearDraftButton").addEventListener("click", () => {
+        const id = current.id || currentSourceId || "new";
+        try { localStorage.removeItem(draftKey(id)); } catch (_) {}
+        status.textContent = "Saved browser draft cleared.";
+        status.className = "status";
+      });
+
+      populatePicker();
+
+      const params = new URLSearchParams(window.location.search);
+      const requested = (params.get("community") || window.WILD_LEDGER_COMMUNITY_ID || "").toLowerCase();
+      const initialId = communities[requested] ? requested : Object.keys(communities)[0] || "__new__";
+      picker.value = initialId;
+      loadCommunity(initialId);
+    })();
+  </script>
+</body>
+</html>
