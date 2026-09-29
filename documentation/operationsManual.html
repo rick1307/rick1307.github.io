@@ -175,7 +175,7 @@
     <div class="brand">Wild Ledger · Operations Manual</div>
     <div class="nav-actions">
       <span class="role-chip" id="roleChip">Owner View</span>
-      <a class="back-link" id="backLink" href="../viewCommunity.html">← View Community</a>
+      <a class="back-link" id="backLink" href="../professionalLibrary.html">← Professional Library</a>
     </div>
   </div>
 </nav>
@@ -369,11 +369,11 @@
   }
 
   if (backLink) {
-    backLink.textContent = '← View Community';
+    backLink.textContent = '← Professional Library';
     const returnParams = new URLSearchParams();
     returnParams.set('role', role);
     if (community) returnParams.set('community', community);
-    backLink.href = `../viewCommunity.html?${returnParams.toString()}`;
+    backLink.href = `../professionalLibrary.html?${returnParams.toString()}`;
   }
 })();
 </script>
