@@ -1134,7 +1134,7 @@
 
     <p class="footnote">
       This page scans validated XRPL transaction history for the authorized LEAP distributor and extracts recognized
-      SFL-LEAP public memo records. Badges in Use is the unique badge-name registry. Past Challenges is the serialized
+      community LEAP public memo records. Badges in Use is the unique badge-name registry. Past Challenges is the serialized
       challenge registry. Past Events is the dated event record.
     </p>
   </main>
@@ -1146,7 +1146,9 @@
       const XRPL_SERVER = "wss://s1.ripple.com/";
       const AUTHORIZED_DISTRIBUTORS = ["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"];
       const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
-      const NAMESPACE = "SFL-LEAP";
+      const params = new URLSearchParams(window.location.search);
+      const requestedCommunity = (params.get("community") || "SFL").trim().toUpperCase();
+      const NAMESPACE = requestedCommunity === "ZHR" ? "ZHR-LEAP" : "SFL-LEAP";
       const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
       const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
 
@@ -1167,12 +1169,6 @@
       let pending = new Map();
       let scannedTransactions = 0;
       let historyLoaded = false;
-      let leapHolderCount = 0;
-      let holderRefreshTimer = null;
-
-      const crewTotal = document.getElementById("crewTotal");
-      const holderTotal = document.getElementById("holderTotal");
-      const reachTotal = document.getElementById("reachTotal");
       const historySummary = document.getElementById("historySummary");
       const badgesView = document.getElementById("badgesView");
       const challengesView = document.getElementById("challengesView");
@@ -1694,11 +1690,6 @@
         document.getElementById("eventCount").textContent =
           `${counts.EVENT} unique · ${activeOccurrences.EVENT} active${eventCanceledText}`;
 
-        const crewCount = totalCrewMembers();
-        crewTotal.textContent = crewCount.toLocaleString();
-        holderTotal.textContent = leapHolderCount.toLocaleString();
-        reachTotal.textContent = crewCount > 0 ? `${(leapHolderCount / crewCount).toFixed(2)}×` : "—";
-
         setHistoryView(historyView);
       }
 
@@ -1710,7 +1701,6 @@
         checkResolutionsById = new Map();
         scannedTransactions = 0;
         historyLoaded = false;
-        leapHolderCount = 0;
         render();
       }
 
@@ -1801,67 +1791,21 @@
         } while (marker !== undefined && marker !== null);
       }
 
-      async function loadLeapHolderCount() {
-        const holders = new Set();
-        let marker;
-        let ledgerIndex = "validated";
-
-        do {
-          const command = {
-            command: "account_lines",
-            account: LEAP_ISSUER,
-            ledger_index: ledgerIndex,
-            limit: 400
-          };
-          if (marker !== undefined) command.marker = marker;
-
-          const result = await request(command);
-          if (Number.isInteger(result.ledger_index)) ledgerIndex = result.ledger_index;
-
-          const lines = Array.isArray(result.lines) ? result.lines : [];
-          for (const line of lines) {
-            if (decodeCurrency(line.currency).toUpperCase() !== "LEAP") continue;
-            if (AUTHORIZED_DISTRIBUTORS.includes(line.account)) continue;
-
-            const issuerPerspectiveBalance = Number(line.balance);
-            if (!Number.isFinite(issuerPerspectiveBalance) || issuerPerspectiveBalance >= 0) continue;
-            holders.add(line.account);
-          }
-
-          marker = result.marker;
-        } while (marker !== undefined && marker !== null);
-
-        leapHolderCount = holders.size;
-        render();
-      }
-
-      async function subscribeLive() {
-        await request({ command: "subscribe", accounts: AUTHORIZED_DISTRIBUTORS });
-      }
 
       async function start() {
         try {
           if (socket) {
             try { socket.close(); } catch {}
           }
-          if (holderRefreshTimer) {
-            clearInterval(holderRefreshTimer);
-            holderRefreshTimer = null;
-          }
-
           pending.clear();
           resetRecords();
           await connect();
 
           for (const account of AUTHORIZED_DISTRIBUTORS) await loadAccountHistory(account);
-          await loadLeapHolderCount();
           historyLoaded = true;
           await subscribeLive();
           render();
 
-          holderRefreshTimer = setInterval(() => {
-            loadLeapHolderCount().catch(() => {});
-          }, 30000);
         } catch (error) {
           console.warn(error?.message || String(error));
         }
