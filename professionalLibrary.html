@@ -125,12 +125,105 @@
 
   .primary-docs {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 14px;
   }
 
   .primary-docs a { min-width: 0; }
   .primary-docs .link-title { font-size: 23px; }
+
+  .protocol-wrap {
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: 24px;
+    background: rgba(255,255,255,.46);
+    border: 1px solid rgba(35,77,134,.14);
+    box-shadow: 0 12px 28px rgba(25,46,77,.08);
+  }
+
+  .protocol-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .protocol-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-decoration: none;
+    color: var(--text);
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(35,77,134,.16);
+    border-radius: 18px;
+    padding: 16px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+
+  .protocol-card:hover,
+  .protocol-card:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(35,77,134,.36);
+    box-shadow: 0 10px 22px rgba(25,46,77,.12);
+    outline: none;
+  }
+
+  .protocol-card.canonical {
+    background: linear-gradient(180deg, #315f9f 0%, #234d86 100%);
+    color: white;
+    border-color: transparent;
+  }
+
+  .protocol-status {
+    align-self: flex-start;
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: var(--blue-3);
+    background: rgba(59,111,182,.10);
+  }
+
+  .canonical .protocol-status {
+    color: white;
+    background: rgba(255,255,255,.16);
+  }
+
+  .protocol-title {
+    display: block;
+    font-size: 20px;
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+  }
+
+  .protocol-copy {
+    display: block;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .canonical .protocol-copy { color: rgba(255,255,255,.88); }
+
+  .protocol-file {
+    display: block;
+    margin-top: auto;
+    padding-top: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6d8096;
+    overflow-wrap: anywhere;
+  }
+
+  .canonical .protocol-file { color: rgba(255,255,255,.72); }
+
+  html[data-role="operator"] .protocol-grid { grid-template-columns: 1fr; }
 
   .link-title {
     display: block;
@@ -166,6 +259,7 @@
     .back-link { top: 22px; right: 18px; }
     h1 { font-size: 28px; }
     .primary-docs { grid-template-columns: 1fr; }
+    .protocol-grid { grid-template-columns: 1fr; }
     .primary-docs .link-title, .link-title { font-size: 22px; }
   }
 </style>
@@ -181,18 +275,38 @@
   </div>
 
   <div class="section-label">Professional Library</div>
-  <div class="section-note">The two authoritative working documents.</div>
+  <div class="section-note">The authoritative operating document.</div>
   <div class="menu primary-docs">
     <a id="operationsManualLink" href="documentation/operationsManual.html">
       <span class="link-title">Operations Manual</span>
       <span class="link-subtitle">How Wild Ledger is operated: wallets, allocation, distribution, replenishment, recognition, community operations, and procedures.</span>
       <span class="link-file">documentation/operationsManual.html</span>
     </a>
-    <a id="leapProtocolLink" href="documentation/leapProtocol.html">
-      <span class="link-title">LEAP Protocol</span>
-      <span class="link-subtitle">The technical standard: LEAP identity, authority, namespace, memo grammar, ledger records, validity, and protocol rules.</span>
-      <span class="link-file">documentation/leapProtocol.html</span>
-    </a>
+  </div>
+
+  <div class="section-label">LEAP Protocol</div>
+  <div class="section-note">The canonical protocol, the design bridge for extending it, and the owner-only view of what may come next.</div>
+  <div class="protocol-wrap">
+    <div class="protocol-grid">
+      <a class="protocol-card canonical" id="leapProtocolLink" href="documentation/leapProtocol.html">
+        <span class="protocol-status">What Is</span>
+        <span class="protocol-title">LEAP Protocol</span>
+        <span class="protocol-copy">The current authoritative standard: LEAP identity, authority, namespace, memo grammar, ledger records, validity, and protocol rules.</span>
+        <span class="protocol-file">documentation/leapProtocol.html</span>
+      </a>
+      <a class="protocol-card" id="protocolExtensibilityLink" data-audience="owner" href="documentation/protocolExtensibility.html">
+        <span class="protocol-status">How It Can Evolve</span>
+        <span class="protocol-title">Protocol Extensibility</span>
+        <span class="protocol-copy">The bridge between the canonical protocol and future versions: how block space, versioning, and compact rules preserve room to grow.</span>
+        <span class="protocol-file">documentation/protocolExtensibility.html</span>
+      </a>
+      <a class="protocol-card" id="protocolSnapshotExtensionLink" data-audience="owner" href="documentation/protocolSnapshotExtension.html">
+        <span class="protocol-status">What Could Be Next</span>
+        <span class="protocol-title">Protocol Snapshot Extension</span>
+        <span class="protocol-copy">A notional protocol extension showing how periodic community state could be recorded without changing what is currently authoritative.</span>
+        <span class="protocol-file">documentation/protocolSnapshotExtension.html</span>
+      </a>
+    </div>
   </div>
 
   <div id="workingPapers" data-audience="owner">
@@ -218,16 +332,6 @@
         <span class="link-title">Ledger History</span>
         <span class="link-subtitle">How the ledger preserves participation and turns moments into permanent history.</span>
         <span class="link-file">ledgerHistory.html</span>
-      </a>
-      <a href="documentation/protocolExtensibility.html">
-        <span class="link-title">Protocol Extensibility</span>
-        <span class="link-subtitle">How block space, versioning, and compact protocols preserve room to grow.</span>
-        <span class="link-file">documentation/protocolExtensibility.html</span>
-      </a>
-      <a href="documentation/protocolSnapshotExtension.html">
-        <span class="link-title">Protocol Extension</span>
-        <span class="link-subtitle">Working sketchpad for a future Protocol 2 with greater data efficiency and capability.</span>
-        <span class="link-file">documentation/protocolSnapshotExtension.html</span>
       </a>
       <a href="documentation/stateMachine.html">
         <span class="link-title">LEAP Logbook</span>
@@ -287,10 +391,14 @@
   const backLink = document.getElementById('backLink');
   const operationsManualLink = document.getElementById('operationsManualLink');
   const leapProtocolLink = document.getElementById('leapProtocolLink');
+  const protocolExtensibilityLink = document.getElementById('protocolExtensibilityLink');
+  const protocolSnapshotExtensionLink = document.getElementById('protocolSnapshotExtensionLink');
 
   if (backLink) backLink.href = `viewCommunity.html?${qs}`;
   if (operationsManualLink) operationsManualLink.href = `documentation/operationsManual.html?${qs}`;
   if (leapProtocolLink) leapProtocolLink.href = `documentation/leapProtocol.html?${qs}`;
+  if (protocolExtensibilityLink) protocolExtensibilityLink.href = `documentation/protocolExtensibility.html?${qs}`;
+  if (protocolSnapshotExtensionLink) protocolSnapshotExtensionLink.href = `documentation/protocolSnapshotExtension.html?${qs}`;
 })();
 </script>
 </body>
