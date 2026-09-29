@@ -43,3 +43,8 @@
     font-size: .66rem !important;
   }
 }
+
+/* A top/navigation row with no left-side action keeps navigation on the right. */
+.wl-nav-right {
+  justify-content: flex-end !important;
+}

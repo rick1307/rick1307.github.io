@@ -1,0 +1,51 @@
+Wild Ledger — Final Header / Navigation System
+
+Design rules now enforced across the included pages:
+1. Top/navigation bars contain controls only.
+2. No decorative logo, repeated page title, branding pill, or "Powered by" label appears in the bar.
+3. If there is no left-side action, the left side stays empty and navigation stays on the right.
+4. Session/actions stay on the left when present; navigation stays on the right.
+5. Header controls use the shared rounded Wild Ledger pill component.
+6. Page identity/titles live below the control row, in page content.
+7. Body/document links remain normal text links.
+
+This package intentionally includes previously-corrected header pages too, so it can be applied as one consolidated pass.
+
+Included files:
+- ambientStateEngine/ambientStateEngine.html
+- badges.html
+- challenges.html
+- chartOfLeapDistribution.html
+- chat.html
+- communities.html
+- documentation/discordIntegration.html
+- documentation/globalStateMachine.html
+- documentation/kudo.html
+- documentation/leapProtocol.html
+- documentation/marketing.html
+- documentation/multiCommunityInitiative.html
+- documentation/operationsManual.html
+- documentation/protocolExtensibility.html
+- documentation/protocolSnapshotExtension.html
+- documentation/stateMachine.html
+- documentation/wildLedger.html
+- events.html
+- faq.html
+- getWild.html
+- home.html
+- index.html
+- join.html
+- leapFaq.html
+- ledgerHistory.html
+- managerCheckCreate.html
+- managerCheckReview.html
+- managerCheckbook.html
+- member-record-community-look.html
+- memberRecord.html
+- owner.html
+- professionalLibrary.html
+- ranks.html
+- setup.html
+- viewCommunity.html
+- wildLedgerFaq.html
+- wildLedgerControls.css

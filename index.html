@@ -67,6 +67,7 @@
     }
 
     .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links.wl-nav-right{width:100%}
 
     .nav-links a{
       text-decoration:none;
@@ -981,13 +982,9 @@
 
 <body>
   <nav>
-    <div class="wrap nav-inner">
-      <div class="brand">
-        <img src="leap-logo.png" alt="LEAP logo">
-        <span id="communityBrand">Community</span>
-      </div>
-      <div class="nav-links">
-        <a href="splash.html">Wild Ledger</a>
+    <div class="wrap nav-inner wl-nav-right">
+      <div class="nav-links wl-nav-right">
+        <a class="wl-header-control" href="splash.html">Wild Ledger</a>
       </div>
     </div>
   </nav>

@@ -13,7 +13,7 @@
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;background:var(--soft);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
     .wrap{width:min(94%,1020px);margin:34px auto 70px}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:8px}
+    .top{display:flex;justify-content:flex-end;align-items:center;gap:16px;margin-bottom:8px}
     h1{margin:0;font-size:clamp(28px,5vw,40px)}
     .back{flex:0 0 auto;text-decoration:none;color:var(--blue);font-weight:800}
     .intro{margin:0 0 18px;color:var(--muted);line-height:1.5;font-size:14px}
@@ -91,7 +91,8 @@
 </head>
 <body>
 <main class="wrap">
-  <div class="top"><h1>Manager Checkbook</h1><a class="back wl-header-control" href="professionalLibrary.html">Professional Library →</a></div>
+  <div class="top wl-nav-right"><a class="back wl-header-control" href="professionalLibrary.html">Professional Library →</a></div>
+  <h1>Manager Checkbook</h1>
   <p class="intro">The working view of every outstanding official LEAP Check. Cashed and canceled Checks disappear automatically because they are no longer open ledger objects.</p>
 
   <div class="statusbar">
