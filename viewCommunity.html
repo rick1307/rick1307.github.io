@@ -948,10 +948,10 @@
             <div class="metric-meaning">Adjusted LEAP</div>
           </div>
           <div class="metric metric-policy-output is-ineligible" id="replenishmentEligibilityCard">
-            <button class="metric-info" type="button" aria-label="About Eligible Replenishment" data-info-title="Eligible Replenishment" data-info-calc="Effective Deployment × 1.03, using the current notional 3% Growth Rate Provision." data-info-text="The amount the current guiding model would make eligible for replenishment: replacement of effective deployment plus a 3% growth liquidity provision." data-info-action="The card turns green when Effective Deployment is greater than zero and red when it is not. This is a notional eligibility signal until Wild Ledger adopts a formal replenishment policy and request workflow.">i</button>
+            <button class="metric-info" type="button" aria-label="About Replenishment" data-info-title="Replenishment" data-info-calc="Effective Deployment × 1.03, using the current notional 3% Growth Rate Provision." data-info-text="The amount the current guiding model makes available for replenishment: replacement of effective deployment plus a 3% growth liquidity provision." data-info-action="The card turns green when replenishment is available and red when it is unavailable. This remains a notional policy signal until Wild Ledger adopts a formal replenishment request workflow.">i</button>
             <div class="metric-value" id="metricEligibleReplenishment" aria-live="polite">—</div>
-            <div class="replenishment-status" id="replenishmentEligibilityStatus" aria-live="polite">Not Eligible</div>
-            <div class="metric-label">Eligible Replenishment</div>
+            <div class="replenishment-status" id="replenishmentEligibilityStatus" aria-live="polite">Unavailable</div>
+            <div class="metric-label">Replenishment</div>
             <div class="metric-meaning">At 3% GRP</div>
           </div>
         </section>
@@ -1164,7 +1164,7 @@
       replenishmentEligibilityCard.classList.toggle("is-ineligible", !eligible);
     }
     if (replenishmentEligibilityStatus) {
-      replenishmentEligibilityStatus.textContent = eligible ? "Eligible" : "Not Eligible";
+      replenishmentEligibilityStatus.textContent = eligible ? "Available" : "Unavailable";
     }
     if (requestReplenishmentButton) {
       requestReplenishmentButton.disabled = !eligible;
@@ -1617,7 +1617,7 @@
       const requestEvent = new CustomEvent("wildledger:replenishment-request", { detail, cancelable: true });
       const handled = !window.dispatchEvent(requestEvent);
       if (!handled) {
-        window.alert(`Eligible replenishment: ${formatLeap(amount)} LEAP. Request routing is not connected yet.`);
+        window.alert(`Replenishment available: ${formatLeap(amount)} LEAP. Request routing is not connected yet.`);
       }
     });
   }
