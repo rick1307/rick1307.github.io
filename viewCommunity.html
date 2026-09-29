@@ -374,6 +374,190 @@
     color: rgba(236,249,247,.58);
   }
 
+
+  .allocation-log-section {
+    padding: 18px 24px 30px;
+  }
+
+  .allocation-log-card {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 22px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.05), rgba(255,255,255,.01)),
+      rgba(5, 34, 46, .42);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  }
+
+  .allocation-log-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .allocation-log-heading {
+    min-width: 0;
+  }
+
+  .allocation-log-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .allocation-log-title {
+    color: var(--ink);
+    font-size: .94rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+
+  .allocation-log-subtitle {
+    color: rgba(236, 249, 247, .56);
+    font-size: .70rem;
+    line-height: 1.2;
+    font-weight: 750;
+  }
+
+  .allocation-log-summary {
+    flex: 0 0 auto;
+    color: var(--sea-glass);
+    font-size: .70rem;
+    line-height: 1.2;
+    font-weight: 850;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .allocation-log-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .allocation-log-table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .allocation-log-table th,
+  .allocation-log-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.065);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .allocation-log-table th {
+    color: rgba(236,249,247,.48);
+    font-size: .60rem;
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .allocation-log-table td {
+    color: rgba(246,252,251,.82);
+    font-size: .79rem;
+    line-height: 1.35;
+  }
+
+  .allocation-log-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .allocation-amount {
+    display: block;
+    color: var(--ink);
+    font-size: .91rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .allocation-memo {
+    display: block;
+    margin-top: 4px;
+    color: rgba(159,221,255,.70);
+    font: 700 .61rem/1.25 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    white-space: nowrap;
+  }
+
+  .allocation-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 999px;
+    font-size: .61rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .allocation-status.cashed {
+    color: #9be8d5;
+    border-color: rgba(121,213,194,.25);
+    background: rgba(41,184,177,.10);
+  }
+
+  .allocation-status.pending {
+    color: #ffd27a;
+    border-color: rgba(244,189,88,.27);
+    background: rgba(244,189,88,.09);
+  }
+
+  .allocation-status.canceled {
+    color: #ffab9a;
+    border-color: rgba(239,118,93,.28);
+    background: rgba(239,118,93,.09);
+  }
+
+  .allocation-ledger-links {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .allocation-ledger-link {
+    color: #9fddff;
+    text-decoration: none;
+    font-size: .69rem;
+    font-weight: 850;
+  }
+
+  .allocation-ledger-link:hover,
+  .allocation-ledger-link:focus-visible {
+    text-decoration: underline;
+  }
+
+  .allocation-log-empty {
+    padding: 22px 18px;
+    color: rgba(236,249,247,.58);
+    font-size: .82rem;
+    line-height: 1.45;
+  }
+
+  .allocation-log-note {
+    margin: 0;
+    padding: 12px 18px 15px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    color: rgba(236,249,247,.46);
+    font-size: .66rem;
+    line-height: 1.45;
+  }
+
   .navigation {
     padding: 24px;
     display: grid;
@@ -514,6 +698,15 @@
     .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
     .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
     .metric-meaning { margin-top: auto; padding-top: 4px; font-size: .44rem; letter-spacing: .04em; }
+
+    .allocation-log-section { padding: 12px 12px 20px; }
+    .allocation-log-card { border-radius: 18px; }
+    .allocation-log-header { padding: 15px 14px 12px; align-items: flex-start; }
+    .allocation-log-title { font-size: .80rem; }
+    .allocation-log-subtitle { font-size: .61rem; }
+    .allocation-log-summary { font-size: .61rem; }
+    .allocation-log-table th,
+    .allocation-log-table td { padding: 11px 13px; }
     .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
     .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
     .nav-copy { margin-top: 0; }
@@ -626,19 +819,19 @@
         </div>
         <section class="metrics" id="communityStateMetrics" aria-label="Community state dashboard">
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Community Allocation" data-info-title="Community Allocation" data-info-calc="Sum of validated LEAP delivered into this community’s registered distribution account from the LEAP issuer or another configured Wild Ledger distribution account. LEAP sent back by members is not counted as a new allocation." data-info-text="This is how much LEAP Wild Ledger has provisioned to this community over time." data-info-action="Do not replenish just because the community balance is low. Compare Allocation with Inventory, Deployment, and Reach. If Allocation keeps rising while Deployment or Reach stays weak, pause additional LEAP and find out why the community is not converting inventory into participation.">i</button>
+            <button class="metric-info" type="button" aria-label="About Community Allocation" data-info-title="Community Allocation" data-info-calc="Sum of protocol-valid Allocation Checks from the Global Distribution Wallet to this community’s registered Community Operating Wallet that were successfully cashed." data-info-text="This is how much LEAP Wild Ledger has provisioned to this community over time." data-info-action="Do not replenish just because the community balance is low. Compare Allocation with Inventory, Deployment, and Reach. If Allocation keeps rising while Deployment or Reach stays weak, pause additional LEAP and find out why the community is not converting inventory into participation.">i</button>
             <div class="metric-value" id="metricCommunityAllocation" aria-live="polite">—</div>
             <div class="metric-label">Community Allocation</div>
             <div class="metric-meaning">Provisioning</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Current validated LEAP balance in this community’s registered distribution account." data-info-text="This is the community’s operating inventory: LEAP still available for future distribution and recognition." data-info-action="Low inventory is healthy when Deployment and Reach are strong; that is when replenishment may be justified. High inventory with weak Deployment means the problem is activity, not supply—do not add more LEAP until usage improves.">i</button>
+            <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Current validated LEAP balance in this community’s registered Community Operating Wallet." data-info-text="This is the community’s operating inventory: LEAP still available for future distribution and recognition." data-info-action="Low inventory is healthy when Deployment and Reach are strong; that is when replenishment may be justified. High inventory with weak Deployment means the problem is activity, not supply—do not add more LEAP until usage improves.">i</button>
             <div class="metric-value" id="metricCommunityLeap" aria-live="polite">—</div>
             <div class="metric-label">Community LEAP</div>
             <div class="metric-meaning">Inventory</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About LEAP Distributed" data-info-title="LEAP Distributed" data-info-calc="Cumulative validated LEAP delivered from this community’s distribution account to non-community wallets through successful Payments and cashed Checks. Pending Checks are not counted." data-info-text="This is lifetime deployment: how much LEAP this community has actually moved into participant wallets." data-info-action="You generally want Deployment to rise over time, but it should bring Reach with it. If Deployment rises while Holders stays flat, the same wallets are absorbing more LEAP. Shift recognition and participation toward additional members before simply increasing allocation.">i</button>
+            <button class="metric-info" type="button" aria-label="About LEAP Distributed" data-info-title="LEAP Distributed" data-info-calc="Cumulative validated LEAP delivered from this community’s Community Operating Wallet to non-community wallets through successful Payments and cashed Checks. Pending Checks are not counted." data-info-text="This is lifetime deployment: how much LEAP this community has actually moved into participant wallets." data-info-action="You generally want Deployment to rise over time, but it should bring Reach with it. If Deployment rises while Holders stays flat, the same wallets are absorbing more LEAP. Shift recognition and participation toward additional members before simply increasing allocation.">i</button>
             <div class="metric-value" id="metricLeapDistributed" aria-live="polite">—</div>
             <div class="metric-label">LEAP Distributed</div>
             <div class="metric-meaning">Deployment</div>
@@ -650,6 +843,37 @@
             <div class="metric-meaning">Reach</div>
           </div>
         </section>
+      </section>
+
+      <section class="allocation-log-section" aria-labelledby="allocation-log-title">
+        <div class="allocation-log-card">
+          <div class="allocation-log-header">
+            <div class="allocation-log-heading">
+              <div class="allocation-log-title-row">
+                <div class="allocation-log-title" id="allocation-log-title">Allocation Log</div>
+                <div class="allocation-log-subtitle">— Owner → Community</div>
+              </div>
+            </div>
+            <div class="allocation-log-summary" id="allocationLogSummary" aria-live="polite">Loading…</div>
+          </div>
+          <div class="allocation-log-table-wrap">
+            <table class="allocation-log-table" aria-label="Community allocation history">
+              <thead>
+                <tr>
+                  <th>Created</th>
+                  <th>Allocation</th>
+                  <th>Status</th>
+                  <th>Cashed</th>
+                  <th>Ledger</th>
+                </tr>
+              </thead>
+              <tbody id="allocationLogBody">
+                <tr><td colspan="5" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="allocation-log-note" id="allocationLogNote">Only protocol-valid Allocation Checks from the Global Distribution Wallet to this community’s registered Community Operating Wallet appear here.</p>
+        </div>
       </section>
     </section>
   </main>
@@ -670,21 +894,22 @@
   const FALLBACK_CONFIG = Object.freeze({
     leapIssuer: "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq",
     leapCurrency: "4C45415000000000000000000000000000000000",
+    globalDistributionWallet: "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU",
     leapDistributors: Object.freeze(["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"]),
     xrplWebSocket: "wss://s1.ripple.com/"
   });
 
-  // Temporary owner-side directory. The public address is operational data,
-  // not a secret. When Wild Ledger gets a formal community registry, this
-  // mapping should move there without changing the dashboard UI.
+  // Temporary Owner-side community directory. Community Operating Wallets are
+  // public operational addresses. When Wild Ledger gets a formal community
+  // registry, this mapping should move there without changing this page.
   const COMMUNITY_DIRECTORY = {
     SFL: {
       name: "Sailing Frog's Leap",
-      distributionAccount: "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
+      operatingWallet: "rfcDSPNx7ZtrPhs1bB7bzicRdKVnRXCB9Q"
     },
     ZHR: {
       name: "Zach's Hot Rods",
-      distributionAccount: null
+      operatingWallet: null
     }
   };
 
@@ -705,8 +930,16 @@
   const issuer = config.leapIssuer || FALLBACK_CONFIG.leapIssuer;
   const leapCurrency = String(config.leapCurrency || "LEAP").toUpperCase();
   const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
-  const configuredCommunityAccounts = new Set(config.leapDistributors || []);
-  if (community?.distributionAccount) configuredCommunityAccounts.add(community.distributionAccount);
+  const globalDistributionWallet =
+    config.globalDistributionWallet ||
+    (Array.isArray(config.leapDistributors) ? config.leapDistributors[0] : null) ||
+    FALLBACK_CONFIG.globalDistributionWallet;
+
+  const communityOperatingWallets = new Set(
+    Object.values(COMMUNITY_DIRECTORY)
+      .map(item => item?.operatingWallet)
+      .filter(Boolean)
+  );
 
   const metricCommunityAllocation = document.getElementById("metricCommunityAllocation");
   const metricCommunityLeap = document.getElementById("metricCommunityLeap");
@@ -714,6 +947,9 @@
   const metricHoldersReached = document.getElementById("metricHoldersReached");
   const metricsSection = document.getElementById("communityStateMetrics");
   const metricValues = [metricCommunityAllocation, metricCommunityLeap, metricLeapDistributed, metricHoldersReached];
+  const allocationLogSummary = document.getElementById("allocationLogSummary");
+  const allocationLogBody = document.getElementById("allocationLogBody");
+  const allocationLogNote = document.getElementById("allocationLogNote");
 
   function decodeCurrency(code) {
     const value = String(code || "");
@@ -772,11 +1008,19 @@
   function setLoading() {
     metricValues.forEach(el => setMetric(el, "…"));
     if (metricsSection) metricsSection.title = "Loading validated XRP Ledger community data…";
+    if (allocationLogSummary) allocationLogSummary.textContent = "Loading…";
+    if (allocationLogBody) {
+      allocationLogBody.innerHTML = '<tr><td colspan="5" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>';
+    }
   }
 
   function setUnavailable(message) {
     metricValues.forEach(el => setMetric(el, "—"));
     if (metricsSection) metricsSection.title = message || "Community ledger data unavailable.";
+    if (allocationLogSummary) allocationLogSummary.textContent = "Unavailable";
+    if (allocationLogBody) {
+      allocationLogBody.innerHTML = `<tr><td colspan="5" class="allocation-log-empty">${escapeHtml(message || "Allocation history unavailable.")}</td></tr>`;
+    }
   }
 
   function openSocket() {
@@ -814,6 +1058,41 @@
     });
   }
 
+  function transactionParts(entry) {
+    return {
+      tx: entry?.tx_json || entry?.tx || {},
+      meta: entry?.meta || {}
+    };
+  }
+
+  function transactionSucceeded(entry) {
+    if (entry?.validated === false) return false;
+    const { meta } = transactionParts(entry);
+    const resultCode = meta.TransactionResult || meta.transaction_result;
+    return !resultCode || resultCode === "tesSUCCESS";
+  }
+
+  function transactionHash(entry) {
+    const { tx } = transactionParts(entry);
+    return String(entry?.hash || tx.hash || tx.Hash || "");
+  }
+
+  function xrplDateToDate(seconds) {
+    const value = Number(seconds);
+    if (!Number.isFinite(value)) return null;
+    return new Date((value + 946684800) * 1000);
+  }
+
+  function entryDate(entry) {
+    const { tx } = transactionParts(entry);
+    return xrplDateToDate(tx.date ?? tx.Date);
+  }
+
+  function formatLedgerDate(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  }
+
   function findDeletedCheck(meta) {
     const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
     for (const wrapped of affected) {
@@ -824,20 +1103,206 @@
     return null;
   }
 
+  function findCreatedCheckId(meta) {
+    const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
+    for (const wrapped of affected) {
+      const node = wrapped?.CreatedNode;
+      if (!node || node.LedgerEntryType !== "Check") continue;
+      return String(node.LedgerIndex || "");
+    }
+    return "";
+  }
+
+  function hexToUtf8(value) {
+    const hex = String(value || "");
+    if (!hex || !/^(?:[0-9A-Fa-f]{2})+$/.test(hex)) return hex;
+    try {
+      const bytes = new Uint8Array(hex.match(/.{2}/g).map(pair => parseInt(pair, 16)));
+      return new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+    } catch (_) {
+      return hex;
+    }
+  }
+
+  function decodedMemoStrings(tx) {
+    const memos = Array.isArray(tx?.Memos) ? tx.Memos : [];
+    const strings = [];
+    for (const wrapped of memos) {
+      const memo = wrapped?.Memo || {};
+      for (const key of ["MemoData", "MemoType", "MemoFormat"]) {
+        if (!memo[key]) continue;
+        const decoded = hexToUtf8(memo[key]).trim();
+        if (decoded) strings.push(decoded);
+      }
+    }
+    return strings;
+  }
+
+  function canonicalAllocationMemo(tx) {
+    const prefix = `${requestedId}-LEAP/ALLOCATION=`;
+    const matches = decodedMemoStrings(tx).filter(value => value.startsWith(prefix));
+    if (matches.length !== 1) return null;
+    const raw = matches[0];
+    const amountText = raw.slice(prefix.length);
+    if (!/^[1-9]\d*$/.test(amountText)) return null;
+    const amount = Number(amountText);
+    if (!Number.isSafeInteger(amount) || amount <= 0) return null;
+    return { raw, amount };
+  }
+
   function qualifiesExternalDestination(destination, account) {
     return Boolean(
       destination &&
       destination !== account &&
       destination !== issuer &&
-      !configuredCommunityAccounts.has(destination)
+      destination !== globalDistributionWallet &&
+      !communityOperatingWallets.has(destination)
     );
+  }
+
+  async function fetchAccountHistory(ws, nextId, account, idPrefix) {
+    let marker;
+    const rows = [];
+    do {
+      const command = {
+        command: "account_tx",
+        account,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        binary: false,
+        forward: false,
+        limit: 200
+      };
+      if (marker !== undefined) command.marker = marker;
+      const result = await request(ws, command, nextId(idPrefix));
+      const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+      rows.push(...transactions);
+      marker = result.marker;
+    } while (marker !== undefined && marker !== null);
+    return rows;
+  }
+
+  function dedupeHistory(entries) {
+    const seen = new Set();
+    const output = [];
+    for (const entry of entries) {
+      const hash = transactionHash(entry);
+      const { tx } = transactionParts(entry);
+      const fallback = `${tx.TransactionType || ""}:${tx.Sequence || ""}:${tx.date || ""}:${tx.CheckID || ""}`;
+      const key = hash || fallback;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      output.push(entry);
+    }
+    return output;
+  }
+
+  function analyzeAllocations(globalHistory, operatingHistory) {
+    const allHistory = dedupeHistory([...globalHistory, ...operatingHistory]);
+    const terminalByCheckId = new Map();
+
+    for (const entry of allHistory) {
+      if (!transactionSucceeded(entry)) continue;
+      const { tx } = transactionParts(entry);
+      if (tx.TransactionType !== "CheckCash" && tx.TransactionType !== "CheckCancel") continue;
+      const checkId = String(tx.CheckID || "");
+      if (!checkId) continue;
+      terminalByCheckId.set(checkId, {
+        type: tx.TransactionType,
+        date: entryDate(entry),
+        hash: transactionHash(entry)
+      });
+    }
+
+    const allocations = [];
+    for (const entry of globalHistory) {
+      if (!transactionSucceeded(entry)) continue;
+      const { tx, meta } = transactionParts(entry);
+      if (tx.TransactionType !== "CheckCreate") continue;
+      if (String(tx.Account || "") !== globalDistributionWallet) continue;
+      if (String(tx.Destination || "") !== community.operatingWallet) continue;
+      if (!isLeapAmount(tx.SendMax)) continue;
+
+      const sendMax = leapAmountValue(tx.SendMax);
+      if (!Number.isSafeInteger(sendMax) || sendMax <= 0) continue;
+
+      const memo = canonicalAllocationMemo(tx);
+      if (!memo || memo.amount !== sendMax) continue;
+
+      const checkId = findCreatedCheckId(meta);
+      if (!checkId) continue;
+
+      const terminal = terminalByCheckId.get(checkId);
+      let status = "Pending";
+      if (terminal?.type === "CheckCash") status = "Cashed";
+      if (terminal?.type === "CheckCancel") status = "Canceled";
+
+      allocations.push({
+        checkId,
+        amount: sendMax,
+        memo: memo.raw,
+        status,
+        createdDate: entryDate(entry),
+        createdHash: transactionHash(entry),
+        terminalDate: terminal?.date || null,
+        terminalHash: terminal?.hash || ""
+      });
+    }
+
+    allocations.sort((a, b) => {
+      const aTime = a.createdDate?.getTime?.() || 0;
+      const bTime = b.createdDate?.getTime?.() || 0;
+      return bTime - aTime;
+    });
+
+    return allocations;
+  }
+
+  function analyzeCommunityDistribution(operatingHistory) {
+    const account = community.operatingWallet;
+    let distributed = 0;
+    const recipients = new Set();
+    const countedHashes = new Set();
+
+    for (const entry of operatingHistory) {
+      if (!transactionSucceeded(entry)) continue;
+      const { tx, meta } = transactionParts(entry);
+      let source = null;
+      let destination = null;
+      let delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+
+      if (tx.TransactionType === "Payment") {
+        source = tx.Account || null;
+        destination = tx.Destination || null;
+        if (!isLeapAmount(delivered) && isLeapAmount(tx.Amount)) delivered = tx.Amount;
+      } else if (tx.TransactionType === "CheckCash") {
+        const check = findDeletedCheck(meta);
+        if (!check) continue;
+        source = check.Account || null;
+        destination = check.Destination || null;
+        if (!isLeapAmount(delivered) && isLeapAmount(tx.Amount)) delivered = tx.Amount;
+      } else {
+        continue;
+      }
+
+      if (!isLeapAmount(delivered)) continue;
+      if (source !== account || !qualifiesExternalDestination(destination, account)) continue;
+
+      const hash = transactionHash(entry);
+      if (hash && countedHashes.has(hash)) continue;
+      distributed += leapAmountValue(delivered);
+      recipients.add(destination);
+      if (hash) countedHashes.add(hash);
+    }
+
+    return { distributed, recipients };
   }
 
   async function loadIssuerLines(ws, nextId, recipientSet) {
     let marker;
     let communityLeap = 0;
     let holdersReached = 0;
-    const account = community.distributionAccount;
+    const account = community.operatingWallet;
 
     do {
       const command = {
@@ -864,84 +1329,60 @@
     return { communityLeap, holdersReached };
   }
 
-  async function loadCommunityHistory(ws, nextId) {
-    const account = community.distributionAccount;
-    let marker;
-    let allocation = 0;
-    let distributed = 0;
-    const recipients = new Set();
-    const countedHashes = new Set();
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-    do {
-      const command = {
-        command: "account_tx",
-        account,
-        ledger_index_min: -1,
-        ledger_index_max: -1,
-        binary: false,
-        forward: false,
-        limit: 200
-      };
-      if (marker !== undefined) command.marker = marker;
-      const result = await request(ws, command, nextId("community-history"));
-      const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+  function ledgerLink(hash, label) {
+    if (!hash) return "—";
+    const safeHash = escapeHtml(hash);
+    return `<a class="allocation-ledger-link" href="https://livenet.xrpl.org/transactions/${safeHash}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
+  }
 
-      for (const entry of transactions) {
-        if (entry.validated === false) continue;
-        const tx = entry.tx_json || entry.tx || {};
-        const meta = entry.meta || {};
-        const resultCode = meta.TransactionResult || meta.transaction_result;
-        if (resultCode && resultCode !== "tesSUCCESS") continue;
-        const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
-        if (!isLeapAmount(delivered)) continue;
+  function renderAllocationLog(allocations) {
+    if (!allocationLogBody || !allocationLogSummary) return;
 
-        const hash = String(entry.hash || tx.hash || tx.Hash || "");
-        if (hash && countedHashes.has(hash)) continue;
+    const completed = allocations.filter(item => item.status === "Cashed");
+    const completedTotal = completed.reduce((sum, item) => sum + item.amount, 0);
+    allocationLogSummary.textContent = `${completed.length} completed • ${formatLeap(completedTotal)} LEAP`;
 
-        const amount = leapAmountValue(delivered);
-        let source = null;
-        let destination = null;
+    if (!allocations.length) {
+      allocationLogBody.innerHTML = '<tr><td colspan="5" class="allocation-log-empty">No protocol-valid Allocation Checks found for this community yet.</td></tr>';
+      return;
+    }
 
-        if (tx.TransactionType === "Payment") {
-          source = tx.Account || null;
-          destination = tx.Destination || null;
-        } else if (tx.TransactionType === "CheckCash") {
-          const check = findDeletedCheck(meta);
-          if (check) {
-            source = check.Account || null;
-            destination = check.Destination || null;
-          }
-        } else {
-          continue;
-        }
+    allocationLogBody.innerHTML = allocations.map(item => {
+      const statusClass = item.status.toLowerCase();
+      const cashDate = item.status === "Cashed" ? formatLedgerDate(item.terminalDate) : "—";
+      const terminalLabel = item.status === "Cashed" ? "Cash" : item.status === "Canceled" ? "Cancel" : "";
+      const links = [
+        ledgerLink(item.createdHash, "Create"),
+        terminalLabel ? ledgerLink(item.terminalHash, terminalLabel) : ""
+      ].filter(Boolean).join("");
 
-        if (
-          destination === account &&
-          source &&
-          (source === issuer || configuredCommunityAccounts.has(source)) &&
-          source !== account
-        ) {
-          allocation += amount;
-          if (hash) countedHashes.add(hash);
-          continue;
-        }
-
-        if (source === account && qualifiesExternalDestination(destination, account)) {
-          distributed += amount;
-          recipients.add(destination);
-          if (hash) countedHashes.add(hash);
-        }
-      }
-
-      marker = result.marker;
-    } while (marker !== undefined && marker !== null);
-
-    return { allocation, distributed, recipients };
+      return `
+        <tr>
+          <td>${escapeHtml(formatLedgerDate(item.createdDate))}</td>
+          <td>
+            <span class="allocation-amount">${escapeHtml(formatLeap(item.amount))} LEAP</span>
+            <span class="allocation-memo">${escapeHtml(item.memo)}</span>
+          </td>
+          <td><span class="allocation-status ${escapeHtml(statusClass)}">${escapeHtml(item.status)}</span></td>
+          <td>${escapeHtml(cashDate)}</td>
+          <td><div class="allocation-ledger-links">${links || "—"}</div></td>
+        </tr>`;
+    }).join("");
   }
 
   async function loadCommunityDashboard() {
-    if (!community?.distributionAccount) {
-      setUnavailable(`${community?.name || "This community"} does not have a registered LEAP distribution account yet.`);
+    if (!community?.operatingWallet) {
+      setUnavailable(`${community?.name || "This community"} does not have a registered Community Operating Wallet yet.`);
+      if (allocationLogNote) allocationLogNote.textContent = "Register a Community Operating Wallet before Owner → Community allocations can be tracked.";
       return;
     }
 
@@ -952,16 +1393,29 @@
       let requestNumber = 0;
       const nextId = prefix => `${prefix}-${++requestNumber}`;
 
-      const history = await loadCommunityHistory(ws, nextId);
-      const balances = await loadIssuerLines(ws, nextId, history.recipients);
+      const [operatingHistory, globalHistory] = await Promise.all([
+        fetchAccountHistory(ws, nextId, community.operatingWallet, "operating-history"),
+        fetchAccountHistory(ws, nextId, globalDistributionWallet, "global-distribution-history")
+      ]);
 
-      setMetric(metricCommunityAllocation, formatLeap(history.allocation));
+      const allocations = analyzeAllocations(globalHistory, operatingHistory);
+      const distribution = analyzeCommunityDistribution(operatingHistory);
+      const balances = await loadIssuerLines(ws, nextId, distribution.recipients);
+      const completedAllocation = allocations
+        .filter(item => item.status === "Cashed")
+        .reduce((sum, item) => sum + item.amount, 0);
+
+      setMetric(metricCommunityAllocation, formatLeap(completedAllocation));
       setMetric(metricCommunityLeap, formatLeap(balances.communityLeap));
-      setMetric(metricLeapDistributed, formatLeap(history.distributed));
+      setMetric(metricLeapDistributed, formatLeap(distribution.distributed));
       setMetric(metricHoldersReached, balances.holdersReached.toLocaleString());
+      renderAllocationLog(allocations);
 
       if (metricsSection) {
-        metricsSection.title = `Validated XRP Ledger data for ${community.name}. Distribution account: ${community.distributionAccount}.`;
+        metricsSection.title = `Validated XRP Ledger data for ${community.name}. Community Operating Wallet: ${community.operatingWallet}.`;
+      }
+      if (allocationLogNote) {
+        allocationLogNote.textContent = `Only protocol-valid ${requestedId}-LEAP/ALLOCATION=<AMOUNT> Checks from the Global Distribution Wallet to this registered Community Operating Wallet are included.`;
       }
     } catch (error) {
       console.error("Wild Ledger community dashboard:", error);
