@@ -167,7 +167,7 @@
 <nav>
   <div class="wrap nav-inner">
     <div class="nav-actions">
-      <a class="back-link wl-header-control" id="backLink" href="../professionalLibrary.html">← Professional Library</a>
+      <a class="back-link wl-header-control" id="backLink" href="../viewCommunityLibrary.html">← View Community Library</a>
     </div>
   </div>
 </nav>
@@ -360,11 +360,11 @@
   }
 
   if (backLink) {
-    backLink.textContent = '← Professional Library';
+    backLink.textContent = '← View Community Library';
     const returnParams = new URLSearchParams();
     returnParams.set('role', role);
     if (community) returnParams.set('community', community);
-    backLink.href = `../professionalLibrary.html?${returnParams.toString()}`;
+    backLink.href = `../viewCommunityLibrary.html?${returnParams.toString()}`;
   }
 })();
 </script>
