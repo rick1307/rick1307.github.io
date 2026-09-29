@@ -210,6 +210,7 @@
         <h1 id="view-community-title">View Community</h1>
         <div class="community-links">
           <a class="community-link" id="communityTokenomicsLink" href="viewCommunityTokenomics.html">Community Tokenomics</a>
+          <a class="community-link" id="communityRecognitionLink" href="viewCommunityRecognition.html">Community Recognition</a>
         </div>
       </header>
     </section>
@@ -233,6 +234,7 @@
   const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
   const operatorLogout = document.getElementById("operatorLogout");
   const communityTokenomicsLink = document.getElementById("communityTokenomicsLink");
+  const communityRecognitionLink = document.getElementById("communityRecognitionLink");
 
   if (ownerCommunitiesBack && role !== "owner") {
     ownerCommunitiesBack.remove();
@@ -254,6 +256,10 @@
 
   if (communityTokenomicsLink) {
     communityTokenomicsLink.href = `viewCommunityTokenomics.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
+  }
+
+  if (communityRecognitionLink) {
+    communityRecognitionLink.href = `viewCommunityRecognition.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
   if (community) {
