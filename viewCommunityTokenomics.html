@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>View Community | Wild Ledger Owner Console</title>
+<title>Community Tokenomics | Wild Ledger</title>
 <style>
   :root {
     --ink: #f5fbfa;
@@ -1106,10 +1106,10 @@
 
   if (community) {
     viewCommunityTitle.textContent = `View ${community.name}`;
-    document.title = `View ${community.name} | Wild Ledger Owner Console`;
+    document.title = `${community.name} Tokenomics | Wild Ledger`;
   } else {
     viewCommunityTitle.textContent = "View Community";
-    document.title = "View Community | Wild Ledger Owner Console";
+    document.title = "Community Tokenomics | Wild Ledger";
   }
 
   const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;
