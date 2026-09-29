@@ -624,25 +624,29 @@
           <div class="dashboard-title" id="community-state-title">State</div>
           <div class="dashboard-subtitle">— What exists</div>
         </div>
-        <section class="metrics" aria-label="Community state dashboard">
+        <section class="metrics" id="communityStateMetrics" aria-label="Community state dashboard">
           <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Community Allocation" data-info-title="Community Allocation" data-info-calc="Sum of validated LEAP delivered into this community’s registered distribution account from the LEAP issuer or another configured Wild Ledger distribution account. LEAP sent back by members is not counted as a new allocation." data-info-text="This is how much LEAP Wild Ledger has provisioned to this community over time." data-info-action="Do not replenish just because the community balance is low. Compare Allocation with Inventory, Deployment, and Reach. If Allocation keeps rising while Deployment or Reach stays weak, pause additional LEAP and find out why the community is not converting inventory into participation.">i</button>
             <div class="metric-value" id="metricCommunityAllocation" aria-live="polite">—</div>
             <div class="metric-label">Community Allocation</div>
-            <div class="metric-meaning">Allocation</div>
+            <div class="metric-meaning">Provisioning</div>
           </div>
           <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Current validated LEAP balance in this community’s registered distribution account." data-info-text="This is the community’s operating inventory: LEAP still available for future distribution and recognition." data-info-action="Low inventory is healthy when Deployment and Reach are strong; that is when replenishment may be justified. High inventory with weak Deployment means the problem is activity, not supply—do not add more LEAP until usage improves.">i</button>
             <div class="metric-value" id="metricCommunityLeap" aria-live="polite">—</div>
             <div class="metric-label">Community LEAP</div>
             <div class="metric-meaning">Inventory</div>
           </div>
           <div class="metric">
+            <button class="metric-info" type="button" aria-label="About LEAP Distributed" data-info-title="LEAP Distributed" data-info-calc="Cumulative validated LEAP delivered from this community’s distribution account to non-community wallets through successful Payments and cashed Checks. Pending Checks are not counted." data-info-text="This is lifetime deployment: how much LEAP this community has actually moved into participant wallets." data-info-action="You generally want Deployment to rise over time, but it should bring Reach with it. If Deployment rises while Holders stays flat, the same wallets are absorbing more LEAP. Shift recognition and participation toward additional members before simply increasing allocation.">i</button>
             <div class="metric-value" id="metricLeapDistributed" aria-live="polite">—</div>
             <div class="metric-label">LEAP Distributed</div>
-            <div class="metric-meaning">Distribution</div>
+            <div class="metric-meaning">Deployment</div>
           </div>
           <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-calc="Count of wallets directly reached by this community that currently hold a positive LEAP balance." data-info-text="This is current reach: how many of the wallets this community has directly served still hold LEAP now." data-info-action="You generally want Reach to grow alongside Deployment. If Deployment rises but Holders does not, participation is getting deeper without getting broader. Focus on bringing new people into the community’s LEAP activity.">i</button>
             <div class="metric-value" id="metricHoldersReached" aria-live="polite">—</div>
-            <div class="metric-label">Holders Reached</div>
+            <div class="metric-label">Holders</div>
             <div class="metric-meaning">Reach</div>
           </div>
         </section>
@@ -650,16 +654,43 @@
     </section>
   </main>
 
+<div class="metric-info-scrim" id="metricInfoScrim" role="dialog" aria-modal="true" aria-labelledby="metricInfoTitle">
+    <div class="metric-info-panel">
+      <h2 id="metricInfoTitle">Metric</h2>
+      <p class="metric-info-detail"><strong>How it’s calculated</strong><span id="metricInfoCalc"></span></p>
+      <p class="metric-info-detail"><strong>What it tells you</strong><span id="metricInfoText"></span></p>
+      <p class="metric-info-detail metric-info-action"><strong>Owner action</strong><span id="metricInfoAction"></span></p>
+      <button class="metric-info-close" id="metricInfoClose" type="button">Close</button>
+    </div>
+  </div>
+
+<script src="js/wildLedgerConfig.js"></script>
 <script>
+(() => {
+  const FALLBACK_CONFIG = Object.freeze({
+    leapIssuer: "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq",
+    leapCurrency: "4C45415000000000000000000000000000000000",
+    leapDistributors: Object.freeze(["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"]),
+    xrplWebSocket: "wss://s1.ripple.com/"
+  });
+
+  // Temporary owner-side directory. The public address is operational data,
+  // not a secret. When Wild Ledger gets a formal community registry, this
+  // mapping should move there without changing the dashboard UI.
   const COMMUNITY_DIRECTORY = {
-    SFL: { name: "Sailing Frog's Leap" },
-    ZHR: { name: "Zach's Hot Rods" }
+    SFL: {
+      name: "Sailing Frog's Leap",
+      distributionAccount: "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
+    },
+    ZHR: {
+      name: "Zach's Hot Rods",
+      distributionAccount: null
+    }
   };
 
   const params = new URLSearchParams(window.location.search);
   const requestedId = (params.get("community") || "SFL").trim().toUpperCase();
   const community = COMMUNITY_DIRECTORY[requestedId];
-
   const viewCommunityTitle = document.getElementById("view-community-title");
 
   if (community) {
@@ -669,6 +700,311 @@
     viewCommunityTitle.textContent = "View Community";
     document.title = "View Community | Wild Ledger Owner Console";
   }
+
+  const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;
+  const issuer = config.leapIssuer || FALLBACK_CONFIG.leapIssuer;
+  const leapCurrency = String(config.leapCurrency || "LEAP").toUpperCase();
+  const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
+  const configuredCommunityAccounts = new Set(config.leapDistributors || []);
+  if (community?.distributionAccount) configuredCommunityAccounts.add(community.distributionAccount);
+
+  const metricCommunityAllocation = document.getElementById("metricCommunityAllocation");
+  const metricCommunityLeap = document.getElementById("metricCommunityLeap");
+  const metricLeapDistributed = document.getElementById("metricLeapDistributed");
+  const metricHoldersReached = document.getElementById("metricHoldersReached");
+  const metricsSection = document.getElementById("communityStateMetrics");
+  const metricValues = [metricCommunityAllocation, metricCommunityLeap, metricLeapDistributed, metricHoldersReached];
+
+  function decodeCurrency(code) {
+    const value = String(code || "");
+    if (/^[A-Za-z0-9?!@#$%^&*<>(){}\[\]|]{3}$/.test(value)) return value;
+    if (!/^[A-Fa-f0-9]{40}$/.test(value)) return value;
+    let text = "";
+    for (let i = 0; i < value.length; i += 2) {
+      const n = parseInt(value.slice(i, i + 2), 16);
+      if (!n) break;
+      text += String.fromCharCode(n);
+    }
+    return text;
+  }
+
+  function isLeapCurrency(code) {
+    const raw = String(code || "").toUpperCase();
+    const decoded = decodeCurrency(raw).toUpperCase();
+    return raw === leapCurrency || decoded === "LEAP";
+  }
+
+  function isLeapAmount(amount) {
+    return Boolean(
+      amount && typeof amount === "object" &&
+      isLeapCurrency(amount.currency) &&
+      String(amount.issuer || "") === issuer &&
+      Number.isFinite(Number(amount.value))
+    );
+  }
+
+  function leapAmountValue(amount) {
+    return isLeapAmount(amount) ? Number(amount.value) : 0;
+  }
+
+  function formatLeap(value) {
+    if (!Number.isFinite(value)) return "—";
+    return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+  }
+
+  function fitMetricValue(el) {
+    if (!el) return;
+    el.style.fontSize = "";
+    const startingSize = parseFloat(getComputedStyle(el).fontSize) || 20;
+    let size = startingSize;
+    while (el.scrollWidth > el.clientWidth && size > 10) {
+      size -= 0.5;
+      el.style.fontSize = `${size}px`;
+    }
+  }
+
+  function setMetric(el, value) {
+    if (!el) return;
+    el.textContent = value;
+    requestAnimationFrame(() => fitMetricValue(el));
+  }
+
+  function setLoading() {
+    metricValues.forEach(el => setMetric(el, "…"));
+    if (metricsSection) metricsSection.title = "Loading validated XRP Ledger community data…";
+  }
+
+  function setUnavailable(message) {
+    metricValues.forEach(el => setMetric(el, "—"));
+    if (metricsSection) metricsSection.title = message || "Community ledger data unavailable.";
+  }
+
+  function openSocket() {
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(xrplWebSocket);
+      const timer = setTimeout(() => {
+        try { ws.close(); } catch (_) {}
+        reject(new Error("XRPL connection timed out."));
+      }, 12000);
+      ws.addEventListener("open", () => { clearTimeout(timer); resolve(ws); }, { once: true });
+      ws.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Could not connect to the XRP Ledger.")); }, { once: true });
+    });
+  }
+
+  function request(ws, command, id) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => { cleanup(); reject(new Error("XRPL request timed out.")); }, 15000);
+      function cleanup() {
+        clearTimeout(timer);
+        ws.removeEventListener("message", onMessage);
+      }
+      function onMessage(event) {
+        let response;
+        try { response = JSON.parse(event.data); } catch (_) { return; }
+        if (response.id !== id) return;
+        cleanup();
+        if (response.status === "error" || response.error || response.result?.error) {
+          reject(new Error(response.error || response.result?.error || "XRPL error"));
+          return;
+        }
+        resolve(response.result || {});
+      }
+      ws.addEventListener("message", onMessage);
+      ws.send(JSON.stringify({ id, api_version: 2, ...command }));
+    });
+  }
+
+  function findDeletedCheck(meta) {
+    const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
+    for (const wrapped of affected) {
+      const node = wrapped?.DeletedNode;
+      if (!node || node.LedgerEntryType !== "Check") continue;
+      return node.FinalFields || node.NewFields || {};
+    }
+    return null;
+  }
+
+  function qualifiesExternalDestination(destination, account) {
+    return Boolean(
+      destination &&
+      destination !== account &&
+      destination !== issuer &&
+      !configuredCommunityAccounts.has(destination)
+    );
+  }
+
+  async function loadIssuerLines(ws, nextId, recipientSet) {
+    let marker;
+    let communityLeap = 0;
+    let holdersReached = 0;
+    const account = community.distributionAccount;
+
+    do {
+      const command = {
+        command: "account_lines",
+        account: issuer,
+        ledger_index: "validated",
+        limit: 400
+      };
+      if (marker !== undefined) command.marker = marker;
+      const result = await request(ws, command, nextId("community-lines"));
+      const lines = Array.isArray(result.lines) ? result.lines : [];
+
+      for (const line of lines) {
+        if (!isLeapCurrency(line.currency)) continue;
+        const issuerPerspectiveBalance = Number(line.balance);
+        if (!Number.isFinite(issuerPerspectiveBalance)) continue;
+        const held = issuerPerspectiveBalance < 0 ? -issuerPerspectiveBalance : 0;
+        if (line.account === account) communityLeap = held;
+        if (held > 0 && recipientSet.has(line.account)) holdersReached += 1;
+      }
+      marker = result.marker;
+    } while (marker !== undefined && marker !== null);
+
+    return { communityLeap, holdersReached };
+  }
+
+  async function loadCommunityHistory(ws, nextId) {
+    const account = community.distributionAccount;
+    let marker;
+    let allocation = 0;
+    let distributed = 0;
+    const recipients = new Set();
+    const countedHashes = new Set();
+
+    do {
+      const command = {
+        command: "account_tx",
+        account,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        binary: false,
+        forward: false,
+        limit: 200
+      };
+      if (marker !== undefined) command.marker = marker;
+      const result = await request(ws, command, nextId("community-history"));
+      const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+
+      for (const entry of transactions) {
+        if (entry.validated === false) continue;
+        const tx = entry.tx_json || entry.tx || {};
+        const meta = entry.meta || {};
+        const resultCode = meta.TransactionResult || meta.transaction_result;
+        if (resultCode && resultCode !== "tesSUCCESS") continue;
+        const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+        if (!isLeapAmount(delivered)) continue;
+
+        const hash = String(entry.hash || tx.hash || tx.Hash || "");
+        if (hash && countedHashes.has(hash)) continue;
+
+        const amount = leapAmountValue(delivered);
+        let source = null;
+        let destination = null;
+
+        if (tx.TransactionType === "Payment") {
+          source = tx.Account || null;
+          destination = tx.Destination || null;
+        } else if (tx.TransactionType === "CheckCash") {
+          const check = findDeletedCheck(meta);
+          if (check) {
+            source = check.Account || null;
+            destination = check.Destination || null;
+          }
+        } else {
+          continue;
+        }
+
+        if (
+          destination === account &&
+          source &&
+          (source === issuer || configuredCommunityAccounts.has(source)) &&
+          source !== account
+        ) {
+          allocation += amount;
+          if (hash) countedHashes.add(hash);
+          continue;
+        }
+
+        if (source === account && qualifiesExternalDestination(destination, account)) {
+          distributed += amount;
+          recipients.add(destination);
+          if (hash) countedHashes.add(hash);
+        }
+      }
+
+      marker = result.marker;
+    } while (marker !== undefined && marker !== null);
+
+    return { allocation, distributed, recipients };
+  }
+
+  async function loadCommunityDashboard() {
+    if (!community?.distributionAccount) {
+      setUnavailable(`${community?.name || "This community"} does not have a registered LEAP distribution account yet.`);
+      return;
+    }
+
+    setLoading();
+    let ws;
+    try {
+      ws = await openSocket();
+      let requestNumber = 0;
+      const nextId = prefix => `${prefix}-${++requestNumber}`;
+
+      const history = await loadCommunityHistory(ws, nextId);
+      const balances = await loadIssuerLines(ws, nextId, history.recipients);
+
+      setMetric(metricCommunityAllocation, formatLeap(history.allocation));
+      setMetric(metricCommunityLeap, formatLeap(balances.communityLeap));
+      setMetric(metricLeapDistributed, formatLeap(history.distributed));
+      setMetric(metricHoldersReached, balances.holdersReached.toLocaleString());
+
+      if (metricsSection) {
+        metricsSection.title = `Validated XRP Ledger data for ${community.name}. Distribution account: ${community.distributionAccount}.`;
+      }
+    } catch (error) {
+      console.error("Wild Ledger community dashboard:", error);
+      setUnavailable(error?.message || "Community ledger data unavailable.");
+    } finally {
+      if (ws) {
+        try { ws.close(); } catch (_) {}
+      }
+    }
+  }
+
+  const metricInfoScrim = document.getElementById("metricInfoScrim");
+  const metricInfoTitle = document.getElementById("metricInfoTitle");
+  const metricInfoCalc = document.getElementById("metricInfoCalc");
+  const metricInfoText = document.getElementById("metricInfoText");
+  const metricInfoAction = document.getElementById("metricInfoAction");
+  const metricInfoClose = document.getElementById("metricInfoClose");
+
+  document.querySelectorAll(".metric-info").forEach(button => {
+    button.addEventListener("click", () => {
+      metricInfoTitle.textContent = button.dataset.infoTitle || "Metric";
+      metricInfoCalc.textContent = button.dataset.infoCalc || "";
+      metricInfoText.textContent = button.dataset.infoText || "";
+      metricInfoAction.textContent = button.dataset.infoAction || "";
+      metricInfoScrim.classList.add("open");
+      setTimeout(() => metricInfoClose.focus(), 0);
+    });
+  });
+
+  function closeMetricInfo() {
+    metricInfoScrim.classList.remove("open");
+  }
+  metricInfoClose.addEventListener("click", closeMetricInfo);
+  metricInfoScrim.addEventListener("click", event => {
+    if (event.target === metricInfoScrim) closeMetricInfo();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && metricInfoScrim.classList.contains("open")) closeMetricInfo();
+  });
+
+  window.addEventListener("resize", () => metricValues.forEach(fitMetricValue));
+  loadCommunityDashboard();
+})();
 </script>
 </body>
 </html>
