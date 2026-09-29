@@ -524,24 +524,6 @@
     background: rgba(239,118,93,.09);
   }
 
-  .allocation-ledger-links {
-    display: flex;
-    gap: 7px;
-    flex-wrap: wrap;
-  }
-
-  .allocation-ledger-link {
-    color: #9fddff;
-    text-decoration: none;
-    font-size: .69rem;
-    font-weight: 850;
-  }
-
-  .allocation-ledger-link:hover,
-  .allocation-ledger-link:focus-visible {
-    text-decoration: underline;
-  }
-
   .allocation-log-empty {
     padding: 22px 18px;
     color: rgba(236,249,247,.58);
@@ -864,11 +846,10 @@
                   <th>Allocation</th>
                   <th>Status</th>
                   <th>Cashed</th>
-                  <th>Ledger</th>
                 </tr>
               </thead>
               <tbody id="allocationLogBody">
-                <tr><td colspan="5" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>
+                <tr><td colspan="4" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1010,7 +991,7 @@
     if (metricsSection) metricsSection.title = "Loading validated XRP Ledger community data…";
     if (allocationLogSummary) allocationLogSummary.textContent = "Loading…";
     if (allocationLogBody) {
-      allocationLogBody.innerHTML = '<tr><td colspan="5" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>';
+      allocationLogBody.innerHTML = '<tr><td colspan="4" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>';
     }
   }
 
@@ -1019,7 +1000,7 @@
     if (metricsSection) metricsSection.title = message || "Community ledger data unavailable.";
     if (allocationLogSummary) allocationLogSummary.textContent = "Unavailable";
     if (allocationLogBody) {
-      allocationLogBody.innerHTML = `<tr><td colspan="5" class="allocation-log-empty">${escapeHtml(message || "Allocation history unavailable.")}</td></tr>`;
+      allocationLogBody.innerHTML = `<tr><td colspan="4" class="allocation-log-empty">${escapeHtml(message || "Allocation history unavailable.")}</td></tr>`;
     }
   }
 
@@ -1338,12 +1319,6 @@
       .replaceAll("'", "&#039;");
   }
 
-  function ledgerLink(hash, label) {
-    if (!hash) return "—";
-    const safeHash = escapeHtml(hash);
-    return `<a class="allocation-ledger-link" href="https://livenet.xrpl.org/transactions/${safeHash}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
-  }
-
   function renderAllocationLog(allocations) {
     if (!allocationLogBody || !allocationLogSummary) return;
 
@@ -1352,19 +1327,13 @@
     allocationLogSummary.textContent = `${completed.length} completed • ${formatLeap(completedTotal)} LEAP`;
 
     if (!allocations.length) {
-      allocationLogBody.innerHTML = '<tr><td colspan="5" class="allocation-log-empty">No protocol-valid Allocation Checks found for this community yet.</td></tr>';
+      allocationLogBody.innerHTML = '<tr><td colspan="4" class="allocation-log-empty">No protocol-valid Allocation Checks found for this community yet.</td></tr>';
       return;
     }
 
     allocationLogBody.innerHTML = allocations.map(item => {
       const statusClass = item.status.toLowerCase();
       const cashDate = item.status === "Cashed" ? formatLedgerDate(item.terminalDate) : "—";
-      const terminalLabel = item.status === "Cashed" ? "Cash" : item.status === "Canceled" ? "Cancel" : "";
-      const links = [
-        ledgerLink(item.createdHash, "Create"),
-        terminalLabel ? ledgerLink(item.terminalHash, terminalLabel) : ""
-      ].filter(Boolean).join("");
-
       return `
         <tr>
           <td>${escapeHtml(formatLedgerDate(item.createdDate))}</td>
@@ -1374,7 +1343,6 @@
           </td>
           <td><span class="allocation-status ${escapeHtml(statusClass)}">${escapeHtml(item.status)}</span></td>
           <td>${escapeHtml(cashDate)}</td>
-          <td><div class="allocation-ledger-links">${links || "—"}</div></td>
         </tr>`;
     }).join("");
   }
