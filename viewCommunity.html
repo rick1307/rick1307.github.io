@@ -121,12 +121,15 @@
     flex-wrap: wrap;
   }
 
+  .owner-back,
   .operations-manual-link {
     color: #b7f0df;
     border-color: rgba(121, 213, 194, .30);
     background: rgba(121, 213, 194, .09);
   }
 
+  .owner-back:hover,
+  .owner-back:focus-visible,
   .operations-manual-link:hover,
   .operations-manual-link:focus-visible {
     color: #e5fff8;
@@ -200,10 +203,10 @@
       <header class="console-header">
         <nav class="top-nav" aria-label="Community controls and navigation">
           <div class="top-actions">
+            <a class="owner-back wl-header-control" id="ownerCommunitiesBack" href="communities.html">← Communities</a>
             <button class="operator-logout wl-header-control" id="operatorLogout" type="button">Log Out</button>
           </div>
           <div class="top-navigation">
-            <a class="owner-back wl-header-control" id="ownerCommunitiesBack" href="communities.html">← Communities</a>
             <a class="operations-manual-link wl-header-control" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
           </div>
         </nav>
