@@ -1,0 +1,17 @@
+/* Wild Ledger Backend Typography
+   Shared type foundation for the operational Owner / Community backend.
+   Public community pages intentionally do not load this file. */
+
+:root {
+  --wl-backend-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--wl-backend-font);
+}
+
+h1, h2, h3, h4, h5, h6,
+button, input, select, textarea {
+  font-family: inherit;
+}

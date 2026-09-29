@@ -1,0 +1,6 @@
+Wild Ledger backend typography fix
+
+Upload these files to the repository root.
+wildLedgerBackend.css is the shared backend typography layer.
+The included HTML files have been wired to load it.
+No public-facing community page is changed by this package.
