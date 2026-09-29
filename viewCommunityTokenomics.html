@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Community Tokenomics | Wild Ledger</title>
+<title>Community | Wild Ledger Owner Console</title>
 <style>
   :root {
     --ink: #f5fbfa;
@@ -28,6 +28,7 @@
     margin: 0;
     min-height: 100vh;
     color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background:
       radial-gradient(circle at 12% 14%, rgba(41, 184, 177, .34) 0, rgba(41, 184, 177, .12) 22%, transparent 44%),
       radial-gradient(circle at 87% 15%, rgba(244, 189, 88, .24) 0, rgba(244, 189, 88, .07) 21%, transparent 42%),
@@ -935,7 +936,6 @@
   }
 </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
-  <link rel="stylesheet" href="wildLedgerBackend.css">
 </head>
 <body>
   <main class="shell">
@@ -948,7 +948,7 @@
           <div class="top-navigation">
           </div>
         </nav>
-        <h1 id="view-community-title">View Community</h1>
+        <h1 id="view-community-title">Community</h1>
       </header>
 
       <section class="dashboard-group" aria-labelledby="community-state-title">
@@ -1105,11 +1105,11 @@
 
 
   if (community) {
-    viewCommunityTitle.textContent = `View ${community.name}`;
-    document.title = `${community.name} Tokenomics | Wild Ledger`;
+    viewCommunityTitle.textContent = community.name;
+    document.title = `${community.name} | Wild Ledger Owner Console`;
   } else {
-    viewCommunityTitle.textContent = "View Community";
-    document.title = "Community Tokenomics | Wild Ledger";
+    viewCommunityTitle.textContent = "Community";
+    document.title = "Community | Wild Ledger Owner Console";
   }
 
   const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;

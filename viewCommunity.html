@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>View Community | Wild Ledger</title>
+<title>Community | Wild Ledger</title>
 <style>
   :root {
     --ink: #f5fbfa;
@@ -209,7 +209,7 @@
           <div class="top-navigation">
           </div>
         </nav>
-        <h1 id="view-community-title">View Community</h1>
+        <h1 id="view-community-title">Community</h1>
         <div class="community-links">
           <a class="community-link" id="communityTokenomicsLink" href="viewCommunityTokenomics.html">Tokenomics</a>
           <a class="community-link" id="communityRecognitionLink" href="viewCommunityRecognition.html">Recognition</a>
@@ -267,11 +267,11 @@
   }
 
   if (community) {
-    viewCommunityTitle.textContent = `View ${community.name}`;
-    document.title = `View ${community.name} | Wild Ledger`;
+    viewCommunityTitle.textContent = community.name;
+    document.title = `${community.name} | Wild Ledger`;
   } else {
-    viewCommunityTitle.textContent = "View Community";
-    document.title = "View Community | Wild Ledger";
+    viewCommunityTitle.textContent = "Community";
+    document.title = "Community | Wild Ledger";
   }
 })();
 </script>

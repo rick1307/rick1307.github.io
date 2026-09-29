@@ -468,6 +468,38 @@
     .back-link { top: 16px; left: 0; right: auto; }
   }
 
+  /* Match the current View Community / Tokenomics / Recognition header hierarchy. */
+  .hero h1 {
+    margin: 0;
+    max-width: 720px;
+    font-size: clamp(2.25rem, 7vw, 4.75rem);
+    line-height: .96;
+    letter-spacing: -.055em;
+    font-weight: 900;
+    color: var(--text);
+  }
+
+  .library-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 30px 0 12px;
+    min-width: 0;
+  }
+
+  .library-title {
+    color: var(--text);
+    font-size: .96rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 560px) {
+    .library-heading { margin-top: 28px; }
+  }
+
 </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
   <link rel="stylesheet" href="wildLedgerBackend.css">
@@ -476,13 +508,13 @@
 <div class="shell">
   <div class="hero">
     <a class="back-link wl-header-control" id="backLink" href="viewCommunity.html">← Back</a>
-    <h1>Library</h1>
+    <h1 id="view-community-title">Community</h1>
+    <div class="library-heading" aria-label="Library section">
+      <div class="library-title">Library</div>
+    </div>
     <p>The operating shelf for Wild Ledger. Formal doctrine lives in the Operations Manual and LEAP Protocol. Working material stays below until it is ready to be absorbed into one of those documents.</p>
     <div class="role-line" id="roleLine">Owner View</div>
   </div>
-
-  <div class="section-label">View Community Library</div>
-  <div class="section-note">The authoritative operating document.</div>
   <div class="menu primary-docs">
     <a id="operationsManualLink" href="documentation/operationsManual.html">
       <span class="link-title">Operations Manual</span>
@@ -586,6 +618,15 @@
   const storedCommunity = (sessionStorage.getItem('wildLedgerLibraryCommunity') || '').trim().toUpperCase();
   const ownerEntry = role === 'owner' && (requestedFrom === 'owner' || (!community && storedOrigin === 'owner'));
   const effectiveCommunity = community || (storedOrigin === 'community' ? storedCommunity : '');
+
+  const COMMUNITY_NAMES = {
+    SFL: "Sailing Frog's Leap",
+    ZHR: "Zach's Hot Rods"
+  };
+  const viewCommunityTitle = document.getElementById('view-community-title');
+  const communityName = COMMUNITY_NAMES[effectiveCommunity] || (ownerEntry ? 'Wild Ledger' : 'Community');
+  if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
+  document.title = `${communityName} | Library`;
 
   document.documentElement.dataset.role = role;
 
