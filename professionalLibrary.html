@@ -372,6 +372,23 @@
   const requestedRole = (params.get('role') || 'owner').trim().toLowerCase();
   const role = requestedRole === 'operator' || requestedRole === 'manager' ? 'operator' : 'owner';
   const community = (params.get('community') || '').trim().toUpperCase();
+  const requestedFrom = (params.get('from') || '').trim().toLowerCase();
+
+  // Professional Library can be entered from the Owner home or from a specific
+  // View Community page. Remember that origin so trips into library documents
+  // can return here without losing the correct back destination.
+  if (role === 'owner' && requestedFrom === 'owner') {
+    sessionStorage.setItem('wildLedgerLibraryOrigin', 'owner');
+    sessionStorage.removeItem('wildLedgerLibraryCommunity');
+  } else if (community) {
+    sessionStorage.setItem('wildLedgerLibraryOrigin', 'community');
+    sessionStorage.setItem('wildLedgerLibraryCommunity', community);
+  }
+
+  const storedOrigin = sessionStorage.getItem('wildLedgerLibraryOrigin') || '';
+  const storedCommunity = (sessionStorage.getItem('wildLedgerLibraryCommunity') || '').trim().toUpperCase();
+  const ownerEntry = role === 'owner' && (requestedFrom === 'owner' || (!community && storedOrigin === 'owner'));
+  const effectiveCommunity = community || (storedOrigin === 'community' ? storedCommunity : '');
 
   document.documentElement.dataset.role = role;
 
@@ -385,7 +402,8 @@
 
   const context = new URLSearchParams();
   context.set('role', role);
-  if (community) context.set('community', community);
+  if (effectiveCommunity) context.set('community', effectiveCommunity);
+  if (ownerEntry) context.set('from', 'owner');
   const qs = context.toString();
 
   const backLink = document.getElementById('backLink');
@@ -394,7 +412,15 @@
   const protocolExtensibilityLink = document.getElementById('protocolExtensibilityLink');
   const protocolSnapshotExtensionLink = document.getElementById('protocolSnapshotExtensionLink');
 
-  if (backLink) backLink.href = `viewCommunity.html?${qs}`;
+  if (backLink) {
+    if (ownerEntry) {
+      backLink.textContent = '← Owner';
+      backLink.href = 'owner.html';
+    } else {
+      backLink.textContent = '← View Community';
+      backLink.href = `viewCommunity.html?${qs}`;
+    }
+  }
   if (operationsManualLink) operationsManualLink.href = `documentation/operationsManual.html?${qs}`;
   if (leapProtocolLink) leapProtocolLink.href = `documentation/leapProtocol.html?${qs}`;
   if (protocolExtensibilityLink) protocolExtensibilityLink.href = `documentation/protocolExtensibility.html?${qs}`;

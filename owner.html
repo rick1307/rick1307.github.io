@@ -125,28 +125,58 @@
   }
 
 
+  .professional-library-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(121, 213, 194, .30);
+    border-radius: 999px;
+    color: #b7f0df;
+    background: rgba(121, 213, 194, .09);
+    text-decoration: none;
+    font-size: .70rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .professional-library-link:hover,
+  .professional-library-link:focus-visible {
+    color: #e5fff8;
+    border-color: rgba(121, 213, 194, .54);
+    background: rgba(121, 213, 194, .15);
+    outline: none;
+  }
+
   .logout-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 38px;
-    padding: 9px 14px;
-    border: 1px solid var(--line);
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(239, 118, 93, .38);
     border-radius: 999px;
-    background: rgba(255,255,255,.045);
-    color: var(--sea-glass);
+    color: #ffd2ca;
+    background: rgba(239, 118, 93, .09);
     font: inherit;
-    font-size: 12px;
-    font-weight: 850;
-    letter-spacing: .08em;
+    font-size: .70rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .045em;
     text-transform: uppercase;
+    white-space: nowrap;
     cursor: pointer;
   }
 
   .logout-button:hover,
   .logout-button:focus-visible {
-    border-color: var(--sea-glass);
-    background: rgba(41,184,177,.09);
+    color: #fff0ec;
+    border-color: rgba(239, 118, 93, .62);
+    background: rgba(239, 118, 93, .16);
     outline: none;
   }
 
@@ -556,7 +586,7 @@
     <section class="console" aria-labelledby="owner-title">
       <header class="console-header">
         <div class="brand-row">
-          <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
+          <a class="professional-library-link" href="professionalLibrary.html?role=owner&from=owner">Professional Library →</a>
           <button class="logout-button" id="ownerLogout" type="button">Log Out</button>
         </div>
         <h1 id="owner-title">Owner Console</h1>
