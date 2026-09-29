@@ -124,6 +124,32 @@
     text-transform: uppercase;
   }
 
+
+  .logout-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255,255,255,.045);
+    color: var(--sea-glass);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .logout-button:hover,
+  .logout-button:focus-visible {
+    border-color: var(--sea-glass);
+    background: rgba(41,184,177,.09);
+    outline: none;
+  }
+
   .brand-mark {
     width: 11px;
     height: 11px;
@@ -531,6 +557,7 @@
       <header class="console-header">
         <div class="brand-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
+          <button class="logout-button" id="ownerLogout" type="button">Log Out</button>
         </div>
         <h1 id="owner-title">Owner Console</h1>
         <p class="intro">Central administration for Wild Ledger. Manage communities, platform settings, operations, and oversight from one place.</p>
@@ -1229,6 +1256,16 @@
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && metricInfoScrim.classList.contains("open")) closeMetricInfo();
     });
+
+
+    const ownerLogout = document.getElementById("ownerLogout");
+    if (ownerLogout) {
+      ownerLogout.addEventListener("click", () => {
+        sessionStorage.removeItem("wildLedgerRole");
+        sessionStorage.removeItem("wildLedgerCommunity");
+        window.location.href = "getWild.html";
+      });
+    }
 
     loadLeapDashboard();
     window.addEventListener("resize", fitAllMetricValues);
