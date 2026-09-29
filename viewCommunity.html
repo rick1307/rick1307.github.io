@@ -183,6 +183,34 @@
     letter-spacing: .02em;
   }
 
+  .strategy-link {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border: 1px solid rgba(121, 213, 194, .26);
+    border-radius: 999px;
+    color: rgba(170, 239, 219, .94);
+    background: rgba(121, 213, 194, .07);
+    text-decoration: none;
+    font-size: .63rem;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .strategy-link:hover,
+  .strategy-link:focus-visible {
+    color: #d8fff5;
+    border-color: rgba(121, 213, 194, .48);
+    background: rgba(121, 213, 194, .12);
+    outline: none;
+  }
+
   .metrics {
     padding: 0 0 4px;
     display: grid;
@@ -745,6 +773,17 @@
     .dashboard-heading { margin: 0 0 8px; gap: 6px; flex-wrap: wrap; }
     .dashboard-title { font-size: .82rem; }
     .dashboard-subtitle { font-size: .62rem; }
+    .strategy-link {
+      width: 100%;
+      min-height: 22px;
+      margin-left: 0;
+      padding: 2px 0 0;
+      justify-content: flex-start;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      font-size: .56rem;
+    }
     .metrics { padding: 0 0 2px; gap: 5px; }
     .guiding-metrics { padding: 7px 0 2px; gap: 5px; }
     .metrics-secondary { padding-top: 0; padding-bottom: 7px; }
@@ -872,6 +911,7 @@
         <div class="dashboard-heading">
           <div class="dashboard-title" id="community-state-title">Tokenomics</div>
           <div class="dashboard-subtitle">— Flow &amp; replenishment</div>
+          <a class="strategy-link" id="replenishmentStrategyLink" href="replenishmentStrategy.html" aria-label="Read the Wild Ledger replenishment strategy">Replenishment Strategy →</a>
         </div>
         <section class="metrics" id="communityStateMetrics" aria-label="Community tokenomics dashboard">
           <div class="metric">
@@ -1000,6 +1040,11 @@
   const requestedId = (params.get("community") || "SFL").trim().toUpperCase();
   const community = COMMUNITY_DIRECTORY[requestedId];
   const viewCommunityTitle = document.getElementById("view-community-title");
+  const replenishmentStrategyLink = document.getElementById("replenishmentStrategyLink");
+
+  if (replenishmentStrategyLink) {
+    replenishmentStrategyLink.href = `replenishmentStrategy.html?community=${encodeURIComponent(requestedId)}`;
+  }
 
   if (community) {
     viewCommunityTitle.textContent = `View ${community.name}`;
