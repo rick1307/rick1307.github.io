@@ -222,6 +222,19 @@
   .metric:nth-child(3) { --metric-accent: var(--mango); }
   .metric:nth-child(4) { --metric-accent: var(--coral); }
 
+  .metric-guiding {
+    grid-column: 1 / -1;
+    --metric-accent: var(--sea-glass);
+    min-height: 88px;
+    background:
+      linear-gradient(150deg, rgba(121,213,194,.075), rgba(255,255,255,.012)),
+      rgba(5, 34, 46, .46);
+  }
+
+  .metric-guiding .metric-value {
+    font-size: clamp(1.55rem, 4.5vw, 2.25rem);
+  }
+
   .metric-value {
     margin: 0;
     width: 100%;
@@ -824,6 +837,12 @@
             <div class="metric-label">Holders</div>
             <div class="metric-meaning">Reach</div>
           </div>
+          <div class="metric metric-guiding">
+            <button class="metric-info" type="button" aria-label="About Deployment Ratio" data-info-title="Deployment Ratio" data-info-calc="LEAP Distributed ÷ (LEAP Distributed + Community LEAP) × 100." data-info-text="This is a notional guiding signal showing how much of the LEAP represented by current inventory plus lifetime deployment has moved out of the Community Operating Wallet and into participant wallets." data-info-action="Use this as a directional signal, not a target. A rising ratio means distribution is increasing relative to inventory. Wild Ledger replenishment policy is not yet tied to this metric, and community leaders should not distribute LEAP simply to raise the ratio.">i</button>
+            <div class="metric-value" id="metricDeploymentRatio" aria-live="polite">—</div>
+            <div class="metric-label">Deployment Ratio</div>
+            <div class="metric-meaning">Guiding Light</div>
+          </div>
         </section>
       </section>
 
@@ -926,8 +945,9 @@
   const metricCommunityLeap = document.getElementById("metricCommunityLeap");
   const metricLeapDistributed = document.getElementById("metricLeapDistributed");
   const metricHoldersReached = document.getElementById("metricHoldersReached");
+  const metricDeploymentRatio = document.getElementById("metricDeploymentRatio");
   const metricsSection = document.getElementById("communityStateMetrics");
-  const metricValues = [metricCommunityAllocation, metricCommunityLeap, metricLeapDistributed, metricHoldersReached];
+  const metricValues = [metricCommunityAllocation, metricCommunityLeap, metricLeapDistributed, metricHoldersReached, metricDeploymentRatio];
   const allocationLogSummary = document.getElementById("allocationLogSummary");
   const allocationLogBody = document.getElementById("allocationLogBody");
   const allocationLogNote = document.getElementById("allocationLogNote");
@@ -967,6 +987,13 @@
   function formatLeap(value) {
     if (!Number.isFinite(value)) return "—";
     return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
+  }
+
+  function formatDeploymentRatio(distributed, inventory) {
+    const total = distributed + inventory;
+    if (!Number.isFinite(total) || total <= 0) return "—";
+    const ratio = (distributed / total) * 100;
+    return `${ratio.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}%`;
   }
 
   function fitMetricValue(el) {
@@ -1377,6 +1404,7 @@
       setMetric(metricCommunityLeap, formatLeap(balances.communityLeap));
       setMetric(metricLeapDistributed, formatLeap(distribution.distributed));
       setMetric(metricHoldersReached, balances.holdersReached.toLocaleString());
+      setMetric(metricDeploymentRatio, formatDeploymentRatio(distribution.distributed, balances.communityLeap));
       renderAllocationLog(allocations);
 
       if (metricsSection) {
