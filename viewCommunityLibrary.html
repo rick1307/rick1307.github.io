@@ -595,6 +595,7 @@
     </div>
   </div>
 </div>
+<script src="js/communityConfig.js" data-registry-only="true"></script>
 <script>
 (() => {
   const params = new URLSearchParams(window.location.search);
@@ -611,7 +612,7 @@
     sessionStorage.removeItem('wildLedgerLibraryCommunity');
   } else if (community) {
     sessionStorage.setItem('wildLedgerLibraryOrigin', 'community');
-    sessionStorage.setItem('wildLedgerLibraryCommunity', community);
+    sessionStorage.setItem('wildLedgerLibraryCommunity', window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(window.WILD_LEDGER_GET_COMMUNITY?.(community)) || community);
   }
 
   const storedOrigin = sessionStorage.getItem('wildLedgerLibraryOrigin') || '';
@@ -619,12 +620,10 @@
   const ownerEntry = role === 'owner' && (requestedFrom === 'owner' || (!community && storedOrigin === 'owner'));
   const effectiveCommunity = community || (storedOrigin === 'community' ? storedCommunity : '');
 
-  const COMMUNITY_NAMES = {
-    SFL: "Sailing Frog's Leap",
-    ZHR: "Zach's Hot Rods"
-  };
+  const registeredCommunity = window.WILD_LEDGER_GET_COMMUNITY?.(effectiveCommunity) || null;
+  const canonicalBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(registeredCommunity) || effectiveCommunity;
   const viewCommunityTitle = document.getElementById('view-community-title');
-  const communityName = COMMUNITY_NAMES[effectiveCommunity] || (ownerEntry ? 'Wild Ledger' : 'Community');
+  const communityName = registeredCommunity?.communityName || (ownerEntry ? 'Wild Ledger' : 'Community');
   if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
   document.title = `${communityName} | Library`;
 
@@ -640,7 +639,7 @@
 
   const context = new URLSearchParams();
   context.set('role', role);
-  if (effectiveCommunity) context.set('community', effectiveCommunity);
+  if (canonicalBackendId) context.set('community', canonicalBackendId);
   if (ownerEntry) context.set('from', 'owner');
   const qs = context.toString();
 

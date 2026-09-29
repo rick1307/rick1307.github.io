@@ -1175,6 +1175,7 @@
     </p>
   </main>
 
+  <script src="js/communityConfig.js" data-registry-only="true"></script>
   <script>
     (() => {
       "use strict";
@@ -1183,16 +1184,17 @@
       const AUTHORIZED_DISTRIBUTORS = ["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"];
       const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
       const params = new URLSearchParams(window.location.search);
-      const requestedCommunity = (params.get("community") || "SFL").trim().toUpperCase();
-      const COMMUNITY_NAMES = Object.freeze({
-        SFL: "Sailing Frog's Leap",
-        ZHR: "Zach's Hot Rods"
-      });
-      const communityName = COMMUNITY_NAMES[requestedCommunity] || "Community";
+      const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
+      const defaultCommunity = Object.values(registry)[0] || null;
+      const defaultBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(defaultCommunity) || "";
+      const requestedValue = params.get("community") || defaultBackendId;
+      const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedValue) || null;
+      const requestedCommunity = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedValue || "").trim().toUpperCase();
+      const communityName = community?.communityName || "Community";
       const viewCommunityTitle = document.getElementById("view-community-title");
       if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
       document.title = `${communityName} | Community Recognition`;
-      const NAMESPACE = requestedCommunity === "ZHR" ? "ZHR-LEAP" : "SFL-LEAP";
+      const NAMESPACE = community?.leapNamespace || `${requestedCommunity}-LEAP`;
       const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
       const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
 

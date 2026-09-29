@@ -1054,6 +1054,7 @@
     </div>
   </div>
 
+<script src="js/communityConfig.js" data-registry-only="true"></script>
 <script src="js/wildLedgerConfig.js"></script>
 <script>
 (() => {
@@ -1065,25 +1066,17 @@
     xrplWebSocket: "wss://s1.ripple.com/"
   });
 
-  // Temporary Owner-side community directory. Community Operating Wallets are
-  // public operational addresses. When Wild Ledger gets a formal community
-  // registry, this mapping should move there without changing this page.
-  const COMMUNITY_DIRECTORY = {
-    SFL: {
-      name: "Sailing Frog's Leap",
-      operatingWallet: "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q"
-    },
-    ZHR: {
-      name: "Zach's Hot Rods",
-      operatingWallet: null
-    }
-  };
-
+  const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
   const params = new URLSearchParams(window.location.search);
-  const requestedId = (params.get("community") || "ZHR").trim().toUpperCase();
+  const defaultCommunity = Object.values(registry)[0] || null;
+  const defaultBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(defaultCommunity) || "";
+  const requestedCommunity = params.get("community") || defaultBackendId;
   const requestedRole = (params.get("role") || "owner").trim().toLowerCase();
   const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
-  const community = COMMUNITY_DIRECTORY[requestedId];
+  const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunity) || null;
+  const requestedId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedCommunity || "").trim().toUpperCase();
+  const communityName = community?.communityName || "Community";
+  const communityNamespace = community?.leapNamespace || `${requestedId}-LEAP`;
   const viewCommunityTitle = document.getElementById("view-community-title");
   const viewCommunityBack = document.getElementById("viewCommunityBack");
   const operatorLogout = document.getElementById("operatorLogout");
@@ -1105,8 +1098,8 @@
 
 
   if (community) {
-    viewCommunityTitle.textContent = community.name;
-    document.title = `${community.name} | Wild Ledger Owner Console`;
+    viewCommunityTitle.textContent = communityName;
+    document.title = `${communityName} | Wild Ledger Owner Console`;
   } else {
     viewCommunityTitle.textContent = "Community";
     document.title = "Community | Wild Ledger Owner Console";
@@ -1122,7 +1115,7 @@
     FALLBACK_CONFIG.globalDistributionWallet;
 
   const communityOperatingWallets = new Set(
-    Object.values(COMMUNITY_DIRECTORY)
+    Object.values(registry)
       .map(item => item?.operatingWallet)
       .filter(Boolean)
   );
@@ -1379,7 +1372,7 @@
   }
 
   function canonicalAllocationMemo(tx) {
-    const prefix = `${requestedId}-LEAP/ALLOCATION=`;
+    const prefix = `${communityNamespace}/ALLOCATION=`;
     const matches = decodedMemoStrings(tx).filter(value => value.startsWith(prefix));
     if (matches.length !== 1) return null;
     const raw = matches[0];
@@ -1611,7 +1604,7 @@
 
   async function loadCommunityDashboard() {
     if (!community?.operatingWallet) {
-      setUnavailable(`${community?.name || "This community"} does not have a registered Community Operating Wallet yet.`);
+      setUnavailable(`${communityName || "This community"} does not have a registered Community Operating Wallet yet.`);
       if (allocationLogNote) allocationLogNote.textContent = "Register a Community Operating Wallet before Owner → Community allocations can be tracked.";
       return;
     }
@@ -1654,13 +1647,13 @@
       renderAllocationLog(allocations);
 
       if (metricsSection) {
-        metricsSection.title = `Validated XRP Ledger data for ${community.name}. Community Operating Wallet: ${community.operatingWallet}.`;
+        metricsSection.title = `Validated XRP Ledger data for ${communityName}. Community Operating Wallet: ${community.operatingWallet}.`;
       }
       if (guidingMetricsSection) {
-        guidingMetricsSection.title = `Notional guidance from validated ${community.name} deployment. Concentration is measured across recipient wallets; eligible replenishment uses a 3% Growth Rate Provision.`;
+        guidingMetricsSection.title = `Notional guidance from validated ${communityName} deployment. Concentration is measured across recipient wallets; eligible replenishment uses a 3% Growth Rate Provision.`;
       }
       if (allocationLogNote) {
-        allocationLogNote.textContent = `Only protocol-valid ${requestedId}-LEAP/ALLOCATION=<AMOUNT> Checks from the Global Distribution Wallet to this registered Community Operating Wallet are included.`;
+        allocationLogNote.textContent = `Only protocol-valid ${communityNamespace}/ALLOCATION=<AMOUNT> Checks from the Global Distribution Wallet to this registered Community Operating Wallet are included.`;
       }
     } catch (error) {
       console.error("Wild Ledger community dashboard:", error);
@@ -1678,7 +1671,7 @@
       const amount = Number(requestReplenishmentButton.dataset.amount || 0);
       const detail = {
         communityId: requestedId,
-        communityName: community?.name || requestedId,
+        communityName: communityName || requestedId,
         eligibleReplenishment: amount,
         growthRateProvision: 0.03
       };

@@ -243,18 +243,18 @@
     </section>
   </main>
 
+<script src="js/communityConfig.js" data-registry-only="true"></script>
 <script>
 (() => {
-  const COMMUNITY_DIRECTORY = {
-    SFL: { name: "Sailing Frog's Leap" },
-    ZHR: { name: "Zach's Hot Rods" }
-  };
-
   const params = new URLSearchParams(window.location.search);
-  const requestedId = (params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "ZHR").trim().toUpperCase();
+  const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
+  const defaultCommunity = Object.values(registry)[0] || null;
+  const defaultBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(defaultCommunity) || "";
+  const requestedCommunity = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || defaultBackendId;
   const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
   const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
-  const community = COMMUNITY_DIRECTORY[requestedId];
+  const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunity) || null;
+  const requestedId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedCommunity || "").trim().toUpperCase();
 
   const viewCommunityTitle = document.getElementById("view-community-title");
   const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
@@ -296,8 +296,8 @@
   }
 
   if (community) {
-    viewCommunityTitle.textContent = community.name;
-    document.title = `${community.name} | Wild Ledger`;
+    viewCommunityTitle.textContent = community.communityName;
+    document.title = `${community.communityName} | Wild Ledger`;
   } else {
     viewCommunityTitle.textContent = "Community";
     document.title = "Community | Wild Ledger";

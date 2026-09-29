@@ -730,25 +730,12 @@
       const requestedMode = (params.get("mode") || "edit").trim().toLowerCase();
       const mode = role === "operator" ? "edit" : (requestedMode === "new" ? "new" : "edit");
 
-      const COMMUNITY_ALIASES = Object.freeze({
-        sfl: "sfl",
-        zach: "zach",
-        zhr: "zach",
-        "sailing-frogs-leap": "sfl",
-        "zachs-hot-rods": "zach"
-      });
-      const BACKEND_COMMUNITY_IDS = Object.freeze({ sfl: "SFL", zach: "ZHR" });
-
       function resolveCommunityId(value) {
-        const raw = String(value || "").trim().toLowerCase();
-        if (!raw) return "";
-        if (communities[raw]) return raw;
-        const alias = COMMUNITY_ALIASES[raw];
-        return alias && communities[alias] ? alias : "";
+        return window.WILD_LEDGER_RESOLVE_COMMUNITY_ID?.(value) || "";
       }
 
       function backendCommunityId(configId) {
-        return BACKEND_COMMUNITY_IDS[configId] || String(configId || "").toUpperCase();
+        return window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(configId) || String(configId || "").toUpperCase();
       }
 
       const colorKeys = [
@@ -774,6 +761,12 @@
 
       const blankCommunity = () => ({
         id: "",
+        backendId: "",
+        aliases: [],
+        operatingWallet: null,
+        directoryStatus: "Community",
+        directoryTone: "current",
+        directoryDescription: "Wild Ledger community.",
         layout: "classic",
         communityName: "",
         leapNamespace: "",

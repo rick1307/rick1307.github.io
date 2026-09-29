@@ -63,7 +63,7 @@
       min-height:132px;padding:22px;border:1px solid rgba(255,255,255,.09);border-radius:20px;
       background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),rgba(5,34,46,.42);
     }
-    .community:nth-of-type(3){border-color:rgba(243,182,74,.17)}
+    .community.reference-community{border-color:rgba(243,182,74,.17)}
     .community-name{font-size:1.28rem;font-weight:900;letter-spacing:-.02em}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
     .chip{padding:5px 8px;border-radius:999px;background:rgba(47,168,160,.12);border:1px solid rgba(134,215,201,.18);color:rgba(236,249,247,.7);font-size:.64rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
@@ -102,28 +102,70 @@
 
       <section class="directory" aria-label="Wild Ledger community directory">
         <div class="section-title">Community Directory</div>
-
-        <article class="community">
-          <div>
-            <div class="community-name">Sailing Frog's Leap</div>
-            <div class="meta"><span class="chip">SFL</span><span class="chip">Current Community</span></div>
-            <p class="community-copy">The current working community and first live Wild Ledger implementation.</p>
-          </div>
-          <a class="open" href="viewCommunity.html?community=SFL&role=owner">Open Community →</a>
-        </article>
-
-        <article class="community">
-          <div>
-            <div class="community-name">Zach's Hot Rods</div>
-            <div class="meta"><span class="chip reference">ZHR</span><span class="chip reference">Reference Community</span></div>
-            <p class="community-copy">A reference community used to prove that Wild Ledger's shared machinery is not tied to Sailing Frog's Leap.</p>
-          </div>
-          <a class="open" href="viewCommunity.html?community=ZHR&role=owner">Open Community →</a>
-        </article>
+        <div id="communityDirectoryList"></div>
       </section>
 
       <div class="future"><strong>Community provisioning:</strong> select an existing community to manage it, or use the + button to begin a new community setup.</div>
     </section>
   </main>
+  <script src="js/communityConfig.js" data-registry-only="true"></script>
+  <script>
+    (() => {
+      const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
+      const directory = document.getElementById("communityDirectoryList");
+      if (!directory) return;
+
+      const communities = Object.values(registry);
+      if (!communities.length) {
+        const empty = document.createElement("p");
+        empty.className = "community-copy";
+        empty.textContent = "No communities are registered yet.";
+        directory.appendChild(empty);
+        return;
+      }
+
+      communities.forEach((community) => {
+        const backendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(community.id || "").toUpperCase();
+        const reference = community.directoryTone === "reference";
+
+        const article = document.createElement("article");
+        article.className = `community${reference ? " reference-community" : ""}`;
+
+        const details = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "community-name";
+        name.textContent = community.communityName || "Community";
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        const idChip = document.createElement("span");
+        idChip.className = `chip${reference ? " reference" : ""}`;
+        idChip.textContent = backendId;
+        meta.appendChild(idChip);
+
+        if (community.directoryStatus) {
+          const statusChip = document.createElement("span");
+          statusChip.className = `chip${reference ? " reference" : ""}`;
+          statusChip.textContent = community.directoryStatus;
+          meta.appendChild(statusChip);
+        }
+
+        const copy = document.createElement("p");
+        copy.className = "community-copy";
+        copy.textContent = community.directoryDescription || "Wild Ledger community.";
+
+        details.append(name, meta, copy);
+
+        const open = document.createElement("a");
+        open.className = "open";
+        open.href = `viewCommunity.html?community=${encodeURIComponent(backendId)}&role=owner`;
+        open.textContent = "Open Community →";
+
+        article.append(details, open);
+        directory.appendChild(article);
+      });
+    })();
+  </script>
 </body>
 </html>
