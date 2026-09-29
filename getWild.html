@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Get Wild · Wild Ledger</title>
+<style>
+:root{
+  --ink:#17202a;
+  --muted:#667085;
+  --paper:#f6f2e9;
+  --card:#fff;
+  --line:#d8d2c7;
+  --accent:#243b35;
+  --gold:#b68a52;
+  --danger:#9b4b3c;
+}
+*{box-sizing:border-box}
+html{min-height:100%}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);
+  background:radial-gradient(circle at 20% 0%,rgba(182,138,82,.14),transparent 34rem),var(--paper);
+}
+.wrap{max-width:980px;margin:auto;padding:28px 20px 64px}
+header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 44px;gap:20px}
+.brand{font-weight:850;letter-spacing:.04em;font-size:20px}
+.leap{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.hero{padding:44px 0 38px}
+.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:750;font-size:12px;color:var(--gold);margin-bottom:14px}
+h1{font-size:clamp(52px,10vw,92px);line-height:.92;margin:0 0 20px;letter-spacing:-.06em}
+.hero p{font-size:clamp(18px,3vw,24px);line-height:1.45;color:#475467;margin:0;max-width:720px}
+.access-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.72fr);gap:18px;align-items:stretch;margin-top:18px}
+.card{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 8px 28px rgba(23,32,42,.045)}
+.card h2{margin:0 0 8px;font-size:28px;letter-spacing:-.025em}
+.card-copy{margin:0 0 24px;color:var(--muted);line-height:1.55}
+.field{margin-top:15px}
+label{display:block;margin:0 0 7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#475467}
+input{
+  width:100%;
+  min-height:50px;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+  outline:none;
+}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(182,138,82,.12)}
+button{
+  width:100%;
+  min-height:50px;
+  margin-top:20px;
+  border:0;
+  border-radius:13px;
+  padding:12px 16px;
+  background:var(--accent);
+  color:#fff;
+  font:850 15px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  letter-spacing:.035em;
+  cursor:pointer;
+}
+button:hover{filter:brightness(1.07)}
+button:focus-visible{outline:3px solid rgba(182,138,82,.34);outline-offset:2px}
+.status{min-height:20px;margin:12px 0 0;font-size:13px;color:var(--muted);line-height:1.45}
+.status.error{color:var(--danger)}
+.system{background:var(--accent);color:#fff;border-radius:20px;padding:28px;position:relative;overflow:hidden}
+.system::after{content:"";position:absolute;width:210px;height:210px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-90px;bottom:-110px;box-shadow:0 0 0 45px rgba(255,255,255,.025),0 0 0 90px rgba(255,255,255,.016)}
+.system > *{position:relative;z-index:1}
+.system h2{margin:0 0 12px;font-size:25px}
+.system p{margin:0;color:#e3e8e5;line-height:1.6}
+.route{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.16)}
+.route-label{font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.13em;color:#d6c29f;margin-bottom:9px}
+.route-row{display:flex;align-items:center;gap:10px;margin:10px 0;color:#fff;font-size:14px;line-height:1.4}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:720px){
+  .wrap{padding:22px 16px 48px}
+  header{padding-bottom:26px}
+  .hero{padding:30px 0 30px}
+  .access-grid{grid-template-columns:1fr}
+  .card,.system{padding:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">WILD LEDGER</div>
+    <div class="leap">Powered by LEAP</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Back-end access</div>
+      <h1>Get Wild.</h1>
+      <p>One sign-in. The right Wild Ledger workspace.</p>
+    </section>
+
+    <section class="access-grid" aria-label="Wild Ledger sign in">
+      <div class="card">
+        <div class="eyebrow">Sign in</div>
+        <h2>Enter Wild Ledger</h2>
+        <p class="card-copy">Your sign-in determines where you start and what you can see.</p>
+
+        <form id="getWildForm" novalidate>
+          <div class="field">
+            <label for="accessId">Access ID</label>
+            <input id="accessId" name="accessId" type="text" autocomplete="username" placeholder="Your Wild Ledger access ID" />
+          </div>
+          <div class="field">
+            <label for="accessKey">Access key</label>
+            <input id="accessKey" name="accessKey" type="password" autocomplete="current-password" placeholder="Your access key" />
+          </div>
+          <button type="submit">Enter Wild Ledger →</button>
+          <p class="status" id="accessStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <aside class="system">
+        <div class="eyebrow">One door. Two paths.</div>
+        <h2>The sign-in does the routing.</h2>
+        <p>Owner and Community Operators enter through the same door. Their roles determine the starting point. From View Community forward, the back end is shared.</p>
+        <div class="route">
+          <div class="route-label">Routing model</div>
+          <div class="route-row"><span class="dot"></span><span><strong>Owner</strong> → Owner Console → Choose Community</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>Community Operator</strong> → Assigned Community</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>Both</strong> → View Community → Shared back end</span></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>Wild Ledger · Powered by LEAP</footer>
+</div>
+
+<script>
+/*
+  WILD LEDGER ROLE-ROUTING BOUNDARY
+  ---------------------------------
+  getWild.html is the single back-end entry point.
+
+  AUTHENTICATED OWNER:
+    owner.html -> choose community -> viewCommunity.html?role=owner&community=...
+
+  AUTHENTICATED COMMUNITY OPERATOR:
+    viewCommunity.html?role=operator&community=<assigned community>
+
+  CONVERGENCE RULE:
+    From viewCommunity.html forward, Owner and Community Operator use the same
+    pages. Role controls visibility/authority; separate downstream page variants
+    should be avoided unless security or a technical constraint requires them.
+
+  IMPORTANT:
+    URL/query parameters may carry authenticated context through the UI, but they
+    must never be treated as authentication or as authority to grant owner access.
+*/
+
+const form = document.getElementById('getWildForm');
+const status = document.getElementById('accessStatus');
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  status.textContent = 'Authentication is not connected yet. This page is ready for the Wild Ledger access service.';
+  status.className = 'status';
+});
+</script>
+</body>
+</html>
