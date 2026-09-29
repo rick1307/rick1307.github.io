@@ -65,7 +65,6 @@ ul{padding-left:22px}li{margin:8px 0}.rule{display:grid;grid-template-columns:64
   <h1>Protocol Snapshot Extension</h1>
   <p class="lede">A teaching sketch for one narrow extension to the existing LEAP protocol: how a dedicated snapshot transaction could preserve small, periodic observations about the community and later turn those observations into historical charts.</p>
   <div class="hero-links">
-    <a href="../ledgerHistory.html">Ledger History</a>
     <a href="protocolExtensibility.html">Protocol Extensibility</a>
   </div>
   <div class="notice"><strong>Status: notional.</strong> Nothing on this page is adopted protocol. It documents the current working idea so it can be tested, challenged, simplified, or discarded before any namespace or grammar is made authoritative.</div>
@@ -73,7 +72,7 @@ ul{padding-left:22px}li{margin:8px 0}.rule{display:grid;grid-template-columns:64
 
 <section>
   <h2>1. Start with the question, not the encoding</h2>
-  <p class="lead">Ledger History now shows two live facts: how many organized crew members exist and how many wallets currently possess LEAP.</p>
+  <p class="lead">The snapshot idea starts with two live facts: how many organized crew members exist and how many wallets currently possess LEAP.</p>
   <div class="two">
     <div class="card"><span class="tag">Live metric</span><strong>Total Crew Members</strong><p>A measure of the organized community that has formally come aboard.</p></div>
     <div class="card"><span class="tag">Live metric</span><strong>Total LEAP Holders</strong><p>A measure of how far LEAP has escaped beyond the organized community and into the wild.</p></div>
@@ -187,10 +186,10 @@ H = Holder count</pre>
 <section>
   <h2>10. The proposed daily workflow</h2>
   <p>The extension becomes useful only when the site can reliably decide whether a new observation should be recorded.</p>
-  <div class="rule"><b>01</b><p>Ledger History loads and calculates the current live metrics.</p></div>
-  <div class="rule"><b>02</b><p>The page checks whether the reporting period already has a snapshot record.</p></div>
-  <div class="rule"><b>03</b><p>If a snapshot already exists, the page reads it and does nothing else.</p></div>
-  <div class="rule"><b>04</b><p>If one is missing, the page can offer the manager a prompt to record the current snapshot.</p></div>
+  <div class="rule"><b>01</b><p>The site calculates the current live metrics.</p></div>
+  <div class="rule"><b>02</b><p>The snapshot workflow checks whether the reporting period already has a snapshot record.</p></div>
+  <div class="rule"><b>03</b><p>If a snapshot already exists, no new record is needed for that reporting period.</p></div>
+  <div class="rule"><b>04</b><p>If one is missing, the site can offer the manager a prompt to record the current snapshot.</p></div>
   <div class="rule"><b>05</b><p>The manager approves and signs one dedicated snapshot transaction.</p></div>
   <div class="rule"><b>06</b><p>Once validated, that transaction becomes another historical observation available to future charts.</p></div>
   <p class="muted">The exact cadence — daily, weekly, or something else — remains a design choice. The extension defines how a snapshot could be represented, not how often it must be written.</p>
