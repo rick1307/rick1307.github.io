@@ -1046,7 +1046,7 @@
   const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
 
   if (ownerCommunitiesBack && role !== "owner") {
-    ownerCommunitiesBack.hidden = true;
+    ownerCommunitiesBack.remove();
   }
 
   if (professionalLibraryLink) {
