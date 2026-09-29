@@ -267,40 +267,12 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 0 0 1px rgba(121,213,194,.04);
   }
 
-  .replenishment-status {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    margin-top: 7px;
-    padding: 4px 7px;
-    border: 1px solid currentColor;
-    border-radius: 999px;
-    font-size: .50rem;
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: .075em;
-    text-transform: uppercase;
-  }
-
-  .metric-policy-output.is-ineligible .replenishment-status {
-    color: rgba(255,174,158,.92);
-    background: rgba(239,118,93,.08);
-  }
-
-  .metric-policy-output.is-eligible .replenishment-status {
-    color: rgba(170,239,219,.96);
-    background: rgba(121,213,194,.08);
-  }
-
-  .replenishment-action {
-    padding: 8px 0 4px;
-  }
-
   .replenishment-request-button {
     width: 100%;
+    margin-top: 9px;
     border: 1px solid rgba(121,213,194,.42);
-    border-radius: 15px;
-    padding: 12px 16px;
+    border-radius: 12px;
+    padding: 9px 10px;
     background: rgba(121,213,194,.14);
     color: #dffaf3;
     font: 900 .78rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -950,14 +922,11 @@
           <div class="metric metric-policy-output is-ineligible" id="replenishmentEligibilityCard">
             <button class="metric-info" type="button" aria-label="About Replenishment" data-info-title="Replenishment" data-info-calc="Effective Deployment × 1.03, using the current notional 3% Growth Rate Provision." data-info-text="The amount the current guiding model makes available for replenishment: replacement of effective deployment plus a 3% growth liquidity provision." data-info-action="The card turns green when replenishment is available and red when it is unavailable. This remains a notional policy signal until Wild Ledger adopts a formal replenishment request workflow.">i</button>
             <div class="metric-value" id="metricEligibleReplenishment" aria-live="polite">—</div>
-            <div class="replenishment-status" id="replenishmentEligibilityStatus" aria-live="polite">Unavailable</div>
             <div class="metric-label">Replenishment</div>
+            <button class="replenishment-request-button" id="requestReplenishmentButton" type="button" disabled>Request Replenishment</button>
             <div class="metric-meaning">At 3% GRP</div>
           </div>
         </section>
-        <div class="replenishment-action">
-          <button class="replenishment-request-button" id="requestReplenishmentButton" type="button" disabled>Request Replenishment</button>
-        </div>
       </section>
 
       <section class="allocation-log-section" aria-labelledby="allocation-log-title">
@@ -1064,7 +1033,6 @@
   const metricEffectiveDeployment = document.getElementById("metricEffectiveDeployment");
   const metricEligibleReplenishment = document.getElementById("metricEligibleReplenishment");
   const replenishmentEligibilityCard = document.getElementById("replenishmentEligibilityCard");
-  const replenishmentEligibilityStatus = document.getElementById("replenishmentEligibilityStatus");
   const requestReplenishmentButton = document.getElementById("requestReplenishmentButton");
   const metricsSection = document.getElementById("communityStateMetrics");
   const guidingMetricsSection = document.getElementById("communityGuidingMetrics");
@@ -1162,9 +1130,6 @@
     if (replenishmentEligibilityCard) {
       replenishmentEligibilityCard.classList.toggle("is-eligible", eligible);
       replenishmentEligibilityCard.classList.toggle("is-ineligible", !eligible);
-    }
-    if (replenishmentEligibilityStatus) {
-      replenishmentEligibilityStatus.textContent = eligible ? "Available" : "Unavailable";
     }
     if (requestReplenishmentButton) {
       requestReplenishmentButton.disabled = !eligible;
