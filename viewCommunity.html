@@ -183,31 +183,38 @@
     letter-spacing: .02em;
   }
 
-  .strategy-link {
-    margin-left: auto;
+  .top-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .operations-manual-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 28px;
-    padding: 0 10px;
-    border: 1px solid rgba(121, 213, 194, .26);
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(121, 213, 194, .30);
     border-radius: 999px;
-    color: rgba(170, 239, 219, .94);
-    background: rgba(121, 213, 194, .07);
+    color: #b7f0df;
+    background: rgba(121, 213, 194, .09);
     text-decoration: none;
-    font-size: .63rem;
+    font-size: .70rem;
     line-height: 1;
-    font-weight: 850;
+    font-weight: 900;
     letter-spacing: .045em;
     text-transform: uppercase;
     white-space: nowrap;
   }
 
-  .strategy-link:hover,
-  .strategy-link:focus-visible {
-    color: #d8fff5;
-    border-color: rgba(121, 213, 194, .48);
-    background: rgba(121, 213, 194, .12);
+  .operations-manual-link:hover,
+  .operations-manual-link:focus-visible {
+    color: #e5fff8;
+    border-color: rgba(121, 213, 194, .54);
+    background: rgba(121, 213, 194, .15);
     outline: none;
   }
 
@@ -773,17 +780,8 @@
     .dashboard-heading { margin: 0 0 8px; gap: 6px; flex-wrap: wrap; }
     .dashboard-title { font-size: .82rem; }
     .dashboard-subtitle { font-size: .62rem; }
-    .strategy-link {
-      width: 100%;
-      min-height: 22px;
-      margin-left: 0;
-      padding: 2px 0 0;
-      justify-content: flex-start;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      font-size: .56rem;
-    }
+    .top-nav { gap: 10px; margin-bottom: 18px; }
+    .operations-manual-link { min-height: 30px; padding: 0 10px; font-size: .60rem; }
     .metrics { padding: 0 0 2px; gap: 5px; }
     .guiding-metrics { padding: 7px 0 2px; gap: 5px; }
     .metrics-secondary { padding-top: 0; padding-bottom: 7px; }
@@ -817,7 +815,7 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    margin-bottom: 18px;
+    margin-bottom: 0;
     color: #9fddff;
     text-decoration: none;
     font-size: .78rem;
@@ -900,7 +898,10 @@
   <main class="shell">
     <section class="console" aria-labelledby="view-community-title">
       <header class="console-header">
-        <a class="owner-back" href="communities.html">← Communities</a>
+        <nav class="top-nav" aria-label="Community navigation">
+          <a class="owner-back" href="communities.html">← Communities</a>
+          <a class="operations-manual-link" id="operationsManualLink" href="documentation/operationsManual.html">Operations Manual →</a>
+        </nav>
         <div class="brand-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
         </div>
@@ -911,7 +912,6 @@
         <div class="dashboard-heading">
           <div class="dashboard-title" id="community-state-title">Tokenomics</div>
           <div class="dashboard-subtitle">— Flow &amp; replenishment</div>
-          <a class="strategy-link" id="replenishmentStrategyLink" href="replenishmentStrategy.html" aria-label="Read the Wild Ledger replenishment strategy">Replenishment Strategy →</a>
         </div>
         <section class="metrics" id="communityStateMetrics" aria-label="Community tokenomics dashboard">
           <div class="metric">
@@ -1038,12 +1038,14 @@
 
   const params = new URLSearchParams(window.location.search);
   const requestedId = (params.get("community") || "SFL").trim().toUpperCase();
+  const requestedRole = (params.get("role") || "owner").trim().toLowerCase();
+  const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
   const community = COMMUNITY_DIRECTORY[requestedId];
   const viewCommunityTitle = document.getElementById("view-community-title");
-  const replenishmentStrategyLink = document.getElementById("replenishmentStrategyLink");
+  const operationsManualLink = document.getElementById("operationsManualLink");
 
-  if (replenishmentStrategyLink) {
-    replenishmentStrategyLink.href = `replenishmentStrategy.html?community=${encodeURIComponent(requestedId)}`;
+  if (operationsManualLink) {
+    operationsManualLink.href = `documentation/operationsManual.html?role=${encodeURIComponent(role)}&community=${encodeURIComponent(requestedId)}`;
   }
 
   if (community) {
