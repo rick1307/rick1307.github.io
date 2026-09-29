@@ -246,10 +246,80 @@
   }
 
   .metric-policy-output {
-    border-color: rgba(239,118,93,.20);
+    transition: border-color .22s ease, background .22s ease, box-shadow .22s ease;
+  }
+
+  .metric-policy-output.is-ineligible {
+    --metric-accent: var(--coral) !important;
+    border-color: rgba(239,118,93,.34);
     background:
-      linear-gradient(150deg, rgba(239,118,93,.075), rgba(255,255,255,.012)),
+      linear-gradient(150deg, rgba(239,118,93,.14), rgba(255,255,255,.012)),
       rgba(5, 34, 46, .46) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 0 0 1px rgba(239,118,93,.035);
+  }
+
+  .metric-policy-output.is-eligible {
+    --metric-accent: var(--sea-glass) !important;
+    border-color: rgba(121,213,194,.42);
+    background:
+      linear-gradient(150deg, rgba(121,213,194,.16), rgba(255,255,255,.014)),
+      rgba(5, 34, 46, .46) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 0 0 1px rgba(121,213,194,.04);
+  }
+
+  .replenishment-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 7px;
+    padding: 4px 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: .50rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+  }
+
+  .metric-policy-output.is-ineligible .replenishment-status {
+    color: rgba(255,174,158,.92);
+    background: rgba(239,118,93,.08);
+  }
+
+  .metric-policy-output.is-eligible .replenishment-status {
+    color: rgba(170,239,219,.96);
+    background: rgba(121,213,194,.08);
+  }
+
+  .replenishment-action {
+    padding: 8px 0 4px;
+  }
+
+  .replenishment-request-button {
+    width: 100%;
+    border: 1px solid rgba(121,213,194,.42);
+    border-radius: 15px;
+    padding: 12px 16px;
+    background: rgba(121,213,194,.14);
+    color: #dffaf3;
+    font: 900 .78rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform .16s ease, border-color .16s ease, background .16s ease, opacity .16s ease;
+  }
+
+  .replenishment-request-button:not(:disabled):active {
+    transform: translateY(1px);
+  }
+
+  .replenishment-request-button:disabled {
+    border-color: rgba(239,118,93,.22);
+    background: rgba(239,118,93,.07);
+    color: rgba(255,203,193,.48);
+    cursor: not-allowed;
+    opacity: .78;
   }
 
   .metric-value {
@@ -828,10 +898,10 @@
 
       <section class="dashboard-group" aria-labelledby="community-state-title">
         <div class="dashboard-heading">
-          <div class="dashboard-title" id="community-state-title">State</div>
-          <div class="dashboard-subtitle">— What exists</div>
+          <div class="dashboard-title" id="community-state-title">Tokenomics</div>
+          <div class="dashboard-subtitle">— Flow &amp; replenishment</div>
         </div>
-        <section class="metrics" id="communityStateMetrics" aria-label="Community state dashboard">
+        <section class="metrics" id="communityStateMetrics" aria-label="Community tokenomics dashboard">
           <div class="metric">
             <button class="metric-info" type="button" aria-label="About Community Allocation" data-info-title="Community Allocation" data-info-calc="Sum of protocol-valid Allocation Checks from the Global Distribution Wallet to this community’s registered Community Operating Wallet that were successfully cashed." data-info-text="This is how much LEAP Wild Ledger has provisioned to this community over time." data-info-action="Do not replenish just because the community balance is low. Compare Allocation with Inventory, Deployment, and Reach. If Allocation keeps rising while Deployment or Reach stays weak, pause additional LEAP and find out why the community is not converting inventory into participation.">i</button>
             <div class="metric-value" id="metricCommunityAllocation" aria-live="polite">—</div>
@@ -877,13 +947,17 @@
             <div class="metric-label">Effective Deployment</div>
             <div class="metric-meaning">Adjusted LEAP</div>
           </div>
-          <div class="metric metric-policy-output">
-            <button class="metric-info" type="button" aria-label="About Eligible Replenishment" data-info-title="Eligible Replenishment" data-info-calc="Effective Deployment × 1.03, using the current notional 3% Growth Rate Provision." data-info-text="The amount the current guiding model would make eligible for replenishment: replacement of effective deployment plus a 3% growth liquidity provision." data-info-action="This is a notional policy output, not an automatic transfer. When formal replenishment events are recorded on-chain, already-replenished deployment must be excluded so it cannot qualify twice.">i</button>
+          <div class="metric metric-policy-output is-ineligible" id="replenishmentEligibilityCard">
+            <button class="metric-info" type="button" aria-label="About Eligible Replenishment" data-info-title="Eligible Replenishment" data-info-calc="Effective Deployment × 1.03, using the current notional 3% Growth Rate Provision." data-info-text="The amount the current guiding model would make eligible for replenishment: replacement of effective deployment plus a 3% growth liquidity provision." data-info-action="The card turns green when Effective Deployment is greater than zero and red when it is not. This is a notional eligibility signal until Wild Ledger adopts a formal replenishment policy and request workflow.">i</button>
             <div class="metric-value" id="metricEligibleReplenishment" aria-live="polite">—</div>
+            <div class="replenishment-status" id="replenishmentEligibilityStatus" aria-live="polite">Not Eligible</div>
             <div class="metric-label">Eligible Replenishment</div>
             <div class="metric-meaning">At 3% GRP</div>
           </div>
         </section>
+        <div class="replenishment-action">
+          <button class="replenishment-request-button" id="requestReplenishmentButton" type="button" disabled>Request Replenishment</button>
+        </div>
       </section>
 
       <section class="allocation-log-section" aria-labelledby="allocation-log-title">
@@ -989,6 +1063,9 @@
   const metricCirculationRatio = document.getElementById("metricCirculationRatio");
   const metricEffectiveDeployment = document.getElementById("metricEffectiveDeployment");
   const metricEligibleReplenishment = document.getElementById("metricEligibleReplenishment");
+  const replenishmentEligibilityCard = document.getElementById("replenishmentEligibilityCard");
+  const replenishmentEligibilityStatus = document.getElementById("replenishmentEligibilityStatus");
+  const requestReplenishmentButton = document.getElementById("requestReplenishmentButton");
   const metricsSection = document.getElementById("communityStateMetrics");
   const guidingMetricsSection = document.getElementById("communityGuidingMetrics");
   const metricValues = [
@@ -1081,8 +1158,24 @@
     requestAnimationFrame(() => fitMetricValue(el));
   }
 
+  function setReplenishmentEligibility(eligible, amount = 0) {
+    if (replenishmentEligibilityCard) {
+      replenishmentEligibilityCard.classList.toggle("is-eligible", eligible);
+      replenishmentEligibilityCard.classList.toggle("is-ineligible", !eligible);
+    }
+    if (replenishmentEligibilityStatus) {
+      replenishmentEligibilityStatus.textContent = eligible ? "Eligible" : "Not Eligible";
+    }
+    if (requestReplenishmentButton) {
+      requestReplenishmentButton.disabled = !eligible;
+      requestReplenishmentButton.dataset.amount = Number.isFinite(amount) ? String(amount) : "0";
+      requestReplenishmentButton.setAttribute("aria-disabled", eligible ? "false" : "true");
+    }
+  }
+
   function setLoading() {
     metricValues.forEach(el => setMetric(el, "…"));
+    setReplenishmentEligibility(false, 0);
     if (metricsSection) metricsSection.title = "Loading validated XRP Ledger community data…";
     if (guidingMetricsSection) guidingMetricsSection.title = "Calculating deployment, circulation, and notional replenishment guidance…";
     if (allocationLogSummary) allocationLogSummary.textContent = "Loading…";
@@ -1093,6 +1186,7 @@
 
   function setUnavailable(message) {
     metricValues.forEach(el => setMetric(el, "—"));
+    setReplenishmentEligibility(false, 0);
     if (metricsSection) metricsSection.title = message || "Community ledger data unavailable.";
     if (guidingMetricsSection) guidingMetricsSection.title = message || "Community ledger data unavailable.";
     if (allocationLogSummary) allocationLogSummary.textContent = "Unavailable";
@@ -1478,6 +1572,7 @@
       const circulationRatio = deploymentRatio === null ? null : deploymentRatio * circulation;
       const effectiveDeployment = distribution.distributed * circulation;
       const eligibleReplenishment = effectiveDeployment * 1.03;
+      const replenishmentEligible = Number.isFinite(effectiveDeployment) && effectiveDeployment > 0;
 
       setMetric(metricCommunityAllocation, formatLeap(completedAllocation));
       setMetric(metricCommunityLeap, formatLeap(balances.communityLeap));
@@ -1487,6 +1582,7 @@
       setMetric(metricCirculationRatio, formatRatio(circulationRatio));
       setMetric(metricEffectiveDeployment, `${formatLeap(effectiveDeployment)} LEAP`);
       setMetric(metricEligibleReplenishment, `${formatLeap(eligibleReplenishment)} LEAP`);
+      setReplenishmentEligibility(replenishmentEligible, eligibleReplenishment);
       renderAllocationLog(allocations);
 
       if (metricsSection) {
@@ -1506,6 +1602,24 @@
         try { ws.close(); } catch (_) {}
       }
     }
+  }
+
+  if (requestReplenishmentButton) {
+    requestReplenishmentButton.addEventListener("click", () => {
+      if (requestReplenishmentButton.disabled) return;
+      const amount = Number(requestReplenishmentButton.dataset.amount || 0);
+      const detail = {
+        communityId: requestedId,
+        communityName: community?.name || requestedId,
+        eligibleReplenishment: amount,
+        growthRateProvision: 0.03
+      };
+      const requestEvent = new CustomEvent("wildledger:replenishment-request", { detail, cancelable: true });
+      const handled = !window.dispatchEvent(requestEvent);
+      if (!handled) {
+        window.alert(`Eligible replenishment: ${formatLeap(amount)} LEAP. Request routing is not connected yet.`);
+      }
+    });
   }
 
   const metricInfoScrim = document.getElementById("metricInfoScrim");
