@@ -900,7 +900,7 @@
       <header class="console-header">
         <nav class="top-nav" aria-label="Community navigation">
           <a class="owner-back" href="communities.html">← Communities</a>
-          <a class="operations-manual-link" id="operationsManualLink" href="documentation/operationsManual.html">Operations Manual →</a>
+          <a class="operations-manual-link" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
         </nav>
         <div class="brand-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
@@ -1042,10 +1042,10 @@
   const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
   const community = COMMUNITY_DIRECTORY[requestedId];
   const viewCommunityTitle = document.getElementById("view-community-title");
-  const operationsManualLink = document.getElementById("operationsManualLink");
+  const professionalLibraryLink = document.getElementById("professionalLibraryLink");
 
-  if (operationsManualLink) {
-    operationsManualLink.href = `documentation/operationsManual.html?role=${encodeURIComponent(role)}&community=${encodeURIComponent(requestedId)}`;
+  if (professionalLibraryLink) {
+    professionalLibraryLink.href = `professionalLibrary.html?role=${encodeURIComponent(role)}&community=${encodeURIComponent(requestedId)}`;
   }
 
   if (community) {
