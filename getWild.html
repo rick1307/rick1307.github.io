@@ -162,10 +162,62 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
 const form = document.getElementById('getWildForm');
 const status = document.getElementById('accessStatus');
 
+/*
+  TEST HARNESS ONLY
+  -----------------
+  These credentials are intentionally simple and public. They provide NO real
+  security. Their only purpose is to test Wild Ledger role routing before the
+  Cloudflare Worker authentication service is connected.
+
+  Owner Access ID: any case-insensitive prefix of "owner" with 2+ characters
+                   (ow, own, owne, owner)
+  ZHR Community Operator Access ID: any case-insensitive prefix of "operator" with 2+ characters
+                                  (op, ope, oper, ... operator)
+  Access key: ignored in test mode (blank or any value accepted)
+*/
+const TEST_USERS = {
+  owner: {
+    role: 'owner',
+    route: 'owner.html'
+  },
+  operator: {
+    role: 'operator',
+    community: 'ZHR',
+    route: 'viewCommunity.html?community=ZHR&role=operator'
+  }
+};
+
 form.addEventListener('submit', event => {
   event.preventDefault();
-  status.textContent = 'Authentication is not connected yet. This page is ready for the Wild Ledger access service.';
+
+  const accessId = document.getElementById('accessId').value.trim().toLowerCase();
+  // The access key is intentionally ignored by this temporary test harness.
+  // Accept only distinguishable 2+ character prefixes of the exact test IDs.
+  // Extra characters do not match: e.g. "owners" and "operators" are rejected.
+  let user = null;
+  if (accessId.length >= 2 && 'owner'.startsWith(accessId)) {
+    user = TEST_USERS.owner;
+  } else if (accessId.length >= 2 && 'operator'.startsWith(accessId)) {
+    user = TEST_USERS.operator;
+  }
+
+  if (!user) {
+    status.textContent = 'Access ID is not recognized.';
+    status.className = 'status error';
+    return;
+  }
+
+  sessionStorage.setItem('wildLedgerRole', user.role);
+
+  if (user.community) {
+    sessionStorage.setItem('wildLedgerCommunity', user.community);
+  } else {
+    sessionStorage.removeItem('wildLedgerCommunity');
+  }
+
+  status.textContent = 'Access recognized. Opening Wild Ledger…';
   status.className = 'status';
+  window.location.href = user.route;
 });
 </script>
 </body>

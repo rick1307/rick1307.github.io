@@ -1037,7 +1037,7 @@
   };
 
   const params = new URLSearchParams(window.location.search);
-  const requestedId = (params.get("community") || "SFL").trim().toUpperCase();
+  const requestedId = (params.get("community") || "ZHR").trim().toUpperCase();
   const requestedRole = (params.get("role") || "owner").trim().toLowerCase();
   const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
   const community = COMMUNITY_DIRECTORY[requestedId];
