@@ -32,6 +32,7 @@ li{margin:8px 0}
 .num{flex:0 0 36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
 .status{display:inline-block;border:1px solid var(--gold);color:#79592f;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 footer{margin-top:55px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.control-row{display:flex;justify-content:flex-end;margin-bottom:18px}
 
 .manager-button{display:inline-block;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:rgba(255,255,255,.78);padding:8px 13px;border-radius:999px;font-size:13px;font-weight:750;white-space:nowrap}
 .manager-button:hover{background:#fff}
@@ -40,11 +41,12 @@ footer{margin-top:55px;padding-top:24px;border-top:1px solid var(--line);color:v
 </head>
 <body>
 <div class="wrap">
-<header style="position:relative">
+<div class="control-row wl-nav-right"><a class="manager-button wl-header-control" href="../professionalLibrary.html">Professional Library</a></div>
+<header>
 <div class="kicker">Wild Ledger · Architecture &amp; Development Plan</div>
 <h1>Multi-Community Initiative</h1>
 <p class="subtitle">The game plan for evolving Sailing Frog's Leap from a single-community application into one Wild Ledger platform capable of serving many independently branded LEAP communities.</p>
-<a class="manager-button wl-header-control" href="../professionalLibrary.html" style="position:absolute;right:0;top:0">Professional Library</a></header>
+</header>
 <section>
 <span class="status">Working plan</span>
 <h2 style="margin-top:12px">Purpose of this document</h2>
