@@ -877,7 +877,7 @@
 <body>
   <main class="wrap">
     <div class="top wl-nav-right">
-      <a class="back wl-header-control" href="professionalLibrary.html">Professional Library →</a>
+      <a class="back wl-header-control" id="viewCommunityBack" href="viewCommunity.html">← View Community</a>
     </div>
     <h1>Community Recognition</h1>
 
@@ -1669,5 +1669,13 @@
       start();
     })();
   </script>
+
+  <script>
+    const viewCommunityBack = document.getElementById("viewCommunityBack");
+    if (viewCommunityBack) {
+      viewCommunityBack.href = `viewCommunity.html${window.location.search}`;
+    }
+  </script>
+
 </body>
 </html>

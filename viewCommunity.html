@@ -207,13 +207,13 @@
             <button class="operator-logout wl-header-control" id="operatorLogout" type="button">Log Out</button>
           </div>
           <div class="top-navigation">
-            <a class="operations-manual-link wl-header-control" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
           </div>
         </nav>
         <h1 id="view-community-title">View Community</h1>
         <div class="community-links">
           <a class="community-link" id="communityTokenomicsLink" href="viewCommunityTokenomics.html">Community Tokenomics</a>
           <a class="community-link" id="communityRecognitionLink" href="viewCommunityRecognition.html">Community Recognition</a>
+          <a class="community-link" id="communityLibraryLink" href="viewCommunityLibrary.html">View Community Library</a>
         </div>
       </header>
     </section>
@@ -233,11 +233,11 @@
   const community = COMMUNITY_DIRECTORY[requestedId];
 
   const viewCommunityTitle = document.getElementById("view-community-title");
-  const professionalLibraryLink = document.getElementById("professionalLibraryLink");
   const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
   const operatorLogout = document.getElementById("operatorLogout");
   const communityTokenomicsLink = document.getElementById("communityTokenomicsLink");
   const communityRecognitionLink = document.getElementById("communityRecognitionLink");
+  const communityLibraryLink = document.getElementById("communityLibraryLink");
 
   if (ownerCommunitiesBack && role !== "owner") {
     ownerCommunitiesBack.remove();
@@ -253,9 +253,6 @@
     });
   }
 
-  if (professionalLibraryLink) {
-    professionalLibraryLink.href = `professionalLibrary.html?role=${encodeURIComponent(role)}&community=${encodeURIComponent(requestedId)}&from=viewCommunity`;
-  }
 
   if (communityTokenomicsLink) {
     communityTokenomicsLink.href = `viewCommunityTokenomics.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
@@ -263,6 +260,10 @@
 
   if (communityRecognitionLink) {
     communityRecognitionLink.href = `viewCommunityRecognition.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
+  }
+
+  if (communityLibraryLink) {
+    communityLibraryLink.href = `viewCommunityLibrary.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}&from=viewCommunity`;
   }
 
   if (community) {

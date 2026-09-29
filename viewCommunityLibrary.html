@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" data-role="owner">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>View Community Library | Wild Ledger</title>
+<style>
+  :root {
+    --bg-top: #eef3f8;
+    --bg-bottom: #dfe6ee;
+    --panel: rgba(255, 255, 255, 0.78);
+    --panel-border: rgba(255, 255, 255, 0.65);
+    --text: #12263f;
+    --muted: #5d728b;
+    --blue-1: #3b6fb6;
+    --blue-2: #2c5ea4;
+    --blue-3: #234d86;
+    --shadow: 0 16px 36px rgba(25, 46, 77, 0.14);
+    --button-shadow: 0 10px 24px rgba(41, 84, 143, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    display: flex;
+    justify-content: center;
+    padding: 26px 18px 48px;
+  }
+
+  .shell { width: min(100%, 640px); }
+
+  .hero {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 72px 22px 22px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin-bottom: 20px;
+  }
+
+  .back-link {
+    position: absolute;
+    top: 26px;
+    right: 22px;
+    text-decoration: none;
+    color: var(--blue-2);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .back-link:hover,
+  .back-link:focus-visible {
+    color: var(--blue-3);
+    outline: none;
+    text-decoration: underline;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-2);
+    background: rgba(59, 111, 182, 0.12);
+    padding: 7px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+
+  h1 { margin: 0 0 8px; font-size: 32px; line-height: 1.1; }
+  .hero p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); }
+
+  .role-line {
+    margin-top: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #50657d;
+  }
+
+  .section-label {
+    margin: 24px 4px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #50657d;
+  }
+
+  .section-note {
+    margin: -4px 4px 12px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .menu { display: flex; flex-direction: column; gap: 14px; }
+
+  .menu a {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(180deg, var(--blue-1) 0%, var(--blue-2) 100%);
+    border-radius: 22px;
+    padding: 18px 20px;
+    box-shadow: var(--button-shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .menu a:hover,
+  .menu a:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(36, 77, 134, 0.24);
+    background: linear-gradient(180deg, #4279c3 0%, #295993 100%);
+    outline: none;
+  }
+
+  .primary-docs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .primary-docs a { min-width: 0; }
+  .primary-docs .link-title { font-size: 23px; }
+
+  .protocol-wrap {
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: 24px;
+    background: rgba(255,255,255,.46);
+    border: 1px solid rgba(35,77,134,.14);
+    box-shadow: 0 12px 28px rgba(25,46,77,.08);
+  }
+
+  .protocol-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .protocol-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-decoration: none;
+    color: var(--text);
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(35,77,134,.16);
+    border-radius: 18px;
+    padding: 16px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+
+  .protocol-card:hover,
+  .protocol-card:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(35,77,134,.36);
+    box-shadow: 0 10px 22px rgba(25,46,77,.12);
+    outline: none;
+  }
+
+  .protocol-card.canonical {
+    background: linear-gradient(180deg, #315f9f 0%, #234d86 100%);
+    color: white;
+    border-color: transparent;
+  }
+
+  .protocol-status {
+    align-self: flex-start;
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: var(--blue-3);
+    background: rgba(59,111,182,.10);
+  }
+
+  .canonical .protocol-status {
+    color: white;
+    background: rgba(255,255,255,.16);
+  }
+
+  .protocol-title {
+    display: block;
+    font-size: 20px;
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+  }
+
+  .protocol-copy {
+    display: block;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .canonical .protocol-copy { color: rgba(255,255,255,.88); }
+
+  .protocol-file {
+    display: block;
+    margin-top: auto;
+    padding-top: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6d8096;
+    overflow-wrap: anywhere;
+  }
+
+  .canonical .protocol-file { color: rgba(255,255,255,.72); }
+
+  html[data-role="operator"] .protocol-grid { grid-template-columns: 1fr; }
+
+  .link-title {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.08;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+
+  .link-subtitle {
+    display: block;
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(255,255,255,.88);
+  }
+
+  .link-file {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: rgba(255,255,255,.78);
+    overflow-wrap: anywhere;
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 560px) {
+    body { padding: 20px 14px 40px; }
+    .hero { border-radius: 20px; padding: 68px 18px 18px; }
+    .back-link { top: 22px; right: 18px; }
+    h1 { font-size: 28px; }
+    .primary-docs { grid-template-columns: 1fr; }
+    .protocol-grid { grid-template-columns: 1fr; }
+    .primary-docs .link-title, .link-title { font-size: 22px; }
+  }
+</style>
+  <link rel="stylesheet" href="wildLedgerControls.css">
+</head>
+<body>
+<div class="shell">
+  <div class="hero">
+    <a class="back-link wl-header-control" id="backLink" href="viewCommunity.html">← View Community</a>
+    <p>The operating shelf for Wild Ledger. Formal doctrine lives in the Operations Manual and LEAP Protocol. Working material stays below until it is ready to be absorbed into one of those documents.</p>
+    <div class="role-line" id="roleLine">Owner View</div>
+  </div>
+
+  <div class="section-label">View Community Library</div>
+  <div class="section-note">The authoritative operating document.</div>
+  <div class="menu primary-docs">
+    <a id="operationsManualLink" href="documentation/operationsManual.html">
+      <span class="link-title">Operations Manual</span>
+      <span class="link-subtitle">How Wild Ledger is operated: wallets, allocation, distribution, replenishment, recognition, community operations, and procedures.</span>
+      <span class="link-file">documentation/operationsManual.html</span>
+    </a>
+  </div>
+
+  <div class="section-label">LEAP Protocol</div>
+  <div class="section-note">The canonical protocol, the design bridge for extending it, and the owner-only view of what may come next.</div>
+  <div class="protocol-wrap">
+    <div class="protocol-grid">
+      <a class="protocol-card canonical" id="leapProtocolLink" href="documentation/leapProtocol.html">
+        <span class="protocol-status">What Is</span>
+        <span class="protocol-title">LEAP Protocol</span>
+        <span class="protocol-copy">The current authoritative standard: LEAP identity, authority, namespace, memo grammar, ledger records, validity, and protocol rules.</span>
+        <span class="protocol-file">documentation/leapProtocol.html</span>
+      </a>
+      <a class="protocol-card" id="protocolExtensibilityLink" data-audience="owner" href="documentation/protocolExtensibility.html">
+        <span class="protocol-status">How It Can Evolve</span>
+        <span class="protocol-title">Protocol Extensibility</span>
+        <span class="protocol-copy">The bridge between the canonical protocol and future versions: how block space, versioning, and compact rules preserve room to grow.</span>
+        <span class="protocol-file">documentation/protocolExtensibility.html</span>
+      </a>
+      <a class="protocol-card" id="protocolSnapshotExtensionLink" data-audience="owner" href="documentation/protocolSnapshotExtension.html">
+        <span class="protocol-status">What Could Be Next</span>
+        <span class="protocol-title">Protocol Snapshot Extension</span>
+        <span class="protocol-copy">A notional protocol extension showing how periodic community state could be recorded without changing what is currently authoritative.</span>
+        <span class="protocol-file">documentation/protocolSnapshotExtension.html</span>
+      </a>
+    </div>
+  </div>
+
+  <div id="workingPapers" data-audience="owner">
+    <div class="section-label">Working Papers / Reference</div>
+    <div class="section-note">Parking lot for useful, strategic, experimental, or not-yet-integrated material. These files remain independent until we decide where they belong.</div>
+    <div class="menu">
+      <a href="documentation/wildLedger.html">
+        <span class="link-title">Wild Ledger</span>
+        <span class="link-subtitle">Prospect-facing overview of the multi-community LEAP platform, offer, and circulation-based replenishment model.</span>
+        <span class="link-file">wildLedger.html</span>
+      </a>
+      <a href="documentation/multiCommunityInitiative.html">
+        <span class="link-title">Multi-Community Initiative</span>
+        <span class="link-subtitle">Working architecture and transition plan for proving one shared application across Sailing Frog’s Leap and Zach’s Hot Rods.</span>
+        <span class="link-file">multiCommunityInitiative.html</span>
+      </a>
+      <a href="managerCheckbook.html">
+        <span class="link-title">Checkbook</span>
+        <span class="link-subtitle">Outstanding LEAP Checks, expiration status, reserve tied up, and Check creation.</span>
+        <span class="link-file">managerCheckbook.html</span>
+      </a>
+      <a href="documentation/stateMachine.html">
+        <span class="link-title">LEAP Logbook</span>
+        <span class="link-subtitle">How the Sailing Frog’s Leap community uses ledger state as a living logbook.</span>
+        <span class="link-file">documentation/stateMachine.html</span>
+      </a>
+      <a href="documentation/discordIntegration.html">
+        <span class="link-title">Discord Integration</span>
+        <span class="link-subtitle">Legacy integration concept retained temporarily as a working reference while Lounge documentation is consolidated.</span>
+        <span class="link-file">documentation/discordIntegration.html</span>
+      </a>
+      <a href="documentation/marketing.html">
+        <span class="link-title">Marketing</span>
+        <span class="link-subtitle">Positioning, messaging, and the outward-facing explanation of the LEAP idea.</span>
+        <span class="link-file">documentation/marketing.html</span>
+      </a>
+      <a href="documentation/kudo.html">
+        <span class="link-title">KUDO</span>
+        <span class="link-subtitle">Future-layer concept: a behavior and recognition game that ultimately feeds back into LEAP.</span>
+        <span class="link-file">documentation/kudo.html</span>
+      </a>
+      <a href="documentation/globalStateMachine.html">
+        <span class="link-title">Global State Machine</span>
+        <span class="link-subtitle">The bigger secular thesis: blockspace as shared global state capacity.</span>
+        <span class="link-file">documentation/globalStateMachine.html</span>
+      </a>
+      <a href="ambientStateEngine/ambientStateEngine.html">
+        <span class="link-title">Ambient State Engine</span>
+        <span class="link-subtitle">Experimental engine for translating live signals into expressive site state.</span>
+        <span class="link-file">ambientStateMachine/ambientStateEngine.html</span>
+      </a>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const requestedRole = (params.get('role') || 'owner').trim().toLowerCase();
+  const role = requestedRole === 'operator' || requestedRole === 'manager' ? 'operator' : 'owner';
+  const community = (params.get('community') || '').trim().toUpperCase();
+  const requestedFrom = (params.get('from') || '').trim().toLowerCase();
+
+  // View Community Library is entered from a specific
+  // View Community page. Remember that origin so trips into library documents
+  // can return here without losing the correct back destination.
+  if (role === 'owner' && requestedFrom === 'owner') {
+    sessionStorage.setItem('wildLedgerLibraryOrigin', 'owner');
+    sessionStorage.removeItem('wildLedgerLibraryCommunity');
+  } else if (community) {
+    sessionStorage.setItem('wildLedgerLibraryOrigin', 'community');
+    sessionStorage.setItem('wildLedgerLibraryCommunity', community);
+  }
+
+  const storedOrigin = sessionStorage.getItem('wildLedgerLibraryOrigin') || '';
+  const storedCommunity = (sessionStorage.getItem('wildLedgerLibraryCommunity') || '').trim().toUpperCase();
+  const ownerEntry = role === 'owner' && (requestedFrom === 'owner' || (!community && storedOrigin === 'owner'));
+  const effectiveCommunity = community || (storedOrigin === 'community' ? storedCommunity : '');
+
+  document.documentElement.dataset.role = role;
+
+  const roleLine = document.getElementById('roleLine');
+  if (roleLine) roleLine.textContent = role === 'operator' ? 'Community Operator View' : 'Owner View';
+
+  document.querySelectorAll('[data-audience]').forEach((node) => {
+    const audience = (node.dataset.audience || 'shared').toLowerCase();
+    node.hidden = !(audience === 'shared' || audience === role || (role === 'owner' && audience === 'operator'));
+  });
+
+  const context = new URLSearchParams();
+  context.set('role', role);
+  if (effectiveCommunity) context.set('community', effectiveCommunity);
+  if (ownerEntry) context.set('from', 'owner');
+  const qs = context.toString();
+
+  const backLink = document.getElementById('backLink');
+  const operationsManualLink = document.getElementById('operationsManualLink');
+  const leapProtocolLink = document.getElementById('leapProtocolLink');
+  const protocolExtensibilityLink = document.getElementById('protocolExtensibilityLink');
+  const protocolSnapshotExtensionLink = document.getElementById('protocolSnapshotExtensionLink');
+
+  if (backLink) {
+    if (ownerEntry) {
+      backLink.textContent = '← Owner';
+      backLink.href = 'owner.html';
+    } else {
+      backLink.textContent = '← View Community';
+      backLink.href = `viewCommunity.html?${qs}`;
+    }
+  }
+  if (operationsManualLink) operationsManualLink.href = `documentation/operationsManual.html?${qs}`;
+  if (leapProtocolLink) leapProtocolLink.href = `documentation/leapProtocol.html?${qs}`;
+  if (protocolExtensibilityLink) protocolExtensibilityLink.href = `documentation/protocolExtensibility.html?${qs}`;
+  if (protocolSnapshotExtensionLink) protocolSnapshotExtensionLink.href = `documentation/protocolSnapshotExtension.html?${qs}`;
+})();
+</script>
+</body>
+</html>

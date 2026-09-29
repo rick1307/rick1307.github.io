@@ -945,8 +945,7 @@
           <div class="top-actions">
           </div>
           <div class="top-navigation">
-            <a class="owner-back wl-header-control" id="ownerCommunitiesBack" href="communities.html">← Communities</a>
-            <a class="operations-manual-link wl-header-control" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
+            <a class="owner-back wl-header-control" id="viewCommunityBack" href="viewCommunity.html">← View Community</a>
           </div>
         </nav>
         <h1 id="view-community-title">View Community</h1>
@@ -1086,13 +1085,13 @@
   const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
   const community = COMMUNITY_DIRECTORY[requestedId];
   const viewCommunityTitle = document.getElementById("view-community-title");
-  const professionalLibraryLink = document.getElementById("professionalLibraryLink");
-  const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
+  const viewCommunityBack = document.getElementById("viewCommunityBack");
   const operatorLogout = document.getElementById("operatorLogout");
 
-  if (ownerCommunitiesBack && role !== "owner") {
-    ownerCommunitiesBack.remove();
+  if (viewCommunityBack) {
+    viewCommunityBack.href = `viewCommunity.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
+
 
   if (operatorLogout && role !== "operator") {
     operatorLogout.remove();
@@ -1104,9 +1103,6 @@
     });
   }
 
-  if (professionalLibraryLink) {
-    professionalLibraryLink.href = `professionalLibrary.html?role=${encodeURIComponent(role)}&community=${encodeURIComponent(requestedId)}`;
-  }
 
   if (community) {
     viewCommunityTitle.textContent = `View ${community.name}`;
