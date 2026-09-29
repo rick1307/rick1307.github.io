@@ -14,9 +14,26 @@
 
     body {
       margin: 0;
-      padding: 32px 18px 60px;
+      padding: 18px 18px 60px;
       line-height: 1.45;
     }
+
+    .library-nav {
+      max-width: 760px;
+      margin: 0 auto 18px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .library-nav a {
+      color: inherit;
+      text-decoration: none;
+      font-size: .86rem;
+      font-weight: 800;
+    }
+
+    .library-nav a:hover,
+    .library-nav a:focus-visible { text-decoration: underline; outline: none; }
 
     main {
       max-width: 760px;
@@ -240,6 +257,9 @@
   </style>
 </head>
 <body>
+  <nav class="library-nav" aria-label="Working paper navigation">
+    <a href="../professionalLibrary.html">Professional Library →</a>
+  </nav>
   <main>
     <h1>Ambient State Engine</h1>
     <p class="subhead">Version 1 — Hello World</p>
