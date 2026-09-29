@@ -222,17 +222,34 @@
   .metric:nth-child(3) { --metric-accent: var(--mango); }
   .metric:nth-child(4) { --metric-accent: var(--coral); }
 
-  .metric-guiding {
-    grid-column: 1 / -1;
-    --metric-accent: var(--sea-glass);
-    min-height: 88px;
+  .guiding-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 10px 0 4px;
+  }
+
+  .guiding-metrics .metric {
+    min-height: 96px;
     background:
-      linear-gradient(150deg, rgba(121,213,194,.075), rgba(255,255,255,.012)),
+      linear-gradient(150deg, rgba(121,213,194,.065), rgba(255,255,255,.012)),
       rgba(5, 34, 46, .46);
   }
 
-  .metric-guiding .metric-value {
-    font-size: clamp(1.55rem, 4.5vw, 2.25rem);
+  .guiding-metrics .metric:nth-child(1) { --metric-accent: var(--sea-glass); }
+  .guiding-metrics .metric:nth-child(2) { --metric-accent: var(--lagoon); }
+  .guiding-metrics .metric:nth-child(3) { --metric-accent: var(--mango); }
+  .guiding-metrics .metric:nth-child(4) { --metric-accent: var(--coral); }
+
+  .guiding-metrics .metric-value {
+    font-size: clamp(1.35rem, 4.2vw, 2rem);
+  }
+
+  .metric-policy-output {
+    border-color: rgba(239,118,93,.20);
+    background:
+      linear-gradient(150deg, rgba(239,118,93,.075), rgba(255,255,255,.012)),
+      rgba(5, 34, 46, .46) !important;
   }
 
   .metric-value {
@@ -687,8 +704,10 @@
     .dashboard-title { font-size: .82rem; }
     .dashboard-subtitle { font-size: .62rem; }
     .metrics { padding: 0 0 2px; gap: 5px; }
+    .guiding-metrics { padding: 7px 0 2px; gap: 5px; }
     .metrics-secondary { padding-top: 0; padding-bottom: 7px; }
     .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
+    .guiding-metrics .metric { min-height: 82px; }
     .metrics-secondary .metric { min-height: 82px; }
     .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
     .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
@@ -837,11 +856,32 @@
             <div class="metric-label">Holders</div>
             <div class="metric-meaning">Reach</div>
           </div>
-          <div class="metric metric-guiding">
-            <button class="metric-info" type="button" aria-label="About Deployment Ratio" data-info-title="Deployment Ratio" data-info-calc="LEAP Distributed ÷ (LEAP Distributed + Community LEAP) × 100." data-info-text="This is a notional guiding signal showing how much of the LEAP represented by current inventory plus lifetime deployment has moved out of the Community Operating Wallet and into participant wallets." data-info-action="Use this as a directional signal, not a target. A rising ratio means distribution is increasing relative to inventory. Wild Ledger replenishment policy is not yet tied to this metric, and community leaders should not distribute LEAP simply to raise the ratio.">i</button>
+        </section>
+
+        <section class="guiding-metrics" id="communityGuidingMetrics" aria-label="Community deployment and replenishment guidance">
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Deployment Ratio" data-info-title="Deployment Ratio" data-info-calc="LEAP Distributed ÷ (LEAP Distributed + Community LEAP) × 100." data-info-text="Raw deployment compared with the LEAP still held as community operating inventory. It shows movement out of the Community Operating Wallet before any concentration adjustment." data-info-action="Use this as the first signal only. A high Deployment Ratio does not by itself qualify replenishment; Circulation Ratio adjusts it for concentration.">i</button>
             <div class="metric-value" id="metricDeploymentRatio" aria-live="polite">—</div>
             <div class="metric-label">Deployment Ratio</div>
-            <div class="metric-meaning">Guiding Light</div>
+            <div class="metric-meaning">DR</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Circulation Ratio" data-info-title="Circulation Ratio" data-info-calc="Deployment Ratio × Circulation Factor. Circulation Factor = 1 − Σ(recipient share²), using each recipient wallet’s share of this community’s validated LEAP deployment." data-info-text="This automatically discounts concentrated deployment. Broad distribution approaches the full Deployment Ratio; concentration in one or a few wallets pulls the ratio down." data-info-action="This is the anti-hoarding stabilizer. Communities improve it by circulating LEAP broadly rather than concentrating distributions into a small number of wallets.">i</button>
+            <div class="metric-value" id="metricCirculationRatio" aria-live="polite">—</div>
+            <div class="metric-label">Circulation Ratio</div>
+            <div class="metric-meaning">CR</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Effective Deployment" data-info-title="Effective Deployment" data-info-calc="LEAP Distributed × Circulation Factor." data-info-text="The concentration-adjusted amount of validated community deployment. This converts Circulation Ratio back into a LEAP amount for policy use." data-info-action="This is the LEAP amount currently recognized by the guiding model as effective deployment rather than merely gross outflow.">i</button>
+            <div class="metric-value" id="metricEffectiveDeployment" aria-live="polite">—</div>
+            <div class="metric-label">Effective Deployment</div>
+            <div class="metric-meaning">Adjusted LEAP</div>
+          </div>
+          <div class="metric metric-policy-output">
+            <button class="metric-info" type="button" aria-label="About Eligible Replenishment" data-info-title="Eligible Replenishment" data-info-calc="Effective Deployment × 1.03, using the current notional 3% Growth Rate Provision." data-info-text="The amount the current guiding model would make eligible for replenishment: replacement of effective deployment plus a 3% growth liquidity provision." data-info-action="This is a notional policy output, not an automatic transfer. When formal replenishment events are recorded on-chain, already-replenished deployment must be excluded so it cannot qualify twice.">i</button>
+            <div class="metric-value" id="metricEligibleReplenishment" aria-live="polite">—</div>
+            <div class="metric-label">Eligible Replenishment</div>
+            <div class="metric-meaning">At 3% GRP</div>
           </div>
         </section>
       </section>
@@ -946,8 +986,21 @@
   const metricLeapDistributed = document.getElementById("metricLeapDistributed");
   const metricHoldersReached = document.getElementById("metricHoldersReached");
   const metricDeploymentRatio = document.getElementById("metricDeploymentRatio");
+  const metricCirculationRatio = document.getElementById("metricCirculationRatio");
+  const metricEffectiveDeployment = document.getElementById("metricEffectiveDeployment");
+  const metricEligibleReplenishment = document.getElementById("metricEligibleReplenishment");
   const metricsSection = document.getElementById("communityStateMetrics");
-  const metricValues = [metricCommunityAllocation, metricCommunityLeap, metricLeapDistributed, metricHoldersReached, metricDeploymentRatio];
+  const guidingMetricsSection = document.getElementById("communityGuidingMetrics");
+  const metricValues = [
+    metricCommunityAllocation,
+    metricCommunityLeap,
+    metricLeapDistributed,
+    metricHoldersReached,
+    metricDeploymentRatio,
+    metricCirculationRatio,
+    metricEffectiveDeployment,
+    metricEligibleReplenishment
+  ];
   const allocationLogSummary = document.getElementById("allocationLogSummary");
   const allocationLogBody = document.getElementById("allocationLogBody");
   const allocationLogNote = document.getElementById("allocationLogNote");
@@ -989,11 +1042,26 @@
     return value.toLocaleString(undefined, { maximumFractionDigits: 6 });
   }
 
-  function formatDeploymentRatio(distributed, inventory) {
+  function deploymentRatioValue(distributed, inventory) {
     const total = distributed + inventory;
-    if (!Number.isFinite(total) || total <= 0) return "—";
-    const ratio = (distributed / total) * 100;
-    return `${ratio.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}%`;
+    if (!Number.isFinite(total) || total <= 0) return null;
+    return distributed / total;
+  }
+
+  function formatRatio(value) {
+    if (!Number.isFinite(value)) return "—";
+    return `${(value * 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}%`;
+  }
+
+  function circulationFactor(recipientAmounts, distributed) {
+    if (!Number.isFinite(distributed) || distributed <= 0) return 0;
+    let concentration = 0;
+    for (const amount of recipientAmounts.values()) {
+      if (!Number.isFinite(amount) || amount <= 0) continue;
+      const share = amount / distributed;
+      concentration += share * share;
+    }
+    return Math.max(0, Math.min(1, 1 - concentration));
   }
 
   function fitMetricValue(el) {
@@ -1016,6 +1084,7 @@
   function setLoading() {
     metricValues.forEach(el => setMetric(el, "…"));
     if (metricsSection) metricsSection.title = "Loading validated XRP Ledger community data…";
+    if (guidingMetricsSection) guidingMetricsSection.title = "Calculating deployment, circulation, and notional replenishment guidance…";
     if (allocationLogSummary) allocationLogSummary.textContent = "Loading…";
     if (allocationLogBody) {
       allocationLogBody.innerHTML = '<tr><td colspan="4" class="allocation-log-empty">Loading validated Allocation Checks…</td></tr>';
@@ -1025,6 +1094,7 @@
   function setUnavailable(message) {
     metricValues.forEach(el => setMetric(el, "—"));
     if (metricsSection) metricsSection.title = message || "Community ledger data unavailable.";
+    if (guidingMetricsSection) guidingMetricsSection.title = message || "Community ledger data unavailable.";
     if (allocationLogSummary) allocationLogSummary.textContent = "Unavailable";
     if (allocationLogBody) {
       allocationLogBody.innerHTML = `<tr><td colspan="4" class="allocation-log-empty">${escapeHtml(message || "Allocation history unavailable.")}</td></tr>`;
@@ -1270,6 +1340,7 @@
     const account = community.operatingWallet;
     let distributed = 0;
     const recipients = new Set();
+    const recipientAmounts = new Map();
     const countedHashes = new Set();
 
     for (const entry of operatingHistory) {
@@ -1298,12 +1369,14 @@
 
       const hash = transactionHash(entry);
       if (hash && countedHashes.has(hash)) continue;
-      distributed += leapAmountValue(delivered);
+      const deliveredValue = leapAmountValue(delivered);
+      distributed += deliveredValue;
       recipients.add(destination);
+      recipientAmounts.set(destination, (recipientAmounts.get(destination) || 0) + deliveredValue);
       if (hash) countedHashes.add(hash);
     }
 
-    return { distributed, recipients };
+    return { distributed, recipients, recipientAmounts };
   }
 
   async function loadIssuerLines(ws, nextId, recipientSet) {
@@ -1400,15 +1473,27 @@
         .filter(item => item.status === "Cashed")
         .reduce((sum, item) => sum + item.amount, 0);
 
+      const deploymentRatio = deploymentRatioValue(distribution.distributed, balances.communityLeap);
+      const circulation = circulationFactor(distribution.recipientAmounts, distribution.distributed);
+      const circulationRatio = deploymentRatio === null ? null : deploymentRatio * circulation;
+      const effectiveDeployment = distribution.distributed * circulation;
+      const eligibleReplenishment = effectiveDeployment * 1.03;
+
       setMetric(metricCommunityAllocation, formatLeap(completedAllocation));
       setMetric(metricCommunityLeap, formatLeap(balances.communityLeap));
       setMetric(metricLeapDistributed, formatLeap(distribution.distributed));
       setMetric(metricHoldersReached, balances.holdersReached.toLocaleString());
-      setMetric(metricDeploymentRatio, formatDeploymentRatio(distribution.distributed, balances.communityLeap));
+      setMetric(metricDeploymentRatio, formatRatio(deploymentRatio));
+      setMetric(metricCirculationRatio, formatRatio(circulationRatio));
+      setMetric(metricEffectiveDeployment, `${formatLeap(effectiveDeployment)} LEAP`);
+      setMetric(metricEligibleReplenishment, `${formatLeap(eligibleReplenishment)} LEAP`);
       renderAllocationLog(allocations);
 
       if (metricsSection) {
         metricsSection.title = `Validated XRP Ledger data for ${community.name}. Community Operating Wallet: ${community.operatingWallet}.`;
+      }
+      if (guidingMetricsSection) {
+        guidingMetricsSection.title = `Notional guidance from validated ${community.name} deployment. Concentration is measured across recipient wallets; eligible replenishment uses a 3% Growth Rate Provision.`;
       }
       if (allocationLogNote) {
         allocationLogNote.textContent = `Only protocol-valid ${requestedId}-LEAP/ALLOCATION=<AMOUNT> Checks from the Global Distribution Wallet to this registered Community Operating Wallet are included.`;
