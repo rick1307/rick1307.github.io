@@ -218,6 +218,34 @@
     outline: none;
   }
 
+  .operator-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(239, 118, 93, .38);
+    border-radius: 999px;
+    color: #ffd2ca;
+    background: rgba(239, 118, 93, .09);
+    font: inherit;
+    font-size: .70rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .operator-logout:hover,
+  .operator-logout:focus-visible {
+    color: #fff0ec;
+    border-color: rgba(239, 118, 93, .62);
+    background: rgba(239, 118, 93, .16);
+    outline: none;
+  }
+
   .metrics {
     padding: 0 0 4px;
     display: grid;
@@ -901,6 +929,7 @@
         <nav class="top-nav" aria-label="Community navigation">
           <a class="owner-back" id="ownerCommunitiesBack" href="communities.html">← Communities</a>
           <a class="operations-manual-link" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
+          <button class="operator-logout" id="operatorLogout" type="button">Log Out</button>
         </nav>
         <div class="brand-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
@@ -1044,9 +1073,20 @@
   const viewCommunityTitle = document.getElementById("view-community-title");
   const professionalLibraryLink = document.getElementById("professionalLibraryLink");
   const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
+  const operatorLogout = document.getElementById("operatorLogout");
 
   if (ownerCommunitiesBack && role !== "owner") {
     ownerCommunitiesBack.remove();
+  }
+
+  if (operatorLogout && role !== "operator") {
+    operatorLogout.remove();
+  } else if (operatorLogout) {
+    operatorLogout.addEventListener("click", () => {
+      sessionStorage.removeItem("wildLedgerRole");
+      sessionStorage.removeItem("wildLedgerCommunity");
+      window.location.href = "getWild.html";
+    });
   }
 
   if (professionalLibraryLink) {
