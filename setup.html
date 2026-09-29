@@ -475,17 +475,20 @@
       .access-card, .section-card { padding: 20px; }
       .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
       .rank-row, .badge-row { grid-template-columns: 1fr; }
-      .top-actions .ghost-link:first-child { display: none; }
+      .top-actions .ghost-link:last-child { display: none; }
     }
   </style>
-  <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="topbar-inner wl-nav-right">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <img src="leap-logo.png" alt="LEAP logo">
+        <span>Wild Ledger<small id="workspaceLabel">Community Workspace</small></span>
+      </a>
       <nav class="top-actions" aria-label="Setup navigation">
-        <a class="ghost-link wl-header-control" href="wildLedgerFaq.html">Wild Ledger FAQ</a>
-        <a class="ghost-link wl-header-control" href="index.html">Home</a>
+        <a class="ghost-link" id="setupBackLink" href="communities.html">← Communities</a>
+        <a class="ghost-link" href="wildLedgerFaq.html">Wild Ledger FAQ</a>
       </nav>
     </div>
   </header>
@@ -493,20 +496,22 @@
   <main>
     <section class="hero">
       <div class="hero-card">
-        <div class="eyebrow">Community Operator Workspace</div>
-        <h1>Community Setup</h1>
-        <p class="hero-copy">Build the identity and experience for a Wild Ledger community. This first version edits every value currently used by the shared community system, keeps a browser draft, and produces a clean configuration for review.</p>
+        <div class="eyebrow" id="workspaceEyebrow">Community Workspace</div>
+        <h1 id="workspaceTitle">Community Setup</h1>
+        <p class="hero-copy" id="workspaceCopy">Build the identity and experience for a Wild Ledger community. This first version edits every value currently used by the shared community system, keeps a browser draft, and produces a clean configuration for review.</p>
       </div>
 
       <div class="access-card">
-        <h2>Choose a community</h2>
-        <p>Operator-token access will be wired here later. For now, select an existing community or start a new draft.</p>
-        <div class="field">
-          <label for="communityPicker">Community</label>
-          <select id="communityPicker"></select>
-        </div>
-        <div class="button-row">
-          <button class="secondary-button" id="newCommunityButton" type="button">New community</button>
+        <h2 id="accessTitle">Choose a community</h2>
+        <p id="accessCopy">Select an existing community or start a new draft.</p>
+        <div id="communityAccessControls">
+          <div class="field">
+            <label for="communityPicker">Community</label>
+            <select id="communityPicker"></select>
+          </div>
+          <div class="button-row">
+            <button class="secondary-button" id="newCommunityButton" type="button">New community</button>
+          </div>
         </div>
         <div class="status" id="draftStatus" aria-live="polite"></div>
       </div>
@@ -709,6 +714,42 @@
       const badgesEditor = document.getElementById("badgesEditor");
       const colorEditor = document.getElementById("colorEditor");
       const advancedThemeEditor = document.getElementById("advancedThemeEditor");
+      const workspaceLabel = document.getElementById("workspaceLabel");
+      const workspaceEyebrow = document.getElementById("workspaceEyebrow");
+      const workspaceTitle = document.getElementById("workspaceTitle");
+      const workspaceCopy = document.getElementById("workspaceCopy");
+      const accessTitle = document.getElementById("accessTitle");
+      const accessCopy = document.getElementById("accessCopy");
+      const communityAccessControls = document.getElementById("communityAccessControls");
+      const setupBackLink = document.getElementById("setupBackLink");
+      const newCommunityButton = document.getElementById("newCommunityButton");
+
+      const params = new URLSearchParams(window.location.search);
+      const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+      const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+      const requestedMode = (params.get("mode") || "edit").trim().toLowerCase();
+      const mode = role === "operator" ? "edit" : (requestedMode === "new" ? "new" : "edit");
+
+      const COMMUNITY_ALIASES = Object.freeze({
+        sfl: "sfl",
+        zach: "zach",
+        zhr: "zach",
+        "sailing-frogs-leap": "sfl",
+        "zachs-hot-rods": "zach"
+      });
+      const BACKEND_COMMUNITY_IDS = Object.freeze({ sfl: "SFL", zach: "ZHR" });
+
+      function resolveCommunityId(value) {
+        const raw = String(value || "").trim().toLowerCase();
+        if (!raw) return "";
+        if (communities[raw]) return raw;
+        const alias = COMMUNITY_ALIASES[raw];
+        return alias && communities[alias] ? alias : "";
+      }
+
+      function backendCommunityId(configId) {
+        return BACKEND_COMMUNITY_IDS[configId] || String(configId || "").toUpperCase();
+      }
 
       const colorKeys = [
         ["paper", "Paper"], ["paper2", "Paper 2"], ["ink", "Ink"],
@@ -814,7 +855,7 @@
 
       function saveDraft() {
         syncFromForm();
-        const id = current.id || currentSourceId || "new";
+        const id = currentSourceId || current.id || "new";
         try {
           localStorage.setItem(draftKey(id), JSON.stringify(current));
           status.textContent = "Draft saved in this browser.";
@@ -929,8 +970,12 @@
         current = saved || value;
         ensureShape();
         renderAll();
-        status.textContent = saved ? "Loaded saved browser draft." : "Loaded community configuration.";
+        const isNew = currentSourceId === "new";
+        status.textContent = saved
+          ? "Loaded saved browser draft."
+          : (isNew ? "Started a new community draft." : "Loaded community configuration.");
         status.className = saved ? "status ok" : "status";
+        applyWorkspacePresentation();
       }
 
       function ensureShape() {
@@ -999,6 +1044,50 @@
         });
       }
 
+      function applyWorkspacePresentation() {
+        const configId = currentSourceId === "new" ? "" : currentSourceId;
+        const communityName = configId && communities[configId]
+          ? communities[configId].communityName
+          : (current.communityName || "Community");
+
+        if (workspaceLabel) workspaceLabel.textContent = role === "operator" ? "Community Operator" : "Wild Ledger Owner";
+        if (workspaceEyebrow) workspaceEyebrow.textContent = role === "operator" ? "Community Operator Workspace" : "Owner Workspace";
+
+        if (mode === "new") {
+          document.title = "New Community | Wild Ledger";
+          if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
+          if (workspaceCopy) workspaceCopy.textContent = "Build the identity and experience for a new Wild Ledger community. This scaffold stays in draft mode and does not publish yet.";
+          if (accessTitle) accessTitle.textContent = "New Community";
+          if (accessCopy) accessCopy.textContent = "Start with the blank community template, shape the experience, and save the draft in this browser.";
+          if (communityAccessControls) communityAccessControls.hidden = true;
+          if (setupBackLink) {
+            setupBackLink.textContent = "← Communities";
+            setupBackLink.href = "communities.html";
+          }
+          return;
+        }
+
+        document.title = `${communityName} | Community Settings`;
+        if (workspaceTitle) workspaceTitle.textContent = "Community Settings";
+        if (workspaceCopy) workspaceCopy.textContent = `Edit the identity and experience for ${communityName}. Changes still remain a browser draft until publishing is built.`;
+
+        if (role === "operator") {
+          if (accessTitle) accessTitle.textContent = communityName;
+          if (accessCopy) accessCopy.textContent = "You are editing your assigned community. Community creation and the global community picker are Owner controls.";
+          if (communityAccessControls) communityAccessControls.hidden = true;
+        } else {
+          if (accessTitle) accessTitle.textContent = "Choose a community";
+          if (accessCopy) accessCopy.textContent = "Select an existing community to edit, or start a new community setup.";
+          if (communityAccessControls) communityAccessControls.hidden = false;
+        }
+
+        if (setupBackLink && configId) {
+          const backendId = backendCommunityId(configId);
+          setupBackLink.textContent = `← ${communityName}`;
+          setupBackLink.href = `viewCommunity.html?community=${encodeURIComponent(backendId)}&role=${encodeURIComponent(role)}`;
+        }
+      }
+
       form.addEventListener("input", (event) => {
         const target = event.target;
         if (target.matches("[data-theme-color-picker]")) {
@@ -1018,9 +1107,8 @@
 
       picker.addEventListener("change", () => loadCommunity(picker.value));
 
-      document.getElementById("newCommunityButton").addEventListener("click", () => {
-        picker.value = "__new__";
-        loadCommunity("__new__");
+      newCommunityButton.addEventListener("click", () => {
+        window.location.href = "setup.html?mode=new&role=owner";
       });
 
       document.getElementById("addBadgeButton").addEventListener("click", () => {
@@ -1070,7 +1158,7 @@
       });
 
       document.getElementById("clearDraftButton").addEventListener("click", () => {
-        const id = current.id || currentSourceId || "new";
+        const id = currentSourceId || current.id || "new";
         try { localStorage.removeItem(draftKey(id)); } catch (_) {}
         status.textContent = "Saved browser draft cleared.";
         status.className = "status";
@@ -1078,9 +1166,16 @@
 
       populatePicker();
 
-      const params = new URLSearchParams(window.location.search);
-      const requested = (params.get("community") || window.WILD_LEDGER_COMMUNITY_ID || "").toLowerCase();
-      const initialId = communities[requested] ? requested : Object.keys(communities)[0] || "__new__";
+      const requestedCommunity =
+        params.get("community") ||
+        sessionStorage.getItem("wildLedgerCommunity") ||
+        window.WILD_LEDGER_COMMUNITY_ID ||
+        "";
+      const resolvedRequestedId = resolveCommunityId(requestedCommunity);
+      const initialId = mode === "new"
+        ? "__new__"
+        : (resolvedRequestedId || Object.keys(communities)[0] || "__new__");
+
       picker.value = initialId;
       loadCommunity(initialId);
     })();
