@@ -191,6 +191,20 @@
     margin-bottom: 18px;
   }
 
+  /* Shared backend rule: session/actions left, Wild Ledger navigation right. */
+  .top-actions,
+  .top-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .top-navigation {
+    margin-left: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
   .operations-manual-link {
     display: inline-flex;
     align-items: center;
@@ -926,10 +940,14 @@
   <main class="shell">
     <section class="console" aria-labelledby="view-community-title">
       <header class="console-header">
-        <nav class="top-nav" aria-label="Community navigation">
-          <a class="owner-back" id="ownerCommunitiesBack" href="communities.html">← Communities</a>
-          <a class="operations-manual-link" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
-          <button class="operator-logout" id="operatorLogout" type="button">Log Out</button>
+        <nav class="top-nav" aria-label="Community controls and navigation">
+          <div class="top-actions">
+            <button class="operator-logout" id="operatorLogout" type="button">Log Out</button>
+          </div>
+          <div class="top-navigation">
+            <a class="owner-back" id="ownerCommunitiesBack" href="communities.html">← Communities</a>
+            <a class="operations-manual-link" id="professionalLibraryLink" href="professionalLibrary.html">Professional Library →</a>
+          </div>
         </nav>
         <div class="brand-row">
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>

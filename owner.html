@@ -113,6 +113,16 @@
     margin-bottom: 21px;
   }
 
+  /* Backend navigation rule: session/actions left, Wild Ledger navigation right. */
+  .top-actions,
+  .top-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .top-navigation { margin-left: auto; }
+
   .brand {
     display: inline-flex;
     align-items: center;
@@ -585,9 +595,13 @@
   <main class="shell">
     <section class="console" aria-labelledby="owner-title">
       <header class="console-header">
-        <div class="brand-row">
-          <a class="professional-library-link" href="professionalLibrary.html?role=owner&from=owner">Professional Library →</a>
-          <button class="logout-button" id="ownerLogout" type="button">Log Out</button>
+        <div class="brand-row" aria-label="Owner controls and navigation">
+          <div class="top-actions">
+            <button class="logout-button" id="ownerLogout" type="button">Log Out</button>
+          </div>
+          <div class="top-navigation">
+            <a class="professional-library-link" href="professionalLibrary.html?role=owner&from=owner">Professional Library →</a>
+          </div>
         </div>
         <h1 id="owner-title">Owner Console</h1>
         <p class="intro">Central administration for Wild Ledger. Manage communities, platform settings, operations, and oversight from one place.</p>
