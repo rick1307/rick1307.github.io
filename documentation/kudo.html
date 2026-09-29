@@ -27,10 +27,28 @@
       line-height: 1.6;
     }
 
+    .library-nav {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 18px 0 0;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .library-nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: .86rem;
+      font-weight: 800;
+    }
+
+    .library-nav a:hover,
+    .library-nav a:focus-visible { text-decoration: underline; outline: none; }
+
     .wrap {
       width: min(960px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 36px 0 64px;
+      padding: 20px 0 64px;
     }
 
     .hero {
@@ -266,6 +284,9 @@
   </style>
 </head>
 <body>
+  <nav class="library-nav" aria-label="Working paper navigation">
+    <a href="../professionalLibrary.html">Professional Library →</a>
+  </nav>
   <main class="wrap">
     <section class="hero">
       <div class="eyebrow">Concept Page</div>
