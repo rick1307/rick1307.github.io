@@ -617,17 +617,7 @@
           <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
         </div>
         <h1 id="view-community-title">View Community</h1>
-        <p class="intro">Owner view of one selected Wild Ledger community.</p>
       </header>
-
-      <section class="community-context" aria-live="polite">
-        <div class="context-card">
-          <div class="context-kicker">Current Community</div>
-          <div class="context-name" id="communityName">Community</div>
-          <div class="context-id" id="communityId">ID: —</div>
-          <p class="context-copy">Owner-level view of this community inside the Wild Ledger ecosystem.</p>
-        </div>
-      </section>
 
       <section class="dashboard-group" aria-labelledby="community-state-title">
         <div class="dashboard-heading">
@@ -670,16 +660,14 @@
   const requestedId = (params.get("community") || "SFL").trim().toUpperCase();
   const community = COMMUNITY_DIRECTORY[requestedId];
 
-  const communityName = document.getElementById("communityName");
-  const communityId = document.getElementById("communityId");
+  const viewCommunityTitle = document.getElementById("view-community-title");
 
   if (community) {
-    communityName.textContent = community.name;
-    communityId.textContent = `ID: ${requestedId}`;
-    document.title = `${community.name} | Wild Ledger Owner Console`;
+    viewCommunityTitle.textContent = `View ${community.name}`;
+    document.title = `View ${community.name} | Wild Ledger Owner Console`;
   } else {
-    communityName.textContent = "Unknown Community";
-    communityId.textContent = `ID: ${requestedId || "—"}`;
+    viewCommunityTitle.textContent = "View Community";
+    document.title = "View Community | Wild Ledger Owner Console";
   }
 </script>
 </body>
