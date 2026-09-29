@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>View Community | Wild Ledger Owner Console</title>
+<style>
+  :root {
+    --ink: #f5fbfa;
+    --muted: rgba(236, 249, 247, .72);
+    --deep: #071f2c;
+    --navy: #0b2f40;
+    --lagoon: #29b8b1;
+    --sea-glass: #79d5c2;
+    --mango: #f4bd58;
+    --coral: #ef765d;
+    --panel: rgba(10, 45, 58, .70);
+    --panel-strong: rgba(10, 49, 63, .90);
+    --line: rgba(219, 248, 244, .14);
+    --shadow: 0 28px 78px rgba(0, 16, 24, .38);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { min-height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 12% 14%, rgba(41, 184, 177, .34) 0, rgba(41, 184, 177, .12) 22%, transparent 44%),
+      radial-gradient(circle at 87% 15%, rgba(244, 189, 88, .24) 0, rgba(244, 189, 88, .07) 21%, transparent 42%),
+      radial-gradient(circle at 88% 86%, rgba(239, 118, 93, .24) 0, rgba(239, 118, 93, .07) 23%, transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(121, 213, 194, .19) 0, transparent 42%),
+      linear-gradient(145deg, #06202e 0%, #0a3444 48%, #071d2a 100%);
+    overflow-x: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::before {
+    inset: 0;
+    opacity: .28;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+  }
+
+  body::after {
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    top: 35%;
+    border-radius: 50%;
+    border: 1px solid rgba(121, 213, 194, .13);
+    box-shadow:
+      0 0 0 54px rgba(121, 213, 194, .035),
+      0 0 0 108px rgba(121, 213, 194, .025),
+      0 0 0 162px rgba(121, 213, 194, .015);
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: 46px 22px 56px;
+  }
+
+  .console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 32px;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.018)),
+      var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .console::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--lagoon), var(--sea-glass), var(--mango), var(--coral));
+  }
+
+  .console-header {
+    position: relative;
+    padding: 34px 34px 26px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 21px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--sea-glass);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  .brand-mark {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--mango);
+    box-shadow:
+      0 0 0 5px rgba(244, 189, 88, .12),
+      0 0 22px rgba(244, 189, 88, .48);
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 720px;
+    font-size: clamp(2.25rem, 7vw, 4.75rem);
+    line-height: .96;
+    letter-spacing: -.055em;
+    font-weight: 900;
+  }
+
+  .intro {
+    margin: 18px 0 0;
+    max-width: 710px;
+    color: var(--muted);
+    font-size: clamp(1rem, 2.3vw, 1.13rem);
+    line-height: 1.65;
+  }
+
+
+
+  .dashboard-group {
+    padding: 12px 24px 0;
+  }
+
+  .dashboard-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 10px;
+    min-width: 0;
+  }
+
+  .dashboard-title {
+    color: var(--ink);
+    font-size: .96rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .dashboard-subtitle {
+    color: rgba(236, 249, 247, .56);
+    font-size: .74rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  .metrics {
+    padding: 0 0 4px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .metric {
+    --metric-accent: var(--lagoon);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 96px;
+    padding: 14px 12px 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 18px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.055), rgba(255,255,255,.012)),
+      rgba(5, 34, 46, .46);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+    overflow: hidden;
+  }
+
+  .metric::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--metric-accent), transparent 90%);
+    opacity: .8;
+  }
+
+  .metric:nth-child(2) { --metric-accent: var(--sea-glass); }
+  .metric:nth-child(3) { --metric-accent: var(--mango); }
+  .metric:nth-child(4) { --metric-accent: var(--coral); }
+
+  .metric-value {
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 9px;
+    color: var(--ink);
+    font-size: clamp(1.4rem, 4vw, 2.05rem);
+    line-height: 1;
+    letter-spacing: -.045em;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .metric-label {
+    margin-top: 10px;
+    color: rgba(236, 249, 247, .66);
+    font-size: .66rem;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+  }
+
+  .metric-meaning {
+    margin-top: auto;
+    padding-top: 5px;
+    color: var(--metric-accent);
+    font-size: .56rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+  }
+
+  .metric-info {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid rgba(126, 202, 255, .55);
+    border-radius: 50%;
+    background: rgba(77, 167, 235, .16);
+    color: #8fd2ff;
+    font: 900 .68rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .metric-info:focus-visible {
+    outline: 2px solid #8fd2ff;
+    outline-offset: 2px;
+  }
+
+  .metric-info-scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    padding: 22px;
+    background: rgba(2, 19, 28, .72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metric-info-scrim.open { display: flex; }
+
+  .metric-info-panel {
+    width: min(92vw, 430px);
+    border: 1px solid rgba(143, 210, 255, .25);
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(17, 63, 75, .98), rgba(6, 35, 48, .98));
+    box-shadow: 0 24px 70px rgba(0,0,0,.34);
+    padding: 22px;
+    color: var(--ink);
+  }
+
+  .metric-info-panel h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .metric-info-panel p {
+    margin: 10px 0 0;
+    color: rgba(236, 249, 247, .74);
+    font-size: .96rem;
+    line-height: 1.55;
+  }
+
+  .metric-info-detail {
+    margin-top: 15px !important;
+    padding-top: 14px;
+    border-top: 1px solid rgba(143, 210, 255, .16);
+  }
+
+  .metric-info-detail strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #9fddff;
+    font-size: .72rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .metric-info-action {
+    border-top-color: rgba(244, 187, 86, .22);
+  }
+
+  .metric-info-action strong {
+    color: #ffd27a;
+  }
+
+  .metric-info-close {
+    margin-top: 18px;
+    width: 100%;
+    border: 1px solid rgba(143, 210, 255, .28);
+    border-radius: 14px;
+    background: rgba(77, 167, 235, .12);
+    color: #b8e3ff;
+    padding: 10px 14px;
+    font: 800 .88rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    cursor: pointer;
+  }
+
+  .metrics-secondary {
+    padding-top: 0;
+    padding-bottom: 8px;
+  }
+
+  .metrics-secondary .metric {
+    min-height: 88px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.04), rgba(255,255,255,.008)),
+      rgba(5, 34, 46, .34);
+  }
+
+  .metrics-secondary .metric-value {
+    color: rgba(246,252,251,.86);
+  }
+
+  .metrics-secondary .metric-label {
+    color: rgba(236,249,247,.58);
+  }
+
+  .navigation {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .nav-card {
+    --accent: var(--lagoon);
+    position: relative;
+    display: flex;
+    min-height: 244px;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 25px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    color: var(--ink);
+    text-decoration: none;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.016)),
+      rgba(5, 34, 46, .54);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+  }
+
+  .nav-card::before {
+    content: "";
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    right: -70px;
+    top: -75px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent) 0%, transparent 68%);
+    opacity: .9;
+  }
+
+  .nav-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 78%);
+    opacity: .85;
+  }
+
+  .nav-card.manager { --accent: var(--coral); }
+
+  .nav-card:hover,
+  .nav-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.025)),
+      rgba(5, 34, 46, .70);
+    box-shadow: 0 18px 34px rgba(0, 15, 23, .24), inset 0 1px 0 rgba(255,255,255,.08);
+    outline: none;
+  }
+
+  .nav-card:active { transform: translateY(-1px) scale(.995); }
+
+  .nav-copy {
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+  }
+
+  .nav-kicker {
+    color: color-mix(in srgb, var(--accent) 80%, white 20%);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .nav-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 7px;
+  }
+
+  .nav-title {
+    font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+    line-height: 1.05;
+    letter-spacing: -.035em;
+    font-weight: 880;
+  }
+
+  .nav-arrow {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.11);
+    color: rgba(255,255,255,.78);
+    transition: transform .22s ease, background .22s ease;
+  }
+
+  .nav-card:hover .nav-arrow,
+  .nav-card:focus-visible .nav-arrow {
+    transform: translateX(3px);
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  .nav-description {
+    margin: 10px 0 0;
+    color: rgba(234, 247, 245, .64);
+    font-size: .91rem;
+    line-height: 1.5;
+  }
+
+  @supports not (color: color-mix(in srgb, red, blue)) {
+    .nav-card::before { background: radial-gradient(circle, rgba(41,184,177,.28), transparent 68%); }
+    .nav-card.manager::before { background: radial-gradient(circle, rgba(239,118,93,.27), transparent 68%); }
+  }
+
+  @media (max-width: 700px) {
+    .shell { padding: 22px 14px 34px; }
+    .console { border-radius: 25px; }
+    .console-header { padding: 28px 22px 23px; }
+    .brand-row { align-items: flex-start; }
+    .dashboard-group { padding: 10px 12px 0; }
+    .dashboard-heading { margin: 0 0 8px; gap: 6px; flex-wrap: wrap; }
+    .dashboard-title { font-size: .82rem; }
+    .dashboard-subtitle { font-size: .62rem; }
+    .metrics { padding: 0 0 2px; gap: 5px; }
+    .metrics-secondary { padding-top: 0; padding-bottom: 7px; }
+    .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
+    .metrics-secondary .metric { min-height: 82px; }
+    .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
+    .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
+    .metric-meaning { margin-top: auto; padding-top: 4px; font-size: .44rem; letter-spacing: .04em; }
+    .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
+    .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
+    .nav-copy { margin-top: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-card,
+    .nav-arrow { transition: none; }
+  }
+
+
+  .owner-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 18px;
+    color: #9fddff;
+    text-decoration: none;
+    font-size: .78rem;
+    font-weight: 850;
+    letter-spacing: .01em;
+  }
+
+  .community-context {
+    padding: 24px;
+  }
+
+  .context-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 190px;
+    padding: 26px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.015)),
+      rgba(5, 34, 46, .46);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  }
+
+  .context-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--lagoon), var(--sea-glass), var(--mango), var(--coral));
+    opacity: .85;
+  }
+
+  .context-kicker {
+    color: var(--sea-glass);
+    font-size: .70rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .context-name {
+    margin-top: 12px;
+    color: var(--ink);
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.04em;
+  }
+
+  .context-id {
+    display: inline-flex;
+    margin-top: 14px;
+    padding: 6px 9px;
+    border: 1px solid rgba(121,213,194,.22);
+    border-radius: 999px;
+    background: rgba(41,184,177,.10);
+    color: rgba(236,249,247,.75);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .context-copy {
+    margin: 18px 0 0;
+    max-width: 680px;
+    color: var(--muted);
+    font-size: .94rem;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 700px) {
+    .community-context { padding: 16px; }
+    .context-card { min-height: 165px; padding: 20px; border-radius: 20px; }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <section class="console" aria-labelledby="view-community-title">
+      <header class="console-header">
+        <a class="owner-back" href="communities.html">← Communities</a>
+        <div class="brand-row">
+          <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Wild Ledger</div>
+        </div>
+        <h1 id="view-community-title">View Community</h1>
+        <p class="intro">Owner view of one selected Wild Ledger community.</p>
+      </header>
+
+      <section class="community-context" aria-live="polite">
+        <div class="context-card">
+          <div class="context-kicker">Current Community</div>
+          <div class="context-name" id="communityName">Community</div>
+          <div class="context-id" id="communityId">ID: —</div>
+          <p class="context-copy">This page establishes the selected community in the Owner context. Community-level owner metrics and drill-down controls can be added here next.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+<script>
+  const COMMUNITY_DIRECTORY = {
+    SFL: { name: "Sailing Frog's Leap" },
+    ZHR: { name: "Zach's Hot Rods" }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const requestedId = (params.get("community") || "SFL").trim().toUpperCase();
+  const community = COMMUNITY_DIRECTORY[requestedId];
+
+  const communityName = document.getElementById("communityName");
+  const communityId = document.getElementById("communityId");
+
+  if (community) {
+    communityName.textContent = community.name;
+    communityId.textContent = `ID: ${requestedId}`;
+    document.title = `${community.name} | Wild Ledger Owner Console`;
+  } else {
+    communityName.textContent = "Unknown Community";
+    communityId.textContent = `ID: ${requestedId || "—"}`;
+  }
+</script>
+</body>
+</html>
