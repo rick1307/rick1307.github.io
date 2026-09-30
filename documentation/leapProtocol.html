@@ -356,8 +356,8 @@
 <section id="registry">
 <h2>3. Authority Registry</h2>
 <p>
-          These accounts define the authority chain for the current LEAP implementation.
-          Additional authorities may be added later through protocol change control.
+          LEAP authority is determined by protocol role and validated XRPL history. Static configuration may cache or display resolved authority,
+          but after authority-state activation it is not the canonical source of the current Community Operating Wallet.
         </p>
 <table class="registry">
 <tr>
@@ -368,7 +368,7 @@
 <tr>
 <td>LEAP Issuer</td>
 <td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td>
-<td>Authorized</td>
+<td>Canonical LEAP issuer and bootstrap authority for a community's first <code>OPERATING-WALLET</code> state statement</td>
 </tr>
 <tr>
 <td>Distributor 01</td>
@@ -376,50 +376,22 @@
 <td>Authorized for current LEAP recognition Check issuance</td>
 </tr>
 <tr>
-<td>SFL Authority Root Account</td>
+<td>SFL Community Operating Wallet</td>
 <td class="address">rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q</td>
-<td>Immutable SFL authority trust anchor; current Community Operating Account is resolved from its XRPL succession chain</td>
+<td>Pre-0.13 configured SFL Operating Wallet; publish the initial canonical on-ledger authority-state statement before relying exclusively on XRPL resolution</td>
 </tr>
 </table>
 <div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="tag">Authority Resolution Rule</div>
 <div>
-            An official recognition transaction must originate from the account authorized for that transaction type at that ledger position.
-            For community lifecycle actions, authorization is resolved through the community authority chain. A matching memo from any other wallet does not count.
+            After a community has a canonical <code>OPERATING-WALLET</code> authority-state statement, the authorized Community Operating Wallet is the
+            latest valid value for that community key at the ledger position being evaluated. A matching memo from any other wallet does not count.
           </div>
 </div>
-<h3>3.1 Community Operating Account succession</h3>
-<p>
-          A community is not its wallet. The community namespace and identity remain continuous while the XRPL account authorized to operate that community may change over time.
-          Wild Ledger starts from the community's immutable <strong>authority root account</strong> and reconstructs every later handoff from validated XRPL history.
-        </p>
-<div class="rule">
-<div class="tag">LEAP Standard</div>
-<div>
-            The authority root is a fixed protocol trust anchor, not mutable application state. The <strong>current</strong> Community Operating Account is never established by a browser setting, local storage value, or editable configuration field. It is derived by applying completed on-ledger authority transitions in sequence.
-          </div>
-</div>
-<p>A routine authority handoff uses the next sequential identifier <code>AUTH-NNN</code> and requires two validated no-op <code>AccountSet</code> records:</p>
-<pre><code>&lt;COMMUNITY&gt;-LEAP/COMMUNITY/AUTHORITY/AUTH-NNN/SUCCESSOR=&lt;NEW-ACCOUNT&gt;
-&lt;COMMUNITY&gt;-LEAP/COMMUNITY/AUTHORITY/AUTH-NNN/PREDECESSOR=&lt;OLD-ACCOUNT&gt;</code></pre>
-<ul>
-<li>The <code>SUCCESSOR</code> record must be signed by the Community Operating Account that is current at that ledger position.</li>
-<li>The matching <code>PREDECESSOR</code> record must be signed by the proposed successor account.</li>
-<li>The transition becomes effective only after both records are validated. Until then, the predecessor remains the current authority.</li>
-<li>The transition's effective ledger is the later of the two validating ledger indexes. Protocol actions from the predecessor after that point are not authoritative.</li>
-<li>Authority transition IDs begin at <code>AUTH-001</code>, advance sequentially, and are interpreted within one community namespace.</li>
-<li>A successor may not create a cycle by returning authority to an account already used earlier in the same authority chain.</li>
-<li>If more than one uncanceled successor is proposed for the same transition ID, readers fail closed rather than guessing which account is authoritative.</li>
-</ul>
-<p>A pending proposal may be canceled by the still-current predecessor before successor acceptance:</p>
-<pre><code>&lt;COMMUNITY&gt;-LEAP/COMMUNITY/AUTHORITY/AUTH-NNN/CANCEL-SUCCESSOR=&lt;NEW-ACCOUNT&gt;</code></pre>
-<div class="decision">
-<div class="tag">Signer Independence</div>
-<div>
-            The XRPL account is the authority; the wallet application is only a signer. An operator may move between Bifrost, Xaman, Tangem, hardware devices, or another compatible signer without changing the Community Operating Account. A protocol authority change is needed only when the XRPL account itself changes.
-          </div>
-</div>
-<div class="note"><strong>Recovery is separate from routine rotation.</strong> If the predecessor account is lost and cannot sign, an owner/recovery authority path must be defined by a later explicit protocol revision. Routine two-party rotation must not be weakened to solve that exceptional case.</div>
+<div class="note">
+          The LEAP Issuer is used only to bootstrap the first canonical <code>OPERATING-WALLET</code> value for a community namespace under Protocol 0.13.
+          Routine replacement is self-service: the currently authorized Community Operating Wallet may name its successor without Wild Ledger approval.
+        </div>
 </section>
 <section id="identity">
 <h2>4. LEAP Asset Identity</h2>
@@ -505,6 +477,7 @@ LEAP-002</code></pre>
             A member recognition award uses <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> on the canonical recognition transaction.
             A recognition lifecycle marker uses <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>
             on a canonical no-op <code>AccountSet</code>. The current lifecycle actions are <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code>.
+            A protocol authority-state statement uses <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> on a canonical no-op <code>AccountSet</code>.
           </div>
 </div>
 <h3>Memo location, token scope, and community namespaces</h3><div class="fact">
@@ -531,6 +504,7 @@ LEAP-002</code></pre>
 <tr><td>Community memo format</td><td>Each community uses its own namespace followed by a category and value: <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.</td></tr>
 <tr><td>Recognition categories</td><td>The standard categories are <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. Examples include <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, <code>&lt;COMMUNITY&gt;-LEAP/EVENT=COMMUNITY-MEETUP</code>, and <code>&lt;COMMUNITY&gt;-LEAP/CHALLENGE=LEAP-001</code>.</td></tr>
 <tr><td>Recognition lifecycle</td><td>Lifecycle state is written as a self-identifying memo of the form <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code> on a canonical no-op <code>AccountSet</code>. The category and canonical recognition ID are part of the lifecycle path itself. Current actions are <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code>.</td></tr>
+<tr><td>Authority state</td><td>Single-valued protocol authority state is written as <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> on a canonical no-op <code>AccountSet</code>. Protocol 0.13 defines <code>OPERATING-WALLET</code> as the first authority-state key.</td></tr>
 <tr><td>Badge memo</td><td>The memo gives the recognition a consistent name inside the community's namespace, such as <code>&lt;COMMUNITY&gt;-LEAP/BADGE=NEW-MEMBER</code> or <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, so the badge can be identified later from ledger history.</td></tr>
 <tr><td>What the XRP Ledger understands</td><td>The XRP Ledger stores the memo data; it does not interpret the community namespace. The namespace is a Wild Ledger convention that lets software recognize and organize each community's records consistently.</td></tr>
 <tr><td>Why each community uses a namespace</td><td>It lets Wild Ledger software separate one community's records from unrelated wallet activity and organize them into badges, events, challenges, the Member Record, and administrative history.</td></tr>
@@ -565,6 +539,9 @@ LEAP-002</code></pre>
 <li>The lifecycle action value is exactly <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code>.</li>
 <li>The canonical recognition ID in the lifecycle path follows the same canonical ID rules used by member recognition memos for that category.</li>
 <li>A canonical lifecycle <code>AccountSet</code> carries exactly one decoded public LEAP lifecycle memo. The lifecycle memo is self-identifying; a second recognition-identity memo is not required.</li>
+<li>An authority-state memo uses the path <code>AUTHORITY/&lt;KEY&gt;</code> followed by one equals sign and the current value.</li>
+<li>Protocol 0.13 defines <code>OPERATING-WALLET</code> as an authority-state key whose value is a valid XRPL classic account address.</li>
+<li>Authority-state keys are single-valued state. They do not use <code>BEGIN</code>, <code>END</code>, <code>OLD</code>, <code>NEW</code>, or a separate history object. Ledger ordering supplies the effective history.</li>
 <li>Once a canonical recognition ID has been established, it is permanently reserved. IDs are never recycled after <code>END</code> or <code>IGNORE</code>.</li>
 </ul>
 <h3>Production examples</h3>
@@ -584,6 +561,11 @@ SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=CREATE
 SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=END
 
 SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
+<h3>Authority-state example</h3>
+<pre><code>SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;NEW-OPERATING-WALLET&gt;</code></pre>
+<p class="mini">
+          The transaction itself supplies provenance, ledger position, transaction hash, and time. The memo supplies the protocol key and asserted value.
+        </p>
 <h3>Ledger-discovered recognition vocabulary</h3>
 <p>
           The XRPL is the working registry of canonical recognition IDs and their lifecycle. The normal recognition interface keeps the categories fixed at
@@ -842,6 +824,55 @@ SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
           Recognition IDs established before explicit lifecycle markers are activated remain readable from valid authorized historical <code>CheckCreate</code> records and are treated as legacy-established IDs for namespace-reservation purposes.
           They may later receive a valid <code>END</code> or <code>IGNORE</code> lifecycle marker without first requiring a retroactive <code>CREATE</code>. The lifecycle activation point must remain documented so legacy history is deterministic.
         </div>
+<h3>7.10 Authority-state statements — no-op <code>AccountSet</code></h3>
+<p>
+          Authority state records a current protocol value without moving LEAP and without changing XRPL account settings.
+          Protocol 0.13 introduces the first authority-state key: <code>OPERATING-WALLET</code>.
+        </p>
+<div class="rule">
+<div class="tag">Canonical Authority-State Transaction</div>
+<div>
+            A canonical authority-state record must be a successful, validated no-op <code>AccountSet</code> containing exactly one decoded public memo in the form
+            <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code>. It must not contain AccountSet-specific fields that change account state.
+          </div>
+</div>
+<pre><code>TransactionType = AccountSet
+Account = authority permitted to set this key
+AccountSet-specific mutation fields = none
+Memos:
+  SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;NEW-OPERATING-WALLET&gt;</code></pre>
+<h4>Bootstrap rule</h4>
+<div class="rule">
+<div class="tag">First Assignment</div>
+<div>
+            If a community namespace has no prior canonical <code>OPERATING-WALLET</code> statement, its first value is canonical only when the transaction is sent by the canonical LEAP Issuer.
+            The value becomes that community's authorized Community Operating Wallet immediately after the bootstrap transaction in canonical XRPL transaction order.
+          </div>
+</div>
+<h4>Normal self-rotation</h4>
+<div class="rule">
+<div class="tag">Self-Service Rotation</div>
+<div>
+            After bootstrap, the currently authorized Community Operating Wallet may replace itself at any time by publishing a canonical
+            <code>OPERATING-WALLET</code> authority-state statement naming the successor account. No Wild Ledger approval is required for routine rotation.
+            The sender must equal the resolved <code>OPERATING-WALLET</code> immediately before that transaction.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Latest Valid Value Wins</div>
+<div>
+            For a single-valued authority-state key, current state is the latest valid statement in canonical XRPL transaction order.
+            A new valid value supersedes the prior value from that transaction forward. No separate <code>BEGIN</code>, <code>END</code>, old-wallet record, new-wallet record, or history table is required.
+          </div>
+</div>
+<div class="note">
+          Historical authority is derived, not separately stored. To evaluate a transaction at a past ledger position, resolve the latest valid
+          <code>OPERATING-WALLET</code> statement that precedes it. If relevant statements share a ledger, transaction order within that validated ledger breaks the tie.
+        </div>
+<div class="note">
+          Protocol 0.13 does not yet define an emergency recovery override for a lost, inaccessible, or compromised current Operating Wallet.
+          Until a later protocol revision defines one, compliant software must not invent an off-ledger recovery authority.
+        </div>
 </section>
 <section id="membership">
 <h2>8. Membership &amp; Rank Rules</h2>
@@ -993,6 +1024,8 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
 <tr><td>Which Badge/Event/Challenge values exist?</td><td>Community Operating Wallet lifecycle <code>account_tx</code> history plus backward-compatible authorized recognition history</td></tr>
 <tr><td>Is a recognition Available / Active or in History?</td><td>Validated Community Operating Wallet <code>AccountSet</code> lifecycle markers, processed in ledger order</td></tr>
+<tr><td>What is this community's current Operating Wallet?</td><td>Latest valid <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;VALUE&gt;</code> statement</td></tr>
+<tr><td>Which Operating Wallet was authoritative at a historical transaction?</td><td>Latest valid <code>OPERATING-WALLET</code> authority-state statement preceding that transaction in canonical XRPL order</td></tr>
 <tr><td>Should a recognition be offered to this recipient?</td><td>Lifecycle state + recipient/distributor history + Check state: suppress ended recognitions, open pending, or redeemed; reopen canceled unredeemed and legacy expired unredeemed only while the recognition remains active/available</td></tr>
 </table>
 </section>
@@ -1012,13 +1045,17 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Memo fields decode successfully when memo-based protocol data is required</li>
 <li>A recognition <code>CheckCreate</code> normalizes to exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
 <li>A lifecycle <code>AccountSet</code> normalizes to exactly one lifecycle tag plus exactly one canonical recognition identity, with matching community namespaces</li>
+<li>An authority-state <code>AccountSet</code> normalizes to exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> statement</li>
+<li>For the first <code>OPERATING-WALLET</code> value in a community namespace, the transaction sender is the canonical LEAP Issuer</li>
+<li>For a later <code>OPERATING-WALLET</code> value, the transaction sender equals the Operating Wallet resolved immediately before that transaction</li>
+<li>For a recognition lifecycle action, the transaction sender equals the Operating Wallet resolved for that community immediately before the lifecycle transaction</li>
 <li>The category is recognized and the value is a valid canonical identifier</li>
 </ul>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
             Fail closed. If required provenance cannot be established, the website may display the transaction as history,
-            but it must not convert it into official LEAP recognition.
+            but it must not convert it into official LEAP recognition or canonical protocol state.
           </div>
 </div>
 </section>
@@ -1073,7 +1110,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Never reuse a retired badge, event, or challenge ID for a different meaning.</li>
 <li>Do not add a recognition category outside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> without an explicit protocol revision.</li>
 <li>When a recurring recognition needs distinction, extend the canonical ID from broad to narrow rather than redefining an existing ID.</li>
-<li>Record newly authorized protocol authorities here before treating their transaction-type-specific actions as official.</li>
+<li>Define new authority roles and authority-state keys through protocol revision before treating them as canonical.</li>
 <li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
 <li>Prefer additive changes over breaking changes.</li>
 </ul>
@@ -1092,7 +1129,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>0.10</td><td>2026-09-30</td><td>Added XRPL-native cradle-to-grave recognition lifecycle markers using validated no-op <code>AccountSet</code> transactions from the authorized Community Operating Wallet. Clarified that RECOGNITION spans multiple XRPL transaction types: <code>CheckCreate</code> records member recognition issuance, while no-op <code>AccountSet</code> records recognition-object lifecycle state.</td></tr>
 <tr><td>0.11</td><td>2026-09-30</td><td>Made recognition lifecycle memos self-identifying by placing the recognition type and canonical ID directly in the lifecycle path: <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>. Added terminal <code>IGNORE</code> alongside <code>CREATE</code> and <code>END</code>; defined type-specific <code>END</code> semantics for Badges, Challenges, and Events; prohibited recognition-ID recycling including ignored IDs; required creation-time validation against full XRPL-derived history; and required ignored IDs to remain annotated in owner/operator ledger views while being excluded from normal recognition lists.</td></tr>
 <tr><td>0.12</td><td>2026-09-30</td><td>Codified the Canonical State Principle: canonical Wild Ledger state exists only on XRPL, while Wild Ledger and its screens interpret that state. Required every authoritative fact needed to reconstruct Wild Ledger state to be recoverable from validated XRPL ledger history, and prohibited off-ledger storage, browser storage, configuration files, caches, or presentation logic from becoming authoritative protocol state.</td></tr>
-<tr><td>0.13</td><td>2026-09-30</td><td>Separated permanent community identity from its changeable Community Operating Account. Added an immutable authority-root trust anchor and XRPL-reconstructed <code>AUTH-NNN</code> succession chain; required mutual predecessor/successor signatures for routine account rotation; added cancellation of a pending proposal; defined effective-ledger and fail-closed conflict rules; and explicitly separated XRPL account authority from the wallet application used to sign.</td></tr>
+<tr><td>0.13</td><td>2026-09-30</td><td>Added XRPL-native authority state using canonical no-op <code>AccountSet</code> protocol statements of the form <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code>. Defined <code>OPERATING-WALLET</code> as the first authority-state key; made the LEAP Issuer the one-time bootstrap authority for a community's first value; allowed the current Operating Wallet to replace itself without Wild Ledger approval; established latest-valid-value-wins interpretation and historical authority reconstruction from ledger ordering; and left emergency recovery authority explicitly unresolved.</td></tr>
 </table>
 </section>
 <section id="open">
@@ -1105,7 +1142,9 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
 <li>Verify the ledger-discovered Badge/Event/Challenge vocabulary, lifecycle reconstruction, and duplicate-state logic against live XRPL history.</li>
 <li>Record the lifecycle activation ledger index before making <code>CREATE</code> mandatory for all newly created recognition IDs, so pre-lifecycle Check-discovered IDs remain deterministically readable.</li>
-<li>Complete the first live SFL <code>AUTH-001</code> operating-account handoff and verify that Wild Ledger reconstructs the new current authority from XRPL without a mutable off-ledger current-wallet setting.</li>
+<li>Publish and validate SFL's initial canonical <code>OPERATING-WALLET</code> authority-state statement so future authority can be resolved entirely from XRPL history.</li>
+<li>Define an emergency recovery rule for a lost, inaccessible, or compromised current Community Operating Wallet before Protocol 1.0.</li>
+<li>Integrate the proven Bifrost / WalletConnect sign-only no-op <code>AccountSet</code> flow into the production Badge, Challenge, and Event CREATE screens.</li>
 <li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier, derived from canonical ledger history rather than a separate database counter.</li>
 </ul>
 </section>
