@@ -106,6 +106,7 @@
               <div class="button-row">
                 <button class="secondary-button" id="recheckButton" type="button">Recheck XRPL</button>
                 <button class="primary-button" id="prepareButton" type="submit" disabled>Prepare CREATE</button>
+                <button class="primary-button" id="publishButton" type="button" disabled>Publish CREATE in Xaman</button>
                 <button class="secondary-button" id="clearButton" type="button">Clear</button>
               </div>
 
@@ -129,10 +130,10 @@
               </div>
 
               <div class="prepared" id="preparedMessage">
-                <strong>CREATE prepared.</strong> This is the canonical lifecycle statement Wild Ledger will hand to the signing/publishing step. Nothing has been written to XRPL yet.
+                <strong>CREATE prepared.</strong> The exact unsigned no-op AccountSet is ready for Xaman. Nothing is written to XRPL until you review, sign, and submit it.
               </div>
 
-              <div class="notice"><strong>Step 3 only:</strong> this page validates and prepares the canonical lifecycle record. It does not sign, submit, or publish an XRPL transaction and it does not award LEAP to a member.</div>
+              <div class="notice"><strong>XRPL publication:</strong> Wild Ledger prepares the unsigned lifecycle transaction and hands it to Xaman. Wild Ledger never receives a private key and cannot sign for the Community Operating Wallet. After Xaman validates the transaction, return to Recognition and the ledger reader will discover the new recognition directly from XRPL.</div>
             </form>
           </section>
 
@@ -187,6 +188,7 @@
       const eventIdInput = document.getElementById("eventId");
       const recheckButton = document.getElementById("recheckButton");
       const prepareButton = document.getElementById("prepareButton");
+      const publishButton = document.getElementById("publishButton");
       const clearButton = document.getElementById("clearButton");
       const xrplStatus = document.getElementById("xrplStatus");
       const formatStatus = document.getElementById("formatStatus");
@@ -210,6 +212,7 @@
       let historyLoaded = false;
       let scanInProgress = false;
       let reservedEvents = new Map();
+      let preparedTransaction = null;
 
       title.textContent = communityName;
       document.title = `${communityName} | Create Event`;
@@ -249,6 +252,31 @@
         return `${namespace}/RECOGNITION/EVENT/${id}/LIFECYCLE-TAG=CREATE`;
       }
 
+      function textToHex(text) {
+        const bytes = new TextEncoder().encode(String(text || ""));
+        return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+      }
+
+      function buildLifecycleTransaction(id) {
+        return {
+          TransactionType: "AccountSet",
+          Account: operatingWallet,
+          Memos: [
+            {
+              Memo: {
+                MemoData: textToHex(lifecycleMemo(id))
+              }
+            }
+          ]
+        };
+      }
+
+      function clearPreparedTransaction() {
+        preparedTransaction = null;
+        publishButton.disabled = true;
+        preparedMessage.classList.remove("show");
+      }
+
       function updatePreview() {
         const id = canonicalizeId(eventIdInput.value);
         canonicalId.textContent = id || "EVENT-ID";
@@ -276,7 +304,7 @@
 
       function refreshValidation() {
         const result = currentValidation();
-        preparedMessage.classList.remove("show");
+        clearPreparedTransaction();
 
         if (!result.id) {
           setStatus(formatStatus, "Enter an Event ID.", "wait");
@@ -562,7 +590,7 @@
       }
 
       eventIdInput.addEventListener("input", () => {
-        preparedMessage.classList.remove("show");
+        clearPreparedTransaction();
         refreshValidation();
       });
 
@@ -576,7 +604,7 @@
 
       clearButton.addEventListener("click", () => {
         eventIdInput.value = "";
-        preparedMessage.classList.remove("show");
+        clearPreparedTransaction();
         refreshValidation();
         eventIdInput.focus();
       });
@@ -590,8 +618,22 @@
         if (!result.ready) return;
 
         memoPreview.textContent = lifecycleMemo(result.id);
-        transactionPreview.textContent = `TransactionType: AccountSet\nAccount: ${operatingWallet}\nAccountSet mutation fields: none\nMemo: ${lifecycleMemo(result.id)}`;
+        preparedTransaction = buildLifecycleTransaction(result.id);
+        transactionPreview.textContent = JSON.stringify(preparedTransaction, null, 2);
         preparedMessage.classList.add("show");
+        publishButton.disabled = false;
+      });
+
+      publishButton.addEventListener("click", () => {
+        if (!preparedTransaction) return;
+        const id = canonicalizeId(eventIdInput.value);
+        const confirmed = window.confirm(
+          `Publish ${id || "this recognition"} to XRPL?\n\nThis opens Xaman's Signing Tool with the exact unsigned AccountSet. Nothing is written until you review, sign, and submit.`
+        );
+        if (!confirmed) return;
+
+        const payload = btoa(JSON.stringify(preparedTransaction));
+        window.location.href = "https://xumm.dev/signing-tool?payload=" + encodeURIComponent(payload);
       });
 
       updatePreview();

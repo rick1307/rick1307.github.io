@@ -1309,66 +1309,40 @@
 
 
     <p class="footnote">
-      Available and Active show recognition that can be used now. History keeps the recognition record that has already
-      been written to the ledger.
+      Available and Active are reconstructed from XRPL lifecycle state. History shows recognitions that reached their normal END state. Ignored recognitions remain on XRPL but are excluded from these normal operating views.
     </p>
   </main>
 
+  <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
   <script>
     (() => {
       "use strict";
 
-      const XRPL_SERVER = "wss://s1.ripple.com/";
-      const AUTHORIZED_DISTRIBUTORS = ["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"];
-      const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
       const params = new URLSearchParams(window.location.search);
       const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
       const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
-      const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
-      const defaultCommunity = Object.values(registry)[0] || null;
-      const defaultBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(defaultCommunity) || "";
-      const requestedValue = params.get("community") || defaultBackendId;
+      const requestedValue = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
       const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedValue) || null;
-      const requestedCommunity = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedValue || "").trim().toUpperCase();
+      const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
       const communityName = community?.communityName || "Community";
-      const viewCommunityTitle = document.getElementById("view-community-title");
-      if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
+      const namespace = community?.leapNamespace || `${communityId}-LEAP`;
+      const operatingWallet = community?.operatingWallet || "";
+      const config = window.WILD_LEDGER_CONFIG || {};
+      const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
+      const LEAP_ISSUER = config.leapIssuer || "";
+      const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
+      const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
+      const CATEGORIES = ["BADGE", "CHALLENGE", "EVENT"];
+      const ACCOUNTSET_SPECIFIC_FIELDS = [
+        "ClearFlag", "Domain", "EmailHash", "MessageKey", "NFTokenMinter",
+        "SetFlag", "TransferRate", "TickSize", "WalletLocator", "WalletSize"
+      ];
+
+      const title = document.getElementById("view-community-title");
       const createBadgeLink = document.getElementById("createBadgeLink");
       const createChallengeLink = document.getElementById("createChallengeLink");
       const createEventLink = document.getElementById("createEventLink");
-      if (createBadgeLink) {
-        createBadgeLink.href = `createBadge.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
-      }
-      if (createChallengeLink) {
-        createChallengeLink.href = `createChallenge.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
-      }
-      if (createEventLink) {
-        createEventLink.href = `createEvent.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
-      }
-      document.title = `${communityName} | Community Recognition`;
-      const NAMESPACE = community?.leapNamespace || `${requestedCommunity}-LEAP`;
-      const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
-      const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
-
-      const records = {
-        BADGE: new Map(),
-        EVENT: new Map(),
-        CHALLENGE: new Map()
-      };
-
-      let historyEntries = [];
-      let checkCreatesById = new Map();
-      let checkCreatesByHash = new Map();
-      let checkResolutionsById = new Map();
-      let historyView = "badges";
-
-      let socket = null;
-      let requestCounter = 0;
-      let pending = new Map();
-      let scannedTransactions = 0;
-      let historyLoaded = false;
-      const historySummary = document.getElementById("historySummary");
       const badgesView = document.getElementById("badgesView");
       const challengesView = document.getElementById("challengesView");
       const eventsView = document.getElementById("eventsView");
@@ -1376,7 +1350,29 @@
       const challengesViewButton = document.getElementById("challengesViewButton");
       const eventsViewButton = document.getElementById("eventsViewButton");
 
+      title.textContent = communityName;
+      document.title = `${communityName} | Community Recognition`;
+      createBadgeLink.href = `createBadge.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+      createChallengeLink.href = `createChallenge.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+      createEventLink.href = `createEvent.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+
+      const lifecycle = {
+        BADGE: new Map(),
+        CHALLENGE: new Map(),
+        EVENT: new Map()
+      };
+      const legacy = {
+        BADGE: new Map(),
+        CHALLENGE: new Map(),
+        EVENT: new Map()
+      };
+
       const recognitionMode = { badges: "available", challenges: "active", events: "active" };
+      let historyView = "badges";
+      let socket = null;
+      let requestCounter = 0;
+      let pending = new Map();
+
       const subviews = {
         badges: {
           available: document.getElementById("badgesAvailablePanel"),
@@ -1403,11 +1399,27 @@
         return new Date(RIPPLE_EPOCH_MS + seconds * 1000).toISOString();
       }
 
-      function cleanIso(value) {
-        if (value === null || value === undefined || value === "") return null;
-        if (typeof value === "number") return rippleTimeToIso(value);
-        const date = new Date(value);
+      function entryTime(entry, tx) {
+        const raw = entry?.close_time_iso || entry?.date || tx?.date || null;
+        if (typeof raw === "number") return rippleTimeToIso(raw);
+        if (!raw) return null;
+        const date = new Date(raw);
         return Number.isNaN(date.getTime()) ? null : date.toISOString();
+      }
+
+      function ledgerIndex(entry, tx) {
+        return entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.ledgerIndex ?? tx?.inLedger ?? null;
+      }
+
+      function normalizeTx(entry) {
+        return entry?.tx_json || entry?.tx || entry?.transaction || entry || {};
+      }
+
+      function transactionSucceeded(entry) {
+        if (entry?.validated === false) return false;
+        const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+        const result = meta?.TransactionResult ?? meta?.transaction_result;
+        return !result || result === "tesSUCCESS";
       }
 
       function hexToText(value) {
@@ -1415,10 +1427,22 @@
         if (!/^[A-Fa-f0-9]+$/.test(value) || value.length % 2 !== 0) return value;
         try {
           const bytes = new Uint8Array(value.match(/.{2}/g).map(pair => parseInt(pair, 16)));
-          return new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/\0+$/g, "");
-        } catch {
+          return new TextDecoder("utf-8", { fatal:false }).decode(bytes).replace(/\0+$/g, "");
+        } catch (_) {
           return value;
         }
+      }
+
+      function memoTexts(tx) {
+        const texts = [];
+        for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
+          const memo = wrapper?.Memo || {};
+          for (const field of [memo.MemoData, memo.MemoType, memo.MemoFormat]) {
+            const decoded = hexToText(field).trim();
+            if (decoded) texts.push(decoded);
+          }
+        }
+        return texts;
       }
 
       function decodeCurrency(value) {
@@ -1432,474 +1456,235 @@
             out += String.fromCharCode(n);
           }
           return out;
-        } catch {
+        } catch (_) {
           return code;
         }
       }
 
       function isLeapAmount(amount) {
         return !!amount && typeof amount === "object" &&
-          amount.issuer === LEAP_ISSUER && decodeCurrency(amount.currency).toUpperCase() === "LEAP";
+          (!LEAP_ISSUER || amount.issuer === LEAP_ISSUER) &&
+          decodeCurrency(amount.currency).toUpperCase() === "LEAP";
       }
 
-      function normalizeTx(entry) {
-        return entry?.tx_json || entry?.tx || entry?.transaction || entry || {};
+      function validId(category, value) {
+        if (category === "CHALLENGE") return /^LEAP-\d{3,}$/.test(value);
+        return /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(value);
       }
 
-      function transactionSucceeded(meta) {
-        if (!meta || typeof meta !== "object") return true;
-        const result = meta.TransactionResult ?? meta.transaction_result;
-        return !result || result === "tesSUCCESS";
+      function isCanonicalNoOpAccountSet(tx) {
+        if (tx?.TransactionType !== "AccountSet") return false;
+        if (Number(tx.Flags || 0) !== 0) return false;
+        return ACCOUNTSET_SPECIFIC_FIELDS.every(field => !(field in tx));
       }
 
-      function parseStructuredData(text) {
-        const out = {};
-        if (!text) return out;
-        for (const piece of text.split("|")) {
-          const equals = piece.indexOf("=");
-          if (equals <= 0) continue;
-          const key = piece.slice(0, equals).trim().toUpperCase();
-          const value = piece.slice(equals + 1).trim();
-          if (RECOGNIZED_KEYS.includes(key) && value) out[key] = value;
+      function lifecycleFromEntry(entry) {
+        const tx = normalizeTx(entry);
+        if (!operatingWallet || tx.Account !== operatingWallet || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
+        const prefix = `${namespace}/RECOGNITION/`;
+        const suffix = "/LIFECYCLE-TAG=";
+        const matches = [];
+
+        for (const text of memoTexts(tx)) {
+          if (!text.startsWith(prefix)) continue;
+          const marker = text.indexOf(suffix, prefix.length);
+          if (marker < 0) continue;
+          const path = text.slice(prefix.length, marker);
+          const [category, ...idParts] = path.split("/");
+          const id = idParts.join("/");
+          const action = text.slice(marker + suffix.length);
+          if (!CATEGORIES.includes(category) || !validId(category, id) || !["CREATE", "END", "IGNORE"].includes(action)) continue;
+          if (text !== `${namespace}/RECOGNITION/${category}/${id}/LIFECYCLE-TAG=${action}`) continue;
+          matches.push({ category, id, action });
         }
-        return out;
+
+        if (matches.length !== 1) return null;
+        return {
+          ...matches[0],
+          ledger: ledgerIndex(entry, tx),
+          time: entryTime(entry, tx),
+          hash: entry?.hash || tx?.hash || ""
+        };
       }
 
-      function parseCanonicalLeapMemo(text) {
+      function applyLifecycle(record) {
+        if (!record) return;
+        const map = lifecycle[record.category];
+        const current = map.get(record.id) || null;
+
+        if (record.action === "CREATE") {
+          if (!current) map.set(record.id, { state:"ACTIVE", create:record, terminal:null });
+          return;
+        }
+
+        if (record.action === "IGNORE") {
+          map.set(record.id, { state:"IGNORED", create:current?.create || null, terminal:record });
+          return;
+        }
+
+        if (record.action === "END") {
+          if (current?.state === "IGNORED") return;
+          map.set(record.id, { state:"ENDED", create:current?.create || null, terminal:record });
+        }
+      }
+
+      function parseCanonicalAward(text) {
         const value = String(text || "").trim();
-        if (!value) return null;
-        const prefix = NAMESPACE + "/";
-        if (!value.toUpperCase().startsWith(prefix)) return null;
+        const prefix = `${namespace}/`;
+        if (!value.startsWith(prefix)) return null;
         const payload = value.slice(prefix.length);
         const equals = payload.indexOf("=");
         if (equals <= 0) return null;
-        const key = payload.slice(0, equals).trim().toUpperCase();
-        const factValue = payload.slice(equals + 1).trim();
-        if (!RECOGNIZED_KEYS.includes(key)) return null;
-        if (!/^[A-Za-z0-9][A-Za-z0-9-]*$/.test(factValue)) return null;
-        return { key, value: factValue };
+        const category = payload.slice(0, equals).trim().toUpperCase();
+        const id = payload.slice(equals + 1).trim().toUpperCase();
+        if (!CATEGORIES.includes(category) || !validId(category, id)) return null;
+        return { category, id };
       }
 
-      function extractFacts(tx) {
-        const facts = [];
-        const seen = new Set();
+      function legacyAwardsFromEntry(entry) {
+        const tx = normalizeTx(entry);
+        if (tx?.TransactionType !== "CheckCreate" || !LEGACY_DISTRIBUTORS.includes(tx.Account) || !transactionSucceeded(entry) || !isLeapAmount(tx.SendMax)) return [];
+        const found = new Map();
         const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
 
-        function addFact(fact) {
-          if (!fact) return;
-          const signature = `${fact.key}=${fact.value}`;
-          if (seen.has(signature)) return;
-          seen.add(signature);
-          facts.push(fact);
+        function add(category, id) {
+          category = String(category || "").toUpperCase();
+          id = String(id || "").trim().toUpperCase();
+          if (!CATEGORIES.includes(category) || !validId(category, id)) return;
+          found.set(`${category}:${id}`, { category, id });
         }
 
         for (const wrapper of memos) {
           const memo = wrapper?.Memo || {};
           const type = hexToText(memo.MemoType).trim();
-          const format = hexToText(memo.MemoFormat).trim();
           const data = hexToText(memo.MemoData).trim();
+          const format = hexToText(memo.MemoFormat).trim();
 
-          addFact(parseCanonicalLeapMemo(data));
-          addFact(parseCanonicalLeapMemo(type));
-          addFact(parseCanonicalLeapMemo(format));
-
-          if (type.toUpperCase() === NAMESPACE) {
-            const parsed = parseStructuredData(data);
-            for (const key of RECOGNIZED_KEYS) {
-              if (parsed[key]) addFact({ key, value: parsed[key] });
-            }
+          for (const text of [data, type, format]) {
+            const parsed = parseCanonicalAward(text);
+            if (parsed) add(parsed.category, parsed.id);
           }
 
-          const legacyPrefix = NAMESPACE + "/";
-          if (type.toUpperCase().startsWith(legacyPrefix) && !type.includes("=")) {
-            const legacyKey = type.slice(legacyPrefix.length).trim().toUpperCase();
-            if (RECOGNIZED_KEYS.includes(legacyKey) && data) {
-              addFact({ key: legacyKey, value: data });
-            } else if (legacyKey === "NEW-MEMBER") {
-              // Historical onboarding form. Treat it as the NEW-MEMBER badge
-              // when reading old ledger records; new Checks use the one-line
-              // SFL-LEAP/BADGE=NEW-MEMBER syntax.
-              addFact({ key: "BADGE", value: "NEW-MEMBER" });
+          const legacyPrefix = `${namespace}/`;
+          if (type.startsWith(legacyPrefix) && !type.includes("=")) {
+            const category = type.slice(legacyPrefix.length).trim().toUpperCase();
+            if (CATEGORIES.includes(category)) add(category, data);
+            if (category === "NEW-MEMBER") add("BADGE", "NEW-MEMBER");
+          }
+
+          if (type === namespace && data) {
+            for (const piece of data.split("|")) {
+              const equals = piece.indexOf("=");
+              if (equals <= 0) continue;
+              add(piece.slice(0, equals).trim(), piece.slice(equals + 1).trim());
             }
           }
         }
 
-        return facts;
-      }
-
-      function extractCreatedCheckId(meta) {
-        const nodes = meta?.AffectedNodes || meta?.affected_nodes || [];
-        for (const wrapper of nodes) {
-          const node = wrapper?.CreatedNode || wrapper?.created_node;
-          if (!node) continue;
-          const type = node.LedgerEntryType || node.ledger_entry_type;
-          if (type !== "Check") continue;
-          return node.LedgerIndex || node.ledger_index || null;
-        }
-        return null;
-      }
-
-      function rememberCheckCreate(tx, meta, info) {
-        if (tx.TransactionType !== "CheckCreate") return null;
-        if (!AUTHORIZED_DISTRIBUTORS.includes(tx.Account)) return null;
-
-        const checkId = extractCreatedCheckId(meta);
-        const record = {
-          hash: info.hash || tx.hash || "",
-          checkId: checkId || "",
-          time: cleanIso(info.time),
-          ledger: info.ledger ?? null,
-          destination: tx.Destination || "",
-          amount: tx.SendMax,
-          expiration: typeof tx.Expiration === "number" ? tx.Expiration : null,
-          facts: extractFacts(tx)
-        };
-
-        if (record.hash) checkCreatesByHash.set(record.hash, record);
-        if (checkId) checkCreatesById.set(checkId, record);
-        return record;
-      }
-
-      function rememberCheckResolution(tx, info) {
-        if (!["CheckCash", "CheckCancel"].includes(tx.TransactionType)) return false;
-
-        const checkId = tx.CheckID || tx.check_id || "";
-        if (!checkId) return false;
-
-        // Only attach lifecycle state to a Check we already proved was created
-        // by an authorized LEAP distributor.
-        if (!checkCreatesById.has(checkId)) return false;
-
-        const next = {
-          status: tx.TransactionType === "CheckCancel" ? "canceled" : "cashed",
-          time: cleanIso(info.time),
-          ledger: info.ledger ?? null,
-          hash: info.hash || tx.hash || ""
-        };
-
-        const existing = checkResolutionsById.get(checkId);
-        if (existing &&
-            existing.status === next.status &&
-            existing.hash === next.hash) return false;
-
-        checkResolutionsById.set(checkId, next);
-        return true;
-      }
-
-      function resolutionForEntry(entry) {
-        if (!entry?.checkId) return null;
-        return checkResolutionsById.get(entry.checkId) || null;
-      }
-
-      function isCanceledEntry(entry) {
-        return resolutionForEntry(entry)?.status === "canceled";
-      }
-
-      function isNewMemberCheck(create) {
-        return !!create?.facts?.some(fact =>
-          fact.key === "BADGE" &&
-          String(fact.value || "").trim().toUpperCase() === "NEW-MEMBER"
-        );
-      }
-
-      function totalCrewMembers() {
-        let total = 0;
-
-        for (const [checkId, create] of checkCreatesById.entries()) {
-          if (!isNewMemberCheck(create)) continue;
-          if (checkResolutionsById.get(checkId)?.status === "cashed") total += 1;
-        }
-
-        return total;
-      }
-
-      function historyStatusNode(entry) {
-        const resolution = resolutionForEntry(entry);
-        if (!resolution) return null;
-
-        const badge = document.createElement("span");
-        badge.className = `history-status ${resolution.status}`;
-        badge.textContent = resolution.status === "canceled" ? "Canceled" : "Cashed";
-        badge.title = resolution.time
-          ? `${badge.textContent} ${prettyDateTime(resolution.time)}`
-          : badge.textContent;
-        return badge;
-      }
-
-      function recordFact(key, value, info) {
-        const map = records[key];
-        if (!map || !value) return;
-        const normalizedValue = value.trim();
-        if (!normalizedValue) return;
-        const existing = map.get(normalizedValue);
-        const when = cleanIso(info.time);
-
-        if (!existing) {
-          map.set(normalizedValue, { value: normalizedValue, count: 1, firstSeen: when, lastSeen: when });
-          return;
-        }
-
-        existing.count += 1;
-        if (when && (!existing.firstSeen || when < existing.firstSeen)) existing.firstSeen = when;
-        if (when && (!existing.lastSeen || when > existing.lastSeen)) existing.lastSeen = when;
-      }
-
-      function recordHistoryEntry(facts, info) {
-        if (!facts.length) return;
-        const hash = info.hash || "";
-        if (hash && historyEntries.some(entry => entry.hash === hash)) return;
-        historyEntries.push({
-          hash,
-          checkId: info.checkId || "",
-          transactionType: info.transactionType || "",
-          time: cleanIso(info.time),
-          ledger: info.ledger ?? null,
-          facts: facts.map(fact => ({ key: fact.key, value: fact.value }))
-        });
-      }
-
-      function processHistoryEntry(entry) {
-        if (entry?.validated === false) return;
-        const tx = normalizeTx(entry);
-        const meta = entry?.meta || tx?.meta;
-        if (!transactionSucceeded(meta)) return;
-
         const info = {
-          time: entry?.close_time_iso || entry?.date || tx?.date || null,
-          ledger: entry?.ledger_index || tx?.ledger_index || tx?.inLedger || null,
-          hash: entry?.hash || tx?.hash || null,
-          transactionType: tx.TransactionType || ""
+          ledger: ledgerIndex(entry, tx),
+          time: entryTime(entry, tx),
+          hash: entry?.hash || tx?.hash || ""
         };
-
-        const create = rememberCheckCreate(tx, meta, info);
-        rememberCheckResolution(tx, info);
-
-        // Recognition memos originate with the authorized distributor.
-        // CheckCash can be submitted by the recipient, so lifecycle tracking
-        // happens above before this authority filter.
-        if (!AUTHORIZED_DISTRIBUTORS.includes(tx.Account)) return;
-
-        const facts = extractFacts(tx);
-        if (!facts.length) return;
-
-        info.checkId = create?.checkId || "";
-        recordHistoryEntry(facts, info);
-        for (const fact of facts) recordFact(fact.key, fact.value, info);
+        return [...found.values()].map(item => ({ ...item, ...info }));
       }
 
-      function processLiveMessage(message) {
-        const tx = message?.transaction || message?.tx_json || {};
-        if (message?.validated === false) return;
+      function applyLegacy(record) {
+        const map = legacy[record.category];
+        if (!map.has(record.id)) map.set(record.id, record);
+      }
 
-        const meta = message?.meta;
-        if (!transactionSucceeded(meta)) return;
-
-        const info = {
-          time: message?.close_time_iso || rippleTimeToIso(tx.date) || new Date().toISOString(),
-          ledger: message?.ledger_index || tx?.ledger_index || null,
-          hash: tx?.hash || message?.hash || null,
-          transactionType: tx.TransactionType || ""
-        };
-
-        const create = rememberCheckCreate(tx, meta, info);
-        const resolutionChanged = rememberCheckResolution(tx, info);
-
-        if (!AUTHORIZED_DISTRIBUTORS.includes(tx.Account)) {
-          if (resolutionChanged) render();
-          return;
+      function combinedState(category) {
+        const ids = new Set([...legacy[category].keys(), ...lifecycle[category].keys()]);
+        const rows = [];
+        for (const id of ids) {
+          const life = lifecycle[category].get(id) || null;
+          const old = legacy[category].get(id) || null;
+          const state = life?.state || "ACTIVE";
+          rows.push({
+            id,
+            state,
+            source: life ? "lifecycle" : "legacy",
+            created: life?.create || old || null,
+            terminal: life?.terminal || null
+          });
         }
-
-        const facts = extractFacts(tx);
-        if (!facts.length) {
-          if (resolutionChanged) render();
-          return;
-        }
-
-        info.checkId = create?.checkId || "";
-        recordHistoryEntry(facts, info);
-        for (const fact of facts) recordFact(fact.key, fact.value, info);
-        render();
+        return rows;
       }
 
       function prettyDate(iso) {
-        if (!iso) return "date unavailable";
-        return new Intl.DateTimeFormat(undefined, {
-          year: "numeric", month: "short", day: "numeric"
-        }).format(new Date(iso));
+        if (!iso) return "";
+        return new Intl.DateTimeFormat(undefined, { year:"numeric", month:"short", day:"numeric" }).format(new Date(iso));
       }
 
-      function prettyDateTime(iso) {
-        if (!iso) return "No expiration set";
-        return new Intl.DateTimeFormat(undefined, {
-          year: "numeric", month: "short", day: "numeric",
-          hour: "numeric", minute: "2-digit"
-        }).format(new Date(iso));
+      function sortRecognitionRows(category, rows) {
+        return rows.sort((a, b) => {
+          if (category === "CHALLENGE") {
+            const an = Number((a.id.match(/(\d+)$/) || [0,0])[1]);
+            const bn = Number((b.id.match(/(\d+)$/) || [0,0])[1]);
+            if (an !== bn) return an - bn;
+          }
+          return a.id.localeCompare(b.id, undefined, { sensitivity:"base", numeric:true });
+        });
       }
 
-      function sortNewestFirst(a, b) {
-        const ta = a.time ? new Date(a.time).getTime() : 0;
-        const tb = b.time ? new Date(b.time).getTime() : 0;
-        return tb - ta;
-      }
-
-      function renderCategoryGroup(key) {
-        const target = document.getElementById(key);
-        target.replaceChildren();
-
-        // BADGES and CHALLENGES are registries, not award/completion history.
-        // Show each identifier once, alphabetically, regardless of how many times it
-        // has been used or whether a particular Check carrying it was later canceled.
-        if (key === "BADGE" || key === "CHALLENGE") {
-          const identifiers = new Set();
-
-          for (const entry of historyEntries) {
-            for (const fact of entry.facts) {
-              if (fact.key === key && fact.value) identifiers.add(fact.value.trim());
-            }
-          }
-
-          const sortedIdentifiers = [...identifiers].sort((a, b) => {
-            if (key === "CHALLENGE") {
-              const aMatch = a.match(/(\d+)$/);
-              const bMatch = b.match(/(\d+)$/);
-              if (aMatch && bMatch) {
-                const delta = Number(aMatch[1]) - Number(bMatch[1]);
-                if (delta !== 0) return delta;
-              }
-            }
-            return a.localeCompare(b, undefined, { sensitivity: "base", numeric: true });
-          });
-
-          if (!sortedIdentifiers.length) {
-            const empty = document.createElement("div");
-            empty.className = "empty";
-            empty.textContent = "None found on the ledger yet.";
-            target.appendChild(empty);
-            return;
-          }
-
-          for (const identifier of sortedIdentifiers) {
-            const row = document.createElement("div");
-            row.className = "item";
-
-            const name = document.createElement("div");
-            name.className = "name";
-            name.textContent = identifier;
-
-            row.appendChild(name);
-            target.appendChild(row);
-          }
-          return;
-        }
-
-        // EVENTS are occurrences, so keep their ledger dates and lifecycle status.
-        const occurrences = [];
-
-        for (const entry of historyEntries) {
-          const matchingFacts = entry.facts.filter(fact => fact.key === key);
-          if (!matchingFacts.length) continue;
-          occurrences.push({ time: entry.time, facts: matchingFacts, entry });
-        }
-
-        occurrences.sort(sortNewestFirst);
-
-        if (!occurrences.length) {
-          const empty = document.createElement("div");
-          empty.className = "empty";
-          empty.textContent = "None found on the ledger yet.";
-          target.appendChild(empty);
-          return;
-        }
-
-        for (const occurrence of occurrences) {
-          const resolution = resolutionForEntry(occurrence.entry);
-
-          for (const fact of occurrence.facts) {
-            const row = document.createElement("div");
-            row.className = "item" + (resolution?.status === "canceled" ? " canceled" : "");
-
-            const name = document.createElement("div");
-            name.className = "name";
-            name.textContent = fact.value;
-
-            const meta = document.createElement("div");
-            meta.className = "meta";
-
-            const date = document.createElement("div");
-            date.textContent = prettyDate(occurrence.time);
-            meta.appendChild(date);
-
-            const status = historyStatusNode(occurrence.entry);
-            if (status) meta.appendChild(status);
-
-            row.append(name, meta);
-            target.appendChild(row);
-          }
-        }
-      }
-
-      function renderRecognitionHistory(key, targetId) {
+      function renderRows(targetId, category, wantedState) {
         const target = document.getElementById(targetId);
         if (!target) return;
         target.replaceChildren();
+        const rows = sortRecognitionRows(category, combinedState(category).filter(row => row.state === wantedState));
 
-        const occurrences = [];
-        for (const entry of historyEntries) {
-          const matchingFacts = entry.facts.filter(fact => fact.key === key);
-          if (!matchingFacts.length) continue;
-          occurrences.push({ time: entry.time, facts: matchingFacts, entry });
-        }
-        occurrences.sort(sortNewestFirst);
-
-        if (!occurrences.length) {
+        if (!rows.length) {
           const empty = document.createElement("div");
           empty.className = "empty";
-          empty.textContent = "No history found on the ledger yet.";
+          empty.textContent = wantedState === "ENDED" ? "No recognition history found on XRPL yet." : "None found on XRPL yet.";
           target.appendChild(empty);
           return;
         }
 
-        for (const occurrence of occurrences) {
-          const resolution = resolutionForEntry(occurrence.entry);
-          for (const fact of occurrence.facts) {
-            const row = document.createElement("div");
-            row.className = "item" + (resolution?.status === "canceled" ? " canceled" : "");
+        for (const rowData of rows) {
+          const row = document.createElement("div");
+          row.className = "item";
+          const name = document.createElement("div");
+          name.className = "name";
+          name.textContent = rowData.id;
+          row.appendChild(name);
 
-            const name = document.createElement("div");
-            name.className = "name";
-            name.textContent = fact.value;
-
-            const meta = document.createElement("div");
-            meta.className = "meta";
-
-            const date = document.createElement("div");
-            date.textContent = prettyDate(occurrence.time);
-            meta.appendChild(date);
-
-            const status = historyStatusNode(occurrence.entry);
-            if (status) meta.appendChild(status);
-
-            row.append(name, meta);
-            target.appendChild(row);
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          if (wantedState === "ENDED") {
+            const label = category === "BADGE" ? "Retired" : category === "CHALLENGE" ? "Closed" : "Completed";
+            const status = document.createElement("div");
+            status.textContent = rowData.terminal?.time ? `${label} · ${prettyDate(rowData.terminal.time)}` : label;
+            meta.appendChild(status);
+          } else if (rowData.source === "legacy") {
+            const status = document.createElement("div");
+            status.textContent = "Legacy-established";
+            meta.appendChild(status);
           }
+          if (meta.childNodes.length) row.appendChild(meta);
+          target.appendChild(row);
         }
       }
 
-      function renderActiveEvents() {
-        const target = document.getElementById("EVENT_ACTIVE");
-        if (!target) return;
-        target.replaceChildren();
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "No active events are listed right now.";
-        target.appendChild(empty);
+      function render() {
+        renderRows("BADGE", "BADGE", "ACTIVE");
+        renderRows("BADGE_HISTORY", "BADGE", "ENDED");
+        renderRows("CHALLENGE", "CHALLENGE", "ACTIVE");
+        renderRows("CHALLENGE_HISTORY", "CHALLENGE", "ENDED");
+        renderRows("EVENT_ACTIVE", "EVENT", "ACTIVE");
+        renderRows("EVENT", "EVENT", "ENDED");
+
+        for (const [category, id] of [["BADGE","badgeTotal"],["CHALLENGE","challengeTotal"],["EVENT","eventTotal"]]) {
+          const total = combinedState(category).filter(row => row.state !== "IGNORED").length;
+          document.getElementById(id).textContent = String(total);
+        }
       }
 
       function setRecognitionMode(category, mode) {
         const config = subviews[category];
         if (!config || !config[mode]) return;
         recognitionMode[category] = mode;
-
         for (const candidate of ["available", "active", "history"]) {
           if (config[candidate]) config[candidate].hidden = candidate !== mode;
           const button = config[`${candidate}Button`];
@@ -1909,191 +1694,95 @@
 
       function setHistoryView(view) {
         historyView = ["badges", "challenges", "events"].includes(view) ? view : "badges";
-
         badgesView.hidden = historyView !== "badges";
         challengesView.hidden = historyView !== "challenges";
         eventsView.hidden = historyView !== "events";
-
         badgesViewButton.setAttribute("aria-pressed", String(historyView === "badges"));
         challengesViewButton.setAttribute("aria-pressed", String(historyView === "challenges"));
         eventsViewButton.setAttribute("aria-pressed", String(historyView === "events"));
         setRecognitionMode(historyView, recognitionMode[historyView]);
       }
 
-      function render() {
-        renderCategoryGroup("BADGE");
-        renderCategoryGroup("CHALLENGE");
-        renderCategoryGroup("EVENT");
-        renderRecognitionHistory("BADGE", "BADGE_HISTORY");
-        renderRecognitionHistory("CHALLENGE", "CHALLENGE_HISTORY");
-        renderActiveEvents();
-
-        const counts = {};
-
-        // Badges and challenges are registry counts: unique identifiers ever defined.
-        // Canceling one Check does not erase the identifier from either registry.
-        for (const key of ["BADGE", "CHALLENGE"]) {
-          const values = new Set();
-          for (const entry of historyEntries) {
-            for (const fact of entry.facts) {
-              if (fact.key === key && fact.value) values.add(fact.value.trim());
-            }
-          }
-          counts[key] = values.size;
-        }
-
-        // Events are dated occurrences. Canceled event Checks remain visible as history
-        // but do not count as active event occurrences.
-        {
-          const activeValues = new Set();
-          let active = 0;
-          let canceled = 0;
-
-          for (const entry of historyEntries) {
-            const matching = entry.facts.filter(fact => fact.key === "EVENT");
-            if (!matching.length) continue;
-
-            if (isCanceledEntry(entry)) {
-              canceled += matching.length;
-              continue;
-            }
-
-            active += matching.length;
-            for (const fact of matching) activeValues.add(fact.value);
-          }
-
-          counts.EVENT = activeValues.size;
-        }
-
-        document.getElementById("badgeTotal").textContent = counts.BADGE;
-        document.getElementById("eventTotal").textContent = counts.EVENT;
-        document.getElementById("challengeTotal").textContent = counts.CHALLENGE;
-
-        setHistoryView(historyView);
-      }
-
-      function resetRecords() {
-        for (const key of RECOGNIZED_KEYS) records[key].clear();
-        historyEntries = [];
-        checkCreatesById = new Map();
-        checkCreatesByHash = new Map();
-        checkResolutionsById = new Map();
-        scannedTransactions = 0;
-        historyLoaded = false;
-        render();
-      }
-
       function connect() {
         return new Promise((resolve, reject) => {
           socket = new WebSocket(XRPL_SERVER);
-
-          const timeout = setTimeout(() => {
-            reject(new Error("Timed out connecting to XRPL."));
-            try { socket.close(); } catch {}
-          }, 15000);
-
-          socket.addEventListener("open", () => {
-            clearTimeout(timeout);
-            resolve();
-          }, { once: true });
-
-          socket.addEventListener("error", () => {
-            clearTimeout(timeout);
-            reject(new Error("XRPL connection failed."));
-          }, { once: true });
-
+          const timer = setTimeout(() => reject(new Error("XRPL connection timed out.")), 12000);
+          socket.addEventListener("open", () => { clearTimeout(timer); resolve(); }, { once:true });
+          socket.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Could not connect to XRPL.")); }, { once:true });
           socket.addEventListener("message", event => {
             let message;
-            try { message = JSON.parse(event.data); } catch { return; }
-
-            if (message.id && pending.has(message.id)) {
-              const handlers = pending.get(message.id);
-              pending.delete(message.id);
-              if (message.status === "error" || message.error || message.result?.error) {
-                handlers.reject(new Error(
-                  message.error_message || message.result?.error_message || message.error || message.result?.error || "XRPL request failed."
-                ));
-              } else {
-                handlers.resolve(message.result || message);
-              }
-              return;
+            try { message = JSON.parse(event.data); } catch (_) { return; }
+            if (!message.id || !pending.has(message.id)) return;
+            const handlers = pending.get(message.id);
+            pending.delete(message.id);
+            if (message.status === "error" || message.error || message.result?.error) {
+              handlers.reject(new Error(message.error_message || message.result?.error_message || message.error || message.result?.error || "XRPL request failed."));
+            } else {
+              handlers.resolve(message.result || message);
             }
-
-            if (message.type === "transaction") processLiveMessage(message);
-          });
-
-          socket.addEventListener("close", () => {
           });
         });
       }
 
       function request(command) {
         return new Promise((resolve, reject) => {
-          if (!socket || socket.readyState !== WebSocket.OPEN) {
-            reject(new Error("XRPL connection is not open."));
-            return;
-          }
-
-          const id = "leap-" + (++requestCounter);
+          if (!socket || socket.readyState !== WebSocket.OPEN) return reject(new Error("XRPL connection is not open."));
+          const id = `recognition-${++requestCounter}`;
           pending.set(id, { resolve, reject });
-          socket.send(JSON.stringify({ id, api_version: 2, ...command }));
-
+          socket.send(JSON.stringify({ id, api_version:2, ...command }));
           setTimeout(() => {
-            if (pending.has(id)) {
-              pending.delete(id);
-              reject(new Error("XRPL request timed out."));
-            }
+            if (!pending.has(id)) return;
+            pending.delete(id);
+            reject(new Error("XRPL request timed out."));
           }, 30000);
         });
       }
 
-      async function loadAccountHistory(account) {
+      async function scanAccount(account, mode) {
+        if (!account) return;
         let marker;
         do {
           const command = {
-            command: "account_tx",
-            account,
-            ledger_index_min: -1,
-            ledger_index_max: -1,
-            binary: false,
-            forward: true,
-            limit: 400
+            command:"account_tx", account,
+            ledger_index_min:-1, ledger_index_max:-1,
+            binary:false, forward:true, limit:400
           };
           if (marker !== undefined) command.marker = marker;
-
           const result = await request(command);
-          const txs = Array.isArray(result.transactions) ? result.transactions : [];
-          for (const entry of txs) processHistoryEntry(entry);
-          scannedTransactions += txs.length;
+          for (const entry of Array.isArray(result.transactions) ? result.transactions : []) {
+            if (mode === "lifecycle") applyLifecycle(lifecycleFromEntry(entry));
+            else for (const record of legacyAwardsFromEntry(entry)) applyLegacy(record);
+          }
           marker = result.marker;
-          render();
         } while (marker !== undefined && marker !== null);
       }
 
-
       async function start() {
         try {
-          if (socket) {
-            try { socket.close(); } catch {}
-          }
-          pending.clear();
-          resetRecords();
-          await connect();
-
-          for (const account of AUTHORIZED_DISTRIBUTORS) await loadAccountHistory(account);
-          historyLoaded = true;
-          await subscribeLive();
+          for (const category of CATEGORIES) { lifecycle[category].clear(); legacy[category].clear(); }
           render();
-
+          if (!operatingWallet) {
+            console.warn("This community does not yet have a Community Operating Wallet configured.");
+            return;
+          }
+          await connect();
+          await scanAccount(operatingWallet, "lifecycle");
+          for (const distributor of LEGACY_DISTRIBUTORS) {
+            if (distributor) await scanAccount(distributor, "legacy");
+          }
+          render();
         } catch (error) {
           console.warn(error?.message || String(error));
+        } finally {
+          if (socket) { try { socket.close(); } catch (_) {} }
+          socket = null;
+          pending.clear();
         }
       }
 
       badgesViewButton.addEventListener("click", () => setHistoryView("badges"));
       challengesViewButton.addEventListener("click", () => setHistoryView("challenges"));
       eventsViewButton.addEventListener("click", () => setHistoryView("events"));
-
       subviews.badges.availableButton.addEventListener("click", () => setRecognitionMode("badges", "available"));
       subviews.badges.historyButton.addEventListener("click", () => setRecognitionMode("badges", "history"));
       subviews.challenges.activeButton.addEventListener("click", () => setRecognitionMode("challenges", "active"));
@@ -2101,12 +1790,10 @@
       subviews.events.activeButton.addEventListener("click", () => setRecognitionMode("events", "active"));
       subviews.events.historyButton.addEventListener("click", () => setRecognitionMode("events", "history"));
 
+      setHistoryView("badges");
       render();
-      if (document.readyState === "complete") {
-        start();
-      } else {
-        window.addEventListener("load", start, { once: true });
-      }
+      if (document.readyState === "complete") start();
+      else window.addEventListener("load", start, { once:true });
     })();
   </script>
 
