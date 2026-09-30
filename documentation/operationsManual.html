@@ -229,6 +229,22 @@
         </div>
         <div class="lesson"><strong>Practical standard</strong><p>A clean Wild Ledger client should be able to rebuild authoritative community state from XRPL and the LEAP Protocol without consulting a conventional application database.</p></div>
       </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">Authority Operations</span>
+        <h3>Changing the Community Operating Account</h3>
+        <p>The community is not permanently tied to one XRPL account. When an operator needs to move to a different account, Wild Ledger uses a signed on-ledger handoff instead of editing a stored wallet address.</p>
+        <div class="checklist">
+          <ul>
+            <li><strong>Start from Community Setup → Manage operating account.</strong> Wild Ledger first reconstructs the current authority from XRPL.</li>
+            <li><strong>The current account authorizes the successor.</strong> Wild Ledger prepares the exact authority transaction, the connected wallet signs only, and Wild Ledger submits it directly to XRPL.</li>
+            <li><strong>The new account accepts.</strong> Connect a signer controlling the successor account and publish the matching acceptance transaction.</li>
+            <li><strong>Authority moves only after both records validate.</strong> Until then, the predecessor remains the current Community Operating Account.</li>
+            <li><strong>Changing wallet apps is not an authority change.</strong> Bifrost, Xaman, Tangem, or another compatible signer may control the same XRPL account without changing community authority.</li>
+          </ul>
+        </div>
+        <div class="lesson"><strong>Do not edit around the ledger</strong><p>Never change a config value just to make a different wallet look current. The succession record is the durable fact; the website must rediscover it from XRPL.</p></div>
+      </div>
     </div>
   </section>
 

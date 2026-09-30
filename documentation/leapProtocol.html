@@ -260,7 +260,7 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
 <div class="meta">
-<span class="pill">Working Draft 0.12</span>
+<span class="pill">Working Draft 0.13</span>
 <span class="pill">XRPL Mainnet</span>
 <span class="pill">Internal / Unlinked</span>
 <span class="pill">Last revised: 2026-09-30</span>
@@ -376,18 +376,50 @@
 <td>Authorized for current LEAP recognition Check issuance</td>
 </tr>
 <tr>
-<td>SFL Community Operating Wallet</td>
+<td>SFL Authority Root Account</td>
 <td class="address">rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q</td>
-<td>Authorized for SFL recognition lifecycle markers</td>
+<td>Immutable SFL authority trust anchor; current Community Operating Account is resolved from its XRPL succession chain</td>
 </tr>
 </table>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            An official recognition transaction must originate from an account listed as an authorized LEAP authority
-            for that transaction type. A matching memo from any other wallet does not count.
+            An official recognition transaction must originate from the account authorized for that transaction type at that ledger position.
+            For community lifecycle actions, authorization is resolved through the community authority chain. A matching memo from any other wallet does not count.
           </div>
 </div>
+<h3>3.1 Community Operating Account succession</h3>
+<p>
+          A community is not its wallet. The community namespace and identity remain continuous while the XRPL account authorized to operate that community may change over time.
+          Wild Ledger starts from the community's immutable <strong>authority root account</strong> and reconstructs every later handoff from validated XRPL history.
+        </p>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
+            The authority root is a fixed protocol trust anchor, not mutable application state. The <strong>current</strong> Community Operating Account is never established by a browser setting, local storage value, or editable configuration field. It is derived by applying completed on-ledger authority transitions in sequence.
+          </div>
+</div>
+<p>A routine authority handoff uses the next sequential identifier <code>AUTH-NNN</code> and requires two validated no-op <code>AccountSet</code> records:</p>
+<pre><code>&lt;COMMUNITY&gt;-LEAP/COMMUNITY/AUTHORITY/AUTH-NNN/SUCCESSOR=&lt;NEW-ACCOUNT&gt;
+&lt;COMMUNITY&gt;-LEAP/COMMUNITY/AUTHORITY/AUTH-NNN/PREDECESSOR=&lt;OLD-ACCOUNT&gt;</code></pre>
+<ul>
+<li>The <code>SUCCESSOR</code> record must be signed by the Community Operating Account that is current at that ledger position.</li>
+<li>The matching <code>PREDECESSOR</code> record must be signed by the proposed successor account.</li>
+<li>The transition becomes effective only after both records are validated. Until then, the predecessor remains the current authority.</li>
+<li>The transition's effective ledger is the later of the two validating ledger indexes. Protocol actions from the predecessor after that point are not authoritative.</li>
+<li>Authority transition IDs begin at <code>AUTH-001</code>, advance sequentially, and are interpreted within one community namespace.</li>
+<li>A successor may not create a cycle by returning authority to an account already used earlier in the same authority chain.</li>
+<li>If more than one uncanceled successor is proposed for the same transition ID, readers fail closed rather than guessing which account is authoritative.</li>
+</ul>
+<p>A pending proposal may be canceled by the still-current predecessor before successor acceptance:</p>
+<pre><code>&lt;COMMUNITY&gt;-LEAP/COMMUNITY/AUTHORITY/AUTH-NNN/CANCEL-SUCCESSOR=&lt;NEW-ACCOUNT&gt;</code></pre>
+<div class="decision">
+<div class="tag">Signer Independence</div>
+<div>
+            The XRPL account is the authority; the wallet application is only a signer. An operator may move between Bifrost, Xaman, Tangem, hardware devices, or another compatible signer without changing the Community Operating Account. A protocol authority change is needed only when the XRPL account itself changes.
+          </div>
+</div>
+<div class="note"><strong>Recovery is separate from routine rotation.</strong> If the predecessor account is lost and cannot sign, an owner/recovery authority path must be defined by a later explicit protocol revision. Routine two-party rotation must not be weakened to solve that exceptional case.</div>
 </section>
 <section id="identity">
 <h2>4. LEAP Asset Identity</h2>
@@ -1060,6 +1092,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>0.10</td><td>2026-09-30</td><td>Added XRPL-native cradle-to-grave recognition lifecycle markers using validated no-op <code>AccountSet</code> transactions from the authorized Community Operating Wallet. Clarified that RECOGNITION spans multiple XRPL transaction types: <code>CheckCreate</code> records member recognition issuance, while no-op <code>AccountSet</code> records recognition-object lifecycle state.</td></tr>
 <tr><td>0.11</td><td>2026-09-30</td><td>Made recognition lifecycle memos self-identifying by placing the recognition type and canonical ID directly in the lifecycle path: <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>. Added terminal <code>IGNORE</code> alongside <code>CREATE</code> and <code>END</code>; defined type-specific <code>END</code> semantics for Badges, Challenges, and Events; prohibited recognition-ID recycling including ignored IDs; required creation-time validation against full XRPL-derived history; and required ignored IDs to remain annotated in owner/operator ledger views while being excluded from normal recognition lists.</td></tr>
 <tr><td>0.12</td><td>2026-09-30</td><td>Codified the Canonical State Principle: canonical Wild Ledger state exists only on XRPL, while Wild Ledger and its screens interpret that state. Required every authoritative fact needed to reconstruct Wild Ledger state to be recoverable from validated XRPL ledger history, and prohibited off-ledger storage, browser storage, configuration files, caches, or presentation logic from becoming authoritative protocol state.</td></tr>
+<tr><td>0.13</td><td>2026-09-30</td><td>Separated permanent community identity from its changeable Community Operating Account. Added an immutable authority-root trust anchor and XRPL-reconstructed <code>AUTH-NNN</code> succession chain; required mutual predecessor/successor signatures for routine account rotation; added cancellation of a pending proposal; defined effective-ledger and fail-closed conflict rules; and explicitly separated XRPL account authority from the wallet application used to sign.</td></tr>
 </table>
 </section>
 <section id="open">
@@ -1072,7 +1105,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
 <li>Verify the ledger-discovered Badge/Event/Challenge vocabulary, lifecycle reconstruction, and duplicate-state logic against live XRPL history.</li>
 <li>Record the lifecycle activation ledger index before making <code>CREATE</code> mandatory for all newly created recognition IDs, so pre-lifecycle Check-discovered IDs remain deterministically readable.</li>
-<li>Complete live signing/validation tests of no-op <code>AccountSet</code> lifecycle transactions from the SFL Community Operating Wallet.</li>
+<li>Complete the first live SFL <code>AUTH-001</code> operating-account handoff and verify that Wild Ledger reconstructs the new current authority from XRPL without a mutable off-ledger current-wallet setting.</li>
 <li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier, derived from canonical ledger history rather than a separate database counter.</li>
 </ul>
 </section>
