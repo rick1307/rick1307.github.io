@@ -1315,7 +1315,8 @@
 
   <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
-  <script>
+  <script type="module">
+    import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
     (() => {
       "use strict";
 
@@ -1327,7 +1328,8 @@
       const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
       const communityName = community?.communityName || "Community";
       const namespace = community?.leapNamespace || `${communityId}-LEAP`;
-      const operatingWallet = community?.operatingWallet || "";
+      let authority = null;
+      let operatingWallet = "";
       const config = window.WILD_LEDGER_CONFIG || {};
       const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
       const LEAP_ISSUER = config.leapIssuer || "";
@@ -1480,7 +1482,8 @@
 
       function lifecycleFromEntry(entry) {
         const tx = normalizeTx(entry);
-        if (!operatingWallet || tx.Account !== operatingWallet || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
+        const ledger = ledgerIndex(entry, tx);
+        if (!authority || !isAuthorizedAtLedger(authority, tx.Account, ledger) || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
         const prefix = `${namespace}/RECOGNITION/`;
         const suffix = "/LIFECYCLE-TAG=";
         const matches = [];
@@ -1761,14 +1764,16 @@
         try {
           for (const category of CATEGORIES) { lifecycle[category].clear(); legacy[category].clear(); }
           render();
+          authority = await resolveCommunityAuthority({ community, serverUrl: XRPL_SERVER });
+          operatingWallet = authority.currentAccount;
           if (!operatingWallet) {
-            console.warn("This community does not yet have a Community Operating Wallet configured.");
+            console.warn("This community does not yet have a resolvable Community Operating Account.");
             return;
           }
           await connect();
-          await scanAccount(operatingWallet, "lifecycle");
+          for (const account of authority.accounts) await scanAccount(account, "lifecycle");
           for (const distributor of LEGACY_DISTRIBUTORS) {
-            if (distributor) await scanAccount(distributor, "legacy");
+            if (distributor && !authority.accounts.includes(distributor)) await scanAccount(distributor, "legacy");
           }
           render();
         } catch (error) {

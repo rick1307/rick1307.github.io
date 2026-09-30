@@ -163,7 +163,8 @@
 
   <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
-  <script>
+  <script type="module">
+    import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
     (() => {
       "use strict";
 
@@ -175,7 +176,8 @@
       const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
       const communityName = community?.communityName || "Community";
       const namespace = community?.leapNamespace || `${communityId}-LEAP`;
-      const operatingWallet = community?.operatingWallet || "";
+      let authority = null;
+      let operatingWallet = "";
       const config = window.WILD_LEDGER_CONFIG || {};
       const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
       const leapIssuer = config.leapIssuer || "";
@@ -215,7 +217,7 @@
       title.textContent = communityName;
       document.title = `${communityName} | Create Challenge`;
       back.href = `viewCommunityRecognition.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
-      authorityStatus.textContent = operatingWallet || "No Community Operating Wallet configured.";
+      authorityStatus.textContent = "Resolving current Community Operating Account from XRPL…";
 
       function setStatus(element, text, tone) {
         element.textContent = text;
@@ -397,7 +399,8 @@
 
       function lifecycleRecordFromEntry(entry) {
         const tx = normalizeTx(entry);
-        if (!operatingWallet || tx.Account !== operatingWallet || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
+        const ledger = ledgerIndex(entry, tx);
+        if (!authority || !isAuthorizedAtLedger(authority, tx.Account, ledger) || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
 
         const prefix = `${namespace}/RECOGNITION/CHALLENGE/`;
         const suffix = "/LIFECYCLE-TAG=";
@@ -566,14 +569,17 @@
         refreshValidation();
 
         try {
-          if (!operatingWallet) throw new Error("This community does not yet have a Community Operating Wallet configured.");
+          authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer });
+          operatingWallet = authority.currentAccount;
+          if (!operatingWallet) throw new Error("This community does not yet have a resolvable Community Operating Account.");
+          authorityStatus.textContent = `${operatingWallet} — resolved from XRPL authority history.`;
           if (socket) { try { socket.close(); } catch (_) {} }
           pending.clear();
           await connect();
 
-          await scanAccount(operatingWallet, "lifecycle");
+          for (const account of authority.accounts) await scanAccount(account, "lifecycle");
           for (const distributor of legacyDistributors) {
-            if (distributor && distributor !== operatingWallet) await scanAccount(distributor, "legacy");
+            if (distributor && !authority.accounts.includes(distributor)) await scanAccount(distributor, "legacy");
           }
 
           historyLoaded = true;

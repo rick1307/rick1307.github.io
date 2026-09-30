@@ -650,6 +650,26 @@
           </div>
         </section>
 
+        <section class="section-card" id="operatingAccountSection">
+          <div class="section-head">
+            <div>
+              <h2>Community Operating Account</h2>
+              <p>The community stays the same when its XRPL operating account changes. Account rotation is signed on XRPL and is not an editable browser-draft field.</p>
+            </div>
+            <span class="permission-tag">XRPL authority</span>
+          </div>
+          <div class="grid-2">
+            <div class="field full">
+              <label>Authority root</label>
+              <div class="hint" id="authorityRootDisplay">Not established yet.</div>
+            </div>
+          </div>
+          <div class="button-row">
+            <a class="secondary-button" id="manageOperatingAccountLink" href="changeCommunityOperatingAccount.html">Manage operating account</a>
+          </div>
+          <div class="notice"><strong>Authority rule:</strong> the current operating account is reconstructed from validated XRPL succession records. Changing the signer app does not change the community or its XRPL account.</div>
+        </section>
+
         <section class="section-card">
           <div class="section-head">
             <div>
@@ -808,6 +828,9 @@
       const copyConfigButton = document.getElementById("copyConfigButton");
       const downloadConfigButton = document.getElementById("downloadConfigButton");
       const publishNotice = document.getElementById("publishNotice");
+      const operatingAccountSection = document.getElementById("operatingAccountSection");
+      const authorityRootDisplay = document.getElementById("authorityRootDisplay");
+      const manageOperatingAccountLink = document.getElementById("manageOperatingAccountLink");
 
       const params = new URLSearchParams(window.location.search);
       const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
@@ -848,7 +871,7 @@
         id: "",
         backendId: "",
         aliases: [],
-        operatingWallet: null,
+        authorityRootAccount: null,
         directoryStatus: "Community",
         directoryTone: "current",
         directoryDescription: "Wild Ledger community.",
@@ -1020,6 +1043,10 @@
       }
 
       function ensureShape() {
+        if (currentSourceId !== "new" && communities[currentSourceId]) {
+          current.authorityRootAccount = communities[currentSourceId].authorityRootAccount || current.authorityRootAccount || null;
+          delete current.operatingWallet;
+        }
         current.experienceSteps = Array.isArray(current.experienceSteps) ? current.experienceSteps.slice(0,3) : [];
         while (current.experienceSteps.length < 3) current.experienceSteps.push("");
         current.ranks = Array.isArray(current.ranks) ? current.ranks : [];
@@ -1141,11 +1168,22 @@
         document.title = "Community Setup — Wild Ledger";
         if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
 
+        const sourceCommunity = configId ? communities[configId] : null;
+        const authorityRoot = sourceCommunity?.authorityRootAccount || sourceCommunity?.operatingWallet || "";
+        if (authorityRootDisplay) authorityRootDisplay.textContent = authorityRoot || "Not established yet.";
+        if (manageOperatingAccountLink && configId) {
+          const backendId = backendCommunityId(configId);
+          manageOperatingAccountLink.href = `changeCommunityOperatingAccount.html?community=${encodeURIComponent(backendId)}&role=${encodeURIComponent(role)}`;
+          manageOperatingAccountLink.hidden = !authorityRoot;
+        }
+
         if (mode === "new") {
           if (setupBackLink) {
             setupBackLink.textContent = "← Communities";
             setupBackLink.href = "communities.html";
           }
+          if (manageOperatingAccountLink) manageOperatingAccountLink.hidden = true;
+          if (authorityRootDisplay) authorityRootDisplay.textContent = "Established when the community is activated on XRPL.";
           applyFieldPermissions();
           return;
         }

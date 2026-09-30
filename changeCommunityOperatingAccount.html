@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a34">
+  <title>Operating Account — Wild Ledger</title>
+  <style>
+    :root{--ink:#f5fbfa;--deep:#071f2c;--lagoon:#29b8b1;--sea:#79d5c2;--mango:#f4bd58;--green:#9fe0b0;--red:#ffb7b7;--panel:rgba(10,45,58,.72);--line:rgba(219,248,244,.14);--muted:rgba(236,249,247,.62);--shadow:0 28px 78px rgba(0,16,24,.38)}
+    *{box-sizing:border-box} html{min-height:100%} body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 12% 14%,rgba(41,184,177,.30),transparent 42%),radial-gradient(circle at 88% 12%,rgba(244,189,88,.20),transparent 38%),linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input{font:inherit} a{color:inherit}.shell{width:min(100%,980px);margin:0 auto;padding:42px 20px 54px}.console{overflow:hidden;border:1px solid var(--line);border-radius:30px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+    .console::before{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--lagoon),var(--sea),var(--mango))}.header{padding:30px;border-bottom:1px solid rgba(219,248,244,.08)}.top{display:flex;justify-content:space-between;gap:12px;margin-bottom:28px}.back{color:#b7f0df;text-decoration:none;font-weight:800}h1{margin:0;font-size:clamp(2rem,6vw,4rem);line-height:1;letter-spacing:-.045em}.kicker{margin-top:14px;color:var(--sea);font-size:.76rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.lead{max-width:760px;margin:12px 0 0;color:var(--muted);line-height:1.6}.body{padding:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{border:1px solid rgba(255,255,255,.10);border-radius:22px;padding:20px;background:rgba(3,27,38,.42)}.wide{grid-column:1/-1}.card h2{margin:0 0 6px;font-size:1.05rem}.small{color:var(--muted);font-size:.8rem;line-height:1.5}.status-grid{display:grid;gap:9px;margin-top:16px}.row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.10)}.label{color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.value{overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem}.good{color:var(--green)}.bad{color:var(--red)}.wait{color:#f5d38f}.field{display:grid;gap:8px;margin-top:16px}.field label{font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:rgba(236,249,247,.76)}input{width:100%;border:1px solid rgba(219,248,244,.14);border-radius:12px;background:rgba(0,0,0,.14);color:var(--ink);padding:13px 14px;outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.primary,.secondary,.danger{min-height:42px;border-radius:12px;padding:10px 14px;font-weight:850;cursor:pointer}.primary{border:1px solid rgba(121,213,194,.42);background:rgba(121,213,194,.14);color:#e5fff8}.secondary{border:1px solid rgba(219,248,244,.14);background:rgba(255,255,255,.05);color:var(--ink)}.danger{border:1px solid rgba(255,183,183,.28);background:rgba(180,47,47,.12);color:#ffd3d3}button:disabled{opacity:.4;cursor:not-allowed}.memo{margin-top:14px;padding:12px;border:1px solid rgba(121,213,194,.16);border-radius:12px;background:rgba(121,213,194,.05);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.74rem;line-height:1.5;overflow-wrap:anywhere}.notice{margin-top:14px;color:var(--muted);font-size:.78rem;line-height:1.55}.qr{display:none;margin-top:14px;padding:14px;border:1px solid rgba(121,213,194,.18);border-radius:16px;background:#fff;text-align:center}.qr.show{display:block}.qr img{width:min(100%,300px);height:auto}.uri{margin-top:8px;color:#223;font-size:.62rem;overflow-wrap:anywhere}.footer{padding:0 22px 22px;text-align:center;color:rgba(236,249,247,.35);font-size:.7rem}@media(max-width:720px){.shell{padding:18px 10px 30px}.console{border-radius:22px}.header{padding:24px 18px}.body{padding:14px}.grid{grid-template-columns:1fr}.wide{grid-column:auto}.row{grid-template-columns:105px minmax(0,1fr)}}
+  </style>
+  <link rel="stylesheet" href="wildLedgerControls.css">
+  <link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+<main class="shell">
+  <section class="console">
+    <header class="header">
+      <div class="top"><a class="back wl-header-control" id="backLink" href="setup.html">← Community Setup</a></div>
+      <h1 id="communityTitle">Community</h1>
+      <div class="kicker">Operating Account</div>
+      <p class="lead">Change the XRPL account that operates this community without changing the community itself. Wild Ledger reconstructs the authority chain from validated XRPL history.</p>
+    </header>
+    <div class="body">
+      <div class="grid">
+        <section class="card wide">
+          <h2>Canonical Authority</h2>
+          <div class="small">The root is an immutable protocol trust anchor. Every later operating-account change requires a signed handoff on XRPL.</div>
+          <div class="status-grid">
+            <div class="row"><div class="label">Root account</div><div class="value" id="rootAccount">—</div></div>
+            <div class="row"><div class="label">Current account</div><div class="value wait" id="currentAccount">Resolving from XRPL…</div></div>
+            <div class="row"><div class="label">Next handoff</div><div class="value" id="transitionId">—</div></div>
+            <div class="row"><div class="label">Pending</div><div class="value" id="pendingStatus">—</div></div>
+          </div>
+          <div class="buttons"><button class="secondary" id="refreshButton" type="button">Refresh XRPL Authority</button></div>
+        </section>
+
+        <section class="card">
+          <h2>1. Choose the successor</h2>
+          <div class="small">Routine rotation needs both the current account and the new account to sign. The community namespace and history do not change.</div>
+          <div class="field"><label for="newAccount">New XRPL classic address</label><input id="newAccount" autocomplete="off" spellcheck="false" placeholder="r..."></div>
+          <div class="memo" id="proposalMemo">Resolve authority and enter a new account.</div>
+        </section>
+
+        <section class="card">
+          <h2>2. Connect a signer</h2>
+          <div class="small">Bifrost is the preferred signer, but the protocol is signer-agnostic. The connected wallet must control the account required for the step you are publishing.</div>
+          <div class="status-grid">
+            <div class="row"><div class="label">Wallet</div><div class="value" id="walletName">—</div></div>
+            <div class="row"><div class="label">Signer account</div><div class="value" id="signerAccount">—</div></div>
+            <div class="row"><div class="label">Connection</div><div class="value wait" id="connectionStatus">Not connected.</div></div>
+          </div>
+          <div class="buttons"><button class="primary" id="connectButton" type="button">Connect Signer</button><button class="secondary" id="disconnectButton" type="button" disabled>Disconnect</button></div>
+          <div class="qr" id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"><div class="uri" id="uriText"></div></div>
+        </section>
+
+        <section class="card wide">
+          <h2>3. Publish the handoff</h2>
+          <div class="small">Wild Ledger prepares and simulates the exact no-op AccountSet, the wallet signs only, and Wild Ledger submits the signed blob directly to XRPL.</div>
+          <div class="buttons">
+            <button class="primary" id="proposeButton" type="button" disabled>Authorize New Account</button>
+            <button class="primary" id="acceptButton" type="button" disabled>Accept Handoff</button>
+            <button class="danger" id="cancelButton" type="button" disabled>Cancel Pending Change</button>
+          </div>
+          <div class="status-grid">
+            <div class="row"><div class="label">Action</div><div class="value wait" id="actionStatus">Waiting.</div></div>
+            <div class="row"><div class="label">Transaction</div><div class="value" id="txStatus">—</div></div>
+          </div>
+          <div class="notice"><strong>Normal change:</strong> current account proposes → successor account accepts → authority moves. Until both records validate, the current account remains authoritative. A pending proposal can be canceled by the current account before acceptance.</div>
+        </section>
+      </div>
+    </div>
+    <div class="footer">Wild Ledger • Community Authority</div>
+  </section>
+</main>
+
+<script src="js/wildLedgerConfig.js"></script>
+<script src="js/communityConfig.js" data-registry-only="true"></script>
+<script type="module">
+  import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+  import { isClassicAddress, prepareNoOpAccountSet, submitSignedTransaction } from "./js/xrplTransport.js";
+  import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+  import {
+    resolveCommunityAuthority,
+    authoritySuccessorMemo,
+    authorityPredecessorMemo,
+    authorityCancelMemo,
+    clearCommunityAuthorityCache
+  } from "./js/communityAuthority.js";
+
+  const params = new URLSearchParams(location.search);
+  const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+  const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+  const requestedValue = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
+  const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedValue) || null;
+  const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
+  const namespace = community?.leapNamespace || `${communityId}-LEAP`;
+  const config = window.WILD_LEDGER_CONFIG || {};
+  const serverUrl = config.xrplWebSocket || "wss://s1.ripple.com/";
+  const projectId = String(config.walletConnectProjectId || "").trim();
+  const feeCushion = Number(config.xrplFeeCushion || 1.2);
+
+  const backLink = document.getElementById("backLink");
+  const communityTitle = document.getElementById("communityTitle");
+  const rootAccount = document.getElementById("rootAccount");
+  const currentAccount = document.getElementById("currentAccount");
+  const transitionId = document.getElementById("transitionId");
+  const pendingStatus = document.getElementById("pendingStatus");
+  const refreshButton = document.getElementById("refreshButton");
+  const newAccount = document.getElementById("newAccount");
+  const proposalMemo = document.getElementById("proposalMemo");
+  const walletName = document.getElementById("walletName");
+  const signerAccount = document.getElementById("signerAccount");
+  const connectionStatus = document.getElementById("connectionStatus");
+  const connectButton = document.getElementById("connectButton");
+  const disconnectButton = document.getElementById("disconnectButton");
+  const qrWrap = document.getElementById("qrWrap");
+  const qrImage = document.getElementById("qrImage");
+  const uriText = document.getElementById("uriText");
+  const proposeButton = document.getElementById("proposeButton");
+  const acceptButton = document.getElementById("acceptButton");
+  const cancelButton = document.getElementById("cancelButton");
+  const actionStatus = document.getElementById("actionStatus");
+  const txStatus = document.getElementById("txStatus");
+
+  let authority = null;
+  let signer = null;
+  let connectedAccount = "";
+  let busy = false;
+
+  communityTitle.textContent = community?.communityName || "Community";
+  document.title = `${community?.communityName || "Community"} | Operating Account`;
+  backLink.href = `setup.html?mode=edit&community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+
+  function tone(el, kind, text) {
+    el.textContent = text;
+    el.classList.remove("good", "bad", "wait");
+    if (kind) el.classList.add(kind);
+  }
+
+  function pendingTarget() {
+    return authority?.pendingTransition?.to || "";
+  }
+
+  function proposedTarget() {
+    return authority?.pendingTransition?.to || newAccount.value.trim();
+  }
+
+  function updateControls() {
+    const current = authority?.currentAccount || "";
+    const pending = authority?.pendingTransition || null;
+    const candidate = newAccount.value.trim();
+    const candidateOkay = isClassicAddress(candidate) && candidate !== current;
+    const signerIsCurrent = connectedAccount && connectedAccount === current;
+    const signerIsSuccessor = connectedAccount && pending && connectedAccount === pending.to;
+
+    newAccount.disabled = busy || !!pending;
+    proposeButton.disabled = busy || !!pending || !candidateOkay || !signerIsCurrent;
+    acceptButton.disabled = busy || !pending || !signerIsSuccessor;
+    cancelButton.disabled = busy || !pending || !signerIsCurrent;
+    connectButton.disabled = busy || !!signer;
+    disconnectButton.disabled = busy || !signer;
+    refreshButton.disabled = busy;
+
+    if (pending) {
+      newAccount.value = pending.to;
+      proposalMemo.textContent = authorityPredecessorMemo(namespace, pending.transitionId, pending.from);
+    } else if (authority && candidateOkay) {
+      proposalMemo.textContent = authoritySuccessorMemo(namespace, authority.nextTransitionId, candidate);
+    } else if (authority) {
+      proposalMemo.textContent = "Enter a valid successor address different from the current account.";
+    }
+  }
+
+  async function resolveAuthority(force = false) {
+    busy = true;
+    updateControls();
+    tone(currentAccount, "wait", "Resolving from validated XRPL history…");
+    tone(actionStatus, "wait", "Reading authority chain.");
+    try {
+      if (!community) throw new Error("Community configuration was not found.");
+      if (force) clearCommunityAuthorityCache();
+      authority = await resolveCommunityAuthority({ community, serverUrl, force });
+      rootAccount.textContent = authority.rootAccount;
+      tone(currentAccount, "good", authority.currentAccount);
+      transitionId.textContent = authority.nextTransitionId;
+      if (authority.pendingTransition) {
+        pendingStatus.textContent = `${authority.pendingTransition.transitionId}: ${authority.pendingTransition.from} → ${authority.pendingTransition.to} (awaiting successor acceptance)`;
+        newAccount.value = authority.pendingTransition.to;
+      } else {
+        pendingStatus.textContent = "None";
+      }
+      tone(actionStatus, "good", `${authority.transitions.length} completed handoff${authority.transitions.length === 1 ? "" : "s"}. Current authority resolved from XRPL.`);
+    } catch (error) {
+      authority = null;
+      rootAccount.textContent = community?.authorityRootAccount || community?.operatingWallet || "—";
+      tone(currentAccount, "bad", error?.message || String(error));
+      transitionId.textContent = "—";
+      pendingStatus.textContent = "—";
+      tone(actionStatus, "bad", "Authority could not be resolved. Publishing is disabled.");
+    } finally {
+      busy = false;
+      updateControls();
+    }
+  }
+
+  async function connectSigner() {
+    try {
+      if (!projectId) throw new Error("Reown / WalletConnect Project ID is missing from Wild Ledger config.");
+      busy = true; updateControls();
+      tone(connectionStatus, "wait", "Initializing WalletConnect…");
+      signer = new WalletConnectXrplSigner({
+        projectId,
+        metadata: {
+          name: "Wild Ledger",
+          description: "Wild Ledger XRPL external signer",
+          url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+          icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+        }
+      });
+      const connection = await signer.connect({
+        onUri: async uri => {
+          qrImage.src = await QRCode.toDataURL(uri, { width: 560, margin: 2, errorCorrectionLevel: "M" });
+          qrWrap.classList.add("show");
+          uriText.textContent = uri;
+          tone(connectionStatus, "wait", "Scan with Bifrost or another compatible XRPL WalletConnect signer and approve.");
+        }
+      });
+      qrWrap.classList.remove("show");
+      uriText.textContent = "";
+      connectedAccount = connection.account;
+      walletName.textContent = connection.walletName;
+      signerAccount.textContent = connectedAccount;
+      tone(connectionStatus, "good", "Connected. The wallet will sign only; Wild Ledger owns preparation and submission.");
+    } catch (error) {
+      signer = null;
+      connectedAccount = "";
+      walletName.textContent = "—";
+      signerAccount.textContent = "—";
+      tone(connectionStatus, "bad", error?.message || String(error));
+    } finally {
+      busy = false; updateControls();
+    }
+  }
+
+  async function disconnectSigner() {
+    busy = true; updateControls();
+    try { if (signer) await signer.disconnect(); } catch (_) {}
+    signer = null; connectedAccount = "";
+    walletName.textContent = "—"; signerAccount.textContent = "—";
+    tone(connectionStatus, "wait", "Not connected.");
+    busy = false; updateControls();
+  }
+
+  async function publishMemo({ account, memoText, successMessage }) {
+    if (!signer || connectedAccount !== account) throw new Error("Connect the signer that controls the required XRPL account.");
+    busy = true; updateControls();
+    tone(actionStatus, "wait", "Preparing and simulating directly with XRPL…");
+    txStatus.textContent = memoText;
+    try {
+      const prepared = await prepareNoOpAccountSet({ serverUrl, account, memoText, feeCushion });
+      tone(actionStatus, "wait", `XRPL simulation tesSUCCESS. Waiting for ${walletName.textContent || "wallet"} signature…`);
+      const signed = await signer.signTransaction(prepared.preparedTx);
+      tone(actionStatus, "wait", "Signature received. Wild Ledger is submitting directly to XRPL…");
+      const submitted = await submitSignedTransaction({
+        serverUrl,
+        signedBlob: signed.signedBlob,
+        onSubmitted: ({ txHash }) => { txStatus.textContent = `${memoText}\nHash: ${txHash}`; }
+      });
+      if (submitted.finalResult !== "tesSUCCESS") throw new Error(`Validated with ${submitted.finalResult}.`);
+      tone(actionStatus, "good", `${successMessage} Validated in ledger ${submitted.ledgerIndex ?? "?"}.`);
+      clearCommunityAuthorityCache();
+      await resolveAuthority(true);
+    } catch (error) {
+      tone(actionStatus, "bad", error?.message || String(error));
+      throw error;
+    } finally {
+      busy = false; updateControls();
+    }
+  }
+
+  async function propose() {
+    if (!authority || authority.pendingTransition) return;
+    const target = newAccount.value.trim();
+    if (!isClassicAddress(target) || target === authority.currentAccount) return;
+    const memoText = authoritySuccessorMemo(namespace, authority.nextTransitionId, target);
+    try {
+      await publishMemo({ account: authority.currentAccount, memoText, successMessage: "Successor proposal published." });
+    } catch (_) {}
+  }
+
+  async function accept() {
+    const pending = authority?.pendingTransition;
+    if (!pending) return;
+    const memoText = authorityPredecessorMemo(namespace, pending.transitionId, pending.from);
+    try {
+      await publishMemo({ account: pending.to, memoText, successMessage: "Successor acceptance published." });
+    } catch (_) {}
+  }
+
+  async function cancelPending() {
+    const pending = authority?.pendingTransition;
+    if (!pending) return;
+    const memoText = authorityCancelMemo(namespace, pending.transitionId, pending.to);
+    try {
+      await publishMemo({ account: pending.from, memoText, successMessage: "Pending successor proposal canceled." });
+    } catch (_) {}
+  }
+
+  newAccount.addEventListener("input", updateControls);
+  refreshButton.addEventListener("click", () => resolveAuthority(true));
+  connectButton.addEventListener("click", connectSigner);
+  disconnectButton.addEventListener("click", disconnectSigner);
+  proposeButton.addEventListener("click", propose);
+  acceptButton.addEventListener("click", accept);
+  cancelButton.addEventListener("click", cancelPending);
+
+  resolveAuthority();
+</script>
+</body>
+</html>
