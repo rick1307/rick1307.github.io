@@ -260,10 +260,10 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
 <div class="meta">
-<span class="pill">Working Draft 0.9</span>
+<span class="pill">Working Draft 0.11</span>
 <span class="pill">XRPL Mainnet</span>
 <span class="pill">Internal / Unlinked</span>
-<span class="pill">Last revised: 2026-09-23</span>
+<span class="pill">Last revised: 2026-09-30</span>
 </div>
 </header>
 <div class="layout">
@@ -318,11 +318,11 @@
 </div>
 <div class="status-card">
 <b>Historical State</b>
-<span class="mini">Awards, events, distributions, provenance, dates, transaction hashes.</span>
+<span class="mini">Awards, recognition lifecycle markers, events, distributions, provenance, dates, transaction hashes.</span>
 </div>
 <div class="status-card">
 <b>Authority</b>
-<span class="mini">Only approved issuer/distributor activity can create official LEAP recognition.</span>
+<span class="mini">Only the approved XRPL authority for a transaction type can create official LEAP protocol facts.</span>
 </div>
 </div>
 <h3>Operating rules</h3>
@@ -349,7 +349,7 @@
 <h2>3. Authority Registry</h2>
 <p>
           These accounts define the authority chain for the current LEAP implementation.
-          Additional distributors may be added later through protocol change control.
+          Additional authorities may be added later through protocol change control.
         </p>
 <table class="registry">
 <tr>
@@ -365,7 +365,12 @@
 <tr>
 <td>Distributor 01</td>
 <td class="address">rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</td>
-<td>Authorized</td>
+<td>Authorized for current LEAP recognition Check issuance</td>
+</tr>
+<tr>
+<td>SFL Community Operating Wallet</td>
+<td class="address">rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q</td>
+<td>Authorized for SFL recognition lifecycle markers</td>
 </tr>
 </table>
 <div class="rule">
@@ -451,20 +456,24 @@ LEAP-002</code></pre>
 <section id="memos">
 <h2>6. Namespace &amp; Memo Standard</h2>
 <p>
-          LEAP uses one short public memo string to identify the project, the recognition category, and the canonical value.
-          The root namespace is <code>SFL-LEAP</code>.
+          LEAP uses public memo strings across permitted XRPL transaction types. The memo namespace identifies the protocol meaning,
+          while the XRPL <code>TransactionType</code> is also part of the interpretation. The root namespace is <code>SFL-LEAP</code>.
         </p>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            The canonical public memo grammar is <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.
-            One Check records one recognition reason, so one canonical recognition Check carries one public LEAP memo.
+            A member recognition award uses <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> on the canonical recognition transaction.
+            A recognition lifecycle marker uses <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>
+            on a canonical no-op <code>AccountSet</code>. The current lifecycle actions are <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code>.
           </div>
 </div>
 <h3>Memo location, token scope, and community namespaces</h3><div class="fact">
 <div class="tag">XRPL Fact</div>
 <div>
-    The public LEAP memo belongs to the <code>CheckCreate</code> transaction that creates the Check. It does not belong to an individual LEAP token or to the Check ledger object itself. Cashing uses a separate <code>CheckCash</code> transaction, and canceling uses a separate <code>CheckCancel</code> transaction. The original <code>CheckCreate</code> and its memo remain in validated public ledger history either way.
+    <code>Memos</code> is a common XRPL transaction field, so different transaction types can carry LEAP protocol data.
+    A member recognition memo belongs to the <code>CheckCreate</code> transaction that creates the Check. A recognition lifecycle memo belongs to the
+    no-op <code>AccountSet</code> transaction that publishes the lifecycle statement. Neither memo belongs to an individual LEAP token or to a Check ledger object.
+    Cashing uses a separate <code>CheckCash</code> transaction, and canceling uses a separate <code>CheckCancel</code> transaction.
   </div>
 </div><div class="note">
 <strong>LEAP is fungible.</strong> A memo does not travel with one specific LEAP coin or unit. The memo is part of the transaction record, not an individually serialized LEAP unit.
@@ -481,6 +490,7 @@ LEAP-002</code></pre>
 <tr><th>Rule</th><th>Standard</th></tr>
 <tr><td>Community memo format</td><td>Each community uses its own namespace followed by a category and value: <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.</td></tr>
 <tr><td>Recognition categories</td><td>The standard categories are <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. Examples include <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, <code>&lt;COMMUNITY&gt;-LEAP/EVENT=COMMUNITY-MEETUP</code>, and <code>&lt;COMMUNITY&gt;-LEAP/CHALLENGE=LEAP-001</code>.</td></tr>
+<tr><td>Recognition lifecycle</td><td>Lifecycle state is written as a self-identifying memo of the form <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code> on a canonical no-op <code>AccountSet</code>. The category and canonical recognition ID are part of the lifecycle path itself. Current actions are <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code>.</td></tr>
 <tr><td>Badge memo</td><td>The memo gives the recognition a consistent name inside the community's namespace, such as <code>&lt;COMMUNITY&gt;-LEAP/BADGE=NEW-MEMBER</code> or <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, so the badge can be identified later from ledger history.</td></tr>
 <tr><td>What the XRP Ledger understands</td><td>The XRP Ledger stores the memo data; it does not interpret the community namespace. The namespace is a Wild Ledger convention that lets software recognize and organize each community's records consistently.</td></tr>
 <tr><td>Why each community uses a namespace</td><td>It lets Wild Ledger software separate one community's records from unrelated wallet activity and organize them into badges, events, challenges, the Member Record, and administrative history.</td></tr>
@@ -511,6 +521,11 @@ LEAP-002</code></pre>
 <li>Do not add spaces around separators.</li>
 <li>Do not append a date merely to duplicate the ledger timestamp. Add time or other qualifiers when they are needed to make a recurring recognition canonically distinct.</li>
 <li>The vertical bar character (<code>|</code>) is not part of the current recognition memo grammar and must not be used to bundle multiple recognitions into one Check.</li>
+<li>A lifecycle marker uses the self-identifying path <code>RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG</code>, where <code>&lt;CATEGORY&gt;</code> is exactly <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code>.</li>
+<li>The lifecycle action value is exactly <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code>.</li>
+<li>The canonical recognition ID in the lifecycle path follows the same canonical ID rules used by member recognition memos for that category.</li>
+<li>A canonical lifecycle <code>AccountSet</code> carries exactly one decoded public LEAP lifecycle memo. The lifecycle memo is self-identifying; a second recognition-identity memo is not required.</li>
+<li>Once a canonical recognition ID has been established, it is permanently reserved. IDs are never recycled after <code>END</code> or <code>IGNORE</code>.</li>
 </ul>
 <h3>Production examples</h3>
 <pre><code>SFL-LEAP/BADGE=NEW-MEMBER
@@ -518,23 +533,35 @@ SFL-LEAP/BADGE=FIRST-MEMBER
 SFL-LEAP/BADGE=PANAMA-CREW-2026
 SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026
 SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
+<h3>Recognition lifecycle examples</h3>
+<pre><code>SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=CREATE
+SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=END
+
+SFL-LEAP/RECOGNITION/CHALLENGE/LEAP-001/LIFECYCLE-TAG=CREATE
+SFL-LEAP/RECOGNITION/CHALLENGE/LEAP-001/LIFECYCLE-TAG=END
+
+SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=CREATE
+SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=END
+
+SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
 <h3>Ledger-discovered recognition vocabulary</h3>
 <p>
-          The XRPL is the working registry of canonical recognition IDs. The normal Create Check interface keeps the Reason choices fixed at
-          <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>, then discovers the existing values for the selected category from validated,
-          protocol-compliant <code>CheckCreate</code> history produced by an authorized LEAP distributor.
+          The XRPL is the working registry of canonical recognition IDs and their lifecycle. The normal recognition interface keeps the categories fixed at
+          <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>, then reconstructs recognition state from validated protocol history rather than from a separate database.
         </p>
 <div class="rule">
 <div class="tag">Implementation Rule</div>
 <div>
-            The first canonical use of a brand-new Badge, Event, or Challenge value may be created manually in Xaman or through another authorized protocol-compliant writer.
-            Once that successful <code>CheckCreate</code> appears in validated distributor history, the value becomes discoverable by the website and may be offered as a future choice.
-            Failed transactions, malformed memos, and matching text from unauthorized accounts do not populate the recognition vocabulary.
+            Under the lifecycle model, a brand-new Badge, Event, or Challenge is born when the authorized Community Operating Wallet publishes a valid
+            self-identifying <code>CREATE</code> lifecycle <code>AccountSet</code>. An <code>END</code> lifecycle marker ends its normal active/available life without erasing
+            the identifier, prior awards, or ledger history. An <code>IGNORE</code> lifecycle marker permanently suppresses an erroneous or invalid recognition from normal recognition views
+            while preserving it in administrative ledger history. Failed transactions, malformed memos, matching text from unauthorized accounts, and mutating
+            <code>AccountSet</code> transactions do not establish lifecycle state.
           </div>
 </div>
 <div class="note">
-          Once a canonical ID has appeared in valid authorized history, the ID remains part of the protocol vocabulary even if the individual Check later expires or is canceled.
-          Check state affects whether that recognition may be issued again to a particular recipient; it does not erase the identifier itself.
+          Recognition IDs established before lifecycle markers are activated remain readable from valid authorized historical <code>CheckCreate</code> records.
+          Before software requires <code>CREATE</code> as the mandatory birth record for all newly created IDs, the lifecycle activation point must be recorded so legacy history remains deterministic.
         </div>
 <div class="fact">
 <div class="tag">XRPL Fact</div>
@@ -560,6 +587,17 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
 </section>
 <section id="transactions">
 <h2>7. Transaction Standards</h2>
+<table>
+<tr><th>Protocol act</th><th>XRPL transaction type</th><th>What it means</th></tr>
+<tr><td>Member recognition award</td><td><code>CheckCreate</code></td><td>Offers LEAP to a member and records one Badge, Event, or Challenge reason.</td></tr>
+<tr><td>Recognition lifecycle statement</td><td>No-op <code>AccountSet</code></td><td>Creates or ends the lifecycle of one canonical Badge, Event, or Challenge without moving LEAP.</td></tr>
+</table>
+<div class="rule">
+<div class="tag">LEAP Standard</div>
+<div>
+            <strong>RECOGNITION is a protocol domain, not a single XRPL transaction type.</strong> Reader software must interpret the transaction type and the decoded LEAP memo data together.
+          </div>
+</div>
 <h3>7.1 Official recognition distribution</h3>
 <div class="flow">
           Authorized Distributor<br/>
@@ -602,13 +640,13 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
 <tr><th>Control</th><th>Protocol / interface rule</th></tr>
 <tr><td>LEAP amount</td><td>Positive whole numbers only. The normal form starts blank so the issuer must enter the amount deliberately. Zero is never submitted.</td></tr>
 <tr><td>XRPL Expiration</td><td>The normal LEAP recognition Check sets <strong>no on-ledger expiration</strong>. The Check remains cashable until it is cashed or canceled.</td></tr>
-<tr><td>Crew Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
+<tr><td>Member Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
 <tr><td>Manager cleanup flag</td><td>The Manager Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is a Manager-side operating rule only; it does not change the ledger object.</td></tr>
 <tr><td>Cleanup action</td><td>Rick decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
 <tr><td>Legacy expirations</td><td>Readers remain compatible with older Checks that contain an XRPL <code>Expiration</code>. Those legacy Checks are interpreted according to their actual ledger expiration.</td></tr>
 </table>
 <div class="note">
-          If the validated creation timestamp cannot be established, software must not invent a seven-day age. Crew Record may keep the notice visible and the Checkbook may report that cleanup age is unavailable until authoritative timing can be determined.
+          If the validated creation timestamp cannot be established, software must not invent a seven-day age. Member Record may keep the notice visible and the Checkbook may report that cleanup age is unavailable until authoritative timing can be determined.
         </div>
 <h3>7.4 Recognition uniqueness and duplicate suppression</h3>
 <p>
@@ -698,6 +736,72 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           The Manager Checkbook merely marks it for cleanup so Rick can decide whether to cancel it. For older legacy Checks that do contain an expiration,
           expiration and cancellation are still different: expiration stops cashing, but only a valid <code>CheckCancel</code> removes the ledger object and releases owner reserve.
         </div>
+<h3>7.9 Recognition lifecycle markers — no-op <code>AccountSet</code></h3>
+<p>
+          Recognition lifecycle is recorded separately from member recognition awards. A lifecycle record moves no LEAP and names no member.
+          It is a signed protocol statement made by the Community Operating Wallet about one recognition object.
+        </p>
+<div class="fact">
+<div class="tag">XRPL Fact</div>
+<div>
+            <code>AccountSet</code> is a different XRPL transaction type from <code>CheckCreate</code>. It supports the common <code>Memos</code> field.
+            If none of the AccountSet-specific setting fields are supplied, the transaction has no account-setting effect beyond consuming the normal transaction cost.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Canonical Lifecycle Transaction</div>
+<div>
+            A canonical recognition lifecycle record must be a successful, validated no-op <code>AccountSet</code> sent by the Community Operating Wallet currently authorized for that community namespace.
+            It must contain exactly one decoded public LEAP lifecycle memo in the self-identifying form
+            <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>.
+            It must not contain AccountSet-specific fields that change account state.
+          </div>
+</div>
+<table>
+<tr><th>Lifecycle action</th><th>Protocol meaning</th></tr>
+<tr><td><code>CREATE</code></td><td>Birth of the identified recognition. A Badge becomes Available; a Challenge becomes Active; an Event becomes Active.</td></tr>
+<tr><td><code>END</code></td><td>Normal terminal lifecycle marker. Its user-facing meaning depends on recognition type: Badge = Retired and no longer selectable for new awards; Challenge = Closed and no longer active/completable; Event = Completed and no longer active. Prior valid awards remain valid and visible.</td></tr>
+<tr><td><code>IGNORE</code></td><td>Exceptional terminal marker for an erroneous, invalid, test, or otherwise non-operational recognition object. The record remains part of XRPL history, but compliant Wild Ledger clients exclude it from normal Available, Active, and History recognition lists and clearly annotate it as Ignored in owner/operator ledger or audit views.</td></tr>
+</table>
+<pre><code>TransactionType = AccountSet
+Account = authorized Community Operating Wallet
+AccountSet-specific mutation fields = none
+Memos:
+  SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=CREATE</code></pre>
+<pre><code>SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=END
+SFL-LEAP/RECOGNITION/CHALLENGE/LEAP-001/LIFECYCLE-TAG=END
+SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=END
+SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
+<ul class="checklist">
+<li><code>TransactionType = AccountSet</code></li>
+<li><code>Account</code> is the authorized Community Operating Wallet for the memo namespace at the time of the transaction</li>
+<li>The transaction is successful and in validated ledger history</li>
+<li>No AccountSet-specific setting field changes account state</li>
+<li>Exactly one canonical LEAP lifecycle memo is present</li>
+<li>The lifecycle category is exactly <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code></li>
+<li>The canonical ID follows the category's canonical ID rules</li>
+<li>The lifecycle action is exactly <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code></li>
+</ul>
+<div class="rule">
+<div class="tag">Cradle-to-Grave Rule</div>
+<div>
+            <code>CREATE</code> begins the recognition's protocol lifecycle. <code>END</code> is the normal terminal state, interpreted according to recognition type.
+            <code>IGNORE</code> is an exceptional terminal state. Neither <code>END</code> nor <code>IGNORE</code> erases XRPL history. Under the current protocol there is no reopen,
+            unend, or unignore action; any future reversal rule requires an explicit protocol revision.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Permanent ID Reservation</div>
+<div>
+            A canonical recognition ID is never recycled. Before creating a new Badge, Challenge, or Event, Wild Ledger must validate the proposed ID against the complete
+            XRPL-derived recognition history for that community and category. Any ID that has already been established — whether currently Available/Active, later ended,
+            or later marked <code>IGNORE</code> — is unavailable for reuse. Ignored IDs remain permanently reserved and must be visibly annotated as Ignored in owner/operator ledger views.
+          </div>
+</div>
+<div class="note">
+          Recognition IDs established before explicit lifecycle markers are activated remain readable from valid authorized historical <code>CheckCreate</code> records and are treated as legacy-established IDs for namespace-reservation purposes.
+          They may later receive a valid <code>END</code> or <code>IGNORE</code> lifecycle marker without first requiring a retroactive <code>CREATE</code>. The lifecycle activation point must remain documented so legacy history is deterministic.
+        </div>
 </section>
 <section id="membership">
 <h2>8. Membership &amp; Rank Rules</h2>
@@ -728,6 +832,13 @@ SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
           A badge represents something the wallet owner actually did, attended, contributed to, or was officially recognized for.
           <code>NEW-MEMBER</code> is a Badge; onboarding does not create a separate recognition category.
         </p>
+<div class="rule">
+<div class="tag">Badge Lifecycle</div>
+<div>
+            A valid <code>CREATE</code> marker makes a Badge <strong>Available</strong>. A later valid <code>END</code> marker makes it <strong>Retired</strong> and places it in recognition History.
+            Retirement ends future normal issuance; it does not erase earlier awards.
+          </div>
+</div>
 <h3>Badge validity test</h3>
 <pre><code>VALIDATED
 AND transaction result = success
@@ -739,8 +850,8 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            A matching memo created by an unauthorized wallet does not establish a badge.
-            Provenance and content must both validate. The authoritative badge vocabulary is discovered from valid authorized on-ledger history,
+            A matching memo created by an unauthorized wallet does not establish a badge award or lifecycle state.
+            Provenance, transaction type, and content must all validate. The authoritative badge vocabulary and lifecycle are reconstructed from valid authorized on-ledger history,
             not from a separately maintained website-only list.
           </div>
 </div>
@@ -761,6 +872,12 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <section id="events">
 <h2>10. Event &amp; Challenge Rules</h2>
 <h3>Event</h3>
+<div class="rule">
+<div class="tag">Event Lifecycle</div>
+<div>
+            A valid <code>CREATE</code> marker makes an Event <strong>Active</strong>. A later valid <code>END</code> marker makes it <strong>Completed</strong> and places it in recognition History.
+          </div>
+</div>
 <p>
           A specific real-world or community occasion connected to a LEAP distribution or recognition.
           Example: <code>LA-CRUZ-BEACH-BONFIRE-2026</code>.
@@ -774,6 +891,12 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
           </div>
 </div>
 <h3>Challenge</h3>
+<div class="rule">
+<div class="tag">Challenge Lifecycle</div>
+<div>
+            A valid <code>CREATE</code> marker makes a Challenge <strong>Active</strong>. A later valid <code>END</code> marker makes it <strong>Closed</strong> and places it in recognition History.
+          </div>
+</div>
 <p>
           A defined participation opportunity. Challenges receive unique sequential IDs and are never recycled.
           Example: <code>LEAP-001</code>. The next challenge receives the next unused number.
@@ -828,8 +951,9 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>When did an award occur?</td><td>Validated transaction ledger/time</td></tr>
 <tr><td>Was a specific Check claimed?</td><td>Match Check ID to <code>CheckCash</code></td></tr>
 <tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
-<tr><td>Which Badge/Event/Challenge values exist?</td><td>Authorized distributor <code>account_tx</code> history + canonical memo validation</td></tr>
-<tr><td>Should a recognition be offered to this recipient?</td><td>Recipient/distributor history + Check state: suppress open pending or redeemed; reopen canceled unredeemed and legacy expired unredeemed</td></tr>
+<tr><td>Which Badge/Event/Challenge values exist?</td><td>Community Operating Wallet lifecycle <code>account_tx</code> history plus backward-compatible authorized recognition history</td></tr>
+<tr><td>Is a recognition Available / Active or in History?</td><td>Validated Community Operating Wallet <code>AccountSet</code> lifecycle markers, processed in ledger order</td></tr>
+<tr><td>Should a recognition be offered to this recipient?</td><td>Lifecycle state + recipient/distributor history + Check state: suppress ended recognitions, open pending, or redeemed; reopen canceled unredeemed and legacy expired unredeemed only while the recognition remains active/available</td></tr>
 </table>
 </section>
 <section id="validity">
@@ -841,12 +965,13 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Data is from validated ledger history</li>
 <li>Transaction result indicates success</li>
 <li>Transaction type is allowed for the intended interpretation</li>
-<li>Issuer matches the canonical LEAP issuer</li>
-<li>Currency matches the canonical LEAP currency value</li>
-<li>Authority account is authorized for the action</li>
-<li>Destination or affected wallet matches the member being evaluated</li>
-<li>Memo fields decode successfully when memo-based recognition is required</li>
-<li>The decoded public memo normalizes to exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
+<li>For LEAP-moving recognition transactions, issuer matches the canonical LEAP issuer</li>
+<li>For LEAP-moving recognition transactions, currency matches the canonical LEAP currency value</li>
+<li>Authority account is authorized for the specific transaction type and protocol action</li>
+<li>Destination or affected wallet matches the member being evaluated when the protocol action concerns a member</li>
+<li>Memo fields decode successfully when memo-based protocol data is required</li>
+<li>A recognition <code>CheckCreate</code> normalizes to exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
+<li>A lifecycle <code>AccountSet</code> normalizes to exactly one lifecycle tag plus exactly one canonical recognition identity, with matching community namespaces</li>
 <li>The category is recognized and the value is a valid canonical identifier</li>
 </ul>
 <div class="rule">
@@ -878,8 +1003,8 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <section id="legacy">
 <h2>14. Legacy / Pre-Protocol Transactions</h2>
 <p>
-          Reader software may preserve compatibility with earlier LEAP memo experiments so genuine historical records remain readable.
-          New issuance must use the canonical single-string format from Section 6.
+          Reader software may preserve compatibility with earlier LEAP memo experiments and pre-lifecycle recognition history so genuine historical records remain readable.
+          New member-recognition issuance and new lifecycle statements must use the current transaction-specific grammars from Sections 6 and 7.
         </p>
 <table>
 <tr><th>Legacy pattern</th><th>Interpretation</th><th>Rule</th></tr>
@@ -887,6 +1012,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td><code>MemoType=SFL-LEAP/BADGE</code> + <code>MemoData=...</code></td><td>Earlier split-memo proposal</td><td>Read-only compatibility; do not create new records this way</td></tr>
 <tr><td>Raw <code>LEAP-OG</code> or another free-form memo</td><td>Potential pre-protocol marker</td><td>Do not automatically grant recognition; map it manually only after provenance is verified</td></tr>
 <tr><td>No LEAP recognition memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge, event, or challenge meaning without another authoritative rule</td></tr>
+<tr><td>Canonical Badge/Event/Challenge first seen in authorized <code>CheckCreate</code> history before lifecycle activation</td><td>Pre-lifecycle canonical recognition ID</td><td>Keep readable as valid historical vocabulary; do not require a retroactive <code>CREATE</code> marker</td></tr>
 </table>
 <div class="note">
           Backward-compatible readers are intentionally more tolerant than the production writer. The writer follows one current grammar; readers may understand older approved forms without making those forms current again.
@@ -907,7 +1033,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Never reuse a retired badge, event, or challenge ID for a different meaning.</li>
 <li>Do not add a recognition category outside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> without an explicit protocol revision.</li>
 <li>When a recurring recognition needs distinction, extend the canonical ID from broad to narrow rather than redefining an existing ID.</li>
-<li>Record newly authorized distributors here before treating their transactions as official.</li>
+<li>Record newly authorized protocol authorities here before treating their transaction-type-specific actions as official.</li>
 <li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
 <li>Prefer additive changes over breaking changes.</li>
 </ul>
@@ -922,7 +1048,9 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
 <tr><td>0.7</td><td>2026-09-20</td><td>Added the Xaman operational cleanup path for outstanding Checks: <strong>Events → Planned → Check → Cancel Check</strong>; documented the distinction between historical <code>CheckCreate</code> entries in All and actionable Check objects in Planned; recorded the current 0.2 XRP owner reserve per open Check; clarified that expiration does not itself remove the Check object or release reserve.</td></tr>
 <tr><td>0.8</td><td>2026-09-23</td><td>Expanded the issuance architecture: kept all recognition inside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>; confirmed <code>NEW-MEMBER</code> as a Badge; adopted broad-to-narrow canonical specificity for recurring recognitions; made the XRPL validated distributor history the working recognition vocabulary; allowed positive whole-number LEAP amounts rather than one LEAP only; standardized deliberate no-default expiration choices of 30/15/7/3/2/1 days; defined recipient + exact canonical recognition as the duplicate key; suppressed pending and redeemed duplicates while reopening expired/canceled unredeemed recognition; kept trust lines out of the issuer workflow; and documented owner reserve as a temporary working-capital automatic stabilizer rather than a fee.</td></tr>
-<tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Crew Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
+<tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Member Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
+<tr><td>0.10</td><td>2026-09-30</td><td>Added XRPL-native cradle-to-grave recognition lifecycle markers using validated no-op <code>AccountSet</code> transactions from the authorized Community Operating Wallet. Clarified that RECOGNITION spans multiple XRPL transaction types: <code>CheckCreate</code> records member recognition issuance, while no-op <code>AccountSet</code> records recognition-object lifecycle state.</td></tr>
+<tr><td>0.11</td><td>2026-09-30</td><td>Made recognition lifecycle memos self-identifying by placing the recognition type and canonical ID directly in the lifecycle path: <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>. Added terminal <code>IGNORE</code> alongside <code>CREATE</code> and <code>END</code>; defined type-specific <code>END</code> semantics for Badges, Challenges, and Events; prohibited recognition-ID recycling including ignored IDs; required creation-time validation against full XRPL-derived history; and required ignored IDs to remain annotated in owner/operator ledger views while being excluded from normal recognition lists.</td></tr>
 </table>
 </section>
 <section id="open">
@@ -933,8 +1061,10 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
 <li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
 <li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
-<li>Verify the ledger-discovered Badge/Event/Challenge vocabulary and duplicate-state logic against live distributor history.</li>
-<li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier.</li>
+<li>Verify the ledger-discovered Badge/Event/Challenge vocabulary, lifecycle reconstruction, and duplicate-state logic against live XRPL history.</li>
+<li>Record the lifecycle activation ledger index before making <code>CREATE</code> mandatory for all newly created recognition IDs, so pre-lifecycle Check-discovered IDs remain deterministically readable.</li>
+<li>Complete live signing/validation tests of no-op <code>AccountSet</code> lifecycle transactions from the SFL Community Operating Wallet.</li>
+<li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier, derived from canonical ledger history rather than a separate database counter.</li>
 </ul>
 </section>
 <section id="sources">
@@ -952,6 +1082,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcreate">CheckCreate</a></li>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcash">CheckCash</a></li>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcancel">CheckCancel</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/types/accountset">AccountSet</a></li>
 <li><a href="https://xrpl.org/docs/tutorials/payments/send-a-check">Send a Check</a></li>
 <li><a href="https://xrpl.org/docs/concepts/accounts/reserves">Account Reserves</a></li>
 <li><a href="https://xrpl.org/resources/known-amendments">Known Amendments — CheckCashMakesTrustLine</a></li>
