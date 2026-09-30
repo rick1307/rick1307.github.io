@@ -8,29 +8,68 @@
   <style>
     :root {
       --ink:#f5fbfa; --deep:#071f2c; --lagoon:#29b8b1; --sea-glass:#79d5c2;
-      --mango:#f4bd58; --coral:#ef765d; --panel:rgba(10,45,58,.70);
-      --line:rgba(219,248,244,.14); --muted:rgba(236,249,247,.62);
-      --shadow:0 28px 78px rgba(0,16,24,.38);
+      --mango:#f4bd58; --coral:#ef765d; --green:#9fe0b0; --red:#ffb7b7;
+      --panel:rgba(10,45,58,.70); --line:rgba(219,248,244,.14);
+      --muted:rgba(236,249,247,.62); --shadow:0 28px 78px rgba(0,16,24,.38);
     }
     *{box-sizing:border-box} html{min-height:100%}
-    body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 12% 14%,rgba(41,184,177,.34) 0,rgba(41,184,177,.12) 22%,transparent 44%),radial-gradient(circle at 87% 15%,rgba(244,189,88,.24) 0,rgba(244,189,88,.07) 21%,transparent 42%),radial-gradient(circle at 88% 86%,rgba(239,118,93,.24) 0,rgba(239,118,93,.07) 23%,transparent 46%),linear-gradient(145deg,#06202e 0%,#0a3444 48%,#071d2a 100%);overflow-x:hidden}
+    body{
+      margin:0; min-height:100vh; color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 14%,rgba(41,184,177,.34) 0,rgba(41,184,177,.12) 22%,transparent 44%),
+        radial-gradient(circle at 87% 15%,rgba(244,189,88,.24) 0,rgba(244,189,88,.07) 21%,transparent 42%),
+        radial-gradient(circle at 88% 86%,rgba(239,118,93,.24) 0,rgba(239,118,93,.07) 23%,transparent 46%),
+        linear-gradient(145deg,#06202e 0%,#0a3444 48%,#071d2a 100%);
+      overflow-x:hidden;
+    }
     body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 78%)}
-    a{color:inherit}
-    .shell{position:relative;z-index:1;width:min(100%,980px);margin:0 auto;padding:46px 22px 56px}
+    button,input{font:inherit} a{color:inherit}
+    .shell{position:relative;z-index:1;width:min(100%,1040px);margin:0 auto;padding:46px 22px 56px}
     .console{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:32px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
-    .console::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral)}
+    .console::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
     .console-header{padding:34px 34px 30px;border-bottom:1px solid rgba(219,248,244,.08)}
     .top-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:34px}
     .owner-back{color:#b7f0df}
-    h1{margin:0;max-width:760px;font-size:clamp(2.25rem,7vw,4.75rem);line-height:.96;letter-spacing:-.055em;font-weight:900}
+    h1{margin:0;max-width:800px;font-size:clamp(2.25rem,7vw,4.75rem);line-height:.96;letter-spacing:-.055em;font-weight:900}
     .section-kicker{margin-top:22px;color:var(--sea-glass);font-size:.78rem;line-height:1;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-    .hero-copy{margin:12px 0 0;max-width:720px;color:var(--muted);font-size:.96rem;line-height:1.6}
+    .hero-copy{margin:12px 0 0;max-width:790px;color:var(--muted);font-size:.96rem;line-height:1.6}
     .console-body{padding:24px}
-    .section-card{padding:22px;border:1px solid rgba(255,255,255,.10);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),rgba(5,34,46,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
-    .section-card h2{margin:0;font-size:1.12rem;letter-spacing:-.02em}
-    .section-card p{margin:10px 0 0;color:var(--muted);font-size:.88rem;line-height:1.6}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(300px,.78fr);gap:18px;align-items:start}
+    .section-card,.preview-card{border:1px solid rgba(255,255,255,.10);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),rgba(5,34,46,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+    .section-card{padding:22px}.preview-card{padding:20px;position:sticky;top:20px}
+    .section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}
+    .section-head h2{margin:0;font-size:1.12rem;letter-spacing:-.02em}
+    .section-head p{margin:7px 0 0;color:var(--muted);font-size:.83rem;line-height:1.5}
+    .field{display:grid;gap:8px}
+    label{color:rgba(236,249,247,.76);font-size:.70rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+    input{width:100%;border:1px solid rgba(219,248,244,.14);border-radius:12px;background:rgba(0,0,0,.14);color:var(--ink);padding:13px 14px;outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:1rem;text-transform:uppercase}
+    input:focus{border-color:rgba(121,213,194,.62);box-shadow:0 0 0 3px rgba(121,213,194,.10)}
+    .field-help{color:var(--muted);font-size:.76rem;line-height:1.45}
+    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .primary-button,.secondary-button{min-height:42px;border-radius:12px;padding:10px 14px;font-weight:850;cursor:pointer}
+    .primary-button{border:1px solid rgba(121,213,194,.42);background:rgba(121,213,194,.14);color:#e5fff8}
+    .primary-button:disabled{opacity:.42;cursor:not-allowed}
+    .secondary-button{border:1px solid rgba(219,248,244,.14);background:rgba(255,255,255,.05);color:var(--ink)}
+    .status-grid{display:grid;gap:10px;margin-top:20px}
+    .status-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:start;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.10)}
+    .status-label{color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .status-value{font-size:.80rem;line-height:1.45;overflow-wrap:anywhere}
+    .status-value.good{color:var(--green)} .status-value.bad{color:var(--red)} .status-value.wait{color:#f5d38f}
+    .notice{margin-top:16px;padding:13px 14px;border:1px dashed rgba(244,189,88,.24);border-radius:14px;color:rgba(236,249,247,.65);font-size:.78rem;line-height:1.5}
+    .notice strong{color:#f5d38f}
+    .preview-label{color:var(--sea-glass);font-size:.68rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    .preview-block{margin-top:14px;padding:16px;border:1px solid rgba(121,213,194,.18);border-radius:18px;background:rgba(121,213,194,.055)}
+    .preview-block + .preview-block{margin-top:12px}
+    .friendly-name{font-size:1.28rem;font-weight:900;overflow-wrap:anywhere}
+    .canonical-id{margin-top:7px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.82rem;overflow-wrap:anywhere}
+    .state-pill{display:inline-block;margin-top:12px;padding:6px 9px;border:1px solid rgba(159,224,176,.28);border-radius:999px;background:rgba(58,159,89,.12);color:var(--green);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .protocol-title{margin:0 0 7px;color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .protocol-value{margin:0;color:#e8fbf7;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.75rem;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+    .prepared{display:none;margin-top:16px;padding:14px;border:1px solid rgba(159,224,176,.24);border-radius:14px;background:rgba(58,159,89,.08)}
+    .prepared.show{display:block}
+    .prepared strong{color:var(--green)}
     .footer-note{padding:0 24px 24px;color:rgba(236,249,247,.35);font-size:.70rem;text-align:center}
-    @media(max-width:760px){.shell{padding:20px 12px 34px}.console{border-radius:24px}.console-header{padding:26px 20px 26px}.console-body{padding:16px}}
+    @media(max-width:800px){.shell{padding:20px 12px 34px}.console{border-radius:24px}.console-header{padding:26px 20px}.console-body{padding:16px}.workspace{grid-template-columns:1fr}.preview-card{position:static}.status-row{grid-template-columns:100px minmax(0,1fr)}}
   </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
   <link rel="stylesheet" href="wildLedgerBackend.css">
@@ -44,20 +83,90 @@
         </nav>
         <h1 id="communityTitle">Community</h1>
         <div class="section-kicker">Create Event</div>
-        <p class="hero-copy">This is the launch point for defining a community event. We’ll define the actual event fields together before anything is published.</p>
+        <p class="hero-copy">Create the canonical Event ID that Wild Ledger will publish to XRPL. The ledger record is the fact; the screen only interprets it.</p>
       </header>
+
       <div class="console-body">
-        <section class="section-card">
-          <h2>Event definition</h2>
-          <p>No event has been created yet. This screen is intentionally waiting for the definition rules so Wild Ledger does not guess at fields or protocol behavior.</p>
-        </section>
+        <div class="workspace">
+          <section class="section-card">
+            <div class="section-head">
+              <div>
+                <h2>Canonical Event ID</h2>
+                <p>An Event is born only when its CREATE lifecycle transaction is validated on XRPL.</p>
+              </div>
+            </div>
+
+            <form id="eventForm" novalidate>
+              <div class="field">
+                <label for="eventId">Event ID</label>
+                <input id="eventId" inputmode="text" autocomplete="off" spellcheck="false" placeholder="COMMUNITY-MEETUP-2026" aria-describedby="eventIdHelp">
+                <div class="field-help" id="eventIdHelp">Uppercase letters, numbers, and hyphens only. Once an ID appears canonically on XRPL, it can never be reused — including after END or IGNORE.</div>
+              </div>
+
+              <div class="button-row">
+                <button class="secondary-button" id="recheckButton" type="button">Recheck XRPL</button>
+                <button class="primary-button" id="prepareButton" type="submit" disabled>Prepare CREATE</button>
+                <button class="secondary-button" id="clearButton" type="button">Clear</button>
+              </div>
+
+              <div class="status-grid" aria-live="polite">
+                <div class="status-row">
+                  <div class="status-label">XRPL</div>
+                  <div class="status-value wait" id="xrplStatus">Waiting to scan validated history…</div>
+                </div>
+                <div class="status-row">
+                  <div class="status-label">Format</div>
+                  <div class="status-value wait" id="formatStatus">Enter an Event ID.</div>
+                </div>
+                <div class="status-row">
+                  <div class="status-label">ID history</div>
+                  <div class="status-value wait" id="historyStatus">XRPL history has not been checked yet.</div>
+                </div>
+                <div class="status-row">
+                  <div class="status-label">Authority</div>
+                  <div class="status-value" id="authorityStatus">—</div>
+                </div>
+              </div>
+
+              <div class="prepared" id="preparedMessage">
+                <strong>CREATE prepared.</strong> This is the canonical lifecycle statement Wild Ledger will hand to the signing/publishing step. Nothing has been written to XRPL yet.
+              </div>
+
+              <div class="notice"><strong>Step 3 only:</strong> this page validates and prepares the canonical lifecycle record. It does not sign, submit, or publish an XRPL transaction and it does not award LEAP to a member.</div>
+            </form>
+          </section>
+
+          <aside class="preview-card" aria-label="Canonical Event preview">
+            <div class="preview-label">Interpretive Preview</div>
+            <div class="preview-block">
+              <div class="friendly-name" id="friendlyName">Event Name</div>
+              <div class="canonical-id" id="canonicalId">EVENT-ID</div>
+              <div class="state-pill">Active after CREATE</div>
+            </div>
+
+            <div class="preview-block">
+              <div class="protocol-title">Lifecycle memo</div>
+              <p class="protocol-value" id="memoPreview">—</p>
+            </div>
+
+            <div class="preview-block">
+              <div class="protocol-title">XRPL transaction</div>
+              <p class="protocol-value" id="transactionPreview">TransactionType: AccountSet\nAccount: —\nAccountSet mutation fields: none</p>
+            </div>
+          </aside>
+        </div>
       </div>
+
       <div class="footer-note">Wild Ledger • Community Recognition</div>
     </section>
   </main>
+
+  <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
   <script>
     (() => {
+      "use strict";
+
       const params = new URLSearchParams(window.location.search);
       const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
       const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
@@ -65,9 +174,429 @@
       const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedValue) || null;
       const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
       const communityName = community?.communityName || "Community";
-      document.getElementById("communityTitle").textContent = communityName;
+      const namespace = community?.leapNamespace || `${communityId}-LEAP`;
+      const operatingWallet = community?.operatingWallet || "";
+      const config = window.WILD_LEDGER_CONFIG || {};
+      const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
+      const leapIssuer = config.leapIssuer || "";
+      const legacyDistributors = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
+
+      const back = document.getElementById("recognitionBack");
+      const title = document.getElementById("communityTitle");
+      const form = document.getElementById("eventForm");
+      const eventIdInput = document.getElementById("eventId");
+      const recheckButton = document.getElementById("recheckButton");
+      const prepareButton = document.getElementById("prepareButton");
+      const clearButton = document.getElementById("clearButton");
+      const xrplStatus = document.getElementById("xrplStatus");
+      const formatStatus = document.getElementById("formatStatus");
+      const historyStatus = document.getElementById("historyStatus");
+      const authorityStatus = document.getElementById("authorityStatus");
+      const friendlyName = document.getElementById("friendlyName");
+      const canonicalId = document.getElementById("canonicalId");
+      const memoPreview = document.getElementById("memoPreview");
+      const transactionPreview = document.getElementById("transactionPreview");
+      const preparedMessage = document.getElementById("preparedMessage");
+
+      const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
+      const ACCOUNTSET_SPECIFIC_FIELDS = [
+        "ClearFlag", "Domain", "EmailHash", "MessageKey", "NFTokenMinter",
+        "SetFlag", "TransferRate", "TickSize", "WalletLocator", "WalletSize"
+      ];
+
+      let socket = null;
+      let requestCounter = 0;
+      let pending = new Map();
+      let historyLoaded = false;
+      let scanInProgress = false;
+      let reservedEvents = new Map();
+
+      title.textContent = communityName;
       document.title = `${communityName} | Create Event`;
-      document.getElementById("recognitionBack").href = `viewCommunityRecognition.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+      back.href = `viewCommunityRecognition.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+      authorityStatus.textContent = operatingWallet || "No Community Operating Wallet configured.";
+
+      function setStatus(element, text, tone) {
+        element.textContent = text;
+        element.classList.remove("good", "bad", "wait");
+        if (tone) element.classList.add(tone);
+      }
+
+      function canonicalizeId(value) {
+        return String(value || "")
+          .trim()
+          .toUpperCase()
+          .replace(/[\s_]+/g, "-")
+          .replace(/[^A-Z0-9-]/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function validCanonicalId(value) {
+        return /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(value);
+      }
+
+      function displayNameFromId(value) {
+        if (!value) return "Event Name";
+        return value.split("-").map(part => {
+          if (/^\d+$/.test(part)) return part;
+          if (part.length <= 4 && /^[A-Z]+$/.test(part)) return part;
+          return part.charAt(0) + part.slice(1).toLowerCase();
+        }).join(" ");
+      }
+
+      function lifecycleMemo(id) {
+        return `${namespace}/RECOGNITION/EVENT/${id}/LIFECYCLE-TAG=CREATE`;
+      }
+
+      function updatePreview() {
+        const id = canonicalizeId(eventIdInput.value);
+        canonicalId.textContent = id || "EVENT-ID";
+        friendlyName.textContent = displayNameFromId(id);
+        memoPreview.textContent = id ? lifecycleMemo(id) : "—";
+        transactionPreview.textContent = `TransactionType: AccountSet\nAccount: ${operatingWallet || "—"}\nAccountSet mutation fields: none`;
+      }
+
+      function currentValidation() {
+        const id = canonicalizeId(eventIdInput.value);
+        const formatOkay = !!id && validCanonicalId(id);
+        const existing = id ? reservedEvents.get(id) : null;
+        const historyOkay = historyLoaded && formatOkay && !existing;
+        const authorityOkay = !!operatingWallet;
+        return { id, formatOkay, existing, historyOkay, authorityOkay, ready: formatOkay && historyOkay && authorityOkay && !scanInProgress };
+      }
+
+      function describeExisting(record) {
+        if (!record) return "";
+        if (record.state === "IGNORED") return `Reserved — this Event ID was previously marked IGNORE on XRPL${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
+        if (record.state === "ENDED") return `Reserved — this Event ID was completed with END on XRPL${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
+        if (record.state === "ACTIVE") return `Reserved — this Event ID already has a CREATE lifecycle record${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
+        return `Reserved — this Event ID already exists in legacy authorized recognition history${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
+      }
+
+      function refreshValidation() {
+        const result = currentValidation();
+        preparedMessage.classList.remove("show");
+
+        if (!result.id) {
+          setStatus(formatStatus, "Enter an Event ID.", "wait");
+        } else if (!result.formatOkay) {
+          setStatus(formatStatus, "Use uppercase letters, numbers, and single hyphens only.", "bad");
+        } else {
+          setStatus(formatStatus, `${result.id} is a valid canonical Event ID format.`, "good");
+        }
+
+        if (scanInProgress) {
+          setStatus(historyStatus, "Scanning validated XRPL history…", "wait");
+        } else if (!historyLoaded) {
+          setStatus(historyStatus, "XRPL history has not been checked yet.", "wait");
+        } else if (!result.id || !result.formatOkay) {
+          setStatus(historyStatus, "Enter a valid Event ID to check namespace history.", "wait");
+        } else if (result.existing) {
+          setStatus(historyStatus, describeExisting(result.existing), "bad");
+        } else {
+          setStatus(historyStatus, "Unused — no canonical or legacy use of this Event ID was found in the scanned XRPL history.", "good");
+        }
+
+        prepareButton.disabled = !result.ready;
+        updatePreview();
+      }
+
+      function hexToText(value) {
+        if (!value || typeof value !== "string") return "";
+        if (!/^[A-Fa-f0-9]+$/.test(value) || value.length % 2 !== 0) return value;
+        try {
+          const bytes = new Uint8Array(value.match(/.{2}/g).map(pair => parseInt(pair, 16)));
+          return new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/\0+$/g, "");
+        } catch (_) {
+          return value;
+        }
+      }
+
+      function decodeCurrency(value) {
+        const code = String(value || "");
+        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
+        try {
+          let out = "";
+          for (let i = 0; i < code.length; i += 2) {
+            const n = parseInt(code.slice(i, i + 2), 16);
+            if (n === 0) break;
+            out += String.fromCharCode(n);
+          }
+          return out;
+        } catch (_) {
+          return code;
+        }
+      }
+
+      function isLeapAmount(amount) {
+        return !!amount && typeof amount === "object" &&
+          (!leapIssuer || amount.issuer === leapIssuer) &&
+          decodeCurrency(amount.currency).toUpperCase() === "LEAP";
+      }
+
+      function normalizeTx(entry) {
+        return entry?.tx_json || entry?.tx || entry?.transaction || entry || {};
+      }
+
+      function transactionSucceeded(entry) {
+        if (entry?.validated === false) return false;
+        const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+        const result = meta?.TransactionResult ?? meta?.transaction_result;
+        return !result || result === "tesSUCCESS";
+      }
+
+      function ledgerIndex(entry, tx) {
+        return entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.ledgerIndex ?? null;
+      }
+
+      function memoTexts(tx) {
+        const texts = [];
+        for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
+          const memo = wrapper?.Memo || {};
+          for (const field of [memo.MemoData, memo.MemoType, memo.MemoFormat]) {
+            const decoded = hexToText(field).trim();
+            if (decoded) texts.push(decoded);
+          }
+        }
+        return texts;
+      }
+
+      function isCanonicalNoOpAccountSet(tx) {
+        if (tx?.TransactionType !== "AccountSet") return false;
+        if (Number(tx.Flags || 0) !== 0) return false;
+        return ACCOUNTSET_SPECIFIC_FIELDS.every(field => !(field in tx));
+      }
+
+      function lifecycleRecordFromEntry(entry) {
+        const tx = normalizeTx(entry);
+        if (!operatingWallet || tx.Account !== operatingWallet || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
+
+        const prefix = `${namespace}/RECOGNITION/EVENT/`;
+        const suffix = "/LIFECYCLE-TAG=";
+        const matches = [];
+
+        for (const text of memoTexts(tx)) {
+          if (!text.startsWith(prefix)) continue;
+          const marker = text.indexOf(suffix, prefix.length);
+          if (marker < 0) continue;
+          const id = text.slice(prefix.length, marker);
+          const action = text.slice(marker + suffix.length);
+          if (!validCanonicalId(id) || !["CREATE", "END", "IGNORE"].includes(action)) continue;
+          if (text !== `${prefix}${id}${suffix}${action}`) continue;
+          matches.push({ id, action });
+        }
+
+        if (matches.length !== 1) return null;
+        return { ...matches[0], ledger: ledgerIndex(entry, tx) };
+      }
+
+      function legacyEventIdsFromEntry(entry) {
+        const tx = normalizeTx(entry);
+        if (tx?.TransactionType !== "CheckCreate") return [];
+        if (!legacyDistributors.includes(tx.Account)) return [];
+        if (!transactionSucceeded(entry) || !isLeapAmount(tx.SendMax)) return [];
+
+        const ids = new Set();
+        const canonicalPrefix = `${namespace}/EVENT=`;
+        const legacyType = `${namespace}/EVENT`;
+
+        const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+        for (const wrapper of memos) {
+          const memo = wrapper?.Memo || {};
+          const type = hexToText(memo.MemoType).trim();
+          const data = hexToText(memo.MemoData).trim();
+          const format = hexToText(memo.MemoFormat).trim();
+
+          for (const text of [data, type, format]) {
+            if (text.startsWith(canonicalPrefix)) {
+              const id = text.slice(canonicalPrefix.length);
+              if (validCanonicalId(id)) ids.add(id);
+            }
+          }
+
+          if (type === legacyType && validCanonicalId(data)) ids.add(data);
+          if (type === namespace && data) {
+            for (const piece of data.split("|")) {
+              const equals = piece.indexOf("=");
+              if (equals <= 0) continue;
+              const key = piece.slice(0, equals).trim().toUpperCase();
+              const value = piece.slice(equals + 1).trim();
+              if (key === "EVENT" && validCanonicalId(value)) ids.add(value);
+            }
+          }
+
+        }
+
+        return [...ids].map(id => ({ id, ledger: ledgerIndex(entry, tx) }));
+      }
+
+      function rememberLifecycle(record) {
+        if (!record) return;
+        const prior = reservedEvents.get(record.id);
+        const state = record.action === "IGNORE" ? "IGNORED" : record.action === "END" ? "ENDED" : "ACTIVE";
+        const next = { state, ledger: record.ledger, source: "lifecycle" };
+
+        if (!prior) {
+          reservedEvents.set(record.id, next);
+          return;
+        }
+
+        if (prior.state === "IGNORED") return;
+        if (prior.state === "ENDED" && state === "ACTIVE") return;
+        if (state === "IGNORED" || state === "ENDED" || prior.state === "LEGACY") reservedEvents.set(record.id, next);
+      }
+
+      function rememberLegacy(record) {
+        if (!record || reservedEvents.has(record.id)) return;
+        reservedEvents.set(record.id, { state: "LEGACY", ledger: record.ledger, source: "legacy" });
+      }
+
+      function connect() {
+        return new Promise((resolve, reject) => {
+          socket = new WebSocket(xrplServer);
+          const timer = setTimeout(() => reject(new Error("XRPL connection timed out.")), 12000);
+
+          socket.addEventListener("open", () => {
+            clearTimeout(timer);
+            resolve();
+          }, { once:true });
+
+          socket.addEventListener("error", () => {
+            clearTimeout(timer);
+            reject(new Error("Could not connect to XRPL."));
+          }, { once:true });
+
+          socket.addEventListener("message", event => {
+            let message;
+            try { message = JSON.parse(event.data); } catch (_) { return; }
+            if (!message.id || !pending.has(message.id)) return;
+            const handlers = pending.get(message.id);
+            pending.delete(message.id);
+            if (message.status === "error" || message.error || message.result?.error) {
+              handlers.reject(new Error(message.error_message || message.result?.error_message || message.error || message.result?.error || "XRPL request failed."));
+            } else {
+              handlers.resolve(message.result || message);
+            }
+          });
+        });
+      }
+
+      function request(command) {
+        return new Promise((resolve, reject) => {
+          if (!socket || socket.readyState !== WebSocket.OPEN) {
+            reject(new Error("XRPL connection is not open."));
+            return;
+          }
+
+          const id = `event-${++requestCounter}`;
+          pending.set(id, { resolve, reject });
+          socket.send(JSON.stringify({ id, api_version:2, ...command }));
+
+          setTimeout(() => {
+            if (!pending.has(id)) return;
+            pending.delete(id);
+            reject(new Error("XRPL request timed out."));
+          }, 30000);
+        });
+      }
+
+      async function scanAccount(account, mode) {
+        let marker;
+        do {
+          const command = {
+            command:"account_tx",
+            account,
+            ledger_index_min:-1,
+            ledger_index_max:-1,
+            binary:false,
+            forward:true,
+            limit:400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(command);
+          const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+          for (const entry of transactions) {
+            if (mode === "lifecycle") {
+              rememberLifecycle(lifecycleRecordFromEntry(entry));
+            } else if (mode === "legacy") {
+              for (const record of legacyEventIdsFromEntry(entry)) rememberLegacy(record);
+            }
+          }
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      async function scanHistory() {
+        if (scanInProgress) return;
+        scanInProgress = true;
+        historyLoaded = false;
+        reservedEvents = new Map();
+        prepareButton.disabled = true;
+        setStatus(xrplStatus, "Scanning validated XRPL history…", "wait");
+        refreshValidation();
+
+        try {
+          if (!operatingWallet) throw new Error("This community does not yet have a Community Operating Wallet configured.");
+          if (socket) { try { socket.close(); } catch (_) {} }
+          pending.clear();
+          await connect();
+
+          await scanAccount(operatingWallet, "lifecycle");
+          for (const distributor of legacyDistributors) {
+            if (distributor && distributor !== operatingWallet) await scanAccount(distributor, "legacy");
+          }
+
+          historyLoaded = true;
+          setStatus(xrplStatus, `Validated history scanned. ${reservedEvents.size} reserved Event ID${reservedEvents.size === 1 ? "" : "s"} found for ${namespace}.`, "good");
+        } catch (error) {
+          historyLoaded = false;
+          setStatus(xrplStatus, error?.message || String(error), "bad");
+        } finally {
+          scanInProgress = false;
+          if (socket) { try { socket.close(); } catch (_) {} }
+          socket = null;
+          refreshValidation();
+        }
+      }
+
+      eventIdInput.addEventListener("input", () => {
+        preparedMessage.classList.remove("show");
+        refreshValidation();
+      });
+
+      eventIdInput.addEventListener("blur", () => {
+        const normalized = canonicalizeId(eventIdInput.value);
+        if (normalized !== eventIdInput.value) eventIdInput.value = normalized;
+        refreshValidation();
+      });
+
+      recheckButton.addEventListener("click", scanHistory);
+
+      clearButton.addEventListener("click", () => {
+        eventIdInput.value = "";
+        preparedMessage.classList.remove("show");
+        refreshValidation();
+        eventIdInput.focus();
+      });
+
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        const normalized = canonicalizeId(eventIdInput.value);
+        eventIdInput.value = normalized;
+        refreshValidation();
+        const result = currentValidation();
+        if (!result.ready) return;
+
+        memoPreview.textContent = lifecycleMemo(result.id);
+        transactionPreview.textContent = `TransactionType: AccountSet\nAccount: ${operatingWallet}\nAccountSet mutation fields: none\nMemo: ${lifecycleMemo(result.id)}`;
+        preparedMessage.classList.add("show");
+      });
+
+      updatePreview();
+      refreshValidation();
+      scanHistory();
     })();
   </script>
 </body>
