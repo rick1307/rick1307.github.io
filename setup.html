@@ -409,9 +409,9 @@
     align-items: center;
   }
 
-  .rank-row,
-  .badge-row {
+  .rank-row {
     display: grid;
+    grid-template-columns: 110px minmax(0,1fr);
     gap: 10px;
     align-items: end;
     padding: 12px;
@@ -420,8 +420,6 @@
     border-radius: 14px;
     background: rgba(255,255,255,.025);
   }
-  .rank-row { grid-template-columns: 110px minmax(0,1fr); }
-  .badge-row { grid-template-columns: 1.1fr 1fr 84px 2fr auto; }
 
   .small-button,
   .primary-button,
@@ -583,7 +581,7 @@
     .top-nav { gap: 10px; margin-bottom: 28px; }
     .section-card, .access-card { padding: 19px; border-radius: 20px; }
     .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
-    .rank-row, .badge-row { grid-template-columns: 1fr; }
+    .rank-row { grid-template-columns: 1fr; }
     .section-head { align-items: flex-start; }
   }
 </style>
@@ -714,16 +712,6 @@
           <div id="ranksEditor"></div>
         </section>
 
-        <section class="section-card">
-          <div class="section-head">
-            <div>
-              <h2>Badges</h2>
-              <p>Reusable recognitions a community operator can award to members.</p>
-            </div>
-            <button class="small-button" id="addBadgeButton" type="button">Add badge</button>
-          </div>
-          <div id="badgesEditor"></div>
-        </section>
 
         <section class="section-card" id="browserStorageSection">
           <div class="section-head">
@@ -803,7 +791,6 @@
       const status = document.getElementById("draftStatus");
       const output = document.getElementById("configOutput");
       const ranksEditor = document.getElementById("ranksEditor");
-      const badgesEditor = document.getElementById("badgesEditor");
       const colorEditor = document.getElementById("colorEditor");
       const advancedThemeEditor = document.getElementById("advancedThemeEditor");
       const workspaceTitle = document.getElementById("workspaceTitle");
@@ -973,29 +960,6 @@
         });
       }
 
-      function renderBadges() {
-        badgesEditor.innerHTML = "";
-        const badges = Array.isArray(current.badges) ? current.badges : [];
-        if (!badges.length) {
-          const empty = document.createElement("div");
-          empty.className = "hint";
-          empty.textContent = "No badges configured yet.";
-          badgesEditor.appendChild(empty);
-          return;
-        }
-        badges.forEach((badge, index) => {
-          const row = document.createElement("div");
-          row.className = "badge-row";
-          row.innerHTML = `
-            <div class="field"><label>Name</label><input value="${escapeHtml(badge.name)}" data-badge-index="${index}" data-badge-key="name"></div>
-            <div class="field"><label>Type</label><input value="${escapeHtml(badge.type)}" data-badge-index="${index}" data-badge-key="type"></div>
-            <div class="field"><label>Icon</label><input value="${escapeHtml(badge.icon)}" data-badge-index="${index}" data-badge-key="icon"></div>
-            <div class="field"><label>Description</label><textarea data-badge-index="${index}" data-badge-key="description">${escapeHtml(badge.description)}</textarea></div>
-            <button class="danger-button" type="button" data-remove-badge="${index}">Remove</button>`;
-          badgesEditor.appendChild(row);
-        });
-      }
-
       function renderThemeEditors() {
         colorEditor.innerHTML = "";
         colorKeys.forEach(([key, label]) => {
@@ -1066,7 +1030,6 @@
       function renderAll() {
         setSimpleFields();
         renderRanks();
-        renderBadges();
         renderThemeEditors();
         updateOutputAndPreview();
       }
@@ -1085,13 +1048,6 @@
           const key = element.dataset.rankKey;
           current.ranks[index] ||= { min: 0, name: "" };
           current.ranks[index][key] = key === "min" ? Number(element.value || 0) : element.value;
-        });
-
-        badgesEditor.querySelectorAll("[data-badge-index]").forEach((element) => {
-          const index = Number(element.dataset.badgeIndex);
-          const key = element.dataset.badgeKey;
-          current.badges[index] ||= { name: "", type: "", icon: "", description: "" };
-          current.badges[index][key] = element.value;
         });
 
         form.querySelectorAll("[data-theme-key]").forEach((element) => {
@@ -1219,22 +1175,6 @@
       });
 
       form.addEventListener("change", updateOutputAndPreview);
-
-      document.getElementById("addBadgeButton").addEventListener("click", () => {
-        syncFromForm();
-        current.badges.push({ name: "New badge", type: "Standard badge", icon: "★", description: "" });
-        renderBadges();
-        updateOutputAndPreview();
-      });
-
-      badgesEditor.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-remove-badge]");
-        if (!button) return;
-        syncFromForm();
-        current.badges.splice(Number(button.dataset.removeBadge), 1);
-        renderBadges();
-        updateOutputAndPreview();
-      });
 
       document.getElementById("saveDraftButton").addEventListener("click", saveDraft);
 
