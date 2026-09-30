@@ -1141,6 +1141,40 @@
       .create-badge-link { min-height: 34px; padding: 0 10px; font-size: .66rem; }
     }
 
+    /* The three total cards are the recognition view selectors. */
+    .summary-card {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    }
+
+    .summary-card[aria-pressed="true"] {
+      border-color: rgba(121, 213, 194, .52);
+      background:
+        linear-gradient(150deg, rgba(121,213,194,.11), rgba(255,255,255,.018)),
+        rgba(5, 34, 46, .52);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+    }
+
+    .summary-card:hover,
+    .summary-card:focus-visible {
+      border-color: rgba(121, 213, 194, .52);
+      outline: none;
+    }
+
+    .group-head {
+      min-height: 52px;
+      align-items: center;
+    }
+
+    .create-badge-link {
+      align-self: center;
+    }
+
 </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
@@ -1155,16 +1189,16 @@
       <div class="recognition-title">Community Recognition</div>
     </div>
 
-    <div id="historySummary" class="summary">
-      <div class="summary-card"><strong id="badgeTotal">0</strong><span>Badges</span></div>
-      <div class="summary-card"><strong id="challengeTotal">0</strong><span>Challenges</span></div>
-      <div class="summary-card"><strong id="eventTotal">0</strong><span>Events</span></div>
-    </div>
-
-    <div class="view-toggle" aria-label="LEAP ledger reference view">
-      <button id="badgesViewButton" type="button" aria-pressed="true">Badges in Use</button>
-      <button id="challengesViewButton" type="button" aria-pressed="false">Past Challenges</button>
-      <button id="eventsViewButton" type="button" aria-pressed="false">Past Events</button>
+    <div id="historySummary" class="summary" aria-label="Community recognition views">
+      <button class="summary-card" id="badgesViewButton" type="button" aria-pressed="true">
+        <strong id="badgeTotal">0</strong><span>Badges</span>
+      </button>
+      <button class="summary-card" id="challengesViewButton" type="button" aria-pressed="false">
+        <strong id="challengeTotal">0</strong><span>Challenges</span>
+      </button>
+      <button class="summary-card" id="eventsViewButton" type="button" aria-pressed="false">
+        <strong id="eventTotal">0</strong><span>Events</span>
+      </button>
     </div>
 
     <section class="ledger">
@@ -1182,7 +1216,6 @@
         <div class="group">
           <div class="group-head">
             <h2>Past Challenges</h2>
-            <span id="challengeCount" class="group-count"></span>
           </div>
           <div id="CHALLENGE"></div>
         </div>
@@ -1192,7 +1225,6 @@
         <div class="group">
           <div class="group-head">
             <h2>Past Events</h2>
-            <span id="eventCount" class="group-count"></span>
           </div>
           <div id="EVENT"></div>
         </div>
@@ -1719,8 +1751,6 @@
         renderCategoryGroup("EVENT");
 
         const counts = {};
-        const activeOccurrences = {};
-        const canceledOccurrences = {};
 
         // Badges and challenges are registry counts: unique identifiers ever defined.
         // Canceling one Check does not erase the identifier from either registry.
@@ -1755,22 +1785,11 @@
           }
 
           counts.EVENT = activeValues.size;
-          activeOccurrences.EVENT = active;
-          canceledOccurrences.EVENT = canceled;
         }
 
         document.getElementById("badgeTotal").textContent = counts.BADGE;
         document.getElementById("eventTotal").textContent = counts.EVENT;
         document.getElementById("challengeTotal").textContent = counts.CHALLENGE;
-
-        document.getElementById("challengeCount").textContent =
-          `${counts.CHALLENGE} unique`;
-
-        const eventCanceledText = canceledOccurrences.EVENT
-          ? ` · ${canceledOccurrences.EVENT} canceled`
-          : "";
-        document.getElementById("eventCount").textContent =
-          `${counts.EVENT} unique · ${activeOccurrences.EVENT} active${eventCanceledText}`;
 
         setHistoryView(historyView);
       }
