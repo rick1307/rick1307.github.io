@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a34">
+  <title>XRPL Direct AccountSet Proof</title>
+  <style>
+    :root{
+      --ink:#f5fbfa;--deep:#071f2c;--lagoon:#29b8b1;--sea:#79d5c2;--mango:#f4bd58;
+      --green:#9fe0b0;--red:#ffb7b7;--panel:rgba(10,45,58,.72);--line:rgba(219,248,244,.14);
+      --muted:rgba(236,249,247,.64);--shadow:0 28px 78px rgba(0,16,24,.38)
+    }
+    *{box-sizing:border-box}html{min-height:100%}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at 12% 14%,rgba(41,184,177,.34),transparent 42%),radial-gradient(circle at 87% 15%,rgba(244,189,88,.20),transparent 40%),linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a);}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:52px 52px}
+    button,input,select,textarea{font:inherit}.shell{position:relative;z-index:1;width:min(100%,1080px);margin:0 auto;padding:42px 20px 56px}
+    .console{overflow:hidden;border:1px solid var(--line);border-radius:30px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+    .console::before{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--lagoon),var(--sea),var(--mango))}
+    header{padding:30px 32px 24px;border-bottom:1px solid rgba(219,248,244,.08)}
+    .eyebrow{color:var(--sea);font-size:.76rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    h1{margin:10px 0 0;font-size:clamp(2.1rem,6vw,4.4rem);line-height:.96;letter-spacing:-.052em}
+    .intro{max-width:860px;margin:16px 0 0;color:var(--muted);font-size:.96rem;line-height:1.62}
+    .safety{margin-top:16px;padding:12px 14px;border:1px solid rgba(159,224,176,.24);border-radius:14px;background:rgba(58,159,89,.08);color:#dff8e6;font-size:.82rem;line-height:1.5}
+    .body{padding:22px;display:grid;gap:18px}
+    .card{border:1px solid rgba(255,255,255,.10);border-radius:22px;background:rgba(5,34,46,.42);padding:20px}
+    .card h2{margin:0 0 14px;font-size:1.05rem}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .field{display:grid;gap:7px}.field.full{grid-column:1/-1}label{color:rgba(236,249,247,.74);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    input,select,textarea{width:100%;border:1px solid rgba(219,248,244,.14);border-radius:12px;background:rgba(0,0,0,.15);color:var(--ink);padding:12px 13px;outline:none}
+    textarea{min-height:96px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.82rem;line-height:1.5}
+    input:focus,select:focus,textarea:focus{border-color:rgba(121,213,194,.62);box-shadow:0 0 0 3px rgba(121,213,194,.10)}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.button{min-height:42px;border-radius:12px;padding:10px 15px;font-weight:850;cursor:pointer}
+    .primary{border:1px solid rgba(121,213,194,.42);background:rgba(121,213,194,.14);color:#e5fff8}.secondary{border:1px solid rgba(219,248,244,.14);background:rgba(255,255,255,.05);color:var(--ink)}
+    .button:disabled{opacity:.45;cursor:not-allowed}.status{display:grid;gap:9px}.row{display:grid;grid-template-columns:160px minmax(0,1fr);gap:12px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.10)}
+    .key{color:var(--muted);font-size:.67rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.value{font-size:.80rem;line-height:1.45;overflow-wrap:anywhere}.good{color:var(--green)}.bad{color:var(--red)}.wait{color:#f5d38f}
+    pre{margin:0;max-height:430px;overflow:auto;padding:15px;border:1px solid rgba(121,213,194,.16);border-radius:14px;background:rgba(0,0,0,.16);color:#e8fbf7;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .small{margin-top:10px;color:var(--muted);font-size:.75rem;line-height:1.5}.pass{border-color:rgba(159,224,176,.34);background:rgba(58,159,89,.08)}.fail{border-color:rgba(255,183,183,.32);background:rgba(151,49,49,.08)}
+    footer{padding:0 22px 24px;color:rgba(236,249,247,.42);font-size:.70rem;text-align:center}
+    @media(max-width:760px){.shell{padding:18px 10px 32px}.console{border-radius:22px}header{padding:24px 18px}.body{padding:14px}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.row{grid-template-columns:110px minmax(0,1fr)}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="console">
+      <header>
+        <div class="eyebrow">Standalone Engineering Proof</div>
+        <h1>XRPL Direct AccountSet Test</h1>
+        <p class="intro">This page bypasses Xaman completely. It talks directly to an XRP Ledger Mainnet WebSocket and asks XRPL to dry-run the exact no-op <code>AccountSet</code> carrier Wild Ledger wants for recognition lifecycle markers.</p>
+        <div class="safety"><strong>Simulation only.</strong> No private key is requested. Nothing is signed. Nothing is submitted. No XRP is spent and no ledger state is changed.</div>
+      </header>
+
+      <div class="body">
+        <section class="card">
+          <h2>Proof Inputs</h2>
+          <div class="grid">
+            <div class="field">
+              <label for="server">Mainnet WebSocket</label>
+              <select id="server">
+                <option value="wss://xrplcluster.com/">xrplcluster.com</option>
+                <option value="wss://s1.ripple.com/">s1.ripple.com</option>
+                <option value="wss://s2.ripple.com/">s2.ripple.com</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="account">Account</label>
+              <input id="account" autocomplete="off" spellcheck="false" value="rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q">
+            </div>
+            <div class="field full">
+              <label for="memo">Lifecycle Memo</label>
+              <input id="memo" autocomplete="off" spellcheck="false" value="SFL-LEAP/RECOGNITION/BADGE/XRPL-DIRECT-PROOF/LIFECYCLE-TAG=CREATE">
+            </div>
+          </div>
+          <div class="buttons">
+            <button class="button primary" id="runButton" type="button">Run XRPL Proof</button>
+            <button class="button secondary" id="clearButton" type="button">Clear Results</button>
+          </div>
+          <div class="small">The sample Badge ID is safe because <strong>simulate</strong> never commits the transaction. It does not reserve the ID on XRPL.</div>
+        </section>
+
+        <section class="card" id="resultCard">
+          <h2>XRPL Result</h2>
+          <div class="status" aria-live="polite">
+            <div class="row"><div class="key">Connection</div><div class="value wait" id="connectionStatus">Not connected.</div></div>
+            <div class="row"><div class="key">Server</div><div class="value" id="serverStatus">—</div></div>
+            <div class="row"><div class="key">Engine result</div><div class="value wait" id="engineStatus">Not simulated.</div></div>
+            <div class="row"><div class="key">XRPL message</div><div class="value" id="messageStatus">—</div></div>
+            <div class="row"><div class="key">Fee</div><div class="value" id="feeStatus">—</div></div>
+            <div class="row"><div class="key">Sequence</div><div class="value" id="sequenceStatus">—</div></div>
+            <div class="row"><div class="key">Ledger</div><div class="value" id="ledgerStatus">—</div></div>
+            <div class="row"><div class="key">Serialized</div><div class="value wait" id="blobStatus">Not requested.</div></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Transaction Sent to XRPL for Simulation</h2>
+          <pre id="requestPreview"></pre>
+        </section>
+
+        <section class="card">
+          <h2>Autofilled Unsigned Transaction Returned by XRPL</h2>
+          <pre id="jsonPreview">Run the proof to populate this section.</pre>
+        </section>
+
+        <section class="card">
+          <h2>Serialized Unsigned Transaction Returned by XRPL</h2>
+          <pre id="blobPreview">Run the proof to populate this section.</pre>
+          <div class="small">This hexadecimal blob is produced by XRPL's <code>simulate</code> method using <code>binary:true</code>. It is unsigned and is not submitted.</div>
+        </section>
+
+        <section class="card">
+          <h2>Raw XRPL Responses</h2>
+          <pre id="rawPreview">Run the proof to populate this section.</pre>
+        </section>
+      </div>
+      <footer>Standalone diagnostic page — intentionally not connected to Wild Ledger navigation or signing.</footer>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = id => document.getElementById(id);
+      const server = $("server");
+      const account = $("account");
+      const memo = $("memo");
+      const runButton = $("runButton");
+      const clearButton = $("clearButton");
+      const resultCard = $("resultCard");
+      const connectionStatus = $("connectionStatus");
+      const serverStatus = $("serverStatus");
+      const engineStatus = $("engineStatus");
+      const messageStatus = $("messageStatus");
+      const feeStatus = $("feeStatus");
+      const sequenceStatus = $("sequenceStatus");
+      const ledgerStatus = $("ledgerStatus");
+      const blobStatus = $("blobStatus");
+      const requestPreview = $("requestPreview");
+      const jsonPreview = $("jsonPreview");
+      const blobPreview = $("blobPreview");
+      const rawPreview = $("rawPreview");
+
+      function textToHex(text) {
+        const bytes = new TextEncoder().encode(String(text || ""));
+        return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+      }
+
+      function buildTransaction() {
+        return {
+          TransactionType: "AccountSet",
+          Account: account.value.trim(),
+          Memos: [
+            {
+              Memo: {
+                MemoData: textToHex(memo.value.trim())
+              }
+            }
+          ]
+        };
+      }
+
+      class DirectXRPL {
+        constructor(url) {
+          this.url = url;
+          this.socket = null;
+          this.nextId = 1;
+          this.pending = new Map();
+        }
+
+        connect(timeoutMs = 12000) {
+          return new Promise((resolve, reject) => {
+            let settled = false;
+            const socket = new WebSocket(this.url);
+            this.socket = socket;
+
+            const timer = setTimeout(() => {
+              if (settled) return;
+              settled = true;
+              try { socket.close(); } catch (_) {}
+              reject(new Error("Connection timed out."));
+            }, timeoutMs);
+
+            socket.addEventListener("open", () => {
+              if (settled) return;
+              settled = true;
+              clearTimeout(timer);
+              resolve();
+            });
+
+            socket.addEventListener("message", event => {
+              let message;
+              try { message = JSON.parse(event.data); } catch (_) { return; }
+              const pending = this.pending.get(message.id);
+              if (!pending) return;
+              this.pending.delete(message.id);
+              clearTimeout(pending.timer);
+
+              if (message.status === "error" || message.error) {
+                const detail = message.error_message || message.error_exception || message.error || "XRPL request failed.";
+                const error = new Error(detail);
+                error.response = message;
+                pending.reject(error);
+              } else {
+                pending.resolve(message);
+              }
+            });
+
+            socket.addEventListener("error", () => {
+              if (!settled) {
+                settled = true;
+                clearTimeout(timer);
+                reject(new Error("WebSocket connection failed."));
+              }
+            });
+
+            socket.addEventListener("close", () => {
+              for (const [, pending] of this.pending) {
+                clearTimeout(pending.timer);
+                pending.reject(new Error("XRPL connection closed."));
+              }
+              this.pending.clear();
+            });
+          });
+        }
+
+        request(command, fields = {}, timeoutMs = 15000) {
+          if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+            return Promise.reject(new Error("XRPL WebSocket is not connected."));
+          }
+
+          const id = this.nextId++;
+          const payload = { id, command, api_version: 2, ...fields };
+
+          return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+              this.pending.delete(id);
+              reject(new Error(`${command} request timed out.`));
+            }, timeoutMs);
+
+            this.pending.set(id, { resolve, reject, timer });
+            this.socket.send(JSON.stringify(payload));
+          });
+        }
+
+        close() {
+          if (this.socket && this.socket.readyState <= WebSocket.OPEN) {
+            try { this.socket.close(); } catch (_) {}
+          }
+        }
+      }
+
+      function resetOutput() {
+        resultCard.classList.remove("pass", "fail");
+        connectionStatus.className = "value wait";
+        connectionStatus.textContent = "Not connected.";
+        serverStatus.textContent = "—";
+        engineStatus.className = "value wait";
+        engineStatus.textContent = "Not simulated.";
+        messageStatus.textContent = "—";
+        feeStatus.textContent = "—";
+        sequenceStatus.textContent = "—";
+        ledgerStatus.textContent = "—";
+        blobStatus.className = "value wait";
+        blobStatus.textContent = "Not requested.";
+        jsonPreview.textContent = "Run the proof to populate this section.";
+        blobPreview.textContent = "Run the proof to populate this section.";
+        rawPreview.textContent = "Run the proof to populate this section.";
+        requestPreview.textContent = JSON.stringify(buildTransaction(), null, 2);
+      }
+
+      function setConnection(text, tone = "wait") {
+        connectionStatus.className = `value ${tone}`;
+        connectionStatus.textContent = text;
+      }
+
+      function validateInputs() {
+        const a = account.value.trim();
+        const m = memo.value.trim();
+        if (!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(a)) throw new Error("Enter a valid classic XRPL account address.");
+        if (!m) throw new Error("Enter a lifecycle memo.");
+        if (new TextEncoder().encode(m).length > 1000) throw new Error("Memo text is too large for this proof.");
+      }
+
+      async function runProof() {
+        let client;
+        const raws = [];
+        try {
+          validateInputs();
+          resetOutput();
+          runButton.disabled = true;
+          server.disabled = true;
+          account.disabled = true;
+          memo.disabled = true;
+
+          const url = server.value;
+          serverStatus.textContent = url;
+          setConnection("Connecting directly to XRPL…", "wait");
+          client = new DirectXRPL(url);
+          await client.connect();
+          setConnection("Connected.", "good");
+
+          const serverInfo = await client.request("server_info");
+          raws.push({ step: "server_info", response: serverInfo });
+
+          const tx = buildTransaction();
+          requestPreview.textContent = JSON.stringify(tx, null, 2);
+          engineStatus.className = "value wait";
+          engineStatus.textContent = "XRPL is simulating…";
+
+          const jsonResponse = await client.request("simulate", { tx_json: tx, binary: false });
+          raws.push({ step: "simulate_json", response: jsonResponse });
+
+          const result = jsonResponse.result || {};
+          const filled = result.tx_json || {};
+          const engine = result.engine_result || result.meta?.TransactionResult || "UNKNOWN";
+          const message = result.engine_result_message || "—";
+
+          engineStatus.textContent = engine;
+          engineStatus.className = engine === "tesSUCCESS" ? "value good" : "value bad";
+          messageStatus.textContent = message;
+          feeStatus.textContent = filled.Fee ?? "—";
+          sequenceStatus.textContent = filled.Sequence ?? "—";
+          ledgerStatus.textContent = result.ledger_index ?? jsonResponse.result?.ledger_current_index ?? "—";
+          jsonPreview.textContent = JSON.stringify(filled, null, 2);
+
+          if (engine !== "tesSUCCESS") {
+            resultCard.classList.add("fail");
+            blobStatus.className = "value bad";
+            blobStatus.textContent = "Skipped because JSON simulation did not return tesSUCCESS.";
+            throw Object.assign(new Error(`XRPL simulation returned ${engine}: ${message}`), { alreadyShown: true });
+          }
+
+          resultCard.classList.add("pass");
+          blobStatus.className = "value wait";
+          blobStatus.textContent = "XRPL is serializing the same unsigned transaction…";
+
+          const binaryResponse = await client.request("simulate", { tx_json: filled, binary: true });
+          raws.push({ step: "simulate_binary", response: binaryResponse });
+          const blob = binaryResponse.result?.tx_blob || "";
+
+          if (!blob) {
+            blobStatus.className = "value bad";
+            blobStatus.textContent = "XRPL returned no tx_blob.";
+            blobPreview.textContent = "No serialized blob returned.";
+          } else {
+            blobStatus.className = "value good";
+            blobStatus.textContent = `${blob.length} hexadecimal characters returned.`;
+            blobPreview.textContent = blob;
+          }
+
+          rawPreview.textContent = JSON.stringify(raws, null, 2);
+        } catch (error) {
+          resultCard.classList.add("fail");
+          if (!error.alreadyShown) {
+            if (connectionStatus.textContent.includes("Connecting")) setConnection(error.message, "bad");
+            else {
+              engineStatus.className = "value bad";
+              engineStatus.textContent = "ERROR";
+              messageStatus.textContent = error.message || String(error);
+            }
+          }
+          if (error.response) raws.push({ step: "error", response: error.response });
+          rawPreview.textContent = JSON.stringify(raws.length ? raws : { error: error.message || String(error) }, null, 2);
+        } finally {
+          if (client) client.close();
+          runButton.disabled = false;
+          server.disabled = false;
+          account.disabled = false;
+          memo.disabled = false;
+        }
+      }
+
+      runButton.addEventListener("click", runProof);
+      clearButton.addEventListener("click", resetOutput);
+      account.addEventListener("input", () => requestPreview.textContent = JSON.stringify(buildTransaction(), null, 2));
+      memo.addEventListener("input", () => requestPreview.textContent = JSON.stringify(buildTransaction(), null, 2));
+      server.addEventListener("change", () => { serverStatus.textContent = server.value; });
+
+      resetOutput();
+    })();
+  </script>
+</body>
+</html>
