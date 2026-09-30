@@ -1109,6 +1109,47 @@
       }
     }
 
+
+    .group-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .create-badge-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid rgba(121,213,194,.36);
+      border-radius: 999px;
+      background: rgba(121,213,194,.10);
+      color: #e5fff8;
+      text-decoration: none;
+      font-size: .70rem;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: .035em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .create-badge-link:hover,
+    .create-badge-link:focus-visible {
+      border-color: rgba(121,213,194,.60);
+      background: rgba(121,213,194,.17);
+      outline: none;
+    }
+
+    @media (max-width: 520px) {
+      .group-head { align-items: flex-start; }
+      .group-actions { gap: 8px; }
+      .create-badge-link { min-height: 34px; padding: 0 10px; font-size: .66rem; }
+    }
+
 </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
@@ -1140,7 +1181,10 @@
         <div class="group">
           <div class="group-head">
             <h2>Badges in Use</h2>
-            <span id="badgeCount" class="group-count"></span>
+            <div class="group-actions">
+              <span id="badgeCount" class="group-count"></span>
+              <a class="create-badge-link" id="createBadgeLink" href="createBadge.html">+ Create Badge</a>
+            </div>
           </div>
           <div id="BADGE"></div>
         </div>
@@ -1184,6 +1228,8 @@
       const AUTHORIZED_DISTRIBUTORS = ["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"];
       const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
       const params = new URLSearchParams(window.location.search);
+      const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+      const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
       const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
       const defaultCommunity = Object.values(registry)[0] || null;
       const defaultBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(defaultCommunity) || "";
@@ -1193,6 +1239,10 @@
       const communityName = community?.communityName || "Community";
       const viewCommunityTitle = document.getElementById("view-community-title");
       if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
+      const createBadgeLink = document.getElementById("createBadgeLink");
+      if (createBadgeLink) {
+        createBadgeLink.href = `createBadge.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
+      }
       document.title = `${communityName} | Community Recognition`;
       const NAMESPACE = community?.leapNamespace || `${requestedCommunity}-LEAP`;
       const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
@@ -1871,10 +1921,16 @@
   </script>
 
   <script>
-    const viewCommunityBack = document.getElementById("viewCommunityBack");
-    if (viewCommunityBack) {
-      viewCommunityBack.href = `viewCommunity.html${window.location.search}`;
-    }
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const community = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
+      const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+      const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+      const viewCommunityBack = document.getElementById("viewCommunityBack");
+      if (viewCommunityBack) {
+        viewCommunityBack.href = `viewCommunity.html?community=${encodeURIComponent(community)}&role=${encodeURIComponent(role)}`;
+      }
+    })();
   </script>
 
 </body>
