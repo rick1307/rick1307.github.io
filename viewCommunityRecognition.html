@@ -191,7 +191,7 @@
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      align-items: baseline;
+      align-items: center;
       padding-bottom: 8px;
       border-bottom: 1px solid #24384b;
       margin-bottom: 8px;
@@ -1110,14 +1110,6 @@
     }
 
 
-    .group-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
     .create-badge-link {
       display: inline-flex;
       align-items: center;
@@ -1145,8 +1137,7 @@
     }
 
     @media (max-width: 520px) {
-      .group-head { align-items: flex-start; }
-      .group-actions { gap: 8px; }
+      .group-head { align-items: center; }
       .create-badge-link { min-height: 34px; padding: 0 10px; font-size: .66rem; }
     }
 
@@ -1181,10 +1172,7 @@
         <div class="group">
           <div class="group-head">
             <h2>Badges in Use</h2>
-            <div class="group-actions">
-              <span id="badgeCount" class="group-count"></span>
-              <a class="create-badge-link" id="createBadgeLink" href="createBadge.html">+ Create Badge</a>
-            </div>
+            <a class="create-badge-link" id="createBadgeLink" href="createBadge.html">+ Create Badge</a>
           </div>
           <div id="BADGE"></div>
         </div>
@@ -1775,8 +1763,6 @@
         document.getElementById("eventTotal").textContent = counts.EVENT;
         document.getElementById("challengeTotal").textContent = counts.CHALLENGE;
 
-        document.getElementById("badgeCount").textContent =
-          `${counts.BADGE} unique`;
         document.getElementById("challengeCount").textContent =
           `${counts.CHALLENGE} unique`;
 
