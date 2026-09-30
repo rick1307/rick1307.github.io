@@ -186,7 +186,7 @@
     const submitCard = $("submitCard");
 
     const runtimeConfig = window.WILD_LEDGER_CONFIG || {};
-    const DEFAULT_PROJECT_ID = runtimeConfig.walletConnectProjectId || "";
+    const DEFAULT_PROJECT_ID = runtimeConfig.walletConnectProjectId || projectId.value.trim();
     const FEE_CUSHION = Number(runtimeConfig.xrplFeeCushion || DEFAULT_FEE_CUSHION);
     projectId.value = DEFAULT_PROJECT_ID;
 
