@@ -1,24 +1,17 @@
 /*
-  Wild Ledger Community Registry.
-
-  Every community is defined once here. Public-facing pages use the same
-  registry as the Owner / Community Operator backend. The ?community= value
-  selects the active public community when this script is loaded normally.
-
-  Backend pages may load this script with data-registry-only="true" to use the
-  registry and resolver helpers without changing the active public community.
+  Wild Ledger community configuration.
+  One index.html; the ?community= value selects the community.
 */
 (() => {
   const communities = {
     sfl: {
       id: "sfl",
       backendId: "SFL",
-      aliases: ["sailing-frogs-leap"],
+      aliases: ["SFL", "sfl", "sailing-frogs-leap"],
       operatingWallet: "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q",
       directoryStatus: "Current Community",
       directoryTone: "current",
       directoryDescription: "The current working community and first live Wild Ledger implementation.",
-      defaultPublic: true,
       layout: "classic",
       communityName: "Sailing Frog's Leap",
       leapNamespace: "SFL-LEAP",
@@ -106,7 +99,7 @@
     zach: {
       id: "zach",
       backendId: "ZHR",
-      aliases: ["zhr", "zachs-hot-rods"],
+      aliases: ["ZHR", "zhr", "zach", "zachs-hot-rods"],
       operatingWallet: null,
       directoryStatus: "Reference Community",
       directoryTone: "reference",
@@ -171,77 +164,68 @@
     }
   };
 
-  const aliasToId = new Map();
+  // Shared Community Registry helpers. Backend and public pages resolve the same records.
+  const normalizeCommunityKey = value => String(value ?? "").trim().toLowerCase();
+  const aliases = new Map();
 
-  Object.values(communities).forEach((community) => {
-    const aliases = [
+  Object.values(communities).forEach(community => {
+    const keys = [
       community.id,
       community.backendId,
+      community.leapNamespace,
       ...(Array.isArray(community.aliases) ? community.aliases : [])
     ];
-
-    aliases.forEach((value) => {
-      const key = String(value || "").trim().toLowerCase();
-      if (key) aliasToId.set(key, community.id);
-    });
+    keys.filter(Boolean).forEach(key => aliases.set(normalizeCommunityKey(key), community.id));
   });
 
   function resolveCommunityId(value) {
-    const key = String(value || "").trim().toLowerCase();
-    return aliasToId.get(key) || "";
+    return aliases.get(normalizeCommunityKey(value)) || "";
   }
 
   function getCommunity(value) {
-    const id = resolveCommunityId(value);
-    return id ? communities[id] : null;
+    const id = typeof value === "object" && value ? value.id : resolveCommunityId(value);
+    return communities[id] || null;
   }
 
-  function getBackendCommunityId(value) {
-    const community = typeof value === "object" && value
-      ? value
-      : getCommunity(value);
-    return community?.backendId || community?.id?.toUpperCase?.() || "";
+  function backendCommunityId(value) {
+    const community = typeof value === "object" && value ? value : getCommunity(value);
+    return community?.backendId || String(community?.id || value || "").trim().toUpperCase();
   }
 
-  // The registry is the one shared source of community truth.
   window.WILD_LEDGER_COMMUNITY_REGISTRY = communities;
-  window.WILD_LEDGER_COMMUNITIES = communities; // Backward-compatible name used by setup.html.
+  window.WILD_LEDGER_COMMUNITIES = communities;
   window.WILD_LEDGER_RESOLVE_COMMUNITY_ID = resolveCommunityId;
   window.WILD_LEDGER_GET_COMMUNITY = getCommunity;
-  window.WILD_LEDGER_BACKEND_COMMUNITY_ID = getBackendCommunityId;
-
-  const registryOnly = document.currentScript?.dataset?.registryOnly === "true";
-  if (registryOnly) return;
+  window.WILD_LEDGER_BACKEND_COMMUNITY_ID = backendCommunityId;
 
   const ACTIVE_COMMUNITY_KEY = "wildLedger.activeCommunity";
   const params = new URLSearchParams(window.location.search);
-  const requestedFromUrl = resolveCommunityId(params.get("community"));
+  const requestedFromUrl = (params.get("community") || "").toLowerCase();
 
   let requestedFromReferrer = "";
   try {
     if (document.referrer) {
       const referrerUrl = new URL(document.referrer);
       if (referrerUrl.origin === window.location.origin) {
-        requestedFromReferrer = resolveCommunityId(referrerUrl.searchParams.get("community"));
+        requestedFromReferrer =
+          (referrerUrl.searchParams.get("community") || "").toLowerCase();
       }
     }
   } catch (_) {}
 
   let rememberedCommunity = "";
   try {
-    rememberedCommunity = resolveCommunityId(sessionStorage.getItem(ACTIVE_COMMUNITY_KEY));
+    rememberedCommunity =
+      (sessionStorage.getItem(ACTIVE_COMMUNITY_KEY) || "").toLowerCase();
   } catch (_) {}
 
-  const defaultCommunityId =
-    Object.values(communities).find((community) => community.defaultPublic)?.id ||
-    Object.keys(communities)[0] ||
-    "";
+  const requestedId =
+    resolveCommunityId(requestedFromUrl) ||
+    resolveCommunityId(requestedFromReferrer) ||
+    resolveCommunityId(rememberedCommunity) ||
+    "sfl";
 
-  const communityId =
-    requestedFromUrl ||
-    requestedFromReferrer ||
-    rememberedCommunity ||
-    defaultCommunityId;
+  const communityId = requestedId;
 
   try {
     sessionStorage.setItem(ACTIVE_COMMUNITY_KEY, communityId);
