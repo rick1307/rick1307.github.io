@@ -1216,6 +1216,7 @@
         <div class="group">
           <div class="group-head">
             <h2>Past Challenges</h2>
+            <a class="create-badge-link" id="createChallengeLink" href="createChallenge.html">+ Create Challenge</a>
           </div>
           <div id="CHALLENGE"></div>
         </div>
@@ -1225,6 +1226,7 @@
         <div class="group">
           <div class="group-head">
             <h2>Past Events</h2>
+            <a class="create-badge-link" id="createEventLink" href="createEvent.html">+ Create Event</a>
           </div>
           <div id="EVENT"></div>
         </div>
@@ -1260,8 +1262,16 @@
       const viewCommunityTitle = document.getElementById("view-community-title");
       if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
       const createBadgeLink = document.getElementById("createBadgeLink");
+      const createChallengeLink = document.getElementById("createChallengeLink");
+      const createEventLink = document.getElementById("createEventLink");
       if (createBadgeLink) {
         createBadgeLink.href = `createBadge.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
+      }
+      if (createChallengeLink) {
+        createChallengeLink.href = `createChallenge.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
+      }
+      if (createEventLink) {
+        createEventLink.href = `createEvent.html?community=${encodeURIComponent(requestedCommunity)}&role=${encodeURIComponent(role)}`;
       }
       document.title = `${communityName} | Community Recognition`;
       const NAMESPACE = community?.leapNamespace || `${requestedCommunity}-LEAP`;
