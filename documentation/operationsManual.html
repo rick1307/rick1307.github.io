@@ -189,11 +189,45 @@
           <div class="contents-note">This manual will grow as Wild Ledger operations are formalized.</div>
         </div>
         <div class="contents-list" id="contentsList">
+          <a class="toc-link" href="#ledger-authority" data-audience="shared">
+            <span>Ledger as Authority</span>
+            <small>Owner + Operator</small>
+          </a>
           <a class="toc-link" href="#replenishment" data-audience="shared">
             <span>Replenishment Strategy</span>
             <small>Owner + Operator</small>
           </a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="manual-section" id="ledger-authority" data-audience="shared">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">Foundational Doctrine</span>
+          <h2>Ledger as Authority</h2>
+          <p class="section-summary">Wild Ledger reads and explains canonical state. It does not independently keep canonical state.</p>
+        </div>
+        <div class="audience-pill">Owner + Operator</div>
+      </div>
+
+      <div class="rule">Canonical state exists only on XRPL. Wild Ledger is an interpreter of canonical state, never its keeper.</div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">Operating Principle</span>
+        <h3>If the website disappeared, the ledger must still contain the facts</h3>
+        <p>Every fact that matters to authoritative Wild Ledger state must be recoverable from validated XRPL history. Wild Ledger may turn those ledger facts into friendly names, statuses, lists, icons, groupings, and workflows, but the screen is an interpretation of the ledger — not a second source of truth.</p>
+        <div class="checklist">
+          <ul>
+            <li><strong>XRPL holds the canonical facts.</strong> Membership, recognition, lifecycle state, provenance, and other durable protocol facts must be reconstructible from ledger history.</li>
+            <li><strong>Wild Ledger interprets those facts.</strong> Labels such as Available, Active, Retired, Closed, Completed, or Ignored are human-readable interpretations of canonical ledger records.</li>
+            <li><strong>Convenience storage is not authority.</strong> Browser storage, caches, configuration files, and temporary drafts may improve the experience, but they must never become the only place an authoritative fact exists.</li>
+            <li><strong>Use the loss test.</strong> If losing the website would also lose the fact, the fact has not yet been stored where Wild Ledger requires it to be stored.</li>
+          </ul>
+        </div>
+        <div class="lesson"><strong>Practical standard</strong><p>A clean Wild Ledger client should be able to rebuild authoritative community state from XRPL and the LEAP Protocol without consulting a conventional application database.</p></div>
       </div>
     </div>
   </section>

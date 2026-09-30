@@ -260,7 +260,7 @@
       and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
     </p>
 <div class="meta">
-<span class="pill">Working Draft 0.11</span>
+<span class="pill">Working Draft 0.12</span>
 <span class="pill">XRPL Mainnet</span>
 <span class="pill">Internal / Unlinked</span>
 <span class="pill">Last revised: 2026-09-30</span>
@@ -299,8 +299,8 @@
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            This document is the operating source of truth for LEAP. Public-facing pages may simplify these rules,
-            but they should not silently invent different ones.
+            This document is the operating source of truth for how LEAP canonical ledger facts are interpreted.
+            Public-facing pages may simplify these rules, but they should not silently invent different ones.
           </div>
 </div>
 <p>
@@ -325,9 +325,17 @@
 <span class="mini">Only the approved XRPL authority for a transaction type can create official LEAP protocol facts.</span>
 </div>
 </div>
+<div class="rule">
+<div class="tag">Canonical State Principle</div>
+<div>
+            <strong>Canonical state exists only on XRPL. Wild Ledger is an interpreter of canonical state, never its keeper.</strong>
+            Any fact required to reconstruct authoritative Wild Ledger state <strong>MUST</strong> be recoverable from validated XRPL ledger history.
+            Off-ledger storage, browser storage, configuration files, caches, or presentation logic <strong>MUST NOT</strong> constitute authoritative protocol state.
+          </div>
+</div>
 <h3>Operating rules</h3>
 <ul>
-<li>Use validated XRPL data for decisions that affect membership, rank, or recognition.</li>
+<li>Use validated XRPL data for every canonical fact and for decisions that affect membership, rank, recognition, or protocol state.</li>
 <li>Never treat a memo by itself as proof of official LEAP recognition.</li>
 <li>Always verify LEAP currency identity and issuer identity together.</li>
 <li>Never use a display label as the canonical machine identifier.</li>
@@ -1051,6 +1059,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Member Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
 <tr><td>0.10</td><td>2026-09-30</td><td>Added XRPL-native cradle-to-grave recognition lifecycle markers using validated no-op <code>AccountSet</code> transactions from the authorized Community Operating Wallet. Clarified that RECOGNITION spans multiple XRPL transaction types: <code>CheckCreate</code> records member recognition issuance, while no-op <code>AccountSet</code> records recognition-object lifecycle state.</td></tr>
 <tr><td>0.11</td><td>2026-09-30</td><td>Made recognition lifecycle memos self-identifying by placing the recognition type and canonical ID directly in the lifecycle path: <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>. Added terminal <code>IGNORE</code> alongside <code>CREATE</code> and <code>END</code>; defined type-specific <code>END</code> semantics for Badges, Challenges, and Events; prohibited recognition-ID recycling including ignored IDs; required creation-time validation against full XRPL-derived history; and required ignored IDs to remain annotated in owner/operator ledger views while being excluded from normal recognition lists.</td></tr>
+<tr><td>0.12</td><td>2026-09-30</td><td>Codified the Canonical State Principle: canonical Wild Ledger state exists only on XRPL, while Wild Ledger and its screens interpret that state. Required every authoritative fact needed to reconstruct Wild Ledger state to be recoverable from validated XRPL ledger history, and prohibited off-ledger storage, browser storage, configuration files, caches, or presentation logic from becoming authoritative protocol state.</td></tr>
 </table>
 </section>
 <section id="open">
