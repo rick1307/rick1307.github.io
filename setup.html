@@ -182,10 +182,43 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
   }
 
+  .access-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
   .access-card {
     position: relative;
+    overflow: hidden;
     padding: 22px;
-    margin-bottom: 22px;
+    min-height: 188px;
+  }
+
+  .access-card.active-context {
+    border-color: rgba(121,213,194,.30);
+    background:
+      linear-gradient(145deg, rgba(121,213,194,.08), rgba(255,255,255,.012)),
+      rgba(5,34,46,.48);
+  }
+
+  .access-label {
+    margin-bottom: 10px;
+    color: var(--sea-glass);
+    font-size: .66rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .access-community-name {
+    margin: 4px 0 10px;
+    color: var(--ink);
+    font-size: 1.32rem;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -.025em;
   }
 
   .access-card::after,
@@ -568,27 +601,9 @@
           <div class="top-navigation"></div>
         </nav>
         <h1 id="workspaceTitle">Community Setup</h1>
-        <div class="section-kicker" id="workspaceEyebrow">New Community</div>
-        <p class="hero-copy" id="workspaceCopy">Build the identity and experience for a Wild Ledger community. This first version edits every value currently used by the shared community system, keeps a browser draft, and produces a clean configuration for review.</p>
       </header>
 
       <div class="console-body">
-        <div class="access-card">
-        <h2 id="accessTitle">Choose a community</h2>
-        <p id="accessCopy">Select an existing community or start a new draft.</p>
-        <div id="communityAccessControls">
-          <div class="field">
-            <label for="communityPicker">Community</label>
-            <select id="communityPicker"></select>
-          </div>
-          <div class="button-row">
-            <button class="secondary-button" id="newCommunityButton" type="button">New community</button>
-          </div>
-        </div>
-        <div class="status" id="draftStatus" aria-live="polite"></div>
-        <div class="permission-summary" id="permissionSummary"></div>
-        </div>
-
         <div class="layout">
       <form class="form-column" id="setupForm" autocomplete="off">
         <section class="section-card" id="identitySection">
@@ -754,6 +769,7 @@
             <button class="secondary-button" id="downloadConfigButton" type="button">Download JSON</button>
             <button class="danger-button" id="clearDraftButton" type="button">Clear saved draft</button>
           </div>
+          <div class="status" id="draftStatus" aria-live="polite"></div>
           <div class="notice" id="publishNotice"><strong>Not publishing yet:</strong> this step defines the Owner / Operator editing boundary only. Real authorization and server-side writes come later.</div>
         </section>
       </form>
@@ -783,7 +799,6 @@
   <script>
     (() => {
       const communities = window.WILD_LEDGER_COMMUNITIES || {};
-      const picker = document.getElementById("communityPicker");
       const form = document.getElementById("setupForm");
       const status = document.getElementById("draftStatus");
       const output = document.getElementById("configOutput");
@@ -791,16 +806,8 @@
       const badgesEditor = document.getElementById("badgesEditor");
       const colorEditor = document.getElementById("colorEditor");
       const advancedThemeEditor = document.getElementById("advancedThemeEditor");
-      const workspaceLabel = document.getElementById("workspaceLabel");
-      const workspaceEyebrow = document.getElementById("workspaceEyebrow");
       const workspaceTitle = document.getElementById("workspaceTitle");
-      const workspaceCopy = document.getElementById("workspaceCopy");
-      const accessTitle = document.getElementById("accessTitle");
-      const accessCopy = document.getElementById("accessCopy");
-      const communityAccessControls = document.getElementById("communityAccessControls");
       const setupBackLink = document.getElementById("setupBackLink");
-      const newCommunityButton = document.getElementById("newCommunityButton");
-      const permissionSummary = document.getElementById("permissionSummary");
       const identityPermissionTag = document.getElementById("identityPermissionTag");
       const idInput = document.getElementById("id");
       const leapNamespaceInput = document.getElementById("leapNamespace");
@@ -909,20 +916,6 @@
       let currentSourceId = "new";
 
       const deepCopy = value => JSON.parse(JSON.stringify(value));
-
-      function populatePicker() {
-        picker.innerHTML = "";
-        Object.values(communities).forEach((community) => {
-          const option = document.createElement("option");
-          option.value = community.id;
-          option.textContent = community.communityName;
-          picker.appendChild(option);
-        });
-        const newOption = document.createElement("option");
-        newOption.value = "__new__";
-        newOption.textContent = "+ New community draft";
-        picker.appendChild(newOption);
-      }
 
       function draftKey(id) {
         return `wildLedger.operatorDraft.${id || "new"}`;
@@ -1181,15 +1174,6 @@
             : "<strong>Not publishing yet:</strong> 2B defines the Owner / Operator editing boundary. Real authorization and server-side writes come later.";
         }
 
-        if (permissionSummary) {
-          if (ownerCreating) {
-            permissionSummary.textContent = "Owner creation mode: define permanent community identity and the community experience.";
-          } else if (role === "operator") {
-            permissionSummary.textContent = "Operator edit mode: community experience is editable; permanent system identity stays locked.";
-          } else {
-            permissionSummary.textContent = "Owner edit mode: community experience is editable; permanent identity stays locked after creation.";
-          }
-        }
       }
 
       function applyWorkspacePresentation() {
@@ -1198,37 +1182,16 @@
           ? communities[configId].communityName
           : (current.communityName || "Community");
 
-        if (workspaceLabel) workspaceLabel.textContent = role === "operator" ? "Community Operator" : "Wild Ledger Owner";
+        document.title = "Community Setup — Wild Ledger";
+        if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
 
         if (mode === "new") {
-          document.title = "New Community | Wild Ledger";
-          if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
-          if (workspaceEyebrow) workspaceEyebrow.textContent = "New Community";
-          if (workspaceCopy) workspaceCopy.textContent = "Create a new Wild Ledger community. Permanent identity is set here first; community experience settings can be changed later.";
-          if (accessTitle) accessTitle.textContent = "New Community";
-          if (accessCopy) accessCopy.textContent = "Define the new community, shape its experience, and save a browser draft. Nothing publishes yet.";
-          if (communityAccessControls) communityAccessControls.hidden = true;
           if (setupBackLink) {
             setupBackLink.textContent = "← Communities";
             setupBackLink.href = "communities.html";
           }
           applyFieldPermissions();
           return;
-        }
-
-        document.title = `${communityName} | Community Settings`;
-        if (workspaceTitle) workspaceTitle.textContent = communityName;
-        if (workspaceEyebrow) workspaceEyebrow.textContent = "Community Settings";
-        if (workspaceCopy) workspaceCopy.textContent = `Edit the community experience for ${communityName}. Permanent system identity stays locked after creation.`;
-
-        if (role === "operator") {
-          if (accessTitle) accessTitle.textContent = communityName;
-          if (accessCopy) accessCopy.textContent = "You are editing your assigned community. Community creation and the global community picker are Owner controls.";
-          if (communityAccessControls) communityAccessControls.hidden = true;
-        } else {
-          if (accessTitle) accessTitle.textContent = "Choose a community";
-          if (accessCopy) accessCopy.textContent = "Select an existing community to edit, or start a new community setup.";
-          if (communityAccessControls) communityAccessControls.hidden = false;
         }
 
         if (setupBackLink && configId) {
@@ -1256,12 +1219,6 @@
       });
 
       form.addEventListener("change", updateOutputAndPreview);
-
-      picker.addEventListener("change", () => loadCommunity(picker.value));
-
-      newCommunityButton.addEventListener("click", () => {
-        window.location.href = "setup.html?mode=new&role=owner";
-      });
 
       document.getElementById("addBadgeButton").addEventListener("click", () => {
         syncFromForm();
@@ -1316,8 +1273,6 @@
         status.className = "status";
       });
 
-      populatePicker();
-
       const requestedCommunity =
         params.get("community") ||
         sessionStorage.getItem("wildLedgerCommunity") ||
@@ -1328,7 +1283,6 @@
         ? "__new__"
         : (resolvedRequestedId || Object.keys(communities)[0] || "__new__");
 
-      picker.value = initialId;
       loadCommunity(initialId);
     })();
   </script>
