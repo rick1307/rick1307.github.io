@@ -232,18 +232,18 @@
 
       <div class="lesson-block">
         <span class="lesson-kicker">Authority Operations</span>
-        <h3>Changing the Community Operating Account</h3>
-        <p>The community is not permanently tied to one XRPL account. When an operator needs to move to a different account, Wild Ledger uses a signed on-ledger handoff instead of editing a stored wallet address.</p>
+        <h3>Changing the Community Operating Wallet</h3>
+        <p>Protocol 0.13 treats the Community Operating Wallet as a single canonical state value on XRPL. Wild Ledger resolves the latest valid <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;VALUE&gt;</code> statement instead of maintaining a separate rotation record.</p>
         <div class="checklist">
           <ul>
-            <li><strong>Start from Community Setup → Manage operating account.</strong> Wild Ledger first reconstructs the current authority from XRPL.</li>
-            <li><strong>The current account authorizes the successor.</strong> Wild Ledger prepares the exact authority transaction, the connected wallet signs only, and Wild Ledger submits it directly to XRPL.</li>
-            <li><strong>The new account accepts.</strong> Connect a signer controlling the successor account and publish the matching acceptance transaction.</li>
-            <li><strong>Authority moves only after both records validate.</strong> Until then, the predecessor remains the current Community Operating Account.</li>
-            <li><strong>Changing wallet apps is not an authority change.</strong> Bifrost, Xaman, Tangem, or another compatible signer may control the same XRPL account without changing community authority.</li>
+            <li><strong>Bootstrap once.</strong> If the community has no canonical <code>OPERATING-WALLET</code> statement yet, the LEAP Issuer publishes the first value.</li>
+            <li><strong>Routine rotation is self-service.</strong> After bootstrap, the currently authorized Community Operating Wallet may publish a new value directly. No Wild Ledger approval and no successor acceptance are required.</li>
+            <li><strong>Latest valid value wins.</strong> The new value becomes authoritative from that validated transaction forward in canonical XRPL transaction order.</li>
+            <li><strong>The ledger is the history.</strong> Wild Ledger derives historical authority from the sequence of validated state statements; there is no separate BEGIN/END, old-wallet/new-wallet, or rotation-history database.</li>
+            <li><strong>Changing signer apps is not an authority change.</strong> Bifrost, Xaman, Tangem, or another compatible signer may control the same XRPL account without changing community authority.</li>
           </ul>
         </div>
-        <div class="lesson"><strong>Do not edit around the ledger</strong><p>Never change a config value just to make a different wallet look current. The succession record is the durable fact; the website must rediscover it from XRPL.</p></div>
+        <div class="lesson"><strong>Do not edit around the ledger</strong><p>Configuration may retain a pre-0.13 value for compatibility or bootstrap convenience, but after bootstrap it is not canonical authority. Protocol 0.13 does not yet define emergency recovery for a lost or compromised current Operating Wallet.</p></div>
       </div>
     </div>
   </section>
