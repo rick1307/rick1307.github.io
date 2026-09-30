@@ -8,7 +8,8 @@
       id: "sfl",
       backendId: "SFL",
       aliases: ["SFL", "sfl", "sailing-frogs-leap"],
-      operatingWallet: "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q",
+      // Immutable protocol trust anchor. Current authority is resolved from XRPL succession history.
+      authorityRootAccount: "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q",
       directoryStatus: "Current Community",
       directoryTone: "current",
       directoryDescription: "The current working community and first live Wild Ledger implementation.",
@@ -100,7 +101,7 @@
       id: "zach",
       backendId: "ZHR",
       aliases: ["ZHR", "zhr", "zach", "zachs-hot-rods"],
-      operatingWallet: null,
+      authorityRootAccount: null,
       directoryStatus: "Reference Community",
       directoryTone: "reference",
       directoryDescription: "A reference community used to prove that Wild Ledger's shared machinery is not tied to Sailing Frog's Leap.",
