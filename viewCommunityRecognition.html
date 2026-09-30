@@ -1175,6 +1175,53 @@
       align-self: center;
     }
 
+    .recognition-subnav {
+      display: inline-grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin: 2px 0 14px;
+      padding: 4px;
+      border: 1px solid rgba(222,184,157,.16);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .recognition-subnav button {
+      min-width: 96px;
+      min-height: 34px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--dark-muted);
+      padding: 0 14px;
+      font: inherit;
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .recognition-subnav button[aria-pressed="true"] {
+      border-color: rgba(121,213,194,.42);
+      background: rgba(121,213,194,.12);
+      color: #e5fff8;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+    }
+
+    .recognition-subnav button:hover,
+    .recognition-subnav button:focus-visible {
+      border-color: rgba(121,213,194,.42);
+      outline: none;
+    }
+
+    .recognition-subview[hidden] { display: none; }
+
+    @media (max-width: 520px) {
+      .recognition-subnav { width: 100%; }
+      .recognition-subnav button { min-width: 0; width: 100%; padding: 0 10px; }
+    }
+
 </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
@@ -1205,39 +1252,65 @@
       <div id="badgesView" class="history-view">
         <div class="group">
           <div class="group-head">
-            <h2>Badges in Use</h2>
+            <h2>Badges for Use</h2>
             <a class="create-badge-link" id="createBadgeLink" href="createBadge.html">+ Create Badge</a>
           </div>
-          <div id="BADGE"></div>
+          <div class="recognition-subnav" aria-label="Badge views">
+            <button id="badgesAvailableButton" type="button" aria-pressed="true">Available</button>
+            <button id="badgesHistoryButton" type="button" aria-pressed="false">History</button>
+          </div>
+          <div id="badgesAvailablePanel" class="recognition-subview">
+            <div id="BADGE"></div>
+          </div>
+          <div id="badgesHistoryPanel" class="recognition-subview" hidden>
+            <div id="BADGE_HISTORY"></div>
+          </div>
         </div>
       </div>
 
       <div id="challengesView" class="history-view" hidden>
         <div class="group">
           <div class="group-head">
-            <h2>Past Challenges</h2>
+            <h2>Challenges</h2>
             <a class="create-badge-link" id="createChallengeLink" href="createChallenge.html">+ Create Challenge</a>
           </div>
-          <div id="CHALLENGE"></div>
+          <div class="recognition-subnav" aria-label="Challenge views">
+            <button id="challengesActiveButton" type="button" aria-pressed="true">Active</button>
+            <button id="challengesHistoryButton" type="button" aria-pressed="false">History</button>
+          </div>
+          <div id="challengesActivePanel" class="recognition-subview">
+            <div id="CHALLENGE"></div>
+          </div>
+          <div id="challengesHistoryPanel" class="recognition-subview" hidden>
+            <div id="CHALLENGE_HISTORY"></div>
+          </div>
         </div>
       </div>
 
       <div id="eventsView" class="history-view" hidden>
         <div class="group">
           <div class="group-head">
-            <h2>Past Events</h2>
+            <h2>Events</h2>
             <a class="create-badge-link" id="createEventLink" href="createEvent.html">+ Create Event</a>
           </div>
-          <div id="EVENT"></div>
+          <div class="recognition-subnav" aria-label="Event views">
+            <button id="eventsActiveButton" type="button" aria-pressed="true">Active</button>
+            <button id="eventsHistoryButton" type="button" aria-pressed="false">History</button>
+          </div>
+          <div id="eventsActivePanel" class="recognition-subview">
+            <div id="EVENT_ACTIVE"></div>
+          </div>
+          <div id="eventsHistoryPanel" class="recognition-subview" hidden>
+            <div id="EVENT"></div>
+          </div>
         </div>
       </div>
     </section>
 
 
     <p class="footnote">
-      This page scans validated XRPL transaction history for the authorized LEAP distributor and extracts recognized
-      community LEAP public memo records. Badges in Use is the unique badge-name registry. Past Challenges is the serialized
-      challenge registry. Past Events is the dated event record.
+      Available and Active show recognition that can be used now. History keeps the recognition record that has already
+      been written to the ledger.
     </p>
   </main>
 
@@ -1302,6 +1375,28 @@
       const badgesViewButton = document.getElementById("badgesViewButton");
       const challengesViewButton = document.getElementById("challengesViewButton");
       const eventsViewButton = document.getElementById("eventsViewButton");
+
+      const recognitionMode = { badges: "available", challenges: "active", events: "active" };
+      const subviews = {
+        badges: {
+          available: document.getElementById("badgesAvailablePanel"),
+          history: document.getElementById("badgesHistoryPanel"),
+          availableButton: document.getElementById("badgesAvailableButton"),
+          historyButton: document.getElementById("badgesHistoryButton")
+        },
+        challenges: {
+          active: document.getElementById("challengesActivePanel"),
+          history: document.getElementById("challengesHistoryPanel"),
+          activeButton: document.getElementById("challengesActiveButton"),
+          historyButton: document.getElementById("challengesHistoryButton")
+        },
+        events: {
+          active: document.getElementById("eventsActivePanel"),
+          history: document.getElementById("eventsHistoryPanel"),
+          activeButton: document.getElementById("eventsActiveButton"),
+          historyButton: document.getElementById("eventsHistoryButton")
+        }
+      };
 
       function rippleTimeToIso(seconds) {
         if (typeof seconds !== "number") return null;
@@ -1743,6 +1838,75 @@
         }
       }
 
+      function renderRecognitionHistory(key, targetId) {
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        target.replaceChildren();
+
+        const occurrences = [];
+        for (const entry of historyEntries) {
+          const matchingFacts = entry.facts.filter(fact => fact.key === key);
+          if (!matchingFacts.length) continue;
+          occurrences.push({ time: entry.time, facts: matchingFacts, entry });
+        }
+        occurrences.sort(sortNewestFirst);
+
+        if (!occurrences.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "No history found on the ledger yet.";
+          target.appendChild(empty);
+          return;
+        }
+
+        for (const occurrence of occurrences) {
+          const resolution = resolutionForEntry(occurrence.entry);
+          for (const fact of occurrence.facts) {
+            const row = document.createElement("div");
+            row.className = "item" + (resolution?.status === "canceled" ? " canceled" : "");
+
+            const name = document.createElement("div");
+            name.className = "name";
+            name.textContent = fact.value;
+
+            const meta = document.createElement("div");
+            meta.className = "meta";
+
+            const date = document.createElement("div");
+            date.textContent = prettyDate(occurrence.time);
+            meta.appendChild(date);
+
+            const status = historyStatusNode(occurrence.entry);
+            if (status) meta.appendChild(status);
+
+            row.append(name, meta);
+            target.appendChild(row);
+          }
+        }
+      }
+
+      function renderActiveEvents() {
+        const target = document.getElementById("EVENT_ACTIVE");
+        if (!target) return;
+        target.replaceChildren();
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No active events are listed right now.";
+        target.appendChild(empty);
+      }
+
+      function setRecognitionMode(category, mode) {
+        const config = subviews[category];
+        if (!config || !config[mode]) return;
+        recognitionMode[category] = mode;
+
+        for (const candidate of ["available", "active", "history"]) {
+          if (config[candidate]) config[candidate].hidden = candidate !== mode;
+          const button = config[`${candidate}Button`];
+          if (button) button.setAttribute("aria-pressed", String(candidate === mode));
+        }
+      }
+
       function setHistoryView(view) {
         historyView = ["badges", "challenges", "events"].includes(view) ? view : "badges";
 
@@ -1753,12 +1917,16 @@
         badgesViewButton.setAttribute("aria-pressed", String(historyView === "badges"));
         challengesViewButton.setAttribute("aria-pressed", String(historyView === "challenges"));
         eventsViewButton.setAttribute("aria-pressed", String(historyView === "events"));
+        setRecognitionMode(historyView, recognitionMode[historyView]);
       }
 
       function render() {
         renderCategoryGroup("BADGE");
         renderCategoryGroup("CHALLENGE");
         renderCategoryGroup("EVENT");
+        renderRecognitionHistory("BADGE", "BADGE_HISTORY");
+        renderRecognitionHistory("CHALLENGE", "CHALLENGE_HISTORY");
+        renderActiveEvents();
 
         const counts = {};
 
@@ -1925,6 +2093,13 @@
       badgesViewButton.addEventListener("click", () => setHistoryView("badges"));
       challengesViewButton.addEventListener("click", () => setHistoryView("challenges"));
       eventsViewButton.addEventListener("click", () => setHistoryView("events"));
+
+      subviews.badges.availableButton.addEventListener("click", () => setRecognitionMode("badges", "available"));
+      subviews.badges.historyButton.addEventListener("click", () => setRecognitionMode("badges", "history"));
+      subviews.challenges.activeButton.addEventListener("click", () => setRecognitionMode("challenges", "active"));
+      subviews.challenges.historyButton.addEventListener("click", () => setRecognitionMode("challenges", "history"));
+      subviews.events.activeButton.addEventListener("click", () => setRecognitionMode("events", "active"));
+      subviews.events.historyButton.addEventListener("click", () => setRecognitionMode("events", "history"));
 
       render();
       if (document.readyState === "complete") {
