@@ -69,6 +69,7 @@
     .prepared.show{display:block}
     .prepared strong{color:var(--green)}
     .footer-note{padding:0 24px 24px;color:rgba(236,249,247,.35);font-size:.70rem;text-align:center}
+    .qr-wrap{display:none;margin-top:14px;padding:14px;border:1px solid rgba(121,213,194,.18);border-radius:16px;background:#fff;text-align:center}.qr-wrap.show{display:block}.qr-wrap img{width:min(100%,300px);height:auto}.qr-uri{margin-top:8px;color:#223;font-size:.62rem;overflow-wrap:anywhere}
     @media(max-width:800px){.shell{padding:20px 12px 34px}.console{border-radius:24px}.console-header{padding:26px 20px}.console-body{padding:16px}.workspace{grid-template-columns:1fr}.preview-card{position:static}.status-row{grid-template-columns:100px minmax(0,1fr)}}
   </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
@@ -106,7 +107,10 @@
               <div class="button-row">
                 <button class="secondary-button" id="recheckButton" type="button">Recheck XRPL</button>
                 <button class="primary-button" id="prepareButton" type="submit" disabled>Prepare CREATE</button>
-                <button class="primary-button" id="publishButton" type="button" disabled>Publish CREATE in Xaman</button>
+                <button class="secondary-button" id="connectButton" type="button">Connect Signer</button>
+                <button class="secondary-button" id="disconnectButton" type="button" disabled>Disconnect</button>
+                <button class="primary-button" id="signButton" type="button" disabled>Sign CREATE</button>
+                <button class="primary-button" id="submitButton" type="button" disabled>Submit + Validate</button>
               </div>
 
               <div class="status-grid" aria-live="polite">
@@ -126,13 +130,23 @@
                   <div class="status-label">Authority</div>
                   <div class="status-value" id="authorityStatus">—</div>
                 </div>
+                <div class="status-row">
+                  <div class="status-label">Signer</div>
+                  <div class="status-value wait" id="signerStatus">Not connected.</div>
+                </div>
+                <div class="status-row">
+                  <div class="status-label">Publication</div>
+                  <div class="status-value wait" id="publicationStatus">Not prepared.</div>
+                </div>
               </div>
+
+              <div class="qr-wrap" id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"><div class="qr-uri" id="qrUri"></div></div>
 
               <div class="prepared" id="preparedMessage">
-                <strong>CREATE prepared.</strong> The exact unsigned no-op AccountSet is ready for Xaman. Nothing is written to XRPL until you review, sign, and submit it.
+                <strong>CREATE prepared.</strong> XRPL simulated and autofilled the no-op AccountSet. Wild Ledger owns the transaction; the connected wallet signs only.
               </div>
 
-              <div class="notice"><strong>XRPL publication:</strong> Wild Ledger prepares the unsigned lifecycle transaction and hands it to Xaman. Wild Ledger never receives a private key and cannot sign for the Community Operating Wallet. After Xaman validates the transaction, return to Recognition and the ledger reader will discover the new recognition directly from XRPL.</div>
+              <div class="notice"><strong>XRPL publication:</strong> Wild Ledger resolves the current Community Operating Wallet from canonical XRPL authority state, prepares and simulates the exact transaction, asks an external signer for the signature only, then submits the signed blob directly to XRPL. Bifrost is the preferred signer, but the protocol is signer-agnostic.</div>
             </form>
           </section>
 
@@ -164,7 +178,10 @@
   <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
   <script type="module">
-    import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
+    import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+    import { prepareNoOpAccountSet, submitSignedTransaction } from "./js/xrplTransport.js";
+    import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+    import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorityCache } from "./js/communityAuthority.js";
     (() => {
       "use strict";
 
@@ -180,6 +197,8 @@
       let operatingWallet = "";
       const config = window.WILD_LEDGER_CONFIG || {};
       const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
+      const feeCushion = Number(config.xrplFeeCushion || 1.2);
+      const projectId = String(config.walletConnectProjectId || "").trim();
       const leapIssuer = config.leapIssuer || "";
       const legacyDistributors = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
 
@@ -189,16 +208,24 @@
       const challengeIdInput = document.getElementById("challengeId");
       const recheckButton = document.getElementById("recheckButton");
       const prepareButton = document.getElementById("prepareButton");
-      const publishButton = document.getElementById("publishButton");
+      const connectButton = document.getElementById("connectButton");
+      const disconnectButton = document.getElementById("disconnectButton");
+      const signButton = document.getElementById("signButton");
+      const submitButton = document.getElementById("submitButton");
       const xrplStatus = document.getElementById("xrplStatus");
       const formatStatus = document.getElementById("formatStatus");
       const historyStatus = document.getElementById("historyStatus");
       const authorityStatus = document.getElementById("authorityStatus");
+      const signerStatus = document.getElementById("signerStatus");
+      const publicationStatus = document.getElementById("publicationStatus");
       const friendlyName = document.getElementById("friendlyName");
       const canonicalId = document.getElementById("canonicalId");
       const memoPreview = document.getElementById("memoPreview");
       const transactionPreview = document.getElementById("transactionPreview");
       const preparedMessage = document.getElementById("preparedMessage");
+      const qrWrap = document.getElementById("qrWrap");
+      const qrImage = document.getElementById("qrImage");
+      const qrUri = document.getElementById("qrUri");
 
       const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
       const ACCOUNTSET_SPECIFIC_FIELDS = [
@@ -213,11 +240,15 @@
       let scanInProgress = false;
       let reservedChallenges = new Map();
       let preparedTransaction = null;
+      let signedBlob = "";
+      let signer = null;
+      let connectedAccount = "";
+      let busy = false;
 
       title.textContent = communityName;
       document.title = `${communityName} | Create Challenge`;
       back.href = `viewCommunityRecognition.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
-      authorityStatus.textContent = "Resolving current Community Operating Account from XRPL…";
+      authorityStatus.textContent = "Resolving current Community Operating Wallet from XRPL…";
 
       function setStatus(element, text, tone) {
         element.textContent = text;
@@ -249,29 +280,13 @@
         return `${namespace}/RECOGNITION/CHALLENGE/${id}/LIFECYCLE-TAG=CREATE`;
       }
 
-      function textToHex(text) {
-        const bytes = new TextEncoder().encode(String(text || ""));
-        return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
-      }
-
-      function buildLifecycleTransaction(id) {
-        return {
-          TransactionType: "AccountSet",
-          Account: operatingWallet,
-          Memos: [
-            {
-              Memo: {
-                MemoData: textToHex(lifecycleMemo(id))
-              }
-            }
-          ]
-        };
-      }
-
       function clearPreparedTransaction() {
         preparedTransaction = null;
-        publishButton.disabled = true;
+        signedBlob = "";
+        signButton.disabled = true;
+        submitButton.disabled = true;
         preparedMessage.classList.remove("show");
+        if (!busy) setStatus(publicationStatus, "Not prepared.", "wait");
       }
 
       function updatePreview() {
@@ -279,7 +294,7 @@
         canonicalId.textContent = id || "LEAP-001";
         friendlyName.textContent = displayNameFromId(id);
         memoPreview.textContent = id ? lifecycleMemo(id) : "—";
-        transactionPreview.textContent = `TransactionType: AccountSet\nAccount: ${operatingWallet || "—"}\nAccountSet mutation fields: none`;
+        transactionPreview.textContent = preparedTransaction ? JSON.stringify(preparedTransaction, null, 2) : `TransactionType: AccountSet\nAccount: ${operatingWallet || "—"}\nAccountSet mutation fields: none`;
       }
 
       function currentValidation() {
@@ -289,8 +304,8 @@
         const expected = historyLoaded ? nextUnusedChallengeId() : "";
         const sequenceOkay = historyLoaded && formatOkay && id === expected;
         const historyOkay = sequenceOkay && !existing;
-        const authorityOkay = !!operatingWallet;
-        return { id, formatOkay, existing, expected, sequenceOkay, historyOkay, authorityOkay, ready: formatOkay && historyOkay && authorityOkay && !scanInProgress };
+        const authorityOkay = !!authority && !authority.bootstrapNeeded && !!operatingWallet;
+        return { id, formatOkay, existing, expected, sequenceOkay, historyOkay, authorityOkay, ready: formatOkay && historyOkay && authorityOkay && !scanInProgress && !busy };
       }
 
       function describeExisting(record) {
@@ -303,7 +318,6 @@
 
       function refreshValidation() {
         const result = currentValidation();
-        clearPreparedTransaction();
 
         if (!historyLoaded || scanInProgress) {
           setStatus(formatStatus, "Waiting to derive the next Challenge ID from validated XRPL history…", "wait");
@@ -328,6 +342,10 @@
         }
 
         prepareButton.disabled = !result.ready;
+        signButton.disabled = busy || !preparedTransaction || !signer || connectedAccount !== operatingWallet;
+        submitButton.disabled = busy || !signedBlob;
+        connectButton.disabled = busy || !!signer;
+        disconnectButton.disabled = busy || !signer;
         updatePreview();
       }
 
@@ -379,6 +397,12 @@
         return entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.ledgerIndex ?? null;
       }
 
+      function transactionIndex(entry) {
+        const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+        const n = Number(entry?.tx_index ?? entry?.transaction_index ?? meta?.TransactionIndex ?? meta?.transaction_index);
+        return Number.isFinite(n) ? n : null;
+      }
+
       function memoTexts(tx) {
         const texts = [];
         for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
@@ -400,7 +424,7 @@
       function lifecycleRecordFromEntry(entry) {
         const tx = normalizeTx(entry);
         const ledger = ledgerIndex(entry, tx);
-        if (!authority || !isAuthorizedAtLedger(authority, tx.Account, ledger) || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
+        if (!authority || !isAuthorizedAtLedger(authority, tx.Account, ledger, transactionIndex(entry)) || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
 
         const prefix = `${namespace}/RECOGNITION/CHALLENGE/`;
         const suffix = "/LIFECYCLE-TAG=";
@@ -564,15 +588,17 @@
         historyLoaded = false;
         reservedChallenges = new Map();
         challengeIdInput.value = "";
+        clearPreparedTransaction();
         prepareButton.disabled = true;
         setStatus(xrplStatus, "Scanning validated XRPL history…", "wait");
         refreshValidation();
 
         try {
           authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer });
+          if (authority.bootstrapNeeded) throw new Error("Protocol 0.13 bootstrap required. Publish the community's first canonical OPERATING-WALLET statement before creating new recognition.");
           operatingWallet = authority.currentAccount;
-          if (!operatingWallet) throw new Error("This community does not yet have a resolvable Community Operating Account.");
-          authorityStatus.textContent = `${operatingWallet} — resolved from XRPL authority history.`;
+          if (!operatingWallet) throw new Error("This community does not yet have a resolvable Community Operating Wallet.");
+          authorityStatus.textContent = `${operatingWallet} — canonical XRPL authority; ${authority.transitions.length} routine rotation${authority.transitions.length === 1 ? "" : "s"} resolved.`;
           if (socket) { try { socket.close(); } catch (_) {} }
           pending.clear();
           await connect();
@@ -601,30 +627,80 @@
 
       recheckButton.addEventListener("click", scanHistory);
 
-      form.addEventListener("submit", event => {
+      async function connectSigner() {
+        try {
+          if (!projectId) throw new Error("Reown / WalletConnect Project ID is missing from Wild Ledger config.");
+          busy = true; refreshValidation();
+          setStatus(signerStatus, "Initializing WalletConnect…", "wait");
+          signer = new WalletConnectXrplSigner({ projectId, metadata:{ name:"Wild Ledger", description:"Wild Ledger XRPL external signer", url:location.protocol.startsWith("http") ? location.origin : "https://example.invalid", icons:[location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"] } });
+          const connection = await signer.connect({ onUri: async uri => {
+            qrImage.src = await QRCode.toDataURL(uri, { width:560, margin:2, errorCorrectionLevel:"M" });
+            qrUri.textContent = uri; qrWrap.classList.add("show");
+            setStatus(signerStatus, "QR ready. Approve the connection in Bifrost or another compatible XRPL signer.", "wait");
+          }});
+          qrWrap.classList.remove("show"); qrUri.textContent = "";
+          connectedAccount = connection.account;
+          if (connectedAccount === operatingWallet) setStatus(signerStatus, `${connection.walletName}: ${connectedAccount}`, "good");
+          else setStatus(signerStatus, `${connection.walletName}: ${connectedAccount} — not the current Community Operating Wallet.`, "bad");
+        } catch (error) {
+          signer = null; connectedAccount = ""; setStatus(signerStatus, error?.message || String(error), "bad");
+        } finally { busy = false; refreshValidation(); }
+      }
+
+      async function disconnectSigner() {
+        busy = true; refreshValidation();
+        try { if (signer) await signer.disconnect(); } catch (_) {}
+        signer = null; connectedAccount = "";
+        setStatus(signerStatus, "Not connected.", "wait");
+        busy = false; refreshValidation();
+      }
+
+      form.addEventListener("submit", async event => {
         event.preventDefault();
-        refreshValidation();
+        clearPreparedTransaction(); refreshValidation();
         const result = currentValidation();
         if (!result.ready) return;
-
-        memoPreview.textContent = lifecycleMemo(result.id);
-        preparedTransaction = buildLifecycleTransaction(result.id);
-        transactionPreview.textContent = JSON.stringify(preparedTransaction, null, 2);
-        preparedMessage.classList.add("show");
-        publishButton.disabled = false;
+        busy = true; refreshValidation();
+        try {
+          setStatus(publicationStatus, "XRPL is simulating, autofilling, and applying the fee cushion…", "wait");
+          const prepared = await prepareNoOpAccountSet({ serverUrl:xrplServer, account:operatingWallet, memoText:lifecycleMemo(result.id), feeCushion });
+          preparedTransaction = prepared.preparedTx; signedBlob = "";
+          preparedMessage.classList.add("show");
+          setStatus(publicationStatus, `Prepared: tesSUCCESS simulation, Fee ${preparedTransaction.Fee} drops.`, "good");
+        } catch (error) { clearPreparedTransaction(); setStatus(publicationStatus, error?.message || String(error), "bad"); }
+        finally { busy = false; refreshValidation(); }
       });
 
-      publishButton.addEventListener("click", () => {
-        if (!preparedTransaction) return;
-        const id = canonicalizeId(challengeIdInput.value);
-        const confirmed = window.confirm(
-          `Publish ${id || "this recognition"} to XRPL?\n\nThis opens Xaman's Signing Tool with the exact unsigned AccountSet. Nothing is written until you review, sign, and submit.`
-        );
-        if (!confirmed) return;
-
-        const payload = btoa(JSON.stringify(preparedTransaction));
-        window.location.href = "https://xumm.dev/signing-tool?payload=" + encodeURIComponent(payload);
+      signButton.addEventListener("click", async () => {
+        if (!signer || !preparedTransaction) return;
+        busy = true; refreshValidation();
+        try {
+          setStatus(publicationStatus, "Waiting for signer approval…", "wait");
+          const result = await signer.signTransaction(preparedTransaction);
+          signedBlob = result.signedBlob;
+          setStatus(publicationStatus, `${result.signatureType} received. Signed transaction is ready for Wild Ledger submission.`, "good");
+        } catch (error) { signedBlob = ""; setStatus(publicationStatus, error?.message || String(error), "bad"); }
+        finally { busy = false; refreshValidation(); }
       });
+
+      submitButton.addEventListener("click", async () => {
+        if (!signedBlob) return;
+        busy = true; refreshValidation();
+        try {
+          setStatus(publicationStatus, "Submitting signed transaction directly to XRPL and waiting for validation…", "wait");
+          const result = await submitSignedTransaction({ serverUrl:xrplServer, signedBlob });
+          if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated with ${result.finalResult}.`);
+          const successText = `CREATE validated in ledger ${result.ledgerIndex ?? "?"}. Hash ${result.txHash}.`;
+          preparedTransaction = null; signedBlob = ""; preparedMessage.classList.remove("show");
+          clearCommunityAuthorityCache();
+          await scanHistory();
+          setStatus(publicationStatus, successText, "good");
+        } catch (error) { setStatus(publicationStatus, error?.message || String(error), "bad"); }
+        finally { busy = false; refreshValidation(); }
+      });
+
+      connectButton.addEventListener("click", connectSigner);
+      disconnectButton.addEventListener("click", disconnectSigner);
 
       updatePreview();
       refreshValidation();

@@ -964,13 +964,13 @@
             <div class="metric-meaning">Provisioning</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Current validated LEAP balance in this community’s current XRPL-resolved Community Operating Account." data-info-text="This is the community’s operating inventory: LEAP still available for future distribution and recognition." data-info-action="Low inventory is healthy when Deployment and Reach are strong; that is when replenishment may be justified. High inventory with weak Deployment means the problem is activity, not supply—do not add more LEAP until usage improves.">i</button>
+            <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Current validated LEAP balance in this community’s current XRPL-resolved Community Operating Wallet." data-info-text="This is the community’s operating inventory: LEAP still available for future distribution and recognition." data-info-action="Low inventory is healthy when Deployment and Reach are strong; that is when replenishment may be justified. High inventory with weak Deployment means the problem is activity, not supply—do not add more LEAP until usage improves.">i</button>
             <div class="metric-value" id="metricCommunityLeap" aria-live="polite">—</div>
             <div class="metric-label">Community LEAP</div>
             <div class="metric-meaning">Inventory</div>
           </div>
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About LEAP Distributed" data-info-title="LEAP Distributed" data-info-calc="Cumulative validated LEAP delivered from this community’s historically authorized Community Operating Accounts to non-community wallets while each account was authoritative. Pending Checks are not counted." data-info-text="This is lifetime deployment: how much LEAP this community has actually moved into participant wallets." data-info-action="You generally want Deployment to rise over time, but it should bring Reach with it. If Deployment rises while Holders stays flat, the same wallets are absorbing more LEAP. Shift recognition and participation toward additional members before simply increasing allocation.">i</button>
+            <button class="metric-info" type="button" aria-label="About LEAP Distributed" data-info-title="LEAP Distributed" data-info-calc="Cumulative validated LEAP delivered from this community’s historically authorized Community Operating Wallets to non-community wallets while each account was authoritative. Pending Checks are not counted." data-info-text="This is lifetime deployment: how much LEAP this community has actually moved into participant wallets." data-info-action="You generally want Deployment to rise over time, but it should bring Reach with it. If Deployment rises while Holders stays flat, the same wallets are absorbing more LEAP. Shift recognition and participation toward additional members before simply increasing allocation.">i</button>
             <div class="metric-value" id="metricLeapDistributed" aria-live="polite">—</div>
             <div class="metric-label">LEAP Distributed</div>
             <div class="metric-meaning">Deployment</div>
@@ -1038,7 +1038,7 @@
               </tbody>
             </table>
           </div>
-          <p class="allocation-log-note" id="allocationLogNote">Only protocol-valid Allocation Checks to an XRPL-authorized Community Operating Account appear here.</p>
+          <p class="allocation-log-note" id="allocationLogNote">Only protocol-valid Allocation Checks to an XRPL-authorized Community Operating Wallet appear here.</p>
         </div>
       </section>
     </section>
@@ -1118,7 +1118,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
   let authority = null;
   let communityOperatingWallets = new Set(
     Object.values(registry)
-      .map(item => item?.authorityRootAccount || item?.operatingWallet)
+      .map(item => item?.operatingWallet)
       .filter(Boolean)
   );
 
@@ -1318,6 +1318,12 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
     return Number.isFinite(value) ? value : null;
   }
 
+  function entryTransactionIndex(entry) {
+    const { meta } = transactionParts(entry);
+    const value = Number(entry?.tx_index ?? entry?.transaction_index ?? meta?.TransactionIndex ?? meta?.transaction_index);
+    return Number.isFinite(value) ? value : null;
+  }
+
   function xrplDateToDate(seconds) {
     const value = Number(seconds);
     if (!Number.isFinite(value)) return null;
@@ -1462,7 +1468,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
       if (tx.TransactionType !== "CheckCreate") continue;
       if (String(tx.Account || "") !== globalDistributionWallet) continue;
       const allocationDestination = String(tx.Destination || "");
-      if (!authority || !isAuthorizedAtLedger(authority, allocationDestination, entryLedger(entry))) continue;
+      if (!authority || !isAuthorizedAtLedger(authority, allocationDestination, entryLedger(entry), entryTransactionIndex(entry))) continue;
       if (!isLeapAmount(tx.SendMax)) continue;
 
       const sendMax = leapAmountValue(tx.SendMax);
@@ -1529,7 +1535,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
 
       if (!isLeapAmount(delivered)) continue;
       const ledger = entryLedger(entry);
-      if (!authority || !isAuthorizedAtLedger(authority, source, ledger) || !qualifiesExternalDestination(destination, source)) continue;
+      if (!authority || !isAuthorizedAtLedger(authority, source, ledger, entryTransactionIndex(entry)) || !qualifiesExternalDestination(destination, source)) continue;
 
       const hash = transactionHash(entry);
       if (hash && countedHashes.has(hash)) continue;
@@ -1612,14 +1618,14 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
   }
 
   async function resolveKnownCommunityOperatingAccounts() {
-    const records = Object.values(registry).filter(item => item?.authorityRootAccount || item?.operatingWallet);
+    const records = Object.values(registry).filter(item => item?.leapNamespace);
     const resolved = await Promise.allSettled(records.map(item =>
       resolveCommunityAuthority({ community: item, serverUrl: xrplWebSocket })
     ));
     const accounts = new Set();
     records.forEach(item => {
-      const root = item?.authorityRootAccount || item?.operatingWallet;
-      if (root) accounts.add(root);
+      const configured = item?.operatingWallet;
+      if (configured) accounts.add(configured);
     });
     for (const result of resolved) {
       if (result.status !== "fulfilled") continue;
@@ -1629,12 +1635,6 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
   }
 
   async function loadCommunityDashboard() {
-    if (!community?.authorityRootAccount && !community?.operatingWallet) {
-      setUnavailable(`${communityName || "This community"} does not have an authority root account yet.`);
-      if (allocationLogNote) allocationLogNote.textContent = "Establish the community authority root before Owner → Community allocations can be tracked.";
-      return;
-    }
-
     setLoading();
     let ws;
     try {
@@ -1679,7 +1679,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
       renderAllocationLog(allocations);
 
       if (metricsSection) {
-        metricsSection.title = `Validated XRP Ledger data for ${communityName}. Current Community Operating Account: ${authority.currentAccount}. Historical authority accounts: ${authority.accounts.length}.`;
+        metricsSection.title = `Validated XRP Ledger data for ${communityName}. Current Community Operating Wallet: ${authority.currentAccount}. Historical authority wallets: ${authority.accounts.length}.`;
       }
       if (guidingMetricsSection) {
         guidingMetricsSection.title = `Notional guidance from validated ${communityName} deployment. Concentration is measured across recipient wallets; eligible replenishment uses a 3% Growth Rate Provision.`;

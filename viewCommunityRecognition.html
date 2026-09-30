@@ -1413,6 +1413,12 @@
         return entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.ledgerIndex ?? tx?.inLedger ?? null;
       }
 
+      function transactionIndex(entry) {
+        const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+        const n = Number(entry?.tx_index ?? entry?.transaction_index ?? meta?.TransactionIndex ?? meta?.transaction_index);
+        return Number.isFinite(n) ? n : null;
+      }
+
       function normalizeTx(entry) {
         return entry?.tx_json || entry?.tx || entry?.transaction || entry || {};
       }
@@ -1483,7 +1489,7 @@
       function lifecycleFromEntry(entry) {
         const tx = normalizeTx(entry);
         const ledger = ledgerIndex(entry, tx);
-        if (!authority || !isAuthorizedAtLedger(authority, tx.Account, ledger) || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
+        if (!authority || !isAuthorizedAtLedger(authority, tx.Account, ledger, transactionIndex(entry)) || !transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx)) return null;
         const prefix = `${namespace}/RECOGNITION/`;
         const suffix = "/LIFECYCLE-TAG=";
         const matches = [];
@@ -1767,7 +1773,7 @@
           authority = await resolveCommunityAuthority({ community, serverUrl: XRPL_SERVER });
           operatingWallet = authority.currentAccount;
           if (!operatingWallet) {
-            console.warn("This community does not yet have a resolvable Community Operating Account.");
+            console.warn("This community does not yet have a resolvable Community Operating Wallet.");
             return;
           }
           await connect();
