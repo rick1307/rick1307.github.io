@@ -347,7 +347,7 @@
 <div class="tag">Design Principle — Automatic Stabilizers</div>
 <div>
             LEAP should prefer rules that are enforced or naturally reinforced by the ledger itself rather than by a growing pile of manual administration.
-            Canonical identifiers reduce ambiguity; Check state prevents ordinary duplicate issuance; the seven-day Manager cleanup policy limits how long an unattended Check normally remains open;
+            Canonical identifiers reduce ambiguity; Check state prevents ordinary duplicate issuance; the seven-day Operator cleanup policy limits how long an unattended Check normally remains open;
             validated history preserves the record; and owner reserve makes large numbers of open Checks consume real working capital.
             The reserve is not a fee or burn. It is temporary capital tied up while the ledger object remains open, which provides a useful anti-spam and discipline mechanism.
           </div>
@@ -377,7 +377,7 @@
 </tr>
 <tr>
 <td>SFL Community Operating Wallet</td>
-<td class="address">rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q</td>
+<td class="address">r9BwELxkK5CEvpTeYeCvMnD4KPC6jdq8MF</td>
 <td>Existing pre-authority-state SFL Operating Wallet; authorized once to publish its own initial canonical <code>OPERATING-WALLET</code> statement under the existing-community migration rule</td>
 </tr>
 </table>
@@ -706,8 +706,8 @@ SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
 <tr><td>LEAP amount</td><td>Positive whole numbers only. The normal form starts blank so the Operator must enter the amount deliberately. Zero is never submitted.</td></tr>
 <tr><td>XRPL Expiration</td><td>The normal LEAP recognition Check sets <strong>no on-ledger expiration</strong>. The Check remains cashable until it is cashed or canceled.</td></tr>
 <tr><td>Member Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
-<tr><td>Manager cleanup flag</td><td>The Manager Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is a Manager-side operating rule only; it does not change the ledger object.</td></tr>
-<tr><td>Cleanup action</td><td>Rick decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
+<tr><td>Operator cleanup flag</td><td>The Operator Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is an Operator-side operating rule only; it does not change the ledger object.</td></tr>
+<tr><td>Cleanup action</td><td>The Operator decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
 <tr><td>Legacy expirations</td><td>Readers remain compatible with older Checks that contain an XRPL <code>Expiration</code>. Those legacy Checks are interpreted according to their actual ledger expiration.</td></tr>
 </table>
 <div class="note">
@@ -783,7 +783,7 @@ SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
 <div class="rule">
 <div class="tag">LEAP Operating Procedure</div>
 <div>
-            When the manager Checkbook identifies a Cleanup Due, legacy-expired, or otherwise unwanted outstanding Check, open the Community Operating Wallet
+            When the Operator Checkbook identifies a Cleanup Due, legacy-expired, or otherwise unwanted outstanding Check, open the Community Operating Wallet
             in Xaman and use <strong>Events → Planned → Check → Cancel Check</strong>. After the <code>CheckCancel</code>
             transaction validates, the Check ledger object is removed and the XRP owner reserve associated with that Check is released.
           </div>
@@ -792,13 +792,13 @@ SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
 <div class="tag">Current XRPL State</div>
 <div>
             At this revision, each open recognition Check created by the Community Operating Wallet increases that account's owner reserve by <strong>0.2 XRP</strong>.
-            The manager Checkbook should read the network's current reserve value rather than assume that 0.2 XRP will remain permanent.
+            The Operator Checkbook should read the network's current reserve value rather than assume that 0.2 XRP will remain permanent.
             The owner reserve is temporary working capital, not a transaction fee; it becomes available again when the Check object is removed.
           </div>
 </div>
 <div class="note">
 <strong>The seven-day cleanup rule is not expiration.</strong> A normal LEAP Check that is 7+ days old remains cashable because no XRPL expiration was set.
-          The Manager Checkbook merely marks it for cleanup so Rick can decide whether to cancel it. For older legacy Checks that do contain an expiration,
+          The Operator Checkbook merely marks it for cleanup so the Operator can decide whether to cancel it. For older legacy Checks that do contain an expiration,
           expiration and cancellation are still different: expiration stops cashing, but only a valid <code>CheckCancel</code> removes the ledger object and releases owner reserve.
         </div>
 <h3>7.9 Recognition lifecycle markers — no-op <code>AccountSet</code></h3>
@@ -1176,7 +1176,7 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>0.6</td><td>2026-09-19</td><td>Removed the unused <code>InvoiceID</code> proposal and explicitly clarified that <code>|</code> is not part of the current recognition memo grammar. One Check continues to record exactly one recognition.</td></tr>
 <tr><td>0.7</td><td>2026-09-20</td><td>Added the Xaman operational cleanup path for outstanding Checks: <strong>Events → Planned → Check → Cancel Check</strong>; documented the distinction between historical <code>CheckCreate</code> entries in All and actionable Check objects in Planned; recorded the current 0.2 XRP owner reserve per open Check; clarified that expiration does not itself remove the Check object or release reserve.</td></tr>
 <tr><td>0.8</td><td>2026-09-23</td><td>Expanded the issuance architecture: kept all recognition inside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>; confirmed <code>NEW-MEMBER</code> as a Badge; adopted broad-to-narrow canonical specificity for recurring recognitions; made the XRPL validated distributor history the working recognition vocabulary; allowed positive whole-number LEAP amounts rather than one LEAP only; standardized deliberate no-default expiration choices of 30/15/7/3/2/1 days; defined recipient + exact canonical recognition as the duplicate key; suppressed pending and redeemed duplicates while reopening expired/canceled unredeemed recognition; kept trust lines out of the issuer workflow; and documented owner reserve as a temporary working-capital automatic stabilizer rather than a fee.</td></tr>
-<tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Member Record shows a pending no-expiration Check for 7 days from its validated creation time; the Manager Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
+<tr><td>0.9</td><td>2026-09-23</td><td>Superseded the 0.8 expiration-selection policy for normal new recognition Checks. New LEAP Checks now omit the XRPL <code>Expiration</code> field; Member Record shows a pending no-expiration Check for 7 days from its validated creation time; the Operator Checkbook flags the still-open Check for cleanup after 7 days; and only cashing or cancellation removes the normal Check object. Clarified that the seven-day rule is an operating/display policy, not an on-ledger expiration, while preserving read compatibility for older Checks that contain <code>Expiration</code>.</td></tr>
 <tr><td>0.10</td><td>2026-09-30</td><td>Added XRPL-native cradle-to-grave recognition lifecycle markers using validated no-op <code>AccountSet</code> transactions from the authorized Community Operating Wallet. Clarified that RECOGNITION spans multiple XRPL transaction types: <code>CheckCreate</code> records member recognition issuance, while no-op <code>AccountSet</code> records recognition-object lifecycle state.</td></tr>
 <tr><td>0.11</td><td>2026-09-30</td><td>Made recognition lifecycle memos self-identifying by placing the recognition type and canonical ID directly in the lifecycle path: <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>. Added terminal <code>IGNORE</code> alongside <code>CREATE</code> and <code>END</code>; defined type-specific <code>END</code> semantics for Badges, Challenges, and Events; prohibited recognition-ID recycling including ignored IDs; required creation-time validation against full XRPL-derived history; and required ignored IDs to remain annotated in owner/operator ledger views while being excluded from normal recognition lists.</td></tr>
 <tr><td>0.12</td><td>2026-09-30</td><td>Codified the Canonical State Principle: canonical Wild Ledger state exists only on XRPL, while Wild Ledger and its screens interpret that state. Required every authoritative fact needed to reconstruct Wild Ledger state to be recoverable from validated XRPL ledger history, and prohibited off-ledger storage, browser storage, configuration files, caches, or presentation logic from becoming authoritative protocol state.</td></tr>
