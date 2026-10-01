@@ -1891,8 +1891,7 @@
       function isLeapLine(line) {
         if (!line || line.account !== LEAP_ISSUER) return false;
 
-        const currency = decodeHexCurrency(String(line.currency || "")).toUpperCase();
-        return currency === "LEAP" || currency.startsWith("LEAP");
+        return String(line.currency || "").toUpperCase() === String(LEAP_CURRENCY || "").toUpperCase();
       }
 
       function queryAccountLines(account) {
@@ -1962,8 +1961,7 @@
         if (!amount || typeof amount !== "object") return false;
         if (amount.issuer !== LEAP_ISSUER) return false;
 
-        const currency = decodeHexCurrency(String(amount.currency || "")).toUpperCase();
-        return currency === "LEAP" || currency.startsWith("LEAP");
+        return String(amount.currency || "").toUpperCase() === String(LEAP_CURRENCY || "").toUpperCase();
       }
 
       function leapAmountValue(amount) {
