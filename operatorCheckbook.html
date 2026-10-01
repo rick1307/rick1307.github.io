@@ -38,10 +38,12 @@
     .check-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.check-amount{font-size:21px;font-weight:900;color:#fff}.check-reason{margin-top:4px;color:#a9bfd2;font-size:13px;overflow-wrap:anywhere}.check-status{flex:0 0 auto;border:1px solid #3c5b75;border-radius:999px;padding:5px 8px;color:#b9cfdf;font-size:11px;font-weight:900}.check-card.expired .check-status{border-color:#8a474e;color:#ffb8bd}
     .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.check-fact{min-width:0;border-top:1px solid #29425a;padding-top:9px}.check-fact span{display:block;color:#7f98ad;font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:900}.check-fact strong{display:block;margin-top:4px;color:#e7edf5;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
     .check-countdown{margin-top:13px;padding:10px 11px;border-radius:9px;background:#101c28;color:#a9bfd2;font-size:12px;line-height:1.45}.check-countdown b{color:#fff}.check-card.expired .check-countdown b{color:#ffd2d2}.check-id{margin-top:9px;color:#68849d;font-size:10px;overflow-wrap:anywhere}
-    .check-actions{display:flex;justify-content:flex-end;margin-top:12px}.cancel-check{border:1px solid #7f4650;border-radius:999px;background:#2a1c22;color:#ffd4d8;padding:8px 13px;font-size:12px;font-weight:900;cursor:pointer}.cancel-check:hover{background:#3a232a}.cancel-check:focus-visible{outline:3px solid rgba(255,212,216,.28);outline-offset:2px}
+    .check-actions{display:flex;justify-content:flex-end;margin-top:12px}.cancel-check{border:1px solid #7f4650;border-radius:999px;background:#2a1c22;color:#ffd4d8;padding:8px 13px;font-size:12px;font-weight:900;cursor:pointer}.cancel-check:hover{background:#3a232a}.cancel-check:disabled{opacity:.5;cursor:not-allowed;background:#2a1c22}.cancel-check:focus-visible{outline:3px solid rgba(255,212,216,.28);outline-offset:2px}
     .empty{padding:26px 18px;border:1px dashed #3a536b;border-radius:12px;text-align:center;color:#8ea5ba}.error{display:none;margin-bottom:14px;padding:12px 14px;border:1px solid #e0b2b2;border-radius:11px;background:#fff0f0;color:#7d2929;font-size:13px;line-height:1.4}
     .footnote{margin:13px 3px 0;color:var(--muted);font-size:11px;line-height:1.45}
-    @media(max-width:700px){.control-zone{grid-template-columns:1fr}.view-panel{grid-template-columns:1fr 1fr}.action-panel{grid-template-columns:1fr 1fr;grid-template-rows:auto}.tool.create{min-height:100%}.ledger{padding:17px}.check-grid{grid-template-columns:1fr}}
+    .cancel-panel{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(16,36,58,.10)}
+    .cancel-panel[hidden]{display:none}.cancel-panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.cancel-panel-head h2{margin:2px 0 0;font-size:22px}.cancel-kicker{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.cancel-close{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--blue);padding:8px 12px;font-weight:900;cursor:pointer}.cancel-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}.cancel-summary>div,.cancel-status{border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}.cancel-summary span,.cancel-status span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:900}.cancel-summary strong,.cancel-status strong{display:block;margin-top:5px;overflow-wrap:anywhere;font-size:12px;line-height:1.4}.cancel-note{margin:12px 1px;color:var(--muted);font-size:12px;line-height:1.5}.cancel-status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cancel-hash{grid-column:1/-1}.cancel-status strong.good{color:var(--green)}.cancel-status strong.bad{color:var(--red)}.cancel-status strong.wait{color:var(--muted)}.cancel-actions-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}.cancel-action{border:1px solid var(--blue);border-radius:999px;background:var(--blue);color:#fff;padding:10px 8px;font-weight:900;cursor:pointer}.cancel-action.dark{background:var(--dark);border-color:var(--dark)}.cancel-action:disabled{opacity:.42;cursor:not-allowed}.cancel-qr{display:none;justify-content:center;margin-top:14px}.cancel-qr.show{display:flex}.cancel-qr img{width:min(280px,90%);height:auto;border:10px solid #fff;border-radius:10px;box-shadow:0 3px 16px rgba(16,36,58,.12)}.cancel-uri{margin-top:8px;color:var(--muted);font-size:10px;overflow-wrap:anywhere}.cancel-message{margin-top:12px;border-radius:10px;padding:11px 12px;font-size:12px;line-height:1.45}.error-msg{background:#fff0f0;border:1px solid #e0b2b2;color:#7d2929}.success-msg{background:#eef9f3;border:1px solid #b9dec9;color:#185b3d}
+    @media(max-width:700px){.control-zone{grid-template-columns:1fr}.view-panel{grid-template-columns:1fr 1fr}.action-panel{grid-template-columns:1fr 1fr;grid-template-rows:auto}.tool.create{min-height:100%}.ledger{padding:17px}.check-grid{grid-template-columns:1fr}.cancel-actions-row{grid-template-columns:1fr 1fr}.cancel-summary,.cancel-status-grid{grid-template-columns:1fr}.cancel-hash{grid-column:auto}}
     @media(max-width:440px){.wrap{margin-top:22px}.top{align-items:flex-start}.view-panel{grid-template-columns:1fr}.action-panel{grid-template-columns:1fr}.tool{font-size:12px}.tool.create{min-height:48px}.check-top{display:block}.check-status{display:inline-block;margin-top:10px}}
   
 
@@ -123,12 +125,49 @@
     <div class="ledger-head"><h2>Outstanding Checks</h2><span id="checkbookCount">Loading…</span></div>
     <div id="checkbookList" class="check-list"></div>
   </section>
-  <p class="footnote">New Checks have no ledger expiration. The Checkbook turns them red after 7 days so you can clean them up with Cancel Check. Cancel Check opens Xaman's Signing Tool with the exact <code>CheckCancel</code> template; nothing is canceled until you sign and submit.</p>
+  <p class="footnote">New Checks have no ledger expiration. The Checkbook turns them red after 7 days so you can clean them up with Cancel Check. Cancellation uses Bifrost sign-only: Wild Ledger prepares the exact <code>CheckCancel</code>, the wallet that owns the Check signs it, and Wild Ledger submits it to XRPL.</p>
+
+  <section id="cancelPanel" class="cancel-panel" hidden aria-live="polite">
+    <div class="cancel-panel-head">
+      <div>
+        <div class="cancel-kicker">Recognition Check cleanup</div>
+        <h2>Cancel Check with Bifrost</h2>
+      </div>
+      <button id="cancelCloseButton" class="cancel-close" type="button">Close</button>
+    </div>
+    <div class="cancel-summary">
+      <div><span>Recognition</span><strong id="cancelRecognition">—</strong></div>
+      <div><span>Amount</span><strong id="cancelAmount">—</strong></div>
+      <div><span>Check ID</span><strong id="cancelCheckId">—</strong></div>
+      <div><span>Required signer</span><strong id="cancelRequiredSigner">—</strong></div>
+    </div>
+    <p class="cancel-note">The required signer is the wallet that created this Check. That wallet owns the open Check object and its reserve. Wild Ledger will not substitute the current Operating Wallet if a different wallet originally created the Check.</p>
+    <div class="cancel-status-grid">
+      <div class="cancel-status"><span>Wallet</span><strong id="cancelWalletStatus" class="wait">Not connected.</strong></div>
+      <div class="cancel-status"><span>XRPL preparation</span><strong id="cancelPrepareStatus" class="wait">Not prepared.</strong></div>
+      <div class="cancel-status"><span>Signature</span><strong id="cancelSignatureStatus" class="wait">Not signed.</strong></div>
+      <div class="cancel-status"><span>Submission</span><strong id="cancelSubmitStatus" class="wait">Not submitted.</strong></div>
+      <div class="cancel-status cancel-hash"><span>Transaction hash</span><strong id="cancelHashStatus">—</strong></div>
+    </div>
+    <div id="cancelQrWrap" class="cancel-qr"><img id="cancelQrImage" alt="WalletConnect QR code"></div>
+    <div id="cancelUriText" class="cancel-uri"></div>
+    <div class="cancel-actions-row">
+      <button id="cancelConnectButton" class="cancel-action dark" type="button">Connect Bifrost</button>
+      <button id="cancelPrepareButton" class="cancel-action" type="button" disabled>Prepare with XRPL</button>
+      <button id="cancelSignButton" class="cancel-action dark" type="button" disabled>Sign in Bifrost</button>
+      <button id="cancelSubmitButton" class="cancel-action" type="button" disabled>Submit + Validate</button>
+    </div>
+    <div id="cancelError" class="cancel-message error-msg" hidden></div>
+    <div id="cancelSuccess" class="cancel-message success-msg" hidden></div>
+  </section>
 </main>
 
 <script src="js/wildLedgerConfig.js"></script>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { DEFAULT_FEE_CUSHION, isClassicAddress, prepareTransaction, submitSignedTransaction } from "./js/xrplTransport.js";
+import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
 import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorityCache } from "./js/communityAuthority.js";
 (() => {
   "use strict";
@@ -141,6 +180,8 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
   const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
   const LEAP_ISSUER = String(config.leapIssuer || "").trim();
+  const PROJECT_ID = String(config.walletConnectProjectId || "").trim();
+  const FEE_CUSHION = Number(config.xrplFeeCushion || DEFAULT_FEE_CUSHION);
   const NAMESPACE = community?.leapNamespace || `${communityId}-LEAP`;
   let authority = null;
   let CHECK_ACCOUNTS = [];
@@ -159,6 +200,13 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   let loaded = false;
   let liveRefreshTimer = null;
 
+  let cancelSelection = null;
+  let cancelSigner = null;
+  let cancelConnectedAccount = "";
+  let cancelPreparedTx = null;
+  let cancelSignedBlob = "";
+  let cancelCompleted = false;
+
   const statusDot = document.getElementById("statusDot");
   const statusText = document.getElementById("statusText");
   const updatedText = document.getElementById("updatedText");
@@ -167,6 +215,25 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   const checkbookCount = document.getElementById("checkbookCount");
   const allButton = document.getElementById("allButton");
   const expiredButton = document.getElementById("expiredButton");
+  const cancelPanel = document.getElementById("cancelPanel");
+  const cancelRecognition = document.getElementById("cancelRecognition");
+  const cancelAmount = document.getElementById("cancelAmount");
+  const cancelCheckId = document.getElementById("cancelCheckId");
+  const cancelRequiredSigner = document.getElementById("cancelRequiredSigner");
+  const cancelWalletStatus = document.getElementById("cancelWalletStatus");
+  const cancelPrepareStatus = document.getElementById("cancelPrepareStatus");
+  const cancelSignatureStatus = document.getElementById("cancelSignatureStatus");
+  const cancelSubmitStatus = document.getElementById("cancelSubmitStatus");
+  const cancelHashStatus = document.getElementById("cancelHashStatus");
+  const cancelQrWrap = document.getElementById("cancelQrWrap");
+  const cancelQrImage = document.getElementById("cancelQrImage");
+  const cancelUriText = document.getElementById("cancelUriText");
+  const cancelConnectButton = document.getElementById("cancelConnectButton");
+  const cancelPrepareButton = document.getElementById("cancelPrepareButton");
+  const cancelSignButton = document.getElementById("cancelSignButton");
+  const cancelSubmitButton = document.getElementById("cancelSubmitButton");
+  const cancelError = document.getElementById("cancelError");
+  const cancelSuccess = document.getElementById("cancelSuccess");
 
   function setStatus(text, state="") { statusText.textContent=text; statusDot.className="dot"+(state?" "+state:""); }
   function showError(message){ errorBox.style.display="block"; errorBox.textContent=message; setStatus("XRPL: connection problem","error"); }
@@ -262,21 +329,95 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   }
   function formatReason(create){const fact=create?.facts?.[0];if(!fact)return "LEAP Check";const label=fact.key.charAt(0)+fact.key.slice(1).toLowerCase();return `${label} · ${fact.value}`;}
 
-  function prepareCancel(object,create){
+  function cancelTone(el,kind,text){el.className=kind;el.textContent=text;}
+  function clearCancelMessages(){cancelError.hidden=true;cancelError.textContent="";cancelSuccess.hidden=true;cancelSuccess.textContent="";}
+  function showCancelError(message){cancelError.hidden=false;cancelError.textContent=message;}
+  function operatorCanCancel(object){return !!object?.Account && (authority?.accounts||[]).includes(String(object.Account));}
+  function resetCancelSigningState(){
+    cancelPreparedTx=null;cancelSignedBlob="";cancelCompleted=false;
+    cancelPrepareButton.disabled=!(cancelSelection&&cancelConnectedAccount===cancelSelection.source);
+    cancelSignButton.disabled=true;cancelSubmitButton.disabled=true;
+    cancelTone(cancelPrepareStatus,"wait","Not prepared.");
+    cancelTone(cancelSignatureStatus,"wait","Not signed.");
+    cancelTone(cancelSubmitStatus,"wait","Not submitted.");
+    cancelHashStatus.textContent="—";clearCancelMessages();
+  }
+  async function selectCancel(object,create){
     const checkId=checkObjectId(object);
-    if(!/^[A-Fa-f0-9]{64}$/.test(checkId)){
-      showError("This Check does not have a valid Check ID, so a cancellation request cannot be prepared.");
-      return;
+    if(!/^[A-Fa-f0-9]{64}$/.test(checkId)){showError("This Check does not have a valid Check ID, so a cancellation request cannot be prepared.");return;}
+    if(!operatorCanCancel(object)){showError("This is a legacy Distributor-owned recognition Check. It remains visible for history, but the Operator Checkbook does not use the Distributor wallet for cleanup.");return;}
+    const source=String(object.Account||"");
+    if(!isClassicAddress(source)){showError("This Check does not identify a valid source wallet.");return;}
+    cancelSelection={checkId,source,amount:`${object.SendMax?.value??create?.amount?.value??"?"} LEAP`,reason:formatReason(create)};
+    cancelConnectButton.disabled=false;
+    cancelRecognition.textContent=cancelSelection.reason;cancelAmount.textContent=cancelSelection.amount;cancelCheckId.textContent=checkId;cancelRequiredSigner.textContent=source;
+    cancelPanel.hidden=false;cancelPanel.scrollIntoView({behavior:"smooth",block:"start"});
+    if(cancelConnectedAccount&&cancelConnectedAccount!==source){
+      try{await cancelSigner?.disconnect();}catch{}
+      cancelSigner=null;cancelConnectedAccount="";cancelTone(cancelWalletStatus,"wait","Not connected.");
     }
-    const amount=`${object.SendMax?.value??create?.amount?.value??"?"} LEAP`;
-    const reason=formatReason(create);
-    const confirmed=window.confirm(`Prepare cancellation for ${amount} — ${reason}?\n\nThis only opens Xaman's Signing Tool. Nothing is canceled until you sign and submit.`);
-    if(!confirmed)return;
-
-    const tx={TransactionType:"CheckCancel",CheckID:checkId};
-    const payload=btoa(JSON.stringify(tx));
-    const url=`https://xumm.dev/signing-tool?payload=${encodeURIComponent(payload)}`;
-    window.open(url,"_blank","noopener,noreferrer");
+    if(cancelConnectedAccount===source)cancelTone(cancelWalletStatus,"good",`${source} connected.`);
+    else cancelTone(cancelWalletStatus,"wait","Connect the Check-owner wallet in Bifrost.");
+    resetCancelSigningState();
+  }
+  async function connectCancelWallet(){
+    clearCancelMessages();
+    try{
+      if(!cancelSelection)throw new Error("Choose a Check to cancel first.");
+      if(!PROJECT_ID)throw new Error("WalletConnect is not configured for Wild Ledger.");
+      cancelConnectButton.disabled=true;
+      if(cancelSigner){try{await cancelSigner.disconnect();}catch{}cancelSigner=null;cancelConnectedAccount="";}
+      cancelTone(cancelWalletStatus,"wait","Initializing WalletConnect…");
+      cancelSigner=new WalletConnectXrplSigner({projectId:PROJECT_ID,metadata:{name:"Wild Ledger Check Cancellation",description:"Sign a LEAP recognition CheckCancel transaction",url:location.protocol.startsWith("http")?location.origin:"https://example.invalid",icons:[location.protocol.startsWith("http")?`${location.origin}/favicon.ico`:"https://example.invalid/favicon.ico"]}});
+      const connection=await cancelSigner.connect({onUri:async uri=>{const qrData=await QRCode.toDataURL(uri,{width:560,margin:2,errorCorrectionLevel:"M"});cancelQrImage.src=qrData;cancelQrWrap.classList.add("show");cancelUriText.textContent=uri;cancelTone(cancelWalletStatus,"wait","QR ready. Approve the connection in Bifrost.");}});
+      cancelQrWrap.classList.remove("show");cancelUriText.textContent="";cancelConnectedAccount=connection.account;
+      if(cancelConnectedAccount!==cancelSelection.source){
+        const wrong=cancelConnectedAccount;cancelTone(cancelWalletStatus,"bad",`Wrong wallet: ${wrong}. Required: ${cancelSelection.source}.`);
+        try{await cancelSigner.disconnect();}catch{}cancelSigner=null;cancelConnectedAccount="";throw new Error("The connected Bifrost wallet is not the wallet that owns this Check.");
+      }
+      cancelTone(cancelWalletStatus,"good",`${connection.walletName} connected as ${cancelConnectedAccount}.`);resetCancelSigningState();
+    }catch(e){showCancelError(e?.message||String(e));if(!cancelConnectedAccount)cancelTone(cancelWalletStatus,"bad",e?.message||String(e));}
+    finally{cancelConnectButton.disabled=false;}
+  }
+  function assertPreparedCancel(tx){
+    if(!cancelSelection)throw new Error("No Check is selected for cancellation.");
+    if(!tx||tx.TransactionType!=="CheckCancel")throw new Error("XRPL returned an unexpected transaction type.");
+    if(tx.Account!==cancelSelection.source)throw new Error("Prepared cancellation account changed unexpectedly.");
+    if(String(tx.CheckID||"").toUpperCase()!==cancelSelection.checkId.toUpperCase())throw new Error("Prepared Check ID changed unexpectedly.");
+  }
+  async function prepareCancelWithXRPL(){
+    clearCancelMessages();
+    try{
+      if(!cancelSelection)throw new Error("Choose a Check to cancel first.");
+      if(!cancelSigner||!cancelConnectedAccount)throw new Error("Connect Bifrost first.");
+      if(cancelConnectedAccount!==cancelSelection.source)throw new Error("Connected wallet does not own this Check.");
+      cancelPrepareButton.disabled=true;cancelSignButton.disabled=true;cancelSubmitButton.disabled=true;cancelTone(cancelPrepareStatus,"wait","XRPL is simulating and autofilling the cancellation…");
+      const template={TransactionType:"CheckCancel",Account:cancelSelection.source,CheckID:cancelSelection.checkId};
+      const result=await prepareTransaction({serverUrl:XRPL_SERVER,txJson:template,feeCushion:FEE_CUSHION});assertPreparedCancel(result.preparedTx);cancelPreparedTx=result.preparedTx;
+      cancelTone(cancelPrepareStatus,"good",`tesSUCCESS — Fee ${cancelPreparedTx.Fee} drops, Sequence ${cancelPreparedTx.Sequence??"?"}.`);cancelSignButton.disabled=false;
+    }catch(e){cancelPreparedTx=null;cancelTone(cancelPrepareStatus,"bad",e?.message||String(e));showCancelError(e?.message||String(e));}
+    finally{cancelPrepareButton.disabled=!(cancelSelection&&cancelConnectedAccount===cancelSelection.source&&!cancelCompleted);}
+  }
+  async function signCancelInBifrost(){
+    clearCancelMessages();
+    try{
+      if(!cancelPreparedTx||!cancelSigner)throw new Error("Prepare the cancellation with XRPL first.");
+      if(cancelConnectedAccount!==cancelSelection?.source||cancelPreparedTx.Account!==cancelSelection.source)throw new Error("The connected wallet no longer matches the Check owner.");
+      cancelSignButton.disabled=true;cancelSubmitButton.disabled=true;cancelTone(cancelSignatureStatus,"wait","Waiting for Bifrost approval…");
+      const result=await cancelSigner.signTransaction(cancelPreparedTx);cancelSignedBlob=result.signedBlob;cancelTone(cancelSignatureStatus,"good","Signed transaction returned by Bifrost. Nothing has been submitted yet.");cancelSubmitButton.disabled=false;
+    }catch(e){cancelTone(cancelSignatureStatus,"bad",e?.message||String(e));showCancelError(e?.message||String(e));cancelSignButton.disabled=!cancelPreparedTx;}
+  }
+  async function submitCancelAndValidate(){
+    clearCancelMessages();
+    try{
+      if(!cancelSignedBlob)throw new Error("Sign the prepared cancellation first.");
+      if(cancelConnectedAccount!==cancelSelection?.source||cancelPreparedTx?.Account!==cancelSelection.source)throw new Error("The connected wallet no longer matches the Check owner. Do not submit this transaction.");
+      cancelSubmitButton.disabled=true;cancelTone(cancelSubmitStatus,"wait","Submitting signed CheckCancel directly to XRPL…");
+      const result=await submitSignedTransaction({serverUrl:XRPL_SERVER,signedBlob:cancelSignedBlob,onSubmitted:({txHash})=>{cancelHashStatus.textContent=txHash;cancelTone(cancelSubmitStatus,"wait","Accepted by XRPL. Waiting for ledger validation…");}});
+      cancelHashStatus.textContent=result.txHash||cancelHashStatus.textContent;if(result.finalResult!=="tesSUCCESS")throw new Error(`${result.finalResult} — transaction validated but was not successful.`);
+      cancelTone(cancelSubmitStatus,"good",`tesSUCCESS — validated in ledger ${result.ledgerIndex??"?"}.`);cancelSuccess.hidden=false;cancelSuccess.textContent="Check canceled and removed from the XRPL ledger. The Check-owner reserve is released.";cancelCompleted=true;cancelConnectButton.disabled=true;cancelPrepareButton.disabled=true;cancelSignButton.disabled=true;cancelSubmitButton.disabled=true;
+      setTimeout(()=>start(),900);
+    }catch(e){cancelTone(cancelSubmitStatus,"bad",e?.message||String(e));showCancelError(e?.message||String(e));cancelSubmitButton.disabled=!cancelSignedBlob||cancelCompleted;}
   }
 
   function rowsForRender(){
@@ -308,7 +449,10 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
       else if(!expirationIso(object,create))countdown.innerHTML="<b>No expiration set.</b> Creation time is unavailable, so the 7-day cleanup age cannot be calculated.";
       else countdown.innerHTML=`<b>${state.text}.</b> It disappears from this Checkbook when it is cashed or canceled.`;
       const id=document.createElement("div");id.className="check-id";id.textContent=`Check ID: ${checkObjectId(object)||"unavailable"}`;
-      const actions=document.createElement("div");actions.className="check-actions";const cancelButton=document.createElement("button");cancelButton.className="cancel-check";cancelButton.type="button";cancelButton.textContent="Cancel Check";cancelButton.addEventListener("click",()=>prepareCancel(object,create));actions.appendChild(cancelButton);
+      const actions=document.createElement("div");actions.className="check-actions";const cancelButton=document.createElement("button");cancelButton.className="cancel-check";cancelButton.type="button";
+      if(operatorCanCancel(object)){cancelButton.textContent="Cancel Check";cancelButton.addEventListener("click",()=>selectCancel(object,create));}
+      else{cancelButton.textContent="Distributor cleanup";cancelButton.disabled=true;cancelButton.title="This legacy recognition Check is owned by the Distributor, not a Community Operating Wallet.";}
+      actions.appendChild(cancelButton);
       card.append(top,grid,countdown,id,actions);checkbookList.appendChild(card);
     }
   }
@@ -333,6 +477,11 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   }
 
   document.getElementById("refreshButton").addEventListener("click",start); allButton.addEventListener("click",()=>setFilter("all")); expiredButton.addEventListener("click",()=>setFilter("expired"));
+  document.getElementById("cancelCloseButton").addEventListener("click",()=>{cancelPanel.hidden=true;clearCancelMessages();});
+  cancelConnectButton.addEventListener("click",connectCancelWallet);
+  cancelPrepareButton.addEventListener("click",prepareCancelWithXRPL);
+  cancelSignButton.addEventListener("click",signCancelInBifrost);
+  cancelSubmitButton.addEventListener("click",submitCancelAndValidate);
   setInterval(renderCheckbook,60000); renderCheckbook(); start();
 })();
 </script>
