@@ -586,6 +586,7 @@
       if(tx.TransactionType!=="CheckCreate"||!canonicalRecognitionCheck(entry))return;
       if(!canonicalLeapCurrency&&tx.SendMax?.currency)canonicalLeapCurrency=String(tx.SendMax.currency);
       const facts=recognitionFacts(tx), checkId=createdCheckId(meta);
+      if(facts.length!==1)return;
       for(const fact of facts){
         if(legacyVocabularyAllowed(entry)) legacyRegistry[fact.key].add(fact.value);
         issues.push({checkId:checkId?checkId.toUpperCase():"",destination:String(tx.Destination||""),key:fact.key,value:fact.value,memo:`${NAMESPACE}/${fact.key}=${fact.value}`,expiration:Number(tx.Expiration||0)||null});
