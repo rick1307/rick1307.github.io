@@ -453,7 +453,7 @@
     <div id="errorBox" class="errorbox"></div>
 
     <p class="footnote">
-      Registry rule: active Badge, Event, and Challenge choices come from canonical Community Operating Wallet lifecycle history, backward-compatible legacy recognition history, and permanent Wild Ledger-supplied definitions such as Great Chat. Current recognition Checks are created by the Community Operating Wallet. Badges are reusable and remain available for repeat awards. For a specific destination, the same exact Event or Challenge is hidden while pending or after redemption; canceled or legacy-expired unredeemed Checks reopen it.
+      Registry rule: active Badge, Event, and Challenge choices come from the shared XRPL-derived recognition catalog, including protocol-defined Great Chat. Historical recognition Checks affect recipient eligibility only when that same shared validator says the recognition was available at the CheckCreate ledger position. Current recognition Checks are created by the Community Operating Wallet. Badges are reusable and remain available for repeat awards. For a specific destination, the same exact Event or Challenge is hidden while pending or after redemption; canceled or legacy-expired unredeemed Checks reopen it.
     </p>
   </main>
 
@@ -462,6 +462,7 @@
   <script type="module">
     import { DirectXRPLClient, isClassicAddress } from "./js/xrplTransport.js";
     import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorityCache } from "./js/communityAuthority.js";
+    import { loadRecognitionCatalog, recognitionAvailabilityFromCatalog, clearRecognitionCatalogCache } from "./js/recognitionCatalog.js";
 
     const params = new URLSearchParams(location.search);
     const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "operator").trim().toLowerCase();
@@ -476,21 +477,13 @@
     const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
     const NAMESPACE = community?.leapNamespace || `${communityId}-LEAP`;
     const CATEGORIES = ["BADGE", "EVENT", "CHALLENGE"];
-    const GLOBAL_RECOGNITIONS = (Array.isArray(config.globalRecognitions) ? config.globalRecognitions : [])
-      .map(item => ({
-        key:String(item?.category || "").trim().toUpperCase(),
-        value:String(item?.id || "").trim().toUpperCase()
-      }))
-      .filter(item => CATEGORIES.includes(item.key) && item.value);
-    const ACCOUNTSET_SPECIFIC_FIELDS = ["ClearFlag","Domain","EmailHash","MessageKey","NFTokenMinter","SetFlag","TransferRate","TickSize","WalletLocator","WalletSize"];
 
     let authority = null;
     let operatingWallet = "";
     let canonicalLeapCurrency = LEAP_CURRENCY;
+    let recognitionCatalog = null;
 
     const registry = { BADGE:new Set(), EVENT:new Set(), CHALLENGE:new Set() };
-    const legacyRegistry = { BADGE:new Set(), EVENT:new Set(), CHALLENGE:new Set() };
-    const lifecycle = { BADGE:new Map(), EVENT:new Map(), CHALLENGE:new Map() };
     const issues = [];
     const resolutions = new Map();
 
@@ -541,7 +534,6 @@
       return compareOrder(a,b)<0;
     }
     function memoTexts(tx){ const out=[]; for(const w of Array.isArray(tx?.Memos)?tx.Memos:[]){const m=w?.Memo||{}; for(const f of [m.MemoData,m.MemoType,m.MemoFormat]){const t=hexToText(f).trim(); if(t)out.push(t);}} return out; }
-    function isCanonicalNoOpAccountSet(tx){ return tx?.TransactionType==="AccountSet" && Number(tx.Flags||0)===0 && ACCOUNTSET_SPECIFIC_FIELDS.every(f=>!(f in tx)); }
     function validId(category,value){ return category==="CHALLENGE" ? /^LEAP-\d{3,}$/.test(value) : /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(value); }
 
     function parseCanonicalRecognition(text){
@@ -552,25 +544,6 @@
       return {key,value};
     }
     function recognitionFacts(tx){ const seen=new Set(),out=[]; for(const text of memoTexts(tx)){const f=parseCanonicalRecognition(text); if(!f)continue; const sig=`${f.key}=${f.value}`; if(!seen.has(sig)){seen.add(sig);out.push(f);}} return out; }
-    function lifecycleFact(entry){
-      const tx=normalizeTx(entry), ledger=ledgerIndex(entry,tx);
-      if(!authority||!transactionSucceeded(entry)||!isCanonicalNoOpAccountSet(tx)||!isAuthorizedAtLedger(authority,tx.Account,ledger,transactionIndex(entry)))return null;
-      const prefix=`${NAMESPACE}/RECOGNITION/`, suffix="/LIFECYCLE-TAG=", matches=[];
-      for(const text of memoTexts(tx)){
-        if(!text.startsWith(prefix))continue; const marker=text.indexOf(suffix,prefix.length); if(marker<0)continue;
-        const path=text.slice(prefix.length,marker), parts=path.split("/"), category=parts.shift(), id=parts.join("/"), action=text.slice(marker+suffix.length);
-        if(!CATEGORIES.includes(category)||!validId(category,id)||!["CREATE","END","IGNORE"].includes(action))continue;
-        if(text!==`${NAMESPACE}/RECOGNITION/${category}/${id}/LIFECYCLE-TAG=${action}`)continue;
-        matches.push({category,id,action,ledger});
-      }
-      return matches.length===1?matches[0]:null;
-    }
-    function applyLifecycle(f){
-      if(!f)return; const map=lifecycle[f.category], current=map.get(f.id)||null;
-      if(f.action==="CREATE"){ if(!current)map.set(f.id,{state:"ACTIVE",ledger:f.ledger}); return; }
-      if(f.action==="IGNORE"){ map.set(f.id,{state:"IGNORED",ledger:f.ledger}); return; }
-      if(f.action==="END" && current?.state!=="IGNORED") map.set(f.id,{state:"ENDED",ledger:f.ledger});
-    }
     function createdCheckId(meta){ for(const w of Array.isArray(meta?.AffectedNodes)?meta.AffectedNodes:[]){const n=w?.CreatedNode; if(n?.LedgerEntryType==="Check"&&n?.LedgerIndex)return n.LedgerIndex;} return ""; }
     function canonicalRecognitionCheck(entry){
       const tx=normalizeTx(entry), ledger=ledgerIndex(entry,tx);
@@ -578,33 +551,33 @@
       if(authority && isAuthorizedAtLedger(authority,tx.Account,ledger,transactionIndex(entry))) return true;
       return beforeInitial(entry) && LEGACY_DISTRIBUTORS.includes(String(tx.Account||""));
     }
-    function legacyVocabularyAllowed(entry){
-      const tx=normalizeTx(entry), ledger=ledgerIndex(entry,tx);
-      if(!beforeInitial(entry))return false;
-      return (authority && isAuthorizedAtLedger(authority,tx.Account,ledger,transactionIndex(entry))) || LEGACY_DISTRIBUTORS.includes(String(tx.Account||""));
-    }
     function processEntry(entry){
       if(entry?.validated===false||!transactionSucceeded(entry))return;
       const tx=normalizeTx(entry), meta=entry?.meta||entry?.metaData||entry?.metadata||{};
       if(tx.TransactionType==="CheckCash"&&tx.CheckID){resolutions.set(String(tx.CheckID).toUpperCase(),"redeemed");return;}
       if(tx.TransactionType==="CheckCancel"&&tx.CheckID){resolutions.set(String(tx.CheckID).toUpperCase(),"canceled");return;}
-      const lf=lifecycleFact(entry); if(lf){applyLifecycle(lf);return;}
       if(tx.TransactionType!=="CheckCreate"||!canonicalRecognitionCheck(entry))return;
       if(!canonicalLeapCurrency&&tx.SendMax?.currency)canonicalLeapCurrency=String(tx.SendMax.currency);
       const facts=recognitionFacts(tx), checkId=createdCheckId(meta);
-      if(facts.length!==1)return;
-      for(const fact of facts){
-        if(legacyVocabularyAllowed(entry)) legacyRegistry[fact.key].add(fact.value);
-        issues.push({checkId:checkId?checkId.toUpperCase():"",destination:String(tx.Destination||""),key:fact.key,value:fact.value,memo:`${NAMESPACE}/${fact.key}=${fact.value}`,expiration:Number(tx.Expiration||0)||null});
-      }
+      if(facts.length!==1||!recognitionCatalog)return;
+      const fact=facts[0];
+      const availability=recognitionAvailabilityFromCatalog({
+        catalog:recognitionCatalog,
+        category:fact.key,
+        id:fact.value,
+        ledgerIndex:ledgerIndex(entry,tx),
+        transactionIndex:transactionIndex(entry)
+      });
+      if(!availability.available)return;
+      issues.push({checkId:checkId?checkId.toUpperCase():"",destination:String(tx.Destination||""),key:fact.key,value:fact.value,memo:`${NAMESPACE}/${fact.key}=${fact.value}`,expiration:Number(tx.Expiration||0)||null});
     }
-    function rebuildRegistry(){
-      for(const key of CATEGORIES){
-        registry[key].clear();
-        for(const value of legacyRegistry[key]){ const state=lifecycle[key].get(value)?.state; if(state!=="ENDED"&&state!=="IGNORED")registry[key].add(value); }
-        for(const [value,record] of lifecycle[key]) if(record.state==="ACTIVE")registry[key].add(value);
+    function rebuildRegistryFromCatalog(){
+      for(const key of CATEGORIES)registry[key].clear();
+      for(const record of Array.isArray(recognitionCatalog?.records)?recognitionCatalog.records:[]){
+        const key=String(record?.category||"").trim().toUpperCase();
+        const value=String(record?.id||"").trim().toUpperCase();
+        if(record?.state==="ACTIVE"&&CATEGORIES.includes(key)&&validId(key,value))registry[key].add(value);
       }
-      for(const item of GLOBAL_RECOGNITIONS) registry[item.key]?.add(item.value);
     }
     function rippleNow(){return Math.floor(Date.now()/1000)-946684800;}
     function issueState(issue){const r=issue.checkId?resolutions.get(issue.checkId):""; if(r)return r; if(issue.expiration&&issue.expiration<=rippleNow())return "expired"; return "pending";}
@@ -618,17 +591,17 @@
     function renderRecognitionChoices(){
       const key=reason.value,address=destination.value.trim(); recognition.replaceChildren();
       if(!isClassicAddress(address)){recognition.disabled=true;recognitionLabel.textContent="Recognition";recognitionHint.textContent="Paste a valid destination address first so recipient-specific recognition eligibility can be applied.";recognition.append(new Option("Enter destination first",""));updatePreview();return;}
-      if(!key){recognition.disabled=true;recognitionLabel.textContent="Recognition";recognitionHint.textContent="Choices come from canonical lifecycle state plus backward-compatible legacy recognition history.";recognition.append(new Option("Choose a reason first",""));updatePreview();return;}
+      if(!key){recognition.disabled=true;recognitionLabel.textContent="Recognition";recognitionHint.textContent="Choices come from the shared recognition catalog reconstructed from XRPL history and protocol-defined built-ins.";recognition.append(new Option("Choose a reason first",""));updatePreview();return;}
       const word=reasonWord(key), all=sortValues(key,registry[key]), values=all.filter(v=>recognitionEligible(address,key,v)), suppressed=all.length-values.length;
       recognitionLabel.textContent=word.charAt(0).toUpperCase()+word.slice(1); recognition.append(new Option("Choose a "+word,"")); for(const value of values)recognition.append(new Option(prettyRecognition(value),value)); recognition.disabled=values.length===0;
-      if(all.length===0){recognition.replaceChildren(new Option("None active on XRPL yet",""));recognitionHint.textContent=`No active ${word}s were found in canonical lifecycle state.`;}
+      if(all.length===0){recognition.replaceChildren(new Option("None active on XRPL yet",""));recognitionHint.textContent=`No active ${word}s are currently available.`;}
       else if(values.length===0){recognition.replaceChildren(new Option("No eligible "+word+"s",""));recognitionHint.textContent=`Every active ${word} is pending or already redeemed for this destination.`;}
       else if(key==="BADGE")recognitionHint.textContent=values.length+" available; Badges may be awarded more than once to the same member.";
       else recognitionHint.textContent=values.length+" available"+(suppressed?`; ${suppressed} duplicate ${suppressed===1?"recognition":"recognitions"} suppressed.`:".");
       updatePreview();
     }
     function updatePreview(){const memo=currentMemo(); memoPreview.textContent=memo||"Choose a reason and recognition."; memoPreview.classList.toggle("empty",!memo); reviewButton.disabled=!(authority?.authorityEstablished&&operatingWallet&&isClassicAddress(destination.value.trim())&&memo&&validLeapAmount(amount.value));}
-    function resetRegistry(){for(const key of CATEGORIES){registry[key].clear();legacyRegistry[key].clear();lifecycle[key].clear();}issues.length=0;resolutions.clear();canonicalLeapCurrency=LEAP_CURRENCY;renderRecognitionChoices();}
+    function resetRegistry(){for(const key of CATEGORIES)registry[key].clear();issues.length=0;resolutions.clear();canonicalLeapCurrency=LEAP_CURRENCY;recognitionCatalog=null;renderRecognitionChoices();}
 
     async function readHistory(client,account){let marker,rows=[];do{const fields={account,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};if(marker!==undefined)fields.marker=marker;const r=await client.request("account_tx",fields,30000);const result=r.result||{};rows.push(...(Array.isArray(result.transactions)?result.transactions:[]));marker=result.marker;}while(marker!==undefined&&marker!==null);return rows;}
     function uniqueSortedEntries(entries){
@@ -641,14 +614,24 @@
       clearError();refreshButton.disabled=true;resetRegistry();setStatus("XRPL: resolving authority…");
       const client=new DirectXRPLClient(XRPL_SERVER);
       try{
-        clearCommunityAuthorityCache(); authority=await resolveCommunityAuthority({community,serverUrl:XRPL_SERVER,force:true});
+        clearCommunityAuthorityCache();
+        clearRecognitionCatalogCache();
+        authority=await resolveCommunityAuthority({community,serverUrl:XRPL_SERVER,force:true});
         if(authority.initialStatementNeeded)throw new Error("First on-ledger Operating Wallet statement required before new recognition Checks. Use Manage Operating Wallet first.");
         operatingWallet=authority.currentAccount; if(!isClassicAddress(operatingWallet))throw new Error("Canonical Community Operating Wallet could not be resolved.");
+        recognitionCatalog=await loadRecognitionCatalog({
+          community,
+          serverUrl:XRPL_SERVER,
+          issuer:LEAP_ISSUER,
+          currency:LEAP_CURRENCY,
+          force:true,
+          includeIgnored:true
+        });
+        rebuildRegistryFromCatalog();
         await client.connect();
         const accounts=[...new Set([...authority.accounts,...LEGACY_DISTRIBUTORS].filter(isClassicAddress))];
         const pages=await Promise.all(accounts.map(account=>readHistory(client,account)));
         for(const entry of uniqueSortedEntries(pages.flat()))processEntry(entry);
-        rebuildRegistry();
         setStatus(`XRPL: ${community?.communityName||communityId} registry loaded`,"live"); updatedText.textContent="Updated "+new Intl.DateTimeFormat(undefined,{hour:"numeric",minute:"2-digit"}).format(new Date());
         renderRecognitionChoices();restoreDraft();
       }catch(error){authority=null;operatingWallet="";setStatus("XRPL: connection problem","error");showError(error?.message||String(error));updatePreview();}
