@@ -405,7 +405,8 @@
 <section id="registry">
 <h2>3. Authority Registry</h2>
 <p>
-          LEAP uses two kinds of authority. Protocol-level identities are defined by this protocol. Community-level Operating Wallet authority is resolved from validated XRPL authority-state history once that community has activated on-ledger authority state.
+          LEAP separates protocol-level asset identities, protocol-level Owner authority, and community-level Operating Wallet authority.
+          The LEAP Issuer and LEAP Distributor are protocol-defined identities. Owner Wallet authority and Community Operating Wallet authority are resolved from validated XRPL authority-state history after their respective canonical establishment.
         </p>
 <table class="registry">
 <tr><th>Role</th><th>XRPL Account</th><th>Status</th></tr>
@@ -420,9 +421,14 @@
 <td>The single current protocol-defined Distributor. It creates LEAP allocation Checks for communities.</td>
 </tr>
 <tr>
+<td>Owner Wallet</td>
+<td class="address">r4ZJA28EzaTa3g1GvMqQ37WjwTmgwkEHRb</td>
+<td>The protocol-level authority that provisions brand-new communities. It is separate from the LEAP Issuer, LEAP Distributor, and every Community Operating Wallet.</td>
+</tr>
+<tr>
 <td>SFL Community Operating Wallet</td>
 <td class="address">r9BwELxkK5CEvpTeYeCvMnD4KPC6jdq8MF</td>
-<td>Current configured SFL Operating Wallet and existing-community migration authority until SFL publishes its first canonical <code>OPERATING-WALLET</code> statement.</td>
+<td>Current canonical SFL Community Operating Wallet, established on XRPL by the one-time existing-community migration statement.</td>
 </tr>
 </table>
 <div class="rule">
@@ -433,8 +439,15 @@
           </div>
 </div>
 <div class="note">
-          The Wild Ledger Owner is an application and protocol-governance role. That role does not, by itself, make an XRPL account authoritative for a community transaction.
+          The Owner is an application and protocol-governance role. The Owner Wallet is the XRPL account that carries protocol provisioning authority. Being the human or application Owner does not, by itself, authorize an arbitrary XRPL account; protocol authority follows the canonical Owner Wallet history.
         </div>
+<div class="rule">
+<div class="tag">Owner Authority Rule</div>
+<div>
+            The current Owner Wallet may establish the first Community Operating Wallet for a Community ID that has never previously been established. After that establishment transaction validates, the Owner Wallet has no continuing authority to replace that community's Operating Wallet.
+            The current Owner Wallet may transfer Owner authority by publishing a canonical <code>OWNER-WALLET</code> authority-state statement naming a successor account. From that ledger position forward, the successor is the current Owner Wallet.
+          </div>
+</div>
 <div class="rule">
 <div class="tag">Authority Resolution Rule</div>
 <div>
@@ -456,6 +469,12 @@
 <tr><td>Canonical on-ledger currency value</td><td><code>4C45415000000000000000000000000000000000</code> <span class="mini">(current Wild Ledger configuration; live-ledger verification remains required before Protocol 1.0)</span></td></tr>
 <tr><td>Protocol maximum supply</td><td>None. Historical metadata or earlier project declarations do not establish a LEAP Protocol supply cap.</td></tr>
 </table>
+<div class="rule">
+<div class="tag">Issuer Permanence</div>
+<div>
+            The LEAP Issuer account is part of the canonical identity of LEAP. It is not an authority-state role subject to ordinary wallet rotation. A different issuer address identifies a different XRPL issued asset.
+          </div>
+</div>
 <div class="fact">
 <div class="tag">XRPL Fact</div>
 <div>
@@ -521,14 +540,15 @@ LEAP-002</code></pre>
 <section id="memos">
 <h2>6. Namespace &amp; Memo Standard</h2>
 <p>
-          LEAP uses public memo strings across permitted XRPL transaction types. The root namespace is <code>&lt;COMMUNITY&gt;-LEAP</code>.
-          Each community has its own canonical namespace, while every community follows the same LEAP Protocol grammar and transaction semantics.
+          LEAP uses public memo strings across permitted XRPL transaction types. Community records use the root namespace <code>&lt;COMMUNITY&gt;-LEAP</code>.
+          Protocol-level Owner authority uses the separate <code>LEAP/AUTHORITY</code> namespace. Each community has its own canonical namespace, while every community follows the same LEAP Protocol grammar and transaction semantics.
         </p>
 <table>
 <tr><th>Protocol record</th><th>Canonical decoded memo</th><th>LEAP moves?</th></tr>
 <tr><td>Member recognition award</td><td><code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;CANONICAL-ID&gt;</code></td><td>Yes</td></tr>
 <tr><td>Recognition-definition lifecycle</td><td><code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code></td><td>No</td></tr>
 <tr><td>Community authority state</td><td><code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code></td><td>No</td></tr>
+<tr><td>Owner authority state</td><td><code>LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></td><td>No</td></tr>
 <tr><td>Community allocation</td><td><code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code></td><td>Yes, when the allocation Check is cashed</td></tr>
 </table>
 <div class="rule">
@@ -584,7 +604,8 @@ SFL-LEAP/RECOGNITION/BADGE/GOOD-CHAT/LIFECYCLE-TAG=END
 SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE
 
 SFL-LEAP/ALLOCATION=500
-SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;ADDRESS&gt;</code></pre>
+SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;ADDRESS&gt;
+LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 <div class="fact">
 <div class="tag">XRPL Fact</div>
 <div>
@@ -612,6 +633,7 @@ SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;ADDRESS&gt;</code></pre>
 <tr><td>Member recognition by direct delivery</td><td><code>Payment</code></td><td>The Operating Wallet delivers LEAP immediately to a member already able to receive it.</td></tr>
 <tr><td>Recognition-definition lifecycle</td><td>No-op <code>AccountSet</code></td><td>Creates, ends, or ignores a Badge, Event, or Challenge definition without moving LEAP.</td></tr>
 <tr><td>Community authority state</td><td>No-op <code>AccountSet</code></td><td>Publishes a canonical community authority value without moving LEAP.</td></tr>
+<tr><td>Owner authority state</td><td>No-op <code>AccountSet</code></td><td>Publishes the canonical Owner Wallet without moving LEAP.</td></tr>
 <tr><td>Check cancellation</td><td><code>CheckCancel</code></td><td>Removes an unredeemed Check; no LEAP is earned from that canceled Check.</td></tr>
 </table>
 <h3>7.0 Community allocation Checks</h3>
@@ -735,7 +757,8 @@ SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;ADDRESS&gt;</code></pre>
           </div>
 </div>
 <div class="note">
-          Definitions established before lifecycle activation remain readable as legacy-established definitions when supported by valid authorized historical recognition records. Their IDs remain reserved and may later receive <code>END</code> or <code>IGNORE</code> without a retroactive <code>CREATE</code>.
+          For a community that existed before canonical community authority state, the validated position of its one-time existing-community migration statement is that community's recognition lifecycle activation point. Definitions supported by valid authorized historical recognition records before that point remain readable as legacy-established definitions. Their IDs remain reserved and may later receive <code>END</code> or <code>IGNORE</code> without a retroactive <code>CREATE</code>.
+          For a newly provisioned community, its first valid <code>OPERATING-WALLET</code> establishment transaction is both its canonical community-establishment point and its recognition lifecycle activation point. From that point forward, a recognition definition must be established by canonical <code>CREATE</code> before it can be awarded.
         </div>
 <h3>7.6 Community authority state — no-op <code>AccountSet</code></h3>
 <div class="rule">
@@ -750,14 +773,35 @@ SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;ADDRESS&gt;</code></pre>
           A documented pre-authority-state Community Operating Wallet may publish exactly one initial <code>OPERATING-WALLET</code> statement naming itself.
           After that statement validates, XRPL authority-state history is canonical for that community.
         </p>
+<h4>Brand-new community establishment</h4>
+<p>
+          For a Community ID with no prior canonical community authority-state history, the current Owner Wallet may publish exactly one initial <code>OPERATING-WALLET</code> statement naming that community's first Community Operating Wallet.
+          The sender must be the Owner Wallet authorized at that ledger position. When the transaction validates, the Community ID is permanently established and reserved, the named account becomes that community's authorized Community Operating Wallet, and XRPL authority-state history becomes canonical for that community from that ledger position forward.
+          The Owner Wallet does not retain authority to replace the Operating Wallet of an established community.
+        </p>
 <h4>Operating Wallet replacement</h4>
 <p>
           The currently authorized Community Operating Wallet may replace itself by publishing a valid <code>OPERATING-WALLET</code> statement naming the successor account.
           The sender must be the Operating Wallet resolved immediately before the transaction. The latest valid value wins from that ledger position forward.
         </p>
 <div class="note">
-          First establishment for a brand-new community and emergency recovery from a lost or compromised current Operating Wallet remain explicit open protocol decisions in Section 16.
+          Emergency recovery from a lost or compromised current Operating Wallet remains an explicit open protocol decision in Section 16.
         </div>
+<h3>7.7 Owner Wallet authority state — no-op <code>AccountSet</code></h3>
+<div class="rule">
+<div class="tag">Canonical Owner Authority-State Transaction</div>
+<div>
+            An Owner Wallet authority-state record is a successful, validated no-op <code>AccountSet</code> containing exactly one canonical <code>LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code> memo and no AccountSet-specific mutation fields.
+          </div>
+</div>
+<h4>Initial Owner Wallet establishment</h4>
+<p>
+          The initial Owner Wallet designated in the Protocol Authority Registry may publish exactly one initial <code>OWNER-WALLET</code> statement naming itself. After that statement validates, XRPL Owner Wallet authority-state history is canonical.
+        </p>
+<h4>Owner Wallet replacement</h4>
+<p>
+          The currently authorized Owner Wallet may replace itself by publishing a valid <code>OWNER-WALLET</code> statement naming the successor account. The sender must be the Owner Wallet resolved immediately before the transaction. The latest valid value wins from that ledger position forward.
+        </p>
 </section>
 <section id="membership">
 <h2>8. Membership &amp; Rank Rules</h2>
@@ -909,7 +953,7 @@ SFL-CAMEO</code></pre>
         </p>
 <h3>11.5 Authority and allocation history</h3>
 <p>
-          Resolve the current Community Operating Wallet from the latest valid <code>OPERATING-WALLET</code> authority-state statement and resolve historical authority at the ledger position being evaluated.
+          Resolve the current Owner Wallet from the latest valid <code>OWNER-WALLET</code> authority-state statement. Resolve the current Community Operating Wallet from the latest valid <code>OPERATING-WALLET</code> authority-state statement and resolve historical authority at the ledger position being evaluated.
           Reconstruct community allocations from valid LEAP Distributor allocation Checks; community ownership comes from the canonical allocation memo namespace.
         </p>
 <h3>11.6 Query output map</h3>
@@ -922,6 +966,7 @@ SFL-CAMEO</code></pre>
 <tr><td>What recognitions has this member earned?</td><td>Validated recognition history after lifecycle/provenance validation</td></tr>
 <tr><td>What recognition opportunities exist now?</td><td>Validated recognition-definition lifecycle history</td></tr>
 <tr><td>Is a Check still outstanding?</td><td>Validated Check ledger object / <code>account_objects</code></td></tr>
+<tr><td>What is the current Owner Wallet?</td><td>Latest valid <code>OWNER-WALLET</code> authority-state value</td></tr>
 <tr><td>What is the current Operating Wallet?</td><td>Latest valid <code>OPERATING-WALLET</code> authority-state value</td></tr>
 <tr><td>Which Operating Wallet was authoritative historically?</td><td>Latest valid authority-state value preceding the transaction in canonical XRPL order</td></tr>
 <tr><td>Which community owns an allocation?</td><td>Community namespace in the valid Distributor allocation memo</td></tr>
@@ -947,6 +992,8 @@ SFL-CAMEO</code></pre>
 <li>An allocation Check is created by the LEAP Distributor and contains exactly one canonical allocation memo whose amount matches the offered whole-number LEAP amount.</li>
 <li>Allocation ownership comes from the community namespace in the memo, not from the delivery address.</li>
 <li>An authority-state record is a no-op <code>AccountSet</code> with exactly one canonical authority-state memo and valid authority for that key.</li>
+<li>The initial <code>OWNER-WALLET</code> statement is published by the Owner Wallet designated in the Protocol Authority Registry and names that same account; later <code>OWNER-WALLET</code> replacements are published by the Owner Wallet resolved immediately before the transaction.</li>
+<li>For a previously unestablished Community ID, the initial <code>OPERATING-WALLET</code> statement is published by the current Owner Wallet and names the community's first Operating Wallet.</li>
 <li>For later <code>OPERATING-WALLET</code> replacements, the sender equals the Operating Wallet resolved immediately before the transaction.</li>
 </ul>
 <div class="rule">
@@ -1041,6 +1088,7 @@ SFL-CAMEO</code></pre>
 <tr><td>0.14</td><td>2026-09-30</td><td>Removed the temporary Issuer first-assignment rule. Existing pre-authority-state communities migrate by having their already-established Community Operating Wallet publish one self-identifying first <code>OPERATING-WALLET</code> value naming itself; future-community first establishment remains open. Corrected wallet-role provenance throughout: Distributor creates allocation Checks; Community Operating Wallet creates member recognition Checks and community protocol statements.</td></tr>
 <tr><td>0.15</td><td>2026-09-30</td><td>Defined allocation attribution independently from wallet rotation. A valid Distributor allocation belongs to the community named by the canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> memo; <code>Destination</code> records delivery and audit history but does not define community ownership. Historical allocations remain attributable to the same community after Operating Wallet changes.</td></tr>
 <tr><td>0.16</td><td>2026-10-01</td><td>Protocol hardening pass. Distinguished current LEAP from community Earned LEAP; made rank community-specific and cumulative; clarified one protocol-defined LEAP Distributor and Community Operator vs. Community Operating Wallet; removed the historical 1,000,000 supply cap as a protocol rule; made community namespaces generic and permanently reserved; clarified that recognition definitions are created and managed by no-op lifecycle <code>AccountSet</code> transactions while member recognition always transfers LEAP; added first-class recognition by <code>Payment</code> for payment-enabled members alongside recognition by Check; made Badges repeatable while Events and Challenges remain occurrence-specific; removed wallet-specific and seven-day UI procedures from the protocol; and rewrote implementation/query/validity guidance to conform to the core protocol.</td></tr>
+<tr><td>0.17</td><td>2026-10-01</td><td>Added protocol-level Owner Wallet authority, separate from the LEAP Issuer and LEAP Distributor. The current Owner Wallet may provision the first Community Operating Wallet for a brand-new Community ID and may transfer Owner authority to a successor Owner Wallet. After a community is established, the Owner Wallet has no continuing authority to replace that community's Operating Wallet; subsequent community authority changes are controlled by the current Community Operating Wallet.</td></tr>
 </table>
 <div class="note">
           The change log records the evolution of earlier drafts. Superseded rules described in older rows are historical context, not current protocol requirements.
@@ -1053,9 +1101,7 @@ SFL-CAMEO</code></pre>
         </p>
 <ul class="checklist">
 <li>Verify the configured LEAP 160-bit currency value against live XRPL state and then remove the verification qualifier from Section 4.</li>
-<li>Record the lifecycle activation ledger position so pre-lifecycle recognition definitions and post-activation <code>CREATE</code> requirements are deterministically separated.</li>
-<li>Publish and validate SFL's one-time existing-community migration statement from its current Operating Wallet: <code>SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;CURRENT-OPERATING-WALLET&gt;</code>.</li>
-<li>Define first-establishment authority for a brand-new community created after authority-state activation.</li>
+
 <li>Define an emergency recovery rule for a lost, inaccessible, or compromised current Community Operating Wallet.</li>
 <li>Define the Earned LEAP / rank treatment of any prior awards if a recognition definition is later marked <code>IGNORE</code>. The underlying XRPL token transfers cannot be reversed by the lifecycle marker, but Protocol 1.0 must state whether those amounts remain official Earned LEAP.</li>
 </ul>
