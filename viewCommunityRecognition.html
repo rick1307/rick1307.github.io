@@ -102,6 +102,76 @@
       line-height: 1.35;
     }
 
+    .great-chat-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0 18px;
+    }
+
+    .great-chat-metric {
+      min-width: 0;
+      padding: 14px 12px 13px;
+      border: 1px solid #d7c985;
+      border-radius: 16px;
+      background: #fffbea;
+      text-align: center;
+    }
+
+    .great-chat-metric:nth-child(2) {
+      border-color: #b9d8c7;
+      background: #f1fbf5;
+    }
+
+    .great-chat-value {
+      display: inline-grid;
+      place-items: center;
+      min-width: 94px;
+      min-height: 54px;
+      padding: 7px 18px;
+      border-radius: 999px;
+      background: #f5df72;
+      color: #443600;
+      font-size: clamp(30px, 7vw, 46px);
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .great-chat-metric:nth-child(2) .great-chat-value {
+      background: #bfe9cf;
+      color: #124b2f;
+    }
+
+    .great-chat-label {
+      display: block;
+      margin-top: 8px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .great-chat-note {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 520px) {
+      .great-chat-summary { gap: 9px; }
+      .great-chat-metric { padding: 12px 8px; }
+      .great-chat-value {
+        min-width: 78px;
+        min-height: 48px;
+        padding: 6px 13px;
+      }
+      .great-chat-label { font-size: 11px; }
+    }
+
     .summary {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1236,6 +1306,19 @@
       <div class="recognition-title">Community Recognition</div>
     </div>
 
+    <div class="great-chat-summary" aria-label="Great Chat totals from validated XRP Ledger history">
+      <div class="great-chat-metric">
+        <strong class="great-chat-value" id="greatChatCount">…</strong>
+        <span class="great-chat-label">Great Chats</span>
+        <small class="great-chat-note">Completed recognitions</small>
+      </div>
+      <div class="great-chat-metric">
+        <strong class="great-chat-value" id="greatChatLeap">…</strong>
+        <span class="great-chat-label">LEAP Received</span>
+        <small class="great-chat-note">From Great Chats</small>
+      </div>
+    </div>
+
     <div id="historySummary" class="summary" aria-label="Community recognition views">
       <button class="summary-card" id="badgesViewButton" type="button" aria-pressed="true">
         <strong id="badgeTotal">0</strong><span>Badges</span>
@@ -1352,6 +1435,8 @@
       const badgesViewButton = document.getElementById("badgesViewButton");
       const challengesViewButton = document.getElementById("challengesViewButton");
       const eventsViewButton = document.getElementById("eventsViewButton");
+      const greatChatCountEl = document.getElementById("greatChatCount");
+      const greatChatLeapEl = document.getElementById("greatChatLeap");
 
       title.textContent = communityName;
       document.title = `${communityName} | Community Recognition`;
@@ -1717,6 +1802,142 @@
         setRecognitionMode(historyView, recognitionMode[historyView]);
       }
 
+      function extractAwardFacts(tx) {
+        const facts = [];
+        const seen = new Set();
+
+        for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
+          const memo = wrapper?.Memo || {};
+          for (const field of [memo.MemoData, memo.MemoType, memo.MemoFormat]) {
+            const parsed = parseCanonicalAward(hexToText(field));
+            if (!parsed) continue;
+            const signature = `${parsed.category}:${parsed.id}`;
+            if (seen.has(signature)) continue;
+            seen.add(signature);
+            facts.push(parsed);
+          }
+        }
+
+        return facts;
+      }
+
+      function isGreatChatAward(tx) {
+        const facts = extractAwardFacts(tx);
+        return facts.length === 1 &&
+          facts[0].category === "BADGE" &&
+          facts[0].id === "GREAT-CHAT";
+      }
+
+      function extractCreatedCheckId(meta) {
+        const nodes = meta?.AffectedNodes || meta?.affected_nodes || [];
+        for (const wrapper of nodes) {
+          const node = wrapper?.CreatedNode || wrapper?.created_node;
+          if (!node) continue;
+          const type = node.LedgerEntryType || node.ledger_entry_type;
+          if (type !== "Check") continue;
+          return node.LedgerIndex || node.ledger_index || "";
+        }
+        return "";
+      }
+
+      function leapAmountValue(amount) {
+        if (!isLeapAmount(amount)) return null;
+        const value = Number(amount.value);
+        return Number.isFinite(value) && value > 0 ? value : null;
+      }
+
+      async function accountHistory(account) {
+        const entries = [];
+        let marker;
+        do {
+          const command = {
+            command:"account_tx",
+            account,
+            ledger_index_min:-1,
+            ledger_index_max:-1,
+            binary:false,
+            forward:true,
+            limit:400
+          };
+          if (marker !== undefined && marker !== null) command.marker = marker;
+          const result = await request(command);
+          entries.push(...(Array.isArray(result.transactions) ? result.transactions : []));
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+        return entries;
+      }
+
+      function greatChatStatsFromHistory(entries, sourceAccount) {
+        const cashed = new Map();
+        let count = 0;
+        let leap = 0;
+
+        for (const entry of entries) {
+          if (!transactionSucceeded(entry)) continue;
+          const tx = normalizeTx(entry);
+          if (tx.TransactionType !== "CheckCash" || !tx.CheckID) continue;
+          const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+          const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+          let amount = leapAmountValue(delivered);
+          if (amount === null) amount = leapAmountValue(tx.Amount);
+          if (amount !== null) cashed.set(String(tx.CheckID), amount);
+        }
+
+        for (const entry of entries) {
+          if (!transactionSucceeded(entry)) continue;
+          const tx = normalizeTx(entry);
+          const ledger = ledgerIndex(entry, tx);
+          if (tx.Account !== sourceAccount) continue;
+          if (!authority || !isAuthorizedAtLedger(authority, sourceAccount, ledger, transactionIndex(entry))) continue;
+          if (!isGreatChatAward(tx)) continue;
+
+          if (tx.TransactionType === "CheckCreate") {
+            if (!isLeapAmount(tx.SendMax)) continue;
+            const checkId = extractCreatedCheckId(entry?.meta || entry?.metaData || entry?.metadata || {});
+            if (!checkId || !cashed.has(checkId)) continue;
+            count += 1;
+            leap += cashed.get(checkId);
+            continue;
+          }
+
+          if (tx.TransactionType === "Payment") {
+            const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+            const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+            let amount = leapAmountValue(delivered);
+            if (amount === null) amount = leapAmountValue(tx.Amount);
+            if (amount === null) continue;
+            count += 1;
+            leap += amount;
+          }
+        }
+
+        return { count, leap };
+      }
+
+      function renderGreatChatStats(stats) {
+        const count = Number(stats?.count || 0);
+        const leap = Number(stats?.leap || 0);
+        greatChatCountEl.textContent = count.toLocaleString();
+        greatChatLeapEl.textContent = Number.isInteger(leap)
+          ? leap.toLocaleString()
+          : leap.toLocaleString(undefined, { maximumFractionDigits:6 });
+      }
+
+      async function loadGreatChatStats() {
+        const accounts = [...new Set((authority?.accounts || []).filter(Boolean))];
+        let totalCount = 0;
+        let totalLeap = 0;
+
+        for (const account of accounts) {
+          const entries = await accountHistory(account);
+          const stats = greatChatStatsFromHistory(entries, account);
+          totalCount += stats.count;
+          totalLeap += stats.leap;
+        }
+
+        return { count:totalCount, leap:Number(totalLeap.toFixed(6)) };
+      }
+
       function connect() {
         return new Promise((resolve, reject) => {
           socket = new WebSocket(XRPL_SERVER);
@@ -1800,7 +2021,12 @@
             }
           }
           render();
+
+          await connect();
+          renderGreatChatStats(await loadGreatChatStats());
         } catch (error) {
+          greatChatCountEl.textContent = "—";
+          greatChatLeapEl.textContent = "—";
           console.warn(error?.message || String(error));
         } finally {
           if (socket) { try { socket.close(); } catch (_) {} }
