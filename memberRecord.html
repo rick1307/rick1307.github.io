@@ -2214,7 +2214,7 @@
             }
 
             const facts = extractLeapFacts(tx);
-            if (!officialRecognitionSource(txResult, tx) || !facts.length) return null;
+            if (!officialRecognitionSource(txResult, tx) || facts.length !== 1) return null;
 
             return {
               ...check,
