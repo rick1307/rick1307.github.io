@@ -137,14 +137,14 @@
   }
 
   function buildTransaction(draft) {
-    if (!draft.distributor || !draft.destination || !draft.leapIssuer || !draft.leapCurrency || !draft.memo) {
-      throw new Error("The Check draft is missing transaction data. Return to Create LEAP Check and rebuild it.");
+    if (!draft.operatingWallet || !draft.destination || !draft.leapIssuer || !draft.leapCurrency || !draft.memo) {
+      throw new Error("The Check draft is missing canonical Community Operating Wallet transaction data. Return to Create LEAP Check and rebuild it.");
     }
     if (!validWholeLeap(draft.amount)) throw new Error("LEAP amount must be a positive whole number.");
 
     return {
       TransactionType: "CheckCreate",
-      Account: draft.distributor,
+      Account: draft.operatingWallet,
       Destination: draft.destination,
       SendMax: {
         currency: draft.leapCurrency,

@@ -126,14 +126,24 @@
   <p class="footnote">New Checks have no ledger expiration. The Checkbook turns them red after 7 days so you can clean them up with Cancel Check. Cancel Check opens Xaman's Signing Tool with the exact <code>CheckCancel</code> template; nothing is canceled until you sign and submit.</p>
 </main>
 
-<script>
+<script src="js/wildLedgerConfig.js"></script>
+<script src="js/communityConfig.js" data-registry-only="true"></script>
+<script type="module">
+import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorityCache } from "./js/communityAuthority.js";
 (() => {
   "use strict";
 
-  const XRPL_SERVER = "wss://s1.ripple.com/";
-  const AUTHORIZED_DISTRIBUTORS = ["rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"];
-  const LEAP_ISSUER = "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq";
-  const NAMESPACE = "SFL-LEAP";
+  const params = new URLSearchParams(location.search);
+  const requestedCommunity = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
+  const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunity) || null;
+  const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedCommunity) || String(requestedCommunity).trim().toUpperCase();
+  const config = window.WILD_LEDGER_CONFIG || {};
+  const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
+  const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
+  const LEAP_ISSUER = String(config.leapIssuer || "").trim();
+  const NAMESPACE = community?.leapNamespace || `${communityId}-LEAP`;
+  let authority = null;
+  let CHECK_ACCOUNTS = [];
   const RECOGNIZED_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
   const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
   const CLEANUP_MS = 7 * 24 * 60 * 60 * 1000;
@@ -176,6 +186,18 @@
   function isLeapAmount(amount){return !!amount&&typeof amount==="object"&&amount.issuer===LEAP_ISSUER&&decodeCurrency(amount.currency).toUpperCase()==="LEAP";}
   function normalizeTx(entry){return entry?.tx_json||entry?.tx||entry?.transaction||entry||{};}
   function transactionSucceeded(meta){if(!meta||typeof meta!=="object")return true;const result=meta.TransactionResult??meta.transaction_result;return !result||result==="tesSUCCESS";}
+  function ledgerIndex(entry,tx=normalizeTx(entry)){const n=Number(entry?.ledger_index??entry?.ledgerIndex??tx?.ledger_index??tx?.ledgerIndex);return Number.isFinite(n)?n:null;}
+  function transactionIndex(entry){const meta=entry?.meta||entry?.metaData||entry?.metadata||{};const n=Number(entry?.tx_index??entry?.transaction_index??meta?.TransactionIndex??meta?.transaction_index);return Number.isFinite(n)?n:null;}
+  function beforeInitial(info){
+    if(!authority?.initialStatement)return true;
+    const ledger=Number(info?.ledger), idx=Number.isFinite(info?.txIndex)?Number(info.txIndex):-1;
+    const initLedger=Number(authority.initialStatement.ledger), initIdx=Number.isFinite(authority.initialStatement.txIndex)?Number(authority.initialStatement.txIndex):-1;
+    return ledger<initLedger || (ledger===initLedger && idx<initIdx);
+  }
+  function canonicalRecognitionSource(account,info){
+    if(authority && isAuthorizedAtLedger(authority,account,info?.ledger,info?.txIndex))return true;
+    return beforeInitial(info) && LEGACY_DISTRIBUTORS.includes(String(account||""));
+  }
 
   function parseStructuredData(text){
     const out={}; if(!text)return out;
@@ -201,13 +223,15 @@
     const nodes=meta?.AffectedNodes||meta?.affected_nodes||[]; for(const wrapper of nodes){const node=wrapper?.CreatedNode||wrapper?.created_node;if(!node)continue;const type=node.LedgerEntryType||node.ledger_entry_type;if(type!=="Check")continue;return node.LedgerIndex||node.ledger_index||null;} return null;
   }
   function rememberCheckCreate(tx,meta,info){
-    if(tx.TransactionType!=="CheckCreate"||!AUTHORIZED_DISTRIBUTORS.includes(tx.Account)||!isLeapAmount(tx.SendMax))return;
-    const checkId=extractCreatedCheckId(meta); const record={hash:info.hash||tx.hash||"",checkId:checkId||"",time:cleanIso(info.time),destination:tx.Destination||"",amount:tx.SendMax,expiration:typeof tx.Expiration==="number"?tx.Expiration:null,facts:extractFacts(tx)};
+    if(tx.TransactionType!=="CheckCreate"||!isLeapAmount(tx.SendMax)||!canonicalRecognitionSource(tx.Account,info))return;
+    const facts=extractFacts(tx);
+    if(!facts.length)return; // Allocation Checks are Distributor activity, not member recognition Checkbook entries.
+    const checkId=extractCreatedCheckId(meta); const record={hash:info.hash||tx.hash||"",checkId:checkId||"",time:cleanIso(info.time),destination:tx.Destination||"",amount:tx.SendMax,expiration:typeof tx.Expiration==="number"?tx.Expiration:null,facts};
     if(record.hash)checkCreatesByHash.set(record.hash,record); if(checkId)checkCreatesById.set(checkId,record);
   }
   function processHistoryEntry(entry){
     if(entry?.validated===false)return; const tx=normalizeTx(entry); const meta=entry?.meta||tx?.meta; if(!transactionSucceeded(meta))return;
-    const info={time:entry?.close_time_iso||entry?.date||tx?.date||null,hash:entry?.hash||tx?.hash||null}; rememberCheckCreate(tx,meta,info);
+    const info={time:entry?.close_time_iso||entry?.date||tx?.date||null,hash:entry?.hash||tx?.hash||null,ledger:ledgerIndex(entry,tx),txIndex:transactionIndex(entry)}; rememberCheckCreate(tx,meta,info);
   }
 
   function checkObjectId(object){return object?.index||object?.LedgerIndex||object?.ledger_index||"";}
@@ -256,7 +280,7 @@
   }
 
   function rowsForRender(){
-    const rows=checkbookObjects.filter(o=>isLeapAmount(o.SendMax)).map(object=>({object,create:checkCreateFor(object)}));
+    const rows=checkbookObjects.filter(o=>isLeapAmount(o.SendMax)).map(object=>({object,create:checkCreateFor(object)})).filter(row=>row.create?.facts?.length);
     rows.sort((a,b)=>{const ta=a.create?.time?new Date(a.create.time).getTime():0;const tb=b.create?.time?new Date(b.create.time).getTime():0;return tb-ta;});
     return rows;
   }
@@ -301,11 +325,11 @@
   }
   function request(command){return new Promise((resolve,reject)=>{if(!socket||socket.readyState!==WebSocket.OPEN){reject(new Error("XRPL connection is not open."));return;}const id="leap-checkbook-"+(++requestCounter);pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,api_version:2,...command}));setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(new Error("XRPL request timed out."));}},30000);});}
   async function loadAccountHistory(account){let marker;do{const command={command:"account_tx",account,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};if(marker!==undefined)command.marker=marker;const result=await request(command);for(const entry of Array.isArray(result.transactions)?result.transactions:[])processHistoryEntry(entry);marker=result.marker;}while(marker!==undefined&&marker!==null);}
-  async function loadCheckbook(){const objects=[];for(const account of AUTHORIZED_DISTRIBUTORS){let marker;do{const command={command:"account_objects",account,type:"check",ledger_index:"validated",limit:400};if(marker!==undefined)command.marker=marker;const result=await request(command);const page=Array.isArray(result.account_objects)?result.account_objects:[];objects.push(...page.filter(object=>object.Account===account&&isLeapAmount(object.SendMax)));marker=result.marker;}while(marker!==undefined&&marker!==null);}checkbookObjects=objects;}
+  async function loadCheckbook(){const objects=[];for(const account of CHECK_ACCOUNTS){let marker;do{const command={command:"account_objects",account,type:"check",ledger_index:"validated",limit:400};if(marker!==undefined)command.marker=marker;const result=await request(command);const page=Array.isArray(result.account_objects)?result.account_objects:[];objects.push(...page.filter(object=>object.Account===account&&isLeapAmount(object.SendMax)));marker=result.marker;}while(marker!==undefined&&marker!==null);}checkbookObjects=objects;}
   async function loadReserveIncrement(){try{const result=await request({command:"server_state"});const ledger=result?.state?.validated_ledger||result?.state?.validatedLedger||{};const xrpCandidate=ledger.reserve_inc_xrp??result?.state?.reserve_inc_xrp;if(xrpCandidate!==undefined&&xrpCandidate!==null){const value=Number(xrpCandidate);reserveIncrementXrp=Number.isFinite(value)?value:null;}else{const drops=Number(ledger.reserve_inc);reserveIncrementXrp=Number.isFinite(drops)?drops/1_000_000:null;}}catch{reserveIncrementXrp=null;}}
-  async function subscribeLive(){await request({command:"subscribe",accounts:AUTHORIZED_DISTRIBUTORS});}
+  async function subscribeLive(){if(CHECK_ACCOUNTS.length)await request({command:"subscribe",accounts:CHECK_ACCOUNTS});}
   async function start(){
-    try{if(socket){try{socket.close();}catch{}}pending.clear();checkCreatesById=new Map();checkCreatesByHash=new Map();checkbookObjects=[];reserveIncrementXrp=null;loaded=false;renderCheckbook();await connect();for(const account of AUTHORIZED_DISTRIBUTORS)await loadAccountHistory(account);await Promise.all([loadCheckbook(),loadReserveIncrement()]);loaded=true;await subscribeLive();setStatus("XRPL: live","live");updatedText.textContent=`· Updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`;renderCheckbook();}catch(error){showError(error?.message||String(error));}
+    try{if(socket){try{socket.close();}catch{}}pending.clear();checkCreatesById=new Map();checkCreatesByHash=new Map();checkbookObjects=[];reserveIncrementXrp=null;loaded=false;renderCheckbook();clearCommunityAuthorityCache();authority=await resolveCommunityAuthority({community,serverUrl:XRPL_SERVER,force:true});CHECK_ACCOUNTS=[...new Set([...(authority?.accounts||[]),...LEGACY_DISTRIBUTORS].filter(Boolean))];await connect();for(const account of CHECK_ACCOUNTS)await loadAccountHistory(account);await Promise.all([loadCheckbook(),loadReserveIncrement()]);loaded=true;await subscribeLive();setStatus("XRPL: live","live");updatedText.textContent=`· Updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`;renderCheckbook();}catch(error){showError(error?.message||String(error));}
   }
 
   document.getElementById("refreshButton").addEventListener("click",start); allButton.addEventListener("click",()=>setFilter("all")); expiredButton.addEventListener("click",()=>setFilter("expired"));

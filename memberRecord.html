@@ -1184,8 +1184,9 @@
 
   <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js"></script>
-  <script>
-    (() => {
+  <script type="module">
+    import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
+    (async () => {
       const community = window.WILD_LEDGER_COMMUNITY;
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
 
@@ -1241,7 +1242,8 @@
       const LEAP_ISSUER = wildLedger.leapIssuer;
       const LEAP_CURRENCY = wildLedger.leapCurrency;
       const LEAP_TRANSFER_LIMIT = wildLedger.leapTransferLimit;
-      const LEAP_DISTRIBUTORS = new Set(wildLedger.leapDistributors);
+      const LEGACY_DISTRIBUTORS = new Set(Array.isArray(wildLedger.leapDistributors) ? wildLedger.leapDistributors : []);
+      let communityAuthority = null;
 
       const LEAP_NAMESPACE = community.leapNamespace;
       const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
@@ -1977,10 +1979,37 @@
       function officialIncomingLeapCheck(object, memberAccount) {
         if (!object || object.LedgerEntryType !== "Check") return null;
         if (object.Destination !== memberAccount) return null;
-        if (!LEAP_DISTRIBUTORS.has(object.Account)) return null;
         if (!isLeapAmount(object.SendMax)) return null;
-
         return object;
+      }
+
+      function entryLedgerIndex(entry, tx = entry?.tx_json || entry?.tx || entry?.transaction || entry || {}) {
+        const n = Number(entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.ledgerIndex);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function entryTransactionIndex(entry) {
+        const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+        const n = Number(entry?.tx_index ?? entry?.transaction_index ?? meta?.TransactionIndex ?? meta?.transaction_index);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function beforeAuthorityActivation(entry, tx = entry?.tx_json || entry?.tx || entry?.transaction || entry || {}) {
+        if (!communityAuthority?.initialStatement) return true;
+        const ledger = entryLedgerIndex(entry, tx);
+        if (!Number.isFinite(ledger)) return false;
+        const txIndex = entryTransactionIndex(entry);
+        const initialLedger = Number(communityAuthority.initialStatement.ledger);
+        const initialIndex = Number.isFinite(communityAuthority.initialStatement.txIndex) ? Number(communityAuthority.initialStatement.txIndex) : -1;
+        const index = Number.isFinite(txIndex) ? txIndex : -1;
+        return ledger < initialLedger || (ledger === initialLedger && index < initialIndex);
+      }
+
+      function officialRecognitionSource(entry, tx = entry?.tx_json || entry?.tx || entry?.transaction || entry || {}) {
+        const ledger = entryLedgerIndex(entry, tx);
+        const txIndex = entryTransactionIndex(entry);
+        if (communityAuthority && isAuthorizedAtLedger(communityAuthority, tx.Account, ledger, txIndex)) return true;
+        return beforeAuthorityActivation(entry, tx) && LEGACY_DISTRIBUTORS.has(tx.Account);
       }
 
       function queryPendingLeapChecks(account) {
@@ -2154,7 +2183,7 @@
       async function enrichPendingLeapChecks(checks) {
         if (!Array.isArray(checks) || !checks.length) return [];
 
-        return Promise.all(checks.map(async check => {
+        const enriched = await Promise.all(checks.map(async check => {
           const originHash = String(check?.PreviousTxnID || "");
 
           if (!/^[A-Fa-f0-9]{64}$/.test(originHash)) {
@@ -2189,9 +2218,12 @@
               }
             }
 
+            const facts = extractLeapFacts(tx);
+            if (!officialRecognitionSource(txResult, tx) || !facts.length) return null;
+
             return {
               ...check,
-              _leapFacts:extractLeapFacts(tx),
+              _leapFacts:facts,
               _createdAtMs:createdAtMs
             };
           } catch (_) {
@@ -2202,6 +2234,7 @@
             return { ...check, _leapFacts:[], _createdAtMs:null };
           }
         }));
+        return enriched.filter(Boolean);
       }
 
       async function queryPendingLeapChecksWithMemos(account) {
@@ -2331,7 +2364,7 @@
         const result = meta.TransactionResult ?? meta.transaction_result;
 
         if (result && result !== "tesSUCCESS") return null;
-        if (!LEAP_DISTRIBUTORS.has(tx.Account)) return null;
+        if (!officialRecognitionSource(entry, tx)) return null;
         if (tx.Destination !== memberAccount) return null;
 
         let officialLeapAsset = false;
@@ -3148,6 +3181,13 @@
         - No localStorage fallback.
         - Only the active wallet handed off by index.html or join.html may load.
       */
+      try {
+        communityAuthority = await resolveCommunityAuthority({ community, serverUrl: XRPL_WS });
+      } catch (error) {
+        console.warn("Community authority could not be fully resolved for Member Record:", error);
+        communityAuthority = null;
+      }
+
       const rawActiveWallet = getRawActiveWallet();
       const activeWallet = getActiveWallet();
 
