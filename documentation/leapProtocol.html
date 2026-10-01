@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>LEAP Protocol — Working Operating Standard</title>
+<title>LEAP Protocol 1.0</title>
 <style>
     :root{
       --ink:#10243a;
@@ -93,7 +93,7 @@
     }
     .layout{
       display:grid;
-      grid-template-columns:245px minmax(0,1fr);
+      grid-template-columns:330px minmax(0,1fr);
       gap:22px;
       margin-top:22px;
     }
@@ -107,16 +107,57 @@
       padding:16px;
       box-shadow:0 5px 18px rgba(20,50,70,.05);
     }
-    .toc strong{display:block;margin-bottom:8px}
+    .toc-title{
+      display:block;
+      margin-bottom:5px;
+      font-size:1.02rem;
+      font-weight:850;
+    }
+    .toc-intro{
+      margin:0 0 13px;
+      color:var(--muted);
+      font-size:.84rem;
+      line-height:1.42;
+    }
+    .toc-card{
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:12px;
+      margin-top:11px;
+      background:#fff;
+    }
+    .toc-card.core{
+      border-color:#9ec5b4;
+      background:var(--green-soft);
+    }
+    .toc-card.implementation{
+      border-color:#b8cad9;
+      background:var(--soft);
+    }
+    .toc-card-title{
+      margin:0 0 3px;
+      font-size:.78rem;
+      font-weight:900;
+      letter-spacing:.055em;
+      text-transform:uppercase;
+      color:var(--ink);
+    }
+    .toc-card-copy{
+      margin:0 0 8px;
+      color:#536779;
+      font-size:.78rem;
+      line-height:1.38;
+    }
     .toc a{
       display:block;
       text-decoration:none;
       color:#41566a;
-      padding:6px 7px;
+      padding:5px 6px;
       border-radius:8px;
-      font-size:.91rem;
+      font-size:.88rem;
+      line-height:1.28;
     }
-    .toc a:hover{background:var(--soft);color:var(--blue)}
+    .toc a:hover{background:rgba(255,255,255,.72);color:var(--blue)}
     main{min-width:0}
     section{
       background:var(--panel);
@@ -253,29 +294,35 @@
 </div>
 <div class="shell">
 <header class="hero">
-<div class="eyebrow">Sailing Frog's Leap — Internal Operating Document</div>
-<h1>LEAP Protocol</h1>
+<div class="eyebrow">Wild Ledger</div>
+<h1>LEAP Protocol 1.0</h1>
 <p>
-      A working standard for how LEAP is identified, distributed, named, queried, interpreted,
-      and used to establish membership, rank, events, challenges, badges, and permanent recognition on the XRP Ledger.
+      This is LEAP. Sections 1–6 are the authoritative Protocol Core. If you cannot accurately explain Sections 1–6, do not modify Wild Ledger protocol behavior.
     </p>
 <div class="meta">
-<span class="pill">Working Draft 0.15</span>
 <span class="pill">XRPL Mainnet</span>
-<span class="pill">Internal / Unlinked</span>
-<span class="pill">Last revised: 2026-09-30</span>
+<span class="pill">Protocol Core + Implementation Guide</span>
+<span class="pill">Last revised: 2026-10-01</span>
 </div>
 </header>
 <div class="layout">
 <nav aria-label="Document sections" class="toc">
-<strong>Contents</strong>
+<strong class="toc-title">Table of Contents</strong>
+<p class="toc-intro">This document must stand on its own. Do not rely on prior conversations, memory, or inferred intent to reinterpret the Protocol Core.</p>
 <div class="links">
+<div class="toc-card core">
+<div class="toc-card-title">Authoritative Protocol Core — Read First</div>
+<p class="toc-card-copy">Sections 1–6 define LEAP. They are authoritative. Any implementation, interpretation, UI, or later section that conflicts with them is wrong and must be corrected. If you cannot accurately explain Sections 1–6, do not modify Wild Ledger protocol behavior.</p>
 <a href="#purpose">1. Purpose</a>
 <a href="#principles">2. Core Principles</a>
 <a href="#registry">3. Authority Registry</a>
 <a href="#identity">4. LEAP Asset Identity</a>
 <a href="#naming">5. Naming Conventions</a>
 <a href="#memos">6. Namespace &amp; Memo Standard</a>
+</div>
+<div class="toc-card implementation">
+<div class="toc-card-title">Implementation &amp; Interpretation</div>
+<p class="toc-card-copy">Sections 7–17 are engineering guidance. Developers and AI may compare, improve, replace, or propose implementation approaches here, but they may not contradict or silently redefine Sections 1–6. A change to the Protocol Core is a proposed protocol change, not an implementation decision.</p>
 <a href="#transactions">7. Transaction Standards</a>
 <a href="#membership">8. Membership &amp; Rank</a>
 <a href="#badges">9. Badges &amp; History</a>
@@ -288,41 +335,48 @@
 <a href="#open">16. Open Decisions</a>
 <a href="#sources">17. XRPL References</a>
 </div>
+</div>
 </nav>
 <main>
 <section id="purpose">
 <h2>1. Purpose</h2>
 <p class="lead">
-          The LEAP Protocol exists so that every future page, script, distribution, badge rule, and XRPL query
-          interprets LEAP in the same way.
+          The LEAP Protocol defines the durable rules that make LEAP activity interpretable across Wild Ledger communities and across time.
+          It is written so that a future developer or AI can read this document, understand the protocol, and safely build against it without inventing new meaning.
         </p>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            This document is the operating source of truth for how LEAP canonical ledger facts are interpreted.
-            Public-facing pages may simplify these rules, but they should not silently invent different ones.
+            Sections 1–6 are the authoritative source of truth for LEAP protocol meaning. Wild Ledger implements and presents that Protocol Core; it does not redefine it.
+            Public pages, operator tools, wallets, signers, user interfaces, implementation notes, and later sections may simplify, explain, or improve the implementation, but they must not silently change the authoritative protocol rules.
           </div>
 </div>
 <p>
-          This protocol deliberately separates <strong>current state</strong> from <strong>historical fact</strong>.
-          Current state answers questions such as “How much LEAP does this wallet hold now?” Historical fact answers
-          questions such as “Was this wallet officially awarded Panama Crew?”
+          LEAP deliberately separates <strong>current holdings</strong> from <strong>community-earned standing</strong>.
+          “How much LEAP is in this wallet now?” and “How much LEAP has this member earned from this community?” are different questions and may have different answers.
         </p>
+<div class="decision">
+<div class="tag">Authority Boundary</div>
+<div>
+            Sections 1–6 define the authoritative Protocol Core. Sections 7–17 explain how to implement, query, validate, display, and evolve software around that core.
+            Developers and AI may challenge or replace implementation approaches in Sections 7–17. They may not reinterpret Sections 1–6. If later guidance or code conflicts with the Protocol Core, the later guidance or code is wrong and must be corrected.
+          </div>
+</div>
 </section>
 <section id="principles">
 <h2>2. Core Principles</h2>
 <div class="status-grid">
 <div class="status-card">
-<b>Current State</b>
-<span class="mini">Membership, balance, current rank, outstanding objects.</span>
+<b>Recognition</b>
+<span class="mini">A member receives LEAP for an existing Badge, Event, or Challenge.</span>
 </div>
 <div class="status-card">
-<b>Historical State</b>
-<span class="mini">Awards, recognition lifecycle markers, events, distributions, provenance, dates, transaction hashes.</span>
+<b>Lifecycle State</b>
+<span class="mini">No LEAP moves. The community publishes which recognition definitions exist and whether they are available.</span>
 </div>
 <div class="status-card">
 <b>Authority</b>
-<span class="mini">Only the approved XRPL authority for a transaction type can create official LEAP protocol facts.</span>
+<span class="mini">Protocol facts count only when the correct XRPL authority performs the correct protocol act.</span>
 </div>
 </div>
 <div class="rule">
@@ -335,778 +389,570 @@
 </div>
 <h3>Operating rules</h3>
 <ul>
-<li>Use validated XRPL data for every canonical fact and for decisions that affect membership, rank, recognition, or protocol state.</li>
-<li>Never treat a memo by itself as proof of official LEAP recognition.</li>
-<li>Always verify LEAP currency identity and issuer identity together.</li>
-<li>Never use a display label as the canonical machine identifier.</li>
-<li>Once a canonical identifier has been used on-ledger, do not rename or reuse it.</li>
-<li>Rank is dynamic. Historical recognition is permanent unless an explicit future revocation rule is created.</li>
-<li>Each website page may query XRPL independently unless a future architecture change explicitly replaces that rule.</li>
+<li>Use validated XRPL data for canonical protocol facts.</li>
+<li>Interpret protocol meaning from the transaction type, authorized provenance, canonical asset identity, canonical memo, and validated result together.</li>
+<li>Never treat a memo by itself as proof of official LEAP activity.</li>
+<li>Member recognition always involves LEAP moving to a member.</li>
+<li>Recognition-definition lifecycle state never moves LEAP and never recognizes a member.</li>
+<li>Recognition definitions and member recognition history are separate ledger-derived views and must never be substituted for one another.</li>
+<li>Current LEAP balance is a current wallet fact. Earned LEAP is cumulative community history. They are not interchangeable.</li>
+<li>Community rank is derived from that community's cumulative Earned LEAP, not from current wallet balance.</li>
+<li>Moving LEAP after it has been earned does not erase the earning history or reduce rank.</li>
+<li>Canonical machine identifiers remain stable even when friendly display labels change.</li>
+<li>User-interface presentation is flexible. Protocol meaning is not.</li>
 </ul>
-<div class="decision">
-<div class="tag">Design Principle — Automatic Stabilizers</div>
-<div>
-            LEAP should prefer rules that are enforced or naturally reinforced by the ledger itself rather than by a growing pile of manual administration.
-            Canonical identifiers reduce ambiguity; Check state prevents ordinary duplicate issuance; the seven-day Operator cleanup policy limits how long an unattended Check normally remains open;
-            validated history preserves the record; and owner reserve makes large numbers of open Checks consume real working capital.
-            The reserve is not a fee or burn. It is temporary capital tied up while the ledger object remains open, which provides a useful anti-spam and discipline mechanism.
-          </div>
-</div>
 </section>
 <section id="registry">
 <h2>3. Authority Registry</h2>
 <p>
-          LEAP authority is determined by protocol role and validated XRPL history. Static configuration may cache or display resolved authority,
-          but after authority-state activation it is not the canonical source of the current Community Operating Wallet.
+          LEAP uses two kinds of authority. Protocol-level identities are defined by this protocol. Community-level Operating Wallet authority is resolved from validated XRPL authority-state history once that community has activated on-ledger authority state.
         </p>
 <table class="registry">
-<tr>
-<th>Role</th>
-<th>XRPL Account</th>
-<th>Status</th>
-</tr>
+<tr><th>Role</th><th>XRPL Account</th><th>Status</th></tr>
 <tr>
 <td>LEAP Issuer</td>
 <td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td>
-<td>Canonical LEAP issuer; defines LEAP asset identity and is the issuer referenced by LEAP trustlines</td>
+<td>Protocol-defined LEAP asset issuer and issuer referenced by LEAP trust lines and issued-currency amounts.</td>
 </tr>
 <tr>
-<td>Distributor 01</td>
+<td>LEAP Distributor</td>
 <td class="address">rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU</td>
-<td>Authorized for LEAP allocation Check issuance to community operations</td>
+<td>The single current protocol-defined Distributor. It creates LEAP allocation Checks for communities.</td>
 </tr>
 <tr>
 <td>SFL Community Operating Wallet</td>
 <td class="address">r9BwELxkK5CEvpTeYeCvMnD4KPC6jdq8MF</td>
-<td>Existing pre-authority-state SFL Operating Wallet; authorized once to publish its own initial canonical <code>OPERATING-WALLET</code> statement under the existing-community migration rule</td>
+<td>Current configured SFL Operating Wallet and existing-community migration authority until SFL publishes its first canonical <code>OPERATING-WALLET</code> statement.</td>
 </tr>
 </table>
 <div class="rule">
-<div class="tag">Authority Resolution Rule</div>
+<div class="tag">Role Separation</div>
 <div>
-            After a community has a canonical <code>OPERATING-WALLET</code> authority-state statement, the authorized Community Operating Wallet is the
-            latest valid value for that community key at the ledger position being evaluated. A matching memo from any other wallet does not count.
+            A <strong>Community Operator</strong> is the human or business role that runs a community. A <strong>Community Operating Wallet</strong> is the XRPL account authorized to perform that community's protocol transactions.
+            The ledger authenticates the account that signed the transaction, not the human title behind it.
           </div>
 </div>
 <div class="note">
-          The LEAP Issuer does not establish Community Operating Wallet authority. For communities that existed before on-ledger authority state, the protocol provides a one-time migration rule: the already-established pre-authority-state Operating Wallet may publish its own first canonical value. After that, routine replacement is self-service through the currently authorized Operating Wallet.
+          The Wild Ledger Owner is an application and protocol-governance role. That role does not, by itself, make an XRPL account authoritative for a community transaction.
+        </div>
+<div class="rule">
+<div class="tag">Authority Resolution Rule</div>
+<div>
+            After a community has a canonical <code>OPERATING-WALLET</code> authority-state statement, the authorized Community Operating Wallet at any ledger position is the latest valid value for that community key immediately before the protocol act being evaluated.
+            A matching memo from another account does not become official merely because the text is correct.
+          </div>
+</div>
+<div class="note">
+          For a community that existed before on-ledger authority state, the already-established pre-authority-state Operating Wallet may publish the one-time initial canonical value naming itself. After that statement validates, future Operating Wallet replacement is performed by the currently authorized Operating Wallet through a new canonical authority-state statement.
         </div>
 </section>
 <section id="identity">
 <h2>4. LEAP Asset Identity</h2>
 <table>
-<tr><th>Property</th><th>Working value</th></tr>
+<tr><th>Property</th><th>Protocol value</th></tr>
 <tr><td>Public name</td><td>LEAP</td></tr>
 <tr><td>Network</td><td>XRP Ledger Mainnet</td></tr>
 <tr><td>Issuer</td><td class="address">rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq</td></tr>
-<tr><td>Declared maximum supply</td><td>1,000,000 LEAP — project rule, not an XRPL protocol-enforced cap</td></tr>
-<tr><td>Canonical on-ledger currency value</td><td><strong>TO VERIFY FROM LEDGER BEFORE HARD-CODING</strong></td></tr>
-<tr><td>Genesis ledger / first issuance ledger</td><td><strong>TO RECORD</strong></td></tr>
+<tr><td>Canonical on-ledger currency value</td><td><code>4C45415000000000000000000000000000000000</code> <span class="mini">(current Wild Ledger configuration; live-ledger verification remains required before Protocol 1.0)</span></td></tr>
+<tr><td>Protocol maximum supply</td><td>None. Historical metadata or earlier project declarations do not establish a LEAP Protocol supply cap.</td></tr>
 </table>
 <div class="fact">
 <div class="tag">XRPL Fact</div>
 <div>
             Standard XRPL currency codes are three characters. Nonstandard currency codes use a 160-bit hexadecimal value.
-            Because LEAP is four letters, code must compare against the actual on-ledger currency value rather than assuming
-            every API will return the literal text <code>LEAP</code>.
+            Because LEAP is four letters, protocol software must compare the canonical on-ledger value and issuer together rather than assuming every XRPL interface will return the literal text <code>LEAP</code>.
           </div>
 </div>
 </section>
 <section id="naming">
 <h2>5. Naming Conventions</h2>
 <p>
-          Human-facing names may be friendly and change over time. Canonical IDs are for machines and must remain stable.
+          Human-facing names may be friendly and may change over time. Canonical IDs are machine identities and must remain stable.
         </p>
 <table>
 <tr><th>Object</th><th>Canonical pattern</th><th>Example</th></tr>
-<tr><td>Root namespace</td><td><code>SFL-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
-<tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>NEW-MEMBER</code></td></tr>
-<tr><td>Event ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LA-CRUZ-BEACH-BONFIRE</code></td></tr>
+<tr><td>Community ID</td><td>UPPERCASE-HYPHENATED</td><td><code>SFL</code></td></tr>
+<tr><td>Community root namespace</td><td><code>&lt;COMMUNITY&gt;-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
+<tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>GOOD-CHAT</code></td></tr>
+<tr><td>Event ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
 <tr><td>Challenge ID</td><td><code>LEAP-NNN</code></td><td><code>LEAP-001</code></td></tr>
 </table>
 <div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="tag">Canonical ID Rule</div>
 <div>
-            Canonical IDs use uppercase ASCII letters, numbers, and hyphens only. Avoid spaces, underscores, punctuation,
-            apostrophes, emojis, and decorative capitalization. Once used on-ledger, an ID is permanent.
+            Canonical IDs use uppercase ASCII letters, numbers, and hyphens only. Avoid spaces, underscores, punctuation, apostrophes, emojis, and decorative capitalization.
+            Once a canonical ID is established on-ledger, its meaning must not be renamed, reassigned, or recycled.
           </div>
 </div>
+<div class="rule">
+<div class="tag">Community ID Reservation</div>
+<div>
+            A Community ID is globally unique within Wild Ledger and is permanently reserved to that community once established.
+            A different community must not reuse the ID and inherit another community's namespace history. The same continuing community may retain its existing ID across Operating Wallet changes or operator succession.
+          </div>
+</div>
+<h3>Recognition IDs</h3>
+<p>
+          A Badge, Event, or Challenge definition is created before it can be awarded. Wild Ledger should validate or generate compliant canonical IDs so Operators do not have to manually construct protocol strings.
+          Before creating a new definition, software must check the complete XRPL-derived history for that community and category and reject an ID that has already been established, ended, or ignored.
+        </p>
 <h3>Broad-to-narrow specificity</h3>
 <p>
-          When a recurring or similar real-world recognition needs to be distinguished from an earlier one, extend the identifier
-          from the broadest concept toward progressively narrower qualifiers. Add only as much specificity as is needed to make the intended recognition unambiguous.
+          Add qualifiers only when they distinguish the meaning of the recognition itself. Specificity proceeds from broad to narrow, left to right.
+          The validated XRPL timestamp distinguishes transactions; a new date or suffix is not required merely because the same repeatable Badge is awarded again.
         </p>
 <pre><code>PANAMA-CREW
 PANAMA-CREW-2026
 PANAMA-CREW-2026-MARCH
 PANAMA-CREW-2026-MARCH-13</code></pre>
-<div class="rule">
-<div class="tag">LEAP Standard</div>
-<div>
-            Specificity proceeds from <strong>large to small</strong>, left to right. A recurring recognition should receive a more specific canonical ID rather than reusing
-            the same exact recognition for the same recipient. A year, month, day, location, edition, or other qualifier may be added when it distinguishes the recognition itself.
-            The XRPL validated timestamp remains the authoritative record of when the transaction was actually issued.
-          </div>
-</div>
+<div class="note">
+          A repeatable Badge such as <code>GOOD-CHAT</code> keeps the same canonical ID across awards. Individual XRPL transactions distinguish the individual awards.
+        </div>
 <h3>Examples</h3>
 <pre><code>NEW-MEMBER
 FIRST-MEMBER
-LEAP-OG
+GOOD-CHAT
 PANAMA-CREW-2026
-
 LA-CRUZ-BEACH-BONFIRE-2026
 PACIFIC-CROSSING
-
 LEAP-001
 LEAP-002</code></pre>
-<div class="note">
-          Public display names can be “New Member,” “First Member,” “LEAP OG,” “Panama Crew 2026,” or “Pacific Crossing.”
-          The canonical identifiers remain unchanged on the ledger.
-        </div>
 </section>
 <section id="memos">
 <h2>6. Namespace &amp; Memo Standard</h2>
 <p>
-          LEAP uses public memo strings across permitted XRPL transaction types. The memo namespace identifies the protocol meaning,
-          while the XRPL <code>TransactionType</code> is also part of the interpretation. The root namespace is <code>SFL-LEAP</code>.
+          LEAP uses public memo strings across permitted XRPL transaction types. The root namespace is <code>&lt;COMMUNITY&gt;-LEAP</code>.
+          Each community has its own canonical namespace, while every community follows the same LEAP Protocol grammar and transaction semantics.
         </p>
+<table>
+<tr><th>Protocol record</th><th>Canonical decoded memo</th><th>LEAP moves?</th></tr>
+<tr><td>Member recognition award</td><td><code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;CANONICAL-ID&gt;</code></td><td>Yes</td></tr>
+<tr><td>Recognition-definition lifecycle</td><td><code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code></td><td>No</td></tr>
+<tr><td>Community authority state</td><td><code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code></td><td>No</td></tr>
+<tr><td>Community allocation</td><td><code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code></td><td>Yes, when the allocation Check is cashed</td></tr>
+</table>
 <div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="tag">Interpretation Rule</div>
 <div>
-            A member recognition award uses <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> on the canonical recognition transaction.
-            A recognition lifecycle marker uses <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>
-            on a canonical no-op <code>AccountSet</code>. The current lifecycle actions are <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code>.
-            A protocol authority-state statement uses <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> on a canonical no-op <code>AccountSet</code>.
-            A community allocation uses <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> on the Distributor's canonical allocation <code>CheckCreate</code>.
+            Protocol meaning comes from the <strong>transaction type + authorized provenance + canonical memo + validated result</strong> together.
+            The same text from the wrong account or on the wrong transaction type does not create the intended protocol fact.
           </div>
 </div>
-<h3>Memo location, token scope, and community namespaces</h3><div class="fact">
-<div class="tag">XRPL Fact</div>
+<div class="rule">
+<div class="tag">Recognition vs. Lifecycle</div>
 <div>
-    <code>Memos</code> is a common XRPL transaction field, so different transaction types can carry LEAP protocol data.
-    A community allocation memo and a member recognition memo each belong to the <code>CheckCreate</code> transaction that creates the Check. A recognition lifecycle memo belongs to the
-    no-op <code>AccountSet</code> transaction that publishes the lifecycle statement. Neither memo belongs to an individual LEAP token or to a Check ledger object.
-    Cashing uses a separate <code>CheckCash</code> transaction, and canceling uses a separate <code>CheckCancel</code> transaction.
-  </div>
-</div><div class="note">
-<strong>LEAP is fungible.</strong> A memo does not travel with one specific LEAP coin or unit. The memo is part of the transaction record, not an individually serialized LEAP unit.
-</div><div class="rule">
-<div class="tag">Community Namespace Rule</div>
-<div>
-    A community namespace lets Wild Ledger software separate that community's LEAP records from unrelated wallet activity and organize them into the community's badges, events, challenges, member history, and administrative history. Each participating community can use its own namespace and conventions within the LEAP protocol.
-  </div>
-</div><h3>Community naming convention</h3>
-<p>
-          Participating communities use a common naming pattern so Wild Ledger software can recognize and organize community records consistently while keeping each community distinct.
-        </p>
-<table>
-<tr><th>Rule</th><th>Standard</th></tr>
-<tr><td>Community memo format</td><td>Each community uses its own namespace followed by a category and value: <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code>.</td></tr>
-<tr><td>Recognition categories</td><td>The standard categories are <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>. Examples include <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, <code>&lt;COMMUNITY&gt;-LEAP/EVENT=COMMUNITY-MEETUP</code>, and <code>&lt;COMMUNITY&gt;-LEAP/CHALLENGE=LEAP-001</code>.</td></tr>
-<tr><td>Recognition lifecycle</td><td>Lifecycle state is written as a self-identifying memo of the form <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code> on a canonical no-op <code>AccountSet</code>. The category and canonical recognition ID are part of the lifecycle path itself. Current actions are <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code>.</td></tr>
-<tr><td>Authority state</td><td>Single-valued protocol authority state is written as <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> on a canonical no-op <code>AccountSet</code>. Protocol 0.15 retains <code>OPERATING-WALLET</code> as the first authority-state key and adds explicit community-allocation attribution rules.</td></tr>
-<tr><td>Community allocation</td><td>A Distributor allocation is written as <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> on the allocation <code>CheckCreate</code>. The community namespace establishes which community the allocation belongs to; the Check destination records where that allocation was delivered.</td></tr>
-<tr><td>Badge memo</td><td>The memo gives the recognition a consistent name inside the community's namespace, such as <code>&lt;COMMUNITY&gt;-LEAP/BADGE=NEW-MEMBER</code> or <code>&lt;COMMUNITY&gt;-LEAP/BADGE=LEAP-OG</code>, so the badge can be identified later from ledger history.</td></tr>
-<tr><td>What the XRP Ledger understands</td><td>The XRP Ledger stores the memo data; it does not interpret the community namespace. The namespace is a Wild Ledger convention that lets software recognize and organize each community's records consistently.</td></tr>
-<tr><td>Why each community uses a namespace</td><td>It lets Wild Ledger software separate one community's records from unrelated wallet activity and organize them into badges, events, challenges, the Member Record, and administrative history.</td></tr>
-</table>
-<h3>Current recognition categories</h3>
-<table>
-<tr><th>Category</th><th>What it records</th><th>Canonical example</th></tr>
-<tr><td><code>BADGE</code></td><td>Permanent recognition for something the member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=NEW-MEMBER</code></td></tr>
-<tr><td><code>EVENT</code></td><td>A specific real-world or community occasion connected to the award</td><td><code>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
-<tr><td><code>CHALLENGE</code></td><td>A numbered LEAP participation challenge</td><td><code>SFL-LEAP/CHALLENGE=LEAP-001</code></td></tr>
-</table>
+            <strong>Member recognition and recognition-definition lifecycle are separate by design.</strong>
+            A member recognition transaction transfers LEAP to a member and records what that member earned.
+            A lifecycle no-op <code>AccountSet</code> transfers no LEAP and records whether a Badge, Event, or Challenge definition exists and is available.
+            A lifecycle <code>CREATE</code> does not award recognition. A member recognition transaction does not create a recognition definition.
+          </div>
+</div>
 <div class="decision">
-<div class="tag">Current Production Convention</div>
+<div class="tag">Two Ledger-Derived Views</div>
 <div>
-<strong>One Check. One recognition. One reason. One line in the logbook.</strong>
-            A Check may carry one or more whole LEAP, but it records exactly one Badge, Event, or Challenge recognition.
-            Do not bundle multiple recognitions into one Check. If a member earns two separate recognitions, create two separate Checks.
+            Wild Ledger reconstructs <strong>available recognition opportunities</strong> from validated lifecycle history and reconstructs <strong>member-earned recognition</strong> from validated LEAP-bearing recognition transactions.
+            Neither list substitutes for the other.
           </div>
 </div>
-<h3>Canonical grammar rules</h3>
-<ul class="checklist">
-<li>The prefix is exactly <code>SFL-LEAP/</code>.</li>
-<li>The category is one of <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code>. No fourth recognition category is implied by onboarding, rank, origin, or protocol metadata.</li>
-<li><code>NEW-MEMBER</code> is a Badge: <code>SFL-LEAP/BADGE=NEW-MEMBER</code>.</li>
-<li>Use one equals sign between category and value: <code>=</code>.</li>
-<li>The value uses uppercase ASCII letters, numbers, and hyphens only.</li>
-<li>Challenge values use the form <code>LEAP-NNN</code>, beginning with <code>LEAP-001</code>.</li>
-<li>Do not add spaces around separators.</li>
-<li>Do not append a date merely to duplicate the ledger timestamp. Add time or other qualifiers when they are needed to make a recurring recognition canonically distinct.</li>
-<li>The vertical bar character (<code>|</code>) is not part of the current recognition memo grammar and must not be used to bundle multiple recognitions into one Check.</li>
-<li>A lifecycle marker uses the self-identifying path <code>RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG</code>, where <code>&lt;CATEGORY&gt;</code> is exactly <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code>.</li>
-<li>The lifecycle action value is exactly <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code>.</li>
-<li>The canonical recognition ID in the lifecycle path follows the same canonical ID rules used by member recognition memos for that category.</li>
-<li>A canonical lifecycle <code>AccountSet</code> carries exactly one decoded public LEAP lifecycle memo. The lifecycle memo is self-identifying; a second recognition-identity memo is not required.</li>
-<li>An authority-state memo uses the path <code>AUTHORITY/&lt;KEY&gt;</code> followed by one equals sign and the current value.</li>
-<li><code>OPERATING-WALLET</code> is an authority-state key whose value is a valid XRPL classic account address.</li>
-<li>Authority-state keys are single-valued state. They do not use <code>BEGIN</code>, <code>END</code>, <code>OLD</code>, <code>NEW</code>, or a separate history object. Ledger ordering supplies the effective history.</li>
-<li>An allocation memo uses exactly <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code>, where <code>&lt;AMOUNT&gt;</code> is the same positive whole-number LEAP amount stated in <code>SendMax.value</code>.</li>
-<li>The allocation's community identity comes from the canonical community namespace in the memo, not from the destination wallet. The destination is delivery and audit data.</li>
-<li>Once a canonical recognition ID has been established, it is permanently reserved. IDs are never recycled after <code>END</code> or <code>IGNORE</code>.</li>
-</ul>
-<h3>Production examples</h3>
-<pre><code>SFL-LEAP/BADGE=NEW-MEMBER
-SFL-LEAP/BADGE=FIRST-MEMBER
-SFL-LEAP/BADGE=PANAMA-CREW-2026
-SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026
-SFL-LEAP/CHALLENGE=LEAP-001</code></pre>
-<h3>Recognition lifecycle examples</h3>
-<pre><code>SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=CREATE
-SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=END
-
-SFL-LEAP/RECOGNITION/CHALLENGE/LEAP-001/LIFECYCLE-TAG=CREATE
-SFL-LEAP/RECOGNITION/CHALLENGE/LEAP-001/LIFECYCLE-TAG=END
-
-SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=CREATE
-SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=END
-
-SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
-<h3>Allocation example</h3>
-<pre><code>SFL-LEAP/ALLOCATION=500</code></pre>
-<p class="mini">The namespace identifies Sailing Frog's Leap as the allocation owner. The Check destination records the wallet that received delivery.</p>
-<h3>Authority-state example</h3>
-<pre><code>SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;NEW-OPERATING-WALLET&gt;</code></pre>
-<p class="mini">
-          The transaction itself supplies provenance, ledger position, transaction hash, and time. The memo supplies the protocol key and asserted value.
-        </p>
-<h3>Ledger-discovered recognition vocabulary</h3>
-<p>
-          The XRPL is the working registry of canonical recognition IDs and their lifecycle. The normal recognition interface keeps the categories fixed at
-          <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code>, then reconstructs recognition state from validated protocol history rather than from a separate database.
-        </p>
+<h3>Recognition categories</h3>
+<table>
+<tr><th>Category</th><th>Meaning</th><th>Example award memo</th></tr>
+<tr><td><code>BADGE</code></td><td>Reusable recognition for something a member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=GOOD-CHAT</code></td></tr>
+<tr><td><code>EVENT</code></td><td>A specific real-world or community occurrence</td><td><code>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
+<tr><td><code>CHALLENGE</code></td><td>A numbered participation opportunity</td><td><code>SFL-LEAP/CHALLENGE=LEAP-001</code></td></tr>
+</table>
 <div class="rule">
-<div class="tag">Implementation Rule</div>
+<div class="tag">One Recognition Rule</div>
 <div>
-            Under the lifecycle model, a brand-new Badge, Event, or Challenge is born when the authorized Community Operating Wallet publishes a valid
-            self-identifying <code>CREATE</code> lifecycle <code>AccountSet</code>. An <code>END</code> lifecycle marker ends its normal active/available life without erasing
-            the identifier, prior awards, or ledger history. An <code>IGNORE</code> lifecycle marker permanently suppresses an erroneous or invalid recognition from normal recognition views
-            while preserving it in administrative ledger history. Failed transactions, malformed memos, matching text from unauthorized accounts, and mutating
-            <code>AccountSet</code> transactions do not establish lifecycle state.
+            <strong>One recognition transaction. One recognition. One reason. One line in the logbook.</strong>
+            A recognition transaction may deliver one or more whole LEAP, but it records exactly one Badge, Event, or Challenge reason.
           </div>
 </div>
-<div class="note">
-          Recognition IDs established before lifecycle markers are activated remain readable from valid authorized historical <code>CheckCreate</code> records.
-          Before software requires <code>CREATE</code> as the mandatory birth record for all newly created IDs, the lifecycle activation point must be recorded so legacy history remains deterministic.
-        </div>
+<h3>Lifecycle actions</h3>
+<ul>
+<li><code>CREATE</code> establishes the recognition definition and makes it available according to its category.</li>
+<li><code>END</code> normally ends future availability without erasing prior valid awards.</li>
+<li><code>IGNORE</code> terminally marks an erroneous, invalid, test, or otherwise non-operational definition. The ID remains permanently reserved.</li>
+</ul>
+<h3>Canonical examples</h3>
+<pre><code>SFL-LEAP/BADGE=GOOD-CHAT
+SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026
+SFL-LEAP/CHALLENGE=LEAP-001
+
+SFL-LEAP/RECOGNITION/BADGE/GOOD-CHAT/LIFECYCLE-TAG=CREATE
+SFL-LEAP/RECOGNITION/BADGE/GOOD-CHAT/LIFECYCLE-TAG=END
+SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE
+
+SFL-LEAP/ALLOCATION=500
+SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;ADDRESS&gt;</code></pre>
 <div class="fact">
 <div class="tag">XRPL Fact</div>
 <div>
-            XRPL transactions can contain a <code>Memos</code> array. A memo can use the protocol fields
-            <code>MemoType</code>, <code>MemoFormat</code>, and <code>MemoData</code>, which are represented as hexadecimal in transaction JSON.
-            Wallet software may expose these fields through a simpler user interface.
-          </div>
-</div>
-<div class="rule">
-<div class="tag">Implementation Rule</div>
-<div>
-            The LEAP protocol standardizes the <strong>decoded public text</strong>, not a particular wallet's field layout.
-            In Xaman's Check workflow, enter the complete canonical string into the single public memo box.
-            Reader software should decode the transaction memo fields, normalize the wallet representation, and accept only
-            a string that matches the LEAP grammar above.
+            LEAP is fungible. A memo is part of a transaction record; it does not travel with an individual LEAP unit.
+            XRPL stores memo data but does not interpret the LEAP namespace. LEAP Protocol software performs that interpretation.
           </div>
 </div>
 <div class="note">
-          Earlier draft structures may still be read for backward compatibility, but they are not used for new issuance.
-          <code>ORIGIN</code> and <code>PROTOCOL</code> are not current member-recognition categories. Protocol versions belong to this operating document and its change log.
+          The protocol standardizes the decoded public memo text, not a particular wallet or signer's user interface.
         </div>
 </section>
 <section id="transactions">
 <h2>7. Transaction Standards</h2>
-<table>
-<tr><th>Protocol act</th><th>XRPL transaction type</th><th>What it means</th></tr>
-<tr><td>Community allocation</td><td><code>CheckCreate</code></td><td>Distributor offers LEAP allocation or replenishment to community operations. This is separate from member recognition.</td></tr>
-<tr><td>Member recognition award</td><td><code>CheckCreate</code></td><td>Community Operating Wallet offers LEAP to a member and records one Badge, Event, or Challenge reason.</td></tr>
-<tr><td>Recognition lifecycle statement</td><td>No-op <code>AccountSet</code></td><td>Creates or ends the lifecycle of one canonical Badge, Event, or Challenge without moving LEAP.</td></tr>
-</table>
-<div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="decision">
+<div class="tag">Implementation Guide</div>
 <div>
-            <strong>RECOGNITION is a protocol domain, not a single XRPL transaction type.</strong> Reader software must interpret the transaction type and the decoded LEAP memo data together.
+            This section implements Sections 1–6. It does not create alternate protocol meaning. If an implementation rule conflicts with the core protocol, the implementation rule must be corrected.
           </div>
 </div>
+<table>
+<tr><th>Protocol act</th><th>XRPL transaction</th><th>Meaning</th></tr>
+<tr><td>Community allocation offer</td><td><code>CheckCreate</code></td><td>The LEAP Distributor offers LEAP to a named community.</td></tr>
+<tr><td>Community allocation delivery</td><td><code>CheckCash</code></td><td>The allocation Check is redeemed and LEAP is delivered.</td></tr>
+<tr><td>Member recognition by Check</td><td><code>CheckCreate</code> + successful <code>CheckCash</code></td><td>The Operating Wallet offers recognition; the member later accepts and receives the LEAP.</td></tr>
+<tr><td>Member recognition by direct delivery</td><td><code>Payment</code></td><td>The Operating Wallet delivers LEAP immediately to a member already able to receive it.</td></tr>
+<tr><td>Recognition-definition lifecycle</td><td>No-op <code>AccountSet</code></td><td>Creates, ends, or ignores a Badge, Event, or Challenge definition without moving LEAP.</td></tr>
+<tr><td>Community authority state</td><td>No-op <code>AccountSet</code></td><td>Publishes a canonical community authority value without moving LEAP.</td></tr>
+<tr><td>Check cancellation</td><td><code>CheckCancel</code></td><td>Removes an unredeemed Check; no LEAP is earned from that canceled Check.</td></tr>
+</table>
 <h3>7.0 Community allocation Checks</h3>
 <div class="flow">
-          Authorized Distributor<br/>
-          ↓<br/>
-          CheckCreate<br/>
-          ↓<br/>
-          Community-specific allocation memo + positive whole LEAP SendMax<br/>
-          ↓<br/>
-          Delivery wallet designated for the community<br/>
-          ↓<br/>
-          CheckCash
+          LEAP Distributor → CheckCreate → community delivery wallet → CheckCash
         </div>
+<ul class="checklist">
+<li><code>TransactionType = CheckCreate</code>.</li>
+<li><code>Account</code> is the LEAP Distributor authorized at that ledger position.</li>
+<li><code>SendMax</code> identifies canonical LEAP and contains a positive whole-number amount.</li>
+<li>Exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> memo is present.</li>
+<li>The memo amount matches the offered <code>SendMax.value</code>.</li>
+<li>The transaction succeeds in validated ledger history.</li>
+</ul>
 <div class="rule">
 <div class="tag">Allocation Attribution Rule</div>
 <div>
-            A protocol-valid allocation belongs to the community named in the canonical allocation memo.
-            The Check destination records where the Distributor delivered that allocation; it does <strong>not</strong> define community ownership.
-            Changing the Community Operating Wallet later must not orphan, reassign, or erase prior allocation history.
+            A valid allocation belongs to the community named in the canonical allocation memo. The Check destination records where the allocation was delivered; it does not define community ownership.
+            Later Operating Wallet changes do not orphan, transfer, or rewrite earlier community allocation history.
           </div>
 </div>
-<h4>Minimum checks for a canonical allocation CheckCreate</h4>
-<ul class="checklist">
-<li><code>TransactionType = CheckCreate</code></li>
-<li><code>Account</code> is an authorized Distributor for LEAP allocation issuance</li>
-<li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
-<li><code>SendMax.issuer</code> is the LEAP issuer</li>
-<li><code>SendMax.value</code> is a positive whole-number LEAP amount</li>
-<li>Exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> public memo is present</li>
-<li>The memo amount exactly matches <code>SendMax.value</code></li>
-<li><code>Destination</code> is retained as delivery and audit data, but need not remain the community's current or historical Operating Wallet for the allocation to remain attributable to that community</li>
-<li>Transaction is successful and in validated ledger history</li>
-</ul>
-<div class="note">
-          Allocation state and delivery state are distinct. <code>CheckCreate</code> records the Distributor's allocation offer; <code>CheckCash</code> completes delivery; <code>CheckCancel</code> cancels the outstanding delivery.
-          Wild Ledger may distinguish Pending, Cashed, and Canceled allocations while preserving the original community attribution from the allocation memo.
-        </div>
-<h3>7.1 Official recognition distribution</h3>
+<p>
+          <code>CheckCreate</code> records the allocation offer. Successful <code>CheckCash</code> completes delivery. <code>CheckCancel</code> cancels an unredeemed delivery.
+        </p>
+<h3>7.1 Member recognition by Check</h3>
 <div class="flow">
-          Authorized Community Operating Wallet<br/>
-          ↓<br/>
-          CheckCreate<br/>
-          ↓<br/>
-          Destination + positive whole LEAP SendMax + no on-ledger expiration + one canonical public memo<br/>
-          ↓<br/>
-          Member<br/>
-          ↓<br/>
-          CheckCash
+          Authorized Community Operating Wallet → CheckCreate → member → CheckCash → Earned LEAP
         </div>
-<div class="rule">
-<div class="tag">LEAP Standard</div>
-<div>
-            When a Check is used to deliver official recognition, the recognition memo belongs on the
-            <strong>CheckCreate</strong> transaction because that transaction is created by the authorized Community Operating Wallet.
-            The later <code>CheckCash</code> claims the Check; it does not replace the original recognition record.
-            The <code>CheckCreate</code> remains in validated transaction history even after the temporary Check ledger object is removed.
-          </div>
-</div>
-<h3>7.2 Minimum checks for a canonical recognition CheckCreate</h3>
 <ul class="checklist">
-<li><code>TransactionType = CheckCreate</code></li>
-<li><code>Account</code> is the Community Operating Wallet authorized for that community namespace at the time of the transaction</li>
-<li><code>Destination</code> is the intended member wallet</li>
-<li><code>SendMax.currency</code> is the canonical LEAP currency value</li>
-<li><code>SendMax.issuer</code> is the LEAP issuer</li>
-<li><code>SendMax.value</code> is a positive whole-number LEAP amount; fractional LEAP is not used by protocol policy</li>
-<li>The normal LEAP recognition Check omits the XRPL <code>Expiration</code> field</li>
-<li>Transaction is successful</li>
-<li>Transaction is in validated ledger history</li>
-<li>Exactly one canonical <code>SFL-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> public memo records the recognition reason</li>
+<li>The recognition definition already exists and is available at the ledger position of the <code>CheckCreate</code>.</li>
+<li><code>Account</code> is the Community Operating Wallet authorized for that community at that ledger position.</li>
+<li><code>Destination</code> is the intended member wallet.</li>
+<li><code>SendMax</code> identifies canonical LEAP and contains a positive whole-number amount.</li>
+<li>The standard recognition Check omits XRPL <code>Expiration</code>.</li>
+<li>Exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;CANONICAL-ID&gt;</code> recognition memo is present.</li>
+<li>The <code>CheckCreate</code> is successful and validated.</li>
 </ul>
-<h3>7.3 Issuance controls: amount, visibility, and cleanup</h3>
-<p>
-          The recognition identity comes from the canonical memo. Delivery timing is handled operationally rather than by putting an expiration on the normal Check.
-        </p>
-<table>
-<tr><th>Control</th><th>Protocol / interface rule</th></tr>
-<tr><td>LEAP amount</td><td>Positive whole numbers only. The normal form starts blank so the Operator must enter the amount deliberately. Zero is never submitted.</td></tr>
-<tr><td>XRPL Expiration</td><td>The normal LEAP recognition Check sets <strong>no on-ledger expiration</strong>. The Check remains cashable until it is cashed or canceled.</td></tr>
-<tr><td>Member Record notice</td><td>A pending no-expiration Check is shown to the member for <strong>7 days</strong> from the validated <code>CheckCreate</code> ledger timestamp, then the notice is hidden on day 8. Hiding the notice does not cancel or expire the Check.</td></tr>
-<tr><td>Operator cleanup flag</td><td>The Operator Checkbook marks an open no-expiration Check <strong>Cleanup Due</strong> after 7 days. This is an Operator-side operating rule only; it does not change the ledger object.</td></tr>
-<tr><td>Cleanup action</td><td>The Operator decides when to cancel an unwanted or stale Check. A validated <code>CheckCancel</code> removes the Check object and releases its owner reserve.</td></tr>
-<tr><td>Legacy expirations</td><td>Readers remain compatible with older Checks that contain an XRPL <code>Expiration</code>. Those legacy Checks are interpreted according to their actual ledger expiration.</td></tr>
-</table>
-<div class="note">
-          If the validated creation timestamp cannot be established, software must not invent a seven-day age. Member Record may keep the notice visible and the Checkbook may report that cleanup age is unavailable until authoritative timing can be determined.
-        </div>
-<h3>7.4 Recognition uniqueness and duplicate suppression</h3>
-<p>
-          Normal LEAP issuance treats the recipient address plus the exact canonical recognition as the duplicate key.
-          Amount, age, and cleanup status do not create a different recognition.
-        </p>
 <div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="tag">Pending vs. Earned</div>
 <div>
-<strong>Same destination address + same exact canonical recognition = duplicate.</strong>
-            The normal Create Check interface should not offer a recognition while an open Check for that exact recognition still exists for the recipient,
-            even after the seven-day cleanup flag appears, or after the recipient has already redeemed it. A canceled unredeemed Check reopens the recognition.
-            A legacy Check that truly expired on-ledger may also reopen it.
+            A recognition <code>CheckCreate</code> is a pending recognition offer. It is <strong>not</strong> Earned LEAP until that exact Check is successfully cashed.
+            The later <code>CheckCash</code> references the Check by <code>CheckID</code>. For official recognition, the cashing result must deliver a positive whole-number amount of LEAP. Earned LEAP is the amount actually delivered by the successful <code>CheckCash</code>, not merely the earlier <code>SendMax</code> offer.
           </div>
 </div>
-<table>
-<tr><th>Earlier state for same recipient + recognition</th><th>Normal Create Check behavior</th></tr>
-<tr><td>Open Check, including 7+ days old</td><td>Suppress the recognition choice; do not create a second pending Check while the original Check still exists.</td></tr>
-<tr><td>Successfully redeemed / cashed</td><td>Suppress the recognition choice; the exact recognition is already part of that recipient's history.</td></tr>
-<tr><td>Canceled and unredeemed</td><td>Recognition may be offered again.</td></tr>
-<tr><td>Legacy expired and unredeemed</td><td>Recognition may be offered again. If the expired Check object still exists, clean it up separately.</td></tr>
-</table>
-<div class="note">
-          Deliberate duplicate or “plus-up” issuance is an exceptional manual action, not a normal software path.
-          If ever needed, it should be performed judgmentally outside the standard Create Check interface, for example manually in Xaman.
-          The standard interface is intentionally designed to make ordinary duplicates impossible rather than merely warn about them.
-        </div>
-<h3>7.5 Trust lines are not a precondition for recognition issuance</h3>
-<p>
-          A recipient does not need to establish a LEAP trust line before the Community Operating Wallet creates a recognition Check. The Create Check interface therefore does not require,
-          warn about, or preflight a destination trust line as a condition of issuance. When an issued-token Check is cashed, XRPL can automatically create the
-          trust line needed to hold the token with a zero limit. After cashing, that trust line remains as needed to hold the recipient's LEAP balance.
-        </p>
-<div class="decision">
-<div class="tag">Why LEAP Uses Checks</div>
-<div>
-            Checks separate <strong>recognition issuance</strong> from <strong>recipient token setup</strong>. The Community Operating Wallet can record and deliver the recognition first;
-            the recipient establishes the holding relationship by cashing the Check. This lowers onboarding friction while preserving an authoritative
-            <code>CheckCreate</code> history for the LEAP logbook.
-          </div>
-</div>
-<h3>7.6 Check linkage</h3>
-<p>
-          Store or derive the Check ledger object's ID from the successful CheckCreate metadata.
-          A later <code>CheckCash.CheckID</code> can be matched back to that exact Check.
-        </p>
-<h3>7.7 Direct Payment fallback</h3>
-<p>
-          Direct LEAP Payments may be valid when deliberately used. When determining the amount actually delivered by a Payment,
-          use transaction metadata rather than assuming the requested amount equals the delivered amount.
-          The Check workflow remains the current onboarding and recognition standard.
-        </p>
-<h3>7.8 Xaman Check cleanup procedure</h3>
-<p>
-          Xaman separates the historical transaction from the live Check ledger object. The <strong>All</strong> tab in Events
-          shows the historical <code>CheckCreate</code> transaction. The actionable open Check is found under <strong>Planned</strong>.
-        </p>
-<div class="flow">
-          Community Operating Wallet<br/>
-          ↓<br/>
-          Xaman → Events<br/>
-          ↓<br/>
-          Planned<br/>
-          ↓<br/>
-          Open the Check object<br/>
-          ↓<br/>
-          Cancel Check
-        </div>
-<div class="rule">
-<div class="tag">LEAP Operating Procedure</div>
-<div>
-            When the Operator Checkbook identifies a Cleanup Due, legacy-expired, or otherwise unwanted outstanding Check, open the Community Operating Wallet
-            in Xaman and use <strong>Events → Planned → Check → Cancel Check</strong>. After the <code>CheckCancel</code>
-            transaction validates, the Check ledger object is removed and the XRP owner reserve associated with that Check is released.
-          </div>
-</div>
-<div class="fact">
-<div class="tag">Current XRPL State</div>
-<div>
-            At this revision, each open recognition Check created by the Community Operating Wallet increases that account's owner reserve by <strong>0.2 XRP</strong>.
-            The Operator Checkbook should read the network's current reserve value rather than assume that 0.2 XRP will remain permanent.
-            The owner reserve is temporary working capital, not a transaction fee; it becomes available again when the Check object is removed.
-          </div>
-</div>
-<div class="note">
-<strong>The seven-day cleanup rule is not expiration.</strong> A normal LEAP Check that is 7+ days old remains cashable because no XRPL expiration was set.
-          The Operator Checkbook merely marks it for cleanup so the Operator can decide whether to cancel it. For older legacy Checks that do contain an expiration,
-          expiration and cancellation are still different: expiration stops cashing, but only a valid <code>CheckCancel</code> removes the ledger object and releases owner reserve.
-        </div>
-<h3>7.9 Recognition lifecycle markers — no-op <code>AccountSet</code></h3>
-<p>
-          Recognition lifecycle is recorded separately from member recognition awards. A lifecycle record moves no LEAP and names no member.
-          It is a signed protocol statement made by the Community Operating Wallet about one recognition object.
-        </p>
 <div class="fact">
 <div class="tag">XRPL Fact</div>
 <div>
-            <code>AccountSet</code> is a different XRPL transaction type from <code>CheckCreate</code>. It supports the common <code>Memos</code> field.
-            If none of the AccountSet-specific setting fields are supplied, the transaction has no account-setting effect beyond consuming the normal transaction cost.
+            A recipient does not need a pre-existing LEAP trust line before the recognition Check is created. Current XRPL behavior can create the required zero-limit trust line when an issued-token Check is successfully cashed.
           </div>
 </div>
+<h3>7.2 Member recognition by Payment</h3>
+<div class="flow">
+          Authorized Community Operating Wallet → Payment → member → Earned LEAP
+        </div>
+<ul class="checklist">
+<li>The recognition definition already exists and is available at the ledger position of the Payment.</li>
+<li><code>Account</code> is the Community Operating Wallet authorized for that community at that ledger position.</li>
+<li><code>Destination</code> is the intended member wallet.</li>
+<li>The Payment successfully delivers a positive whole-number amount of canonical LEAP.</li>
+<li>Exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;CANONICAL-ID&gt;</code> recognition memo is present.</li>
+<li>The transaction succeeds in validated ledger history.</li>
+</ul>
+<div class="rule">
+<div class="tag">Immediate Recognition</div>
+<div>
+            A valid recognition Payment becomes Earned LEAP when the Payment validates successfully. Earned LEAP is based on the amount actually delivered.
+            The receiving wallet must already be able to receive LEAP; how Wild Ledger represents that capability in the user interface is not part of the protocol.
+          </div>
+</div>
+<div class="note">
+          XRP tips from members to a Community Operator are outside LEAP member recognition. They do not create Earned LEAP and do not affect community rank.
+        </div>
+<h3>7.3 Recognition repetition</h3>
+<div class="rule">
+<div class="tag">Category Semantics</div>
+<div>
+            A Badge definition may be awarded repeatedly to the same member. Each protocol-valid Badge recognition transaction is a separate award and its delivered LEAP contributes to Earned LEAP.
+            Event and Challenge IDs identify specific occurrences or opportunities; for a given member, the same canonical Event or Challenge ID counts as one official earned recognition. A different occurrence or challenge receives its own canonical ID.
+          </div>
+</div>
+<div class="note">
+          The protocol does not manufacture new Badge IDs merely to make repeated awards unique. Individual XRPL transactions already distinguish the awards.
+        </div>
+<h3>7.4 Check state and cancellation</h3>
+<p>
+          Standard recognition Checks have no protocol expiration. An open Check remains pending until it is cashed or canceled.
+          A successful <code>CheckCancel</code> removes the outstanding Check ledger object but does not erase the historical <code>CheckCreate</code> transaction.
+          A canceled, unredeemed recognition Check contributes no Earned LEAP.
+        </p>
+<div class="note">
+          Cleanup timing, reminders, buttons, wallet-specific navigation, and other operating conveniences are Wild Ledger policy and UI behavior, not LEAP Protocol state.
+        </div>
+<h3>7.5 Recognition-definition lifecycle — no-op <code>AccountSet</code></h3>
+<p>
+          Lifecycle state is separate from member recognition. It moves no LEAP, names no member, and tells Wild Ledger what recognition opportunities exist and whether they remain available.
+        </p>
 <div class="rule">
 <div class="tag">Canonical Lifecycle Transaction</div>
 <div>
-            A canonical recognition lifecycle record must be a successful, validated no-op <code>AccountSet</code> sent by the Community Operating Wallet currently authorized for that community namespace.
-            It must contain exactly one decoded public LEAP lifecycle memo in the self-identifying form
-            <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code>.
-            It must not contain AccountSet-specific fields that change account state.
+            A lifecycle record is a successful, validated no-op <code>AccountSet</code> from the Community Operating Wallet authorized at that ledger position, containing exactly one canonical
+            <code>&lt;COMMUNITY&gt;-LEAP/RECOGNITION/&lt;CATEGORY&gt;/&lt;CANONICAL-ID&gt;/LIFECYCLE-TAG=&lt;ACTION&gt;</code> memo and no AccountSet-specific mutation fields.
           </div>
 </div>
 <table>
-<tr><th>Lifecycle action</th><th>Protocol meaning</th></tr>
-<tr><td><code>CREATE</code></td><td>Birth of the identified recognition. A Badge becomes Available; a Challenge becomes Active; an Event becomes Active.</td></tr>
-<tr><td><code>END</code></td><td>Normal terminal lifecycle marker. Its user-facing meaning depends on recognition type: Badge = Retired and no longer selectable for new awards; Challenge = Closed and no longer active/completable; Event = Completed and no longer active. Prior valid awards remain valid and visible.</td></tr>
-<tr><td><code>IGNORE</code></td><td>Exceptional terminal marker for an erroneous, invalid, test, or otherwise non-operational recognition object. The record remains part of XRPL history, but compliant Wild Ledger clients exclude it from normal Available, Active, and History recognition lists and clearly annotate it as Ignored in owner/operator ledger or audit views.</td></tr>
+<tr><th>Action</th><th>Protocol meaning</th></tr>
+<tr><td><code>CREATE</code></td><td>Birth of the definition. Badge = Available; Event = Active; Challenge = Active.</td></tr>
+<tr><td><code>END</code></td><td>Normal terminal state. Badge = Retired; Event = Completed; Challenge = Closed. Prior valid earned recognition remains valid.</td></tr>
+<tr><td><code>IGNORE</code></td><td>Exceptional terminal state for an erroneous, invalid, test, or non-operational definition. It is suppressed from normal recognition use and the ID remains permanently reserved.</td></tr>
 </table>
-<pre><code>TransactionType = AccountSet
-Account = authorized Community Operating Wallet
-AccountSet-specific mutation fields = none
-Memos:
-  SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=CREATE</code></pre>
-<pre><code>SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=END
-SFL-LEAP/RECOGNITION/CHALLENGE/LEAP-001/LIFECYCLE-TAG=END
-SFL-LEAP/RECOGNITION/EVENT/COMMUNITY-MEETUP/LIFECYCLE-TAG=END
-SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE</code></pre>
-<ul class="checklist">
-<li><code>TransactionType = AccountSet</code></li>
-<li><code>Account</code> is the authorized Community Operating Wallet for the memo namespace at the time of the transaction</li>
-<li>The transaction is successful and in validated ledger history</li>
-<li>No AccountSet-specific setting field changes account state</li>
-<li>Exactly one canonical LEAP lifecycle memo is present</li>
-<li>The lifecycle category is exactly <code>BADGE</code>, <code>EVENT</code>, or <code>CHALLENGE</code></li>
-<li>The canonical ID follows the category's canonical ID rules</li>
-<li>The lifecycle action is exactly <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code></li>
-</ul>
 <div class="rule">
 <div class="tag">Cradle-to-Grave Rule</div>
 <div>
-            <code>CREATE</code> begins the recognition's protocol lifecycle. <code>END</code> is the normal terminal state, interpreted according to recognition type.
-            <code>IGNORE</code> is an exceptional terminal state. Neither <code>END</code> nor <code>IGNORE</code> erases XRPL history. Under the current protocol there is no reopen,
-            unend, or unignore action; any future reversal rule requires an explicit protocol revision.
+            <code>CREATE</code> begins the definition's lifecycle. <code>END</code> and <code>IGNORE</code> are terminal. There is no reopen, unend, or unignore action in the current protocol.
+            Lifecycle changes do not erase the XRPL transaction history or reverse any token transfer that already occurred.
           </div>
 </div>
 <div class="rule">
 <div class="tag">Permanent ID Reservation</div>
 <div>
-            A canonical recognition ID is never recycled. Before creating a new Badge, Challenge, or Event, Wild Ledger must validate the proposed ID against the complete
-            XRPL-derived recognition history for that community and category. Any ID that has already been established — whether currently Available/Active, later ended,
-            or later marked <code>IGNORE</code> — is unavailable for reuse. Ignored IDs remain permanently reserved and must be visibly annotated as Ignored in owner/operator ledger views.
+            Before creating a Badge, Event, or Challenge, Wild Ledger must reject a canonical ID already established in that community and category, including IDs later ended or ignored.
           </div>
 </div>
 <div class="note">
-          Recognition IDs established before explicit lifecycle markers are activated remain readable from valid authorized historical <code>CheckCreate</code> records and are treated as legacy-established IDs for namespace-reservation purposes.
-          They may later receive a valid <code>END</code> or <code>IGNORE</code> lifecycle marker without first requiring a retroactive <code>CREATE</code>. The lifecycle activation point must remain documented so legacy history is deterministic.
+          Definitions established before lifecycle activation remain readable as legacy-established definitions when supported by valid authorized historical recognition records. Their IDs remain reserved and may later receive <code>END</code> or <code>IGNORE</code> without a retroactive <code>CREATE</code>.
         </div>
-<h3>7.10 Authority-state statements — no-op <code>AccountSet</code></h3>
-<p>
-          Authority state records a current protocol value without moving LEAP and without changing XRPL account settings.
-          The protocol uses <code>OPERATING-WALLET</code> as the first authority-state key.
-        </p>
+<h3>7.6 Community authority state — no-op <code>AccountSet</code></h3>
 <div class="rule">
 <div class="tag">Canonical Authority-State Transaction</div>
 <div>
-            A canonical authority-state record must be a successful, validated no-op <code>AccountSet</code> containing exactly one decoded public memo in the form
-            <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code>. It must not contain AccountSet-specific fields that change account state.
+            A community authority-state record is a successful, validated no-op <code>AccountSet</code> containing exactly one canonical
+            <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> memo and no AccountSet-specific mutation fields.
           </div>
 </div>
-<pre><code>TransactionType = AccountSet
-Account = authority permitted to set this key
-AccountSet-specific mutation fields = none
-Memos:
-  SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;NEW-OPERATING-WALLET&gt;</code></pre>
-<h4>Existing-community migration rule</h4>
-<div class="rule">
-<div class="tag">First On-Ledger Statement</div>
-<div>
-            For a community that already existed before on-ledger authority state was activated, the documented pre-authority-state Community Operating Wallet may publish exactly one initial canonical <code>OPERATING-WALLET</code> statement.
-            The transaction sender and the statement value must be that same existing Operating Wallet. This one-time migration authorization exists only to move an already-established community onto canonical XRPL authority state; the configured wallet value is not itself canonical protocol state.
-            After that transaction validates, XRPL authority-state history is authoritative and the migration authorization is exhausted.
-          </div>
-</div>
+<h4>Existing-community migration</h4>
+<p>
+          A documented pre-authority-state Community Operating Wallet may publish exactly one initial <code>OPERATING-WALLET</code> statement naming itself.
+          After that statement validates, XRPL authority-state history is canonical for that community.
+        </p>
+<h4>Operating Wallet replacement</h4>
+<p>
+          The currently authorized Community Operating Wallet may replace itself by publishing a valid <code>OPERATING-WALLET</code> statement naming the successor account.
+          The sender must be the Operating Wallet resolved immediately before the transaction. The latest valid value wins from that ledger position forward.
+        </p>
 <div class="note">
-          Protocol 0.15 does not yet define the first-establishment rule for a brand-new community created after authority-state activation. That provisioning rule remains an open protocol decision and must not be inferred from the roles of the Issuer or Distributor.
-        </div>
-<h4>Normal self-rotation</h4>
-<div class="rule">
-<div class="tag">Self-Service Rotation</div>
-<div>
-            After the first canonical authority-state statement, the currently authorized Community Operating Wallet may replace itself at any time by publishing a canonical
-            <code>OPERATING-WALLET</code> authority-state statement naming the successor account. No Wild Ledger approval is required for routine rotation.
-            The sender must equal the resolved <code>OPERATING-WALLET</code> immediately before that transaction.
-          </div>
-</div>
-<div class="rule">
-<div class="tag">Latest Valid Value Wins</div>
-<div>
-            For a single-valued authority-state key, current state is the latest valid statement in canonical XRPL transaction order.
-            A new valid value supersedes the prior value from that transaction forward. No separate <code>BEGIN</code>, <code>END</code>, old-wallet record, new-wallet record, or history table is required.
-          </div>
-</div>
-<div class="note">
-          Historical authority is derived, not separately stored. To evaluate a transaction at a past ledger position, resolve the latest valid
-          <code>OPERATING-WALLET</code> statement that precedes it. If relevant statements share a ledger, transaction order within that validated ledger breaks the tie.
-        </div>
-<div class="note">
-          Protocol 0.15 does not yet define an emergency recovery override for a lost, inaccessible, or compromised current Operating Wallet.
-          Until a later protocol revision defines one, compliant software must not invent an off-ledger recovery authority.
+          First establishment for a brand-new community and emergency recovery from a lost or compromised current Operating Wallet remain explicit open protocol decisions in Section 16.
         </div>
 </section>
 <section id="membership">
 <h2>8. Membership &amp; Rank Rules</h2>
 <div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="tag">Earned LEAP</div>
 <div>
-            Membership and rank are determined from the wallet's <strong>current validated LEAP trust-line balance</strong>.
-            They are current-state properties, not historical awards.
+            <strong>Earned LEAP is the cumulative LEAP actually delivered to a member through protocol-valid recognition from a specific community.</strong>
+            Check-based recognition contributes when the Check is successfully cashed. Payment-based recognition contributes when the Payment successfully validates.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Membership</div>
+<div>
+            For LEAP Protocol purposes, a wallet becomes a member of a community when it first earns LEAP from that community through valid recognition.
+            Membership is historical community status and does not disappear merely because the wallet's current LEAP balance later falls to zero.
           </div>
 </div>
 <table>
-<tr><th>Current LEAP balance</th><th>Meaning</th></tr>
-<tr><td>0</td><td>No current LEAP membership status</td></tr>
+<tr><th>Community Earned LEAP</th><th>Rank</th></tr>
 <tr><td>1–4</td><td>Deckhand</td></tr>
 <tr><td>5–9</td><td>Bosun</td></tr>
 <tr><td>10–24</td><td>Quartermaster</td></tr>
 <tr><td>25–50</td><td>First Mate</td></tr>
 <tr><td>51+</td><td>Master Of The Leap</td></tr>
 </table>
-<p>
-          Rank can rise or fall as the wallet's LEAP balance changes. A badge or historical record does not disappear merely
-          because the current balance changes.
-        </p>
+<div class="rule">
+<div class="tag">Rank Rule</div>
+<div>
+            Rank is derived from that community's cumulative Earned LEAP. Sending, spending, or otherwise moving LEAP after it was earned changes current holdings but does not erase the earned history or reduce rank.
+            Receiving LEAP through ordinary transfers, trades, purchases, self-transfers, or non-recognition Payments does not create community Earned LEAP or rank.
+          </div>
+</div>
+<h3>Current LEAP vs. Earned LEAP</h3>
+<table>
+<tr><th>Fact</th><th>Meaning</th></tr>
+<tr><td>Current LEAP</td><td>The wallet's present validated LEAP balance.</td></tr>
+<tr><td>Earned LEAP</td><td>Cumulative LEAP validly awarded and delivered by this community.</td></tr>
+<tr><td>Community Rank</td><td>Derived from this community's Earned LEAP total.</td></tr>
+</table>
+<div class="note">
+          The same wallet can hold one LEAP balance while having different Earned LEAP totals and different ranks in different communities.
+        </div>
 </section>
 <section id="badges">
 <h2>9. Badge &amp; Historical Recognition Rules</h2>
 <p>
-          A badge represents something the wallet owner actually did, attended, contributed to, or was officially recognized for.
-          <code>NEW-MEMBER</code> is a Badge; onboarding does not create a separate recognition category.
+          A Badge is a reusable recognition definition for something a member did, contributed to, attended, or was recognized for. <code>NEW-MEMBER</code> and <code>GOOD-CHAT</code> are Badges; onboarding and chat are not separate recognition categories.
         </p>
 <div class="rule">
 <div class="tag">Badge Lifecycle</div>
 <div>
-            A valid <code>CREATE</code> marker makes a Badge <strong>Available</strong>. A later valid <code>END</code> marker makes it <strong>Retired</strong> and places it in recognition History.
-            Retirement ends future normal issuance; it does not erase earlier awards.
+            A valid lifecycle <code>CREATE</code> makes a Badge <strong>Available</strong>. A valid <code>END</code> makes it <strong>Retired</strong> for future awards. Retirement does not erase prior valid awards.
           </div>
 </div>
-<h3>Badge validity test</h3>
-<pre><code>VALIDATED
-AND transaction result = success
-AND originating account = Community Operating Wallet authorized for the community at that ledger position
+<div class="rule">
+<div class="tag">Repeatable Badge Rule</div>
+<div>
+            A Badge may be awarded more than once to the same member. Each valid Badge recognition transaction is a separate award and the LEAP actually delivered by that transaction contributes to the member's Earned LEAP.
+          </div>
+</div>
+<h3>Badge award validity</h3>
+<pre><code>validated success
+AND Badge definition exists and is available at the award ledger position
+AND source = Community Operating Wallet authorized at that ledger position
 AND destination = member wallet
-AND currency = canonical LEAP currency
-AND issuer = canonical LEAP issuer
-AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
+AND asset = canonical LEAP
+AND decoded memo = &lt;COMMUNITY&gt;-LEAP/BADGE=&lt;CANONICAL-ID&gt;
+AND (successful matching CheckCash OR successful recognition Payment)</code></pre>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            A matching memo created by an unauthorized wallet does not establish a badge award or lifecycle state.
-            Provenance, transaction type, and content must all validate. The authoritative badge vocabulary and lifecycle are reconstructed from valid authorized on-ledger history,
-            not from a separately maintained website-only list.
+            Correct memo text from an unauthorized account does not establish official Badge recognition. The authoritative Badge catalog comes from lifecycle history; member-earned Badge history comes from valid LEAP-bearing recognition transactions.
           </div>
 </div>
-<h3>Known / illustrative badge IDs</h3>
-<table>
-<tr><th>Canonical ID</th><th>Display label</th><th>Notes</th></tr>
-<tr><td><code>NEW-MEMBER</code></td><td>New Member</td><td>Onboarding recognition; still a normal Badge.</td></tr>
-<tr><td><code>FIRST-MEMBER</code></td><td>First Member</td><td>Unique designation.</td></tr>
-<tr><td><code>LEAP-OG</code></td><td>LEAP OG</td><td>Historical / early-crew recognition.</td></tr>
-<tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td><td>Illustrative family name; add broad-to-narrow qualifiers when needed to distinguish a specific recognition.</td></tr>
-<tr><td><code>PACIFIC-CREW</code></td><td>Pacific Crew</td><td>Illustrative family name.</td></tr>
-<tr><td><code>SFL-CAMEO</code></td><td>SFL Cameo</td><td>Illustrative family name.</td></tr>
-</table>
+<h3>Illustrative Badge IDs</h3>
+<pre><code>NEW-MEMBER
+FIRST-MEMBER
+GOOD-CHAT
+LEAP-OG
+PANAMA-CREW-2026
+PACIFIC-CREW
+SFL-CAMEO</code></pre>
 <div class="note">
-          This table is explanatory, not the canonical registry. The ledger-discovered vocabulary described in Section 6 is authoritative for production choices.
+          These examples are explanatory, not a separately maintained canonical registry. Production definitions are reconstructed from XRPL history.
         </div>
 </section>
 <section id="events">
 <h2>10. Event &amp; Challenge Rules</h2>
 <h3>Event</h3>
+<p>
+          An Event is a specific real-world or community occurrence that members may be recognized for participating in.
+        </p>
 <div class="rule">
 <div class="tag">Event Lifecycle</div>
 <div>
-            A valid <code>CREATE</code> marker makes an Event <strong>Active</strong>. A later valid <code>END</code> marker makes it <strong>Completed</strong> and places it in recognition History.
+            A valid <code>CREATE</code> makes an Event <strong>Active</strong>. A valid <code>END</code> makes it <strong>Completed</strong>. Completion ends future normal awards for that Event but preserves prior valid member history.
           </div>
 </div>
 <p>
-          A specific real-world or community occasion connected to a LEAP distribution or recognition.
-          Example: <code>LA-CRUZ-BEACH-BONFIRE-2026</code>.
+          Many members may earn recognition for the same Event. For a given member, the same canonical Event ID represents one occurrence and counts as one official Event recognition.
+          If a similar event occurs again, create a distinct canonical Event ID using only enough broad-to-narrow specificity to distinguish the new occurrence.
         </p>
-<div class="rule">
-<div class="tag">LEAP Standard</div>
-<div>
-            The XRPL validated timestamp records when the recognition transaction was actually issued. The canonical EVENT identifier describes which event the recognition means.
-            If the same or similar event occurs again, make the new identifier more specific using the broad-to-narrow convention from Section 5 rather than relying on timestamp alone
-            to distinguish two recognitions. Date components are acceptable when they identify the occurrence itself.
-          </div>
-</div>
 <h3>Challenge</h3>
+<p>
+          A Challenge is a defined participation opportunity. Many members may complete the same Challenge while it is active.
+        </p>
 <div class="rule">
 <div class="tag">Challenge Lifecycle</div>
 <div>
-            A valid <code>CREATE</code> marker makes a Challenge <strong>Active</strong>. A later valid <code>END</code> marker makes it <strong>Closed</strong> and places it in recognition History.
+            A valid <code>CREATE</code> makes a Challenge <strong>Active</strong>. A valid <code>END</code> makes it <strong>Closed</strong>. Closing ends future normal completion recognition but preserves prior valid member history.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Challenge ID Rule</div>
+<div>
+            Challenge IDs use the sequential form <code>LEAP-NNN</code>. Wild Ledger derives the next unused value from the complete XRPL-derived Challenge history. Challenge IDs are never recycled, including ended or ignored IDs.
           </div>
 </div>
 <p>
-          A defined participation opportunity. Challenges receive unique sequential IDs and are never recycled.
-          Example: <code>LEAP-001</code>. The next challenge receives the next unused number.
+          For a given member, the same canonical Challenge ID counts as one official Challenge completion. Event, Challenge, Badge, and rank are separate concepts and must not overload one another's identifiers.
         </p>
-<div class="rule">
-<div class="tag">LEAP Standard</div>
-<div>
-            Event, challenge, badge, and rank are separate concepts. Do not overload one identifier to mean another.
-            For a given recipient, the exact same canonical Event, Challenge, or Badge is normally recognized only once through the standard issuance interface.
-          </div>
-</div>
 </section>
 <section id="queries">
 <h2>11. Query Standards</h2>
-<h3>11.1 Current membership / rank — <code>account_lines</code></h3>
+<p>
+          Query logic reconstructs protocol meaning from XRPL. Optimizations and caches are permitted, but they must not become canonical state.
+        </p>
+<h3>11.1 Current LEAP — <code>account_lines</code></h3>
 <pre><code>{
   "command": "account_lines",
   "account": "MEMBER_WALLET",
   "peer": "LEAP_ISSUER",
   "ledger_index": "validated"
 }</code></pre>
+<p>Filter by the canonical LEAP issuer and currency value. The resulting balance answers current holdings only; it does not determine Earned LEAP or rank.</p>
+<h3>11.2 Member Earned LEAP and recognition history — <code>account_tx</code></h3>
 <p>
-          Filter the returned line by the canonical LEAP currency value and issuer. Use the returned balance for rank.
+          Scan validated member history with pagination. For each candidate recognition, validate the community namespace, recognition definition state at that ledger position, authorized Community Operating Wallet, asset identity, destination, transaction type, result, and memo.
+          For Check recognition, link the originating <code>CheckCreate</code> to the successful <code>CheckCash</code> by Check ID and use the amount actually delivered. For Payment recognition, use the amount actually delivered by the successful Payment.
         </p>
-<h3>11.2 Historical logbook — <code>account_tx</code></h3>
-<pre><code>{
-  "command": "account_tx",
-  "account": "MEMBER_WALLET",
-  "ledger_index_min": "LEAP_GENESIS_LEDGER",
-  "ledger_index_max": -1,
-  "forward": true,
-  "limit": 200
-}</code></pre>
+<h3>11.3 Recognition opportunity catalog</h3>
 <p>
-          Follow <code>marker</code> pagination until the needed history is exhausted. Parse transactions and metadata;
-          do not assume every transaction involving the account is a LEAP transaction.
+          Reconstruct Badge, Event, and Challenge availability from validated lifecycle <code>AccountSet</code> history produced by wallets that were authorized for the community at the relevant ledger positions.
+          Process lifecycle records in canonical XRPL order. This catalog answers what exists and is available; it is not member-earned history.
         </p>
-<h3>11.3 Outstanding Checks — <code>account_objects</code></h3>
-<pre><code>{
-  "command": "account_objects",
-  "account": "MEMBER_WALLET",
-  "ledger_index": "validated",
-  "type": "check"
-}</code></pre>
-<h3>11.4 Query output categories</h3>
+<h3>11.4 Outstanding Checks — <code>account_objects</code></h3>
+<p>
+          Use validated Check ledger objects to determine whether a specific Check remains open. Historical <code>CheckCreate</code>, <code>CheckCash</code>, and <code>CheckCancel</code> transactions provide the durable transaction history.
+        </p>
+<h3>11.5 Authority and allocation history</h3>
+<p>
+          Resolve the current Community Operating Wallet from the latest valid <code>OPERATING-WALLET</code> authority-state statement and resolve historical authority at the ledger position being evaluated.
+          Reconstruct community allocations from valid LEAP Distributor allocation Checks; community ownership comes from the canonical allocation memo namespace.
+        </p>
+<h3>11.6 Query output map</h3>
 <table>
-<tr><th>Question</th><th>Primary source</th></tr>
-<tr><td>Does this wallet currently hold LEAP?</td><td><code>account_lines</code></td></tr>
-<tr><td>What is the current LEAP balance?</td><td><code>account_lines</code></td></tr>
-<tr><td>What is the current rank?</td><td>Calculated from validated balance</td></tr>
-<tr><td>What official awards exist in history?</td><td><code>account_tx</code> + provenance validation</td></tr>
-<tr><td>When did an award occur?</td><td>Validated transaction ledger/time</td></tr>
-<tr><td>Was a specific Check claimed?</td><td>Match Check ID to <code>CheckCash</code></td></tr>
-<tr><td>Is a Check still outstanding?</td><td><code>account_objects</code> / Check object</td></tr>
-<tr><td>Which Badge/Event/Challenge values exist?</td><td>Community Operating Wallet lifecycle <code>account_tx</code> history plus backward-compatible authorized recognition history</td></tr>
-<tr><td>Is a recognition Available / Active or in History?</td><td>Validated Community Operating Wallet <code>AccountSet</code> lifecycle markers, processed in ledger order</td></tr>
-<tr><td>What is this community's current Operating Wallet?</td><td>Latest valid <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;VALUE&gt;</code> statement</td></tr>
-<tr><td>Which Operating Wallet was authoritative at a historical transaction?</td><td>Latest valid <code>OPERATING-WALLET</code> authority-state statement preceding that transaction in canonical XRPL order</td></tr>
-<tr><td>Which community owns an allocation?</td><td>The canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> memo on a valid Distributor allocation <code>CheckCreate</code></td></tr>
-<tr><td>Where was an allocation delivered?</td><td>The allocation <code>CheckCreate.Destination</code>; this is delivery/audit data and does not define community ownership</td></tr>
-<tr><td>Should a recognition be offered to this recipient?</td><td>Lifecycle state + recipient/Operating-Wallet recognition history + Check state: suppress ended recognitions, open pending, or redeemed; reopen canceled unredeemed and legacy expired unredeemed only while the recognition remains active/available</td></tr>
+<tr><th>Question</th><th>Authoritative derivation</th></tr>
+<tr><td>What LEAP does this wallet hold now?</td><td>Validated <code>account_lines</code></td></tr>
+<tr><td>Is this wallet a member of this community?</td><td>At least one unit of community Earned LEAP in validated recognition history</td></tr>
+<tr><td>How much LEAP has this member earned here?</td><td>Sum actual LEAP delivered by valid community recognition Checks and Payments</td></tr>
+<tr><td>What is this member's rank here?</td><td>Apply the rank ladder to community Earned LEAP</td></tr>
+<tr><td>What recognitions has this member earned?</td><td>Validated recognition history after lifecycle/provenance validation</td></tr>
+<tr><td>What recognition opportunities exist now?</td><td>Validated recognition-definition lifecycle history</td></tr>
+<tr><td>Is a Check still outstanding?</td><td>Validated Check ledger object / <code>account_objects</code></td></tr>
+<tr><td>What is the current Operating Wallet?</td><td>Latest valid <code>OPERATING-WALLET</code> authority-state value</td></tr>
+<tr><td>Which Operating Wallet was authoritative historically?</td><td>Latest valid authority-state value preceding the transaction in canonical XRPL order</td></tr>
+<tr><td>Which community owns an allocation?</td><td>Community namespace in the valid Distributor allocation memo</td></tr>
+<tr><td>Where was an allocation delivered?</td><td>Allocation Check destination; delivery/audit data only</td></tr>
 </table>
 </section>
 <section id="validity">
 <h2>12. Transaction Validity Rules</h2>
 <p>
-          Before website code treats an XRPL transaction as an official LEAP fact, validate all applicable conditions.
+          Before software turns an XRPL transaction into an official LEAP fact, it must validate every condition required by that protocol act.
         </p>
 <ul class="checklist">
-<li>Data is from validated ledger history</li>
-<li>Transaction result indicates success</li>
-<li>Transaction type is allowed for the intended interpretation</li>
-<li>For LEAP-moving recognition transactions, issuer matches the canonical LEAP issuer</li>
-<li>For LEAP-moving recognition transactions, currency matches the canonical LEAP currency value</li>
-<li>Authority account is authorized for the specific transaction type and protocol action</li>
-<li>Destination or affected wallet matches the member being evaluated when the protocol action concerns a member</li>
-<li>Memo fields decode successfully when memo-based protocol data is required</li>
-<li>An allocation <code>CheckCreate</code> normalizes to exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> record, signed by an authorized Distributor, with memo amount equal to the LEAP <code>SendMax.value</code></li>
-<li>Allocation community attribution comes from the canonical memo namespace; do not reject an otherwise valid historical allocation merely because its destination is no longer the community's Operating Wallet</li>
-<li>A recognition <code>CheckCreate</code> normalizes to exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/&lt;CATEGORY&gt;=&lt;VALUE&gt;</code> record</li>
-<li>A lifecycle <code>AccountSet</code> normalizes to exactly one lifecycle tag plus exactly one canonical recognition identity, with matching community namespaces</li>
-<li>An authority-state <code>AccountSet</code> normalizes to exactly one canonical <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code> statement</li>
-<li>For an existing pre-authority-state community's first <code>OPERATING-WALLET</code> statement, the sender and value are the same documented pre-authority-state Community Operating Wallet</li>
-<li>For every later <code>OPERATING-WALLET</code> value, the transaction sender equals the Operating Wallet resolved immediately before that transaction</li>
-<li>For a recognition lifecycle action, the transaction sender equals the Operating Wallet resolved for that community immediately before the lifecycle transaction</li>
-<li>The category is recognized and the value is a valid canonical identifier</li>
+<li>Data comes from validated ledger history and the transaction succeeded.</li>
+<li>The XRPL transaction type is permitted for the intended LEAP protocol act.</li>
+<li>The account that initiated the transaction was authorized for that act at that ledger position.</li>
+<li>LEAP-moving acts use the canonical LEAP issuer and canonical LEAP currency value.</li>
+<li>Member-facing recognition identifies the intended member destination and exactly one canonical Badge, Event, or Challenge memo.</li>
+<li>A new recognition award references a definition that already exists and is available at the award's ledger position, except where explicit legacy rules apply.</li>
+<li>A Check-based recognition is pending at <code>CheckCreate</code> and becomes earned only after the matching Check is successfully cashed.</li>
+<li>A Payment-based recognition becomes earned only when the LEAP Payment successfully validates and delivers LEAP.</li>
+<li>A lifecycle record is a no-op <code>AccountSet</code> from the authorized Community Operating Wallet, contains exactly one canonical lifecycle memo, and changes no AccountSet-specific setting.</li>
+<li>A lifecycle <code>CREATE</code> does not reuse an already-reserved recognition ID.</li>
+<li>An allocation Check is created by the LEAP Distributor and contains exactly one canonical allocation memo whose amount matches the offered whole-number LEAP amount.</li>
+<li>Allocation ownership comes from the community namespace in the memo, not from the delivery address.</li>
+<li>An authority-state record is a no-op <code>AccountSet</code> with exactly one canonical authority-state memo and valid authority for that key.</li>
+<li>For later <code>OPERATING-WALLET</code> replacements, the sender equals the Operating Wallet resolved immediately before the transaction.</li>
 </ul>
 <div class="rule">
-<div class="tag">LEAP Standard</div>
+<div class="tag">Fail Closed</div>
 <div>
-            Fail closed. If required provenance cannot be established, the website may display the transaction as history,
-            but it must not convert it into official LEAP recognition or canonical protocol state.
+            If required provenance or protocol meaning cannot be established, software may display the transaction as raw/audit history, but it must not convert it into official recognition, Earned LEAP, rank, allocation, lifecycle state, or authority state.
           </div>
 </div>
 </section>
@@ -1115,55 +961,66 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <table>
 <tr><th>Canonical ledger ID</th><th>Possible display label</th></tr>
 <tr><td><code>FIRST-MEMBER</code></td><td>First Member</td></tr>
+<tr><td><code>GOOD-CHAT</code></td><td>Good Chat</td></tr>
 <tr><td><code>LEAP-OG</code></td><td>LEAP OG</td></tr>
-<tr><td><code>PANAMA-CREW</code></td><td>Panama Crew</td></tr>
-<tr><td><code>PACIFIC-CROSSING</code></td><td>Pacific Crossing</td></tr>
+<tr><td><code>PANAMA-CREW-2026</code></td><td>Panama Crew 2026</td></tr>
 <tr><td><code>LEAP-001</code></td><td>LEAP 001</td></tr>
 </table>
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            Display text may be revised without changing historical identifiers.
-            Once an ID has appeared in a canonical on-ledger LEAP transaction, that ID is permanent.
+            Friendly labels, icons, banners, animations, confetti, navigation, and other presentation may evolve without changing canonical ledger meaning.
+            A user-interface indicator may represent a ledger-derived capability such as the ability to receive LEAP directly, but the indicator itself is not protocol state.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Immutable Meaning</div>
+<div>
+            Once a canonical ID has appeared in valid protocol history, its canonical meaning is not renamed, reassigned, or recycled merely because the display text changes.
           </div>
 </div>
 </section>
 <section id="legacy">
 <h2>14. Legacy / Pre-Protocol Transactions</h2>
 <p>
-          Reader software may preserve compatibility with earlier LEAP memo experiments and pre-lifecycle recognition history so genuine historical records remain readable.
-          New member-recognition issuance and new lifecycle statements must use the current transaction-specific grammars from Sections 6 and 7.
+          Reader software may preserve compatibility with genuine earlier LEAP history so that protocol hardening does not erase the past. New protocol writes use only the current grammar and transaction rules.
         </p>
 <table>
-<tr><th>Legacy pattern</th><th>Interpretation</th><th>Rule</th></tr>
-<tr><td><code>MemoType=SFL-LEAP</code> + <code>MemoData=BADGE=...</code></td><td>Earlier structured LEAP form</td><td>Read-only compatibility after full authority, asset, destination, and validation checks</td></tr>
-<tr><td><code>MemoType=SFL-LEAP/BADGE</code> + <code>MemoData=...</code></td><td>Earlier split-memo proposal</td><td>Read-only compatibility; do not create new records this way</td></tr>
-<tr><td>Raw <code>LEAP-OG</code> or another free-form memo</td><td>Potential pre-protocol marker</td><td>Do not automatically grant recognition; map it manually only after provenance is verified</td></tr>
-<tr><td>No LEAP recognition memo</td><td>Ordinary earlier LEAP transfer/check</td><td>Do not infer badge, event, or challenge meaning without another authoritative rule</td></tr>
-<tr><td>Canonical Badge/Event/Challenge first seen in authorized <code>CheckCreate</code> history before lifecycle activation</td><td>Pre-lifecycle canonical recognition ID</td><td>Keep readable as valid historical vocabulary; do not require a retroactive <code>CREATE</code> marker</td></tr>
+<tr><th>Legacy pattern or state</th><th>Interpretation rule</th></tr>
+<tr><td>Earlier structured or split memo representations</td><td>Read-only compatibility after complete authority, asset, destination, result, and semantic validation. Never emit new records in the old form.</td></tr>
+<tr><td>Free-form historical memo</td><td>Do not automatically grant recognition. Map only when provenance and intended meaning can be established under an explicit legacy rule.</td></tr>
+<tr><td>Recognition ID established before lifecycle activation</td><td>May be treated as a legacy-established definition when supported by valid authorized historical recognition. The ID remains reserved and may later receive <code>END</code> or <code>IGNORE</code> without retroactive <code>CREATE</code>.</td></tr>
+<tr><td>Legacy Check with XRPL <code>Expiration</code></td><td>Interpret according to its actual ledger fields. New standard recognition Checks omit expiration.</td></tr>
+<tr><td>Pre-authority-state community</td><td>Use the documented existing-community migration rule to establish the first canonical <code>OPERATING-WALLET</code> value.</td></tr>
 </table>
-<div class="note">
-          Backward-compatible readers are intentionally more tolerant than the production writer. The writer follows one current grammar; readers may understand older approved forms without making those forms current again.
-        </div>
+<div class="rule">
+<div class="tag">Compatibility Rule</div>
+<div>
+            Backward-compatible reading must not make an old draft form current again. Writers follow one current protocol; readers may understand older approved history where necessary.
+          </div>
+</div>
 </section>
 <section id="change">
 <h2>15. Versioning &amp; Change Control</h2>
 <table>
 <tr><th>Version</th><th>Use</th></tr>
-<tr><td><code>0.x</code></td><td>Working drafts before the first production standard</td></tr>
-<tr><td><code>1.0</code></td><td>First approved production protocol</td></tr>
-<tr><td><code>1.1, 1.2…</code></td><td>Additive / backward-compatible rules</td></tr>
+<tr><td><code>0.x</code></td><td>Working protocol drafts before the first approved production standard</td></tr>
+<tr><td><code>1.0</code></td><td>First hardened production protocol</td></tr>
+<tr><td><code>1.1, 1.2…</code></td><td>Additive / backward-compatible protocol changes</td></tr>
 <tr><td><code>2.0</code></td><td>Breaking interpretation change</td></tr>
 </table>
 <h3>Change rules</h3>
 <ul>
-<li>Never silently redefine an identifier already used on-ledger.</li>
-<li>Never reuse a retired badge, event, or challenge ID for a different meaning.</li>
-<li>Do not add a recognition category outside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> without an explicit protocol revision.</li>
-<li>When a recurring recognition needs distinction, extend the canonical ID from broad to narrow rather than redefining an existing ID.</li>
-<li>Define new authority roles and authority-state keys through protocol revision before treating them as canonical.</li>
-<li>Keep old protocol versions readable so historical transactions remain interpretable.</li>
+<li>Protocol changes must be deliberate and documented. Application implementation must not silently redefine protocol meaning.</li>
+<li>Sections 1–6 define the core model; later sections must conform to that model.</li>
+<li>Never silently redefine, rename, reassign, or recycle a canonical Community, Badge, Event, or Challenge ID already used on-ledger.</li>
+<li>Do not add a member-recognition category outside <code>BADGE</code>, <code>EVENT</code>, and <code>CHALLENGE</code> without an explicit protocol revision.</li>
+<li>Keep older protocol versions readable so historical transactions remain interpretable under the rules that applied to them.</li>
 <li>Prefer additive changes over breaking changes.</li>
+<li>The LEAP Distributor is singular. If the Distributor changes, the protocol revision must identify the successor and an unambiguous XRPL activation point so historical Distributor authority remains reconstructable.</li>
+<li>A change to the LEAP Issuer changes the asset identity and requires an explicit breaking protocol decision; it must never be treated as ordinary wallet rotation.</li>
+<li>Community Operating Wallet changes use the on-ledger authority-state mechanism in Section 7, not protocol-document edits.</li>
+<li>UI, signer, navigation, celebration, reminder, and other presentation/operating changes do not require protocol revisions unless they change ledger meaning.</li>
 </ul>
 <h3>Change log</h3>
 <table>
@@ -1183,29 +1040,30 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <tr><td>0.13</td><td>2026-09-30</td><td>Added XRPL-native authority state using canonical no-op <code>AccountSet</code> protocol statements of the form <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code>. Defined <code>OPERATING-WALLET</code> as the first authority-state key; allowed the current Operating Wallet to replace itself without Wild Ledger approval; established latest-valid-value-wins interpretation and historical authority reconstruction from ledger ordering. The temporary Issuer first-assignment rule introduced in this draft was superseded by 0.14.</td></tr>
 <tr><td>0.14</td><td>2026-09-30</td><td>Removed the temporary Issuer first-assignment rule. Existing pre-authority-state communities migrate by having their already-established Community Operating Wallet publish one self-identifying first <code>OPERATING-WALLET</code> value naming itself; future-community first establishment remains open. Corrected wallet-role provenance throughout: Distributor creates allocation Checks; Community Operating Wallet creates member recognition Checks and community protocol statements.</td></tr>
 <tr><td>0.15</td><td>2026-09-30</td><td>Defined allocation attribution independently from wallet rotation. A valid Distributor allocation belongs to the community named by the canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> memo; <code>Destination</code> records delivery and audit history but does not define community ownership. Historical allocations remain attributable to the same community after Operating Wallet changes.</td></tr>
+<tr><td>0.16</td><td>2026-10-01</td><td>Protocol hardening pass. Distinguished current LEAP from community Earned LEAP; made rank community-specific and cumulative; clarified one protocol-defined LEAP Distributor and Community Operator vs. Community Operating Wallet; removed the historical 1,000,000 supply cap as a protocol rule; made community namespaces generic and permanently reserved; clarified that recognition definitions are created and managed by no-op lifecycle <code>AccountSet</code> transactions while member recognition always transfers LEAP; added first-class recognition by <code>Payment</code> for payment-enabled members alongside recognition by Check; made Badges repeatable while Events and Challenges remain occurrence-specific; removed wallet-specific and seven-day UI procedures from the protocol; and rewrote implementation/query/validity guidance to conform to the core protocol.</td></tr>
 </table>
+<div class="note">
+          The change log records the evolution of earlier drafts. Superseded rules described in older rows are historical context, not current protocol requirements.
+        </div>
 </section>
 <section id="open">
-<h2>16. Open Decisions / Next Work</h2>
-<p>These are intentionally unresolved or implementation work still required before declaring Protocol 1.0.</p>
+<h2>16. Open Decisions Before Protocol 1.0</h2>
+<p>
+          Only genuine protocol questions belong here. Implementation chores, wallet-specific work, and UI polish do not.
+        </p>
 <ul class="checklist">
-<li>Verify and record LEAP's exact 160-bit currency value from the live ledger.</li>
-<li>Record the LEAP genesis / first relevant ledger index for efficient historical queries.</li>
-<li>Inventory existing pre-protocol LEAP transactions and complete any legacy mapping rules that are actually needed.</li>
-<li>Complete live verification of the Create Check / Review Check writer against Sections 5–7, including whole-number amount, no on-ledger expiration, canonical memo preview, duplicate suppression, and Xaman signing.</li>
-<li>Verify the ledger-discovered Badge/Event/Challenge vocabulary, lifecycle reconstruction, and duplicate-state logic against live XRPL history.</li>
-<li>Record the lifecycle activation ledger index before making <code>CREATE</code> mandatory for all newly created recognition IDs, so pre-lifecycle Check-discovered IDs remain deterministically readable.</li>
+<li>Verify the configured LEAP 160-bit currency value against live XRPL state and then remove the verification qualifier from Section 4.</li>
+<li>Record the lifecycle activation ledger position so pre-lifecycle recognition definitions and post-activation <code>CREATE</code> requirements are deterministically separated.</li>
 <li>Publish and validate SFL's one-time existing-community migration statement from its current Operating Wallet: <code>SFL-LEAP/AUTHORITY/OPERATING-WALLET=&lt;CURRENT-OPERATING-WALLET&gt;</code>.</li>
-<li>Define first-establishment authority for brand-new communities created after authority-state activation.</li>
-<li>Define an emergency recovery rule for a lost, inaccessible, or compromised current Community Operating Wallet before Protocol 1.0.</li>
-<li>Complete live validation of the Bifrost / WalletConnect sign-only no-op <code>AccountSet</code> flow in the production Badge, Challenge, and Event CREATE screens.</li>
-<li>Maintain the challenge sequence so each new challenge receives the next unused <code>LEAP-NNN</code> identifier, derived from canonical ledger history rather than a separate database counter.</li>
+<li>Define first-establishment authority for a brand-new community created after authority-state activation.</li>
+<li>Define an emergency recovery rule for a lost, inaccessible, or compromised current Community Operating Wallet.</li>
+<li>Define the Earned LEAP / rank treatment of any prior awards if a recognition definition is later marked <code>IGNORE</code>. The underlying XRPL token transfers cannot be reversed by the lifecycle marker, but Protocol 1.0 must state whether those amounts remain official Earned LEAP.</li>
 </ul>
 </section>
 <section id="sources">
 <h2>17. XRPL Technical References</h2>
 <p class="mini">
-          These links describe XRPL behavior. The LEAP naming, provenance, badge, rank, and protocol rules above are project-level standards.
+          These references describe XRPL behavior. LEAP's community namespaces, authority model, allocation rules, recognition rules, Earned LEAP, rank, and lifecycle semantics are project-level protocol standards defined above.
         </p>
 <ul>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/common-fields">Transaction Common Fields — Memos</a></li>
@@ -1217,17 +1075,18 @@ AND decoded public memo matches SFL-LEAP/BADGE=&lt;CANONICAL-ID&gt;</code></pre>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcreate">CheckCreate</a></li>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcash">CheckCash</a></li>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/checkcancel">CheckCancel</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/types/payment">Payment</a></li>
 <li><a href="https://xrpl.org/docs/references/protocol/transactions/types/accountset">AccountSet</a></li>
-<li><a href="https://xrpl.org/docs/tutorials/payments/send-a-check">Send a Check</a></li>
+<li><a href="https://xrpl.org/docs/references/protocol/transactions/types/trustset">TrustSet</a></li>
 <li><a href="https://xrpl.org/docs/concepts/accounts/reserves">Account Reserves</a></li>
-<li><a href="https://xrpl.org/resources/known-amendments">Known Amendments — CheckCashMakesTrustLine</a></li>
+<li><a href="https://xrpl.org/resources/known-amendments">Known Amendments — including CheckCashMakesTrustLine</a></li>
 <li><a href="https://xrpl.org/docs/concepts/tokens/fungible-tokens/trust-line-tokens">Trust Line Tokens</a></li>
 </ul>
 </section>
 </main>
 </div>
 <footer>
-    LEAP Protocol — working internal standard for Sailing Frog's Leap.
+    LEAP Protocol — working internal standard for Wild Ledger communities.
   </footer>
 </div>
 
