@@ -3027,55 +3027,21 @@
             ? checksResult.value
             : [];
 
-          if (safeBalance < 1) {
-            resetRecord();
-            setTrustlineStatus(leapLine);
-
-            if (pending.length) {
-              walletEl.textContent = shortAddress(account);
-              walletEl.title = account;
-              saveWallet(account);
-              renderPendingChecks(pending);
-            } else {
-              clearIdentityState({ forgetWallet:true });
-            }
-
-            if (pending.length) {
-              setStateMessage(
-                "Your first LEAP is waiting in Xaman.",
-                `Cash the LEAP Check to bring it aboard. New LEAP from ${communityName} starts with a Check so its history is recorded. After that, LEAP can move directly between ${communityMemberPlural}.`,
-                "success",
-                transfersDisabled
-              );
-            } else if (!leapLine) {
-              setStateMessage(
-                `You have not joined the ${communityName} membership system.`,
-                "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
-                "action",
-                false,
-                true
-              );
-            } else if (Number(leapLine.limit) === 0) {
-              setStateMessage(
-                "",
-                "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
-                "warn",
-                true
-              );
-            } else {
-              setStateMessage();
-            }
-
-            setStatus("");
-            return;
-          }
+          const firstLeapPending = safeBalance < 1 && pending.length > 0;
 
           renderRecord(account, safeBalance);
           if (communityId === "sfl" && leaperLoungeEntry) {
             leaperLoungeEntry.classList.add("show");
           }
 
-          if (Number(leapLine?.limit) === 0) {
+          if (firstLeapPending) {
+            setStateMessage(
+              "Your first LEAP is waiting in Xaman.",
+              `Cash the LEAP Check to bring it aboard. New LEAP from ${communityName} starts with a Check so its history is recorded. After that, LEAP can move directly between ${communityMemberPlural}.`,
+              "success",
+              transfersDisabled
+            );
+          } else if (Number(leapLine?.limit) === 0) {
             setStateMessage(
               "",
               "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
