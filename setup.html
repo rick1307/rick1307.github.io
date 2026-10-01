@@ -607,16 +607,16 @@
         <section class="section-card" id="identitySection">
           <div class="section-head">
             <div>
-              <h2>Identity</h2>
-              <p>The permanent keys Wild Ledger uses to know who this community is.</p>
+              <h2>Community identity</h2>
+              <p>Wild Ledger application fields and the LEAP namespace used for this community. The lowercase application key is not the canonical LEAP Protocol Community ID.</p>
             </div>
-            <span class="permission-tag" id="identityPermissionTag">Owner identity</span>
+            <span class="permission-tag" id="identityPermissionTag">Owner setup</span>
           </div>
           <div class="grid-2">
             <div class="field">
-              <label for="id">Community ID</label>
+              <label for="id">Application key</label>
               <input id="id" data-path="id" placeholder="zach">
-              <div class="hint" id="idHint">Short lowercase key used in URLs and storage.</div>
+              <div class="hint" id="idHint">Lowercase internal key used by Wild Ledger for URLs and browser storage. This is not the canonical LEAP Protocol Community ID.</div>
             </div>
             <div class="field">
               <label for="layout">Layout</label>
@@ -1115,21 +1115,22 @@
         const isNew = mode === "new" || currentSourceId === "new";
         const ownerCreating = role === "owner" && isNew;
 
-        // Community ID, LEAP namespace, and storage keys establish system identity.
-        // The Owner defines them during creation; once the community exists they
-        // are deliberately treated as immutable in this interface.
+        // The application key, LEAP namespace, and storage keys are setup fields.
+        // The lowercase application key is not the canonical LEAP Protocol Community ID.
+        // The Owner defines these fields during creation; once the community exists
+        // they are deliberately treated as immutable in this interface.
         setLocked(idInput, !ownerCreating);
         setLocked(leapNamespaceInput, !ownerCreating);
         setLocked(walletStorageKeyInput, !ownerCreating);
         setLocked(activeWalletKeyInput, !ownerCreating);
 
         if (identityPermissionTag) {
-          identityPermissionTag.textContent = ownerCreating ? "Owner sets at creation" : "Permanent identity";
+          identityPermissionTag.textContent = ownerCreating ? "Owner sets at creation" : "Locked setup fields";
         }
         if (idHint) {
           idHint.textContent = ownerCreating
-            ? "Permanent community key used in URLs and storage. Choose it carefully; it locks after creation."
-            : "Permanent community key. Locked after community creation.";
+            ? "Lowercase internal application key used for URLs and browser storage. It is not the canonical LEAP Protocol Community ID, and it locks after creation in this interface."
+            : "Lowercase internal application key used for URLs and browser storage. Not the canonical LEAP Protocol Community ID. Locked in this interface.";
         }
         if (namespaceHint) {
           namespaceHint.textContent = ownerCreating
