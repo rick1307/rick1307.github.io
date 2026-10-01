@@ -111,27 +111,30 @@
 
     .great-chat-metric {
       min-width: 0;
-      padding: 14px 12px 13px;
-      border: 1px solid #d7c985;
-      border-radius: 16px;
-      background: #fffbea;
+      padding: 15px 12px 14px;
+      border: 1px solid #d6bf63;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fff3b8 0%, #f4e7ae 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 5px 14px rgba(0,0,0,.10);
       text-align: center;
     }
 
     .great-chat-metric:nth-child(2) {
-      border-color: #b9d8c7;
-      background: #f1fbf5;
+      border-color: #8fc9aa;
+      background: linear-gradient(180deg, #d9f1e4 0%, #cce8d9 100%);
     }
 
     .great-chat-value {
       display: inline-grid;
       place-items: center;
-      min-width: 94px;
+      min-width: 98px;
       min-height: 54px;
-      padding: 7px 18px;
+      padding: 7px 20px;
+      border: 1px solid rgba(102,79,0,.18);
       border-radius: 999px;
-      background: #f5df72;
-      color: #443600;
+      background: #efd04f;
+      color: #302700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 2px 8px rgba(72,57,0,.12);
       font-size: clamp(30px, 7vw, 46px);
       font-weight: 900;
       line-height: 1;
@@ -139,25 +142,28 @@
     }
 
     .great-chat-metric:nth-child(2) .great-chat-value {
-      background: #bfe9cf;
-      color: #124b2f;
+      border-color: rgba(14,76,45,.16);
+      background: #93d8b1;
+      color: #123c29;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 2px 8px rgba(14,76,45,.10);
     }
 
     .great-chat-label {
       display: block;
-      margin-top: 8px;
-      color: var(--ink);
+      margin-top: 9px;
+      color: #18313b;
       font-size: 13px;
       font-weight: 900;
-      letter-spacing: .06em;
+      letter-spacing: .055em;
       text-transform: uppercase;
     }
 
     .great-chat-note {
       display: block;
       margin-top: 3px;
-      color: var(--muted);
+      color: #526970;
       font-size: 11px;
+      font-weight: 600;
       line-height: 1.35;
     }
 
