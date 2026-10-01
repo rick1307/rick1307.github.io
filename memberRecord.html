@@ -2395,7 +2395,7 @@
 
         const facts = extractLeapFacts(tx);
 
-        if (!facts.length) return null;
+        if (facts.length !== 1) return null;
 
         const time =
           entry.close_time_iso ||
