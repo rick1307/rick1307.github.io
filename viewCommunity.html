@@ -289,10 +289,8 @@
     communityRecognitionLink.href = `viewCommunityRecognition.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
-  if (communityCheckbookLink && role !== "operator") {
-    communityCheckbookLink.remove();
-  } else if (communityCheckbookLink) {
-    communityCheckbookLink.href = `operatorCheckbook.html?community=${encodeURIComponent(requestedId)}&role=operator`;
+  if (communityCheckbookLink) {
+    communityCheckbookLink.href = `operatorCheckbook.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
   if (communityLibraryLink) {
