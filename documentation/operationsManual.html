@@ -109,6 +109,12 @@
   p{margin:.6rem 0;color:var(--muted)}
   strong{color:var(--ink)}
   .cycle-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+  .wallet-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+  .wallet-card{border:1px solid var(--line);border-radius:18px;background:var(--glass);padding:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+  .wallet-card .wallet-role{color:var(--mango);font-size:.68rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+  .wallet-card h4{margin-top:10px}
+  .wallet-card p{font-size:.9rem}
+  .flow-line{margin:12px 0;padding:13px 14px;border-radius:12px;background:rgba(0,0,0,.18);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem;color:#f7fffd;overflow-wrap:anywhere}
   .cycle-card,.formula-card,.lesson,.checklist,.example-card{
     border:1px solid var(--line);border-radius:18px;background:var(--glass);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
@@ -146,7 +152,7 @@
   .footer-inner{padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   @media(max-width:760px){
     header{padding:42px 0 20px}
-    .cycle-grid,.formula-grid,.examples,.contents-list{grid-template-columns:1fr}
+    .cycle-grid,.wallet-grid,.formula-grid,.examples,.contents-list{grid-template-columns:1fr}
     .cycle-card{min-height:auto}
     .decision,.section-head{grid-template-columns:1fr}
     .pill,.audience-pill{width:max-content}
@@ -193,6 +199,10 @@
             <span>Ledger as Authority</span>
             <small>Owner + Operator</small>
           </a>
+          <a class="toc-link" href="#wallet-roles" data-audience="shared">
+            <span>Wallet Roles &amp; Responsibilities</span>
+            <small>Owner + Operator</small>
+          </a>
           <a class="toc-link" href="#replenishment" data-audience="shared">
             <span>Replenishment Strategy</span>
             <small>Owner + Operator</small>
@@ -230,20 +240,86 @@
         <div class="lesson"><strong>Practical standard</strong><p>A clean Wild Ledger client should be able to rebuild authoritative community state from XRPL and the LEAP Protocol without consulting a conventional application database.</p></div>
       </div>
 
+    </div>
+  </section>
+
+  <section class="manual-section" id="wallet-roles" data-audience="shared">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">Section 1 · Operating Structure</span>
+          <h2>Wallet Roles &amp; Responsibilities</h2>
+          <p class="section-summary">Wild Ledger uses several XRPL accounts, but they do not all do the same job. The wallet that signs a transaction is part of the protocol meaning.</p>
+        </div>
+        <div class="audience-pill">Owner + Operator</div>
+      </div>
+
+      <div class="rule">Issuer defines LEAP. Distributor allocates LEAP. The Community Operating Wallet runs the community.</div>
+
       <div class="lesson-block">
-        <span class="lesson-kicker">Authority Operations</span>
-        <h3>Changing the Community Operating Wallet</h3>
-        <p>Protocol 0.13 treats the Community Operating Wallet as a single canonical state value on XRPL. Wild Ledger resolves the latest valid <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;VALUE&gt;</code> statement instead of maintaining a separate rotation record.</p>
+        <span class="lesson-kicker">1.1 · The Three Wallet Roles</span>
+        <h3>Know which wallet is doing the job</h3>
+        <p>The same XRPL network and even the same transaction type can be used for different purposes. Wild Ledger determines protocol meaning from the role of the signing account, the transaction, the direction of value, and the canonical memo or state statement.</p>
+        <div class="wallet-grid">
+          <article class="wallet-card">
+            <div class="wallet-role">Asset Identity</div>
+            <h4>LEAP Issuer</h4>
+            <p>The Issuer defines the LEAP asset on XRPL. A member's LEAP trustline points to this issuer. The Issuer is part of LEAP identity; it is not the community's day-to-day operating wallet.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Allocation</div>
+            <h4>Distributor</h4>
+            <p>The Distributor distributes community allocations and replenishments using allocation Checks. Its job is to put operating LEAP into the community side of the system. It does not create member recognition Checks.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Community Operations</div>
+            <h4>Community Operating Wallet</h4>
+            <p>The Operating Wallet is the community's on-ledger operating identity. It manages the community's operating LEAP, creates member recognition Checks, and signs canonical community protocol statements such as recognition lifecycle records.</p>
+          </article>
+        </div>
+        <div class="lesson"><strong>People, accounts, and signer apps are different things</strong><p>The <strong>Operator</strong> is the person or business role running the community. The <strong>Community Operating Wallet</strong> is the XRPL account authorized to act for that community. Bifrost, Xaman, Tangem, or another compatible wallet app is only a signing tool that controls an XRPL account; changing signer apps does not change the community's protocol authority.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">1.2 · Checks</span>
+        <h3>Both Distributor and Operating Wallet use Checks — for different jobs</h3>
+        <p>A Check is an XRPL transaction mechanism. The fact that two roles both use Checks does not make their jobs interchangeable.</p>
+        <div class="flow-line">Distributor → Allocation Check → Community operating side</div>
+        <p>An <strong>allocation Check</strong> makes LEAP available to community operations; cashing the Check completes delivery. It belongs to the allocation and replenishment side of Wild Ledger.</p>
+        <div class="flow-line">Community Operating Wallet → Recognition Check → Member</div>
+        <p>A <strong>recognition Check</strong> awards LEAP to a member for one canonical Badge, Event, or Challenge. The Operating Wallet creates that Check because recognition is a community operation.</p>
+        <div class="lesson"><strong>One mechanism, different protocol meaning</strong><p>Wild Ledger does not classify a transaction merely because it is a Check. It verifies who signed it, what asset it concerns, where it is going, and which protocol rules apply.</p></div>
+        <div class="lesson"><strong>Allocation ownership follows the community namespace</strong><p>For an allocation such as <code>SFL-LEAP/ALLOCATION=500</code>, the memo says which community owns the allocation. The Check destination says where the Distributor delivered it. If the community later changes its Operating Wallet, the old allocation still belongs to that same community and remains part of its Tokenomics and audit history.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">1.3 · Protocol Statements</span>
+        <h3>The Operating Wallet also speaks for the community on XRPL</h3>
+        <p>Not every community action transfers LEAP. When the community needs to publish canonical state, the Operating Wallet can sign a successful validated no-op <code>AccountSet</code>. The transaction moves no LEAP; the public memo is the protocol statement.</p>
         <div class="checklist">
           <ul>
-            <li><strong>Bootstrap once.</strong> If the community has no canonical <code>OPERATING-WALLET</code> statement yet, the LEAP Issuer publishes the first value.</li>
-            <li><strong>Routine rotation is self-service.</strong> After bootstrap, the currently authorized Community Operating Wallet may publish a new value directly. No Wild Ledger approval and no successor acceptance are required.</li>
-            <li><strong>Latest valid value wins.</strong> The new value becomes authoritative from that validated transaction forward in canonical XRPL transaction order.</li>
-            <li><strong>The ledger is the history.</strong> Wild Ledger derives historical authority from the sequence of validated state statements; there is no separate BEGIN/END, old-wallet/new-wallet, or rotation-history database.</li>
-            <li><strong>Changing signer apps is not an authority change.</strong> Bifrost, Xaman, Tangem, or another compatible signer may control the same XRPL account without changing community authority.</li>
+            <li><strong>Recognition lifecycle.</strong> <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code> statements define the lifecycle of canonical Badges, Events, and Challenges.</li>
+            <li><strong>Authority state.</strong> Single-valued protocol state can use the form <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code>.</li>
+            <li><strong>No private key leaves the wallet.</strong> Wild Ledger constructs and validates the transaction; the wallet app signs it; Wild Ledger submits the signed transaction and verifies the validated result.</li>
           </ul>
         </div>
-        <div class="lesson"><strong>Do not edit around the ledger</strong><p>Configuration may retain a pre-0.13 value for compatibility or bootstrap convenience, but after bootstrap it is not canonical authority. Protocol 0.13 does not yet define emergency recovery for a lost or compromised current Operating Wallet.</p></div>
+        <div class="lesson"><strong>The Operating Wallet is more than a LEAP balance</strong><p>It is the community account whose validated transactions establish community provenance. That is why Wild Ledger must know which Operating Wallet was authorized at the ledger position being interpreted.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">1.4 · Operating Wallet State</span>
+        <h3>Changing the Community Operating Wallet</h3>
+        <p>Authority state is expressed as a single current value on XRPL: <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;VALUE&gt;</code>. Wild Ledger does not maintain a separate old-wallet/new-wallet history object.</p>
+        <div class="checklist">
+          <ul>
+            <li><strong>Routine replacement is self-service.</strong> Once a community has an established canonical Operating Wallet, the currently authorized Operating Wallet may publish a new value directly.</li>
+            <li><strong>Latest valid value wins.</strong> The new value becomes authoritative from that validated transaction forward in canonical XRPL transaction order.</li>
+            <li><strong>The ledger is the history.</strong> There is no separate <code>BEGIN</code>, <code>END</code>, <code>OLD</code>, <code>NEW</code>, rotation number, or wallet-history database.</li>
+            <li><strong>Historical reporting remains possible.</strong> Wild Ledger can determine which Operating Wallet was authoritative at any point by reading the ordered authority-state statements already preserved on XRPL.</li>
+          </ul>
+        </div>
+        <div class="lesson"><strong>Existing-community first statement</strong><p>For a community that already existed before on-ledger authority state, the already-established Community Operating Wallet publishes one first canonical statement naming itself. That one-time step moves authority state onto XRPL. The Issuer and Distributor do not establish or control the Community Operating Wallet.</p></div>
+        <div class="warning"><strong>Brand-new community provisioning is still open.</strong> Protocol 0.15 does not yet define how a new community with no pre-existing Operating Wallet receives its first authority. Do not infer that authority from the Issuer or Distributor roles.</div>
       </div>
     </div>
   </section>
@@ -252,7 +328,7 @@
     <div class="wrap">
       <div class="section-head">
         <div>
-          <span class="section-number">Section 1 · Token Operations</span>
+          <span class="section-number">Section 2 · Token Operations</span>
           <h2>Replenishment Strategy</h2>
           <p class="section-summary">Wild Ledger replenishment is designed to support communities that put LEAP into circulation. This section explains what the algorithm measures, why broad circulation matters, and how to decide when a replenishment request makes sense.</p>
         </div>
@@ -262,7 +338,7 @@
       <div class="rule">Circulate first. Replenish second. Grow through participation.</div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">1.1 · Replenishment Cycles</span>
+        <span class="lesson-kicker">2.1 · Replenishment Cycles</span>
         <h3>Think in cycles, not calendar months</h3>
         <p>A replenishment is an <strong>economic event</strong>, not a monthly entitlement. Every completed replenishment closes one cycle and starts the next. The next calculation uses only activity that happens after that new starting line.</p>
         <div class="cycle-grid">
@@ -275,7 +351,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">1.2 · Replenishment Algorithm</span>
+        <span class="lesson-kicker">2.2 · Replenishment Algorithm</span>
         <h3>How the Wild Ledger algorithm works</h3>
         <p>The algorithm deliberately separates <strong>movement</strong> from <strong>healthy circulation</strong>. Moving LEAP out of the operating wallet matters, but concentrating it in one or a few wallets should not produce the same replenishment as broad community participation.</p>
         <div class="formula-grid">
@@ -314,7 +390,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">1.3 · Timing</span>
+        <span class="lesson-kicker">2.3 · Timing</span>
         <h3>Why waiting can improve the result</h3>
         <p>The Replenishment card turning green means a request is <strong>available</strong>. It does not mean the operator should immediately request it. Because a completed replenishment closes the current cycle, requesting too early can reduce what the cycle ultimately produces.</p>
         <div class="examples">
@@ -337,7 +413,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">1.4 · Decision Standard</span>
+        <span class="lesson-kicker">2.4 · Decision Standard</span>
         <h3>When should you request?</h3>
         <div class="checklist">
           <h4>Before requesting replenishment, ask:</h4>
@@ -356,7 +432,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">1.5 · Quick Reference</span>
+        <span class="lesson-kicker">2.5 · Quick Reference</span>
         <h3>The operator playbook</h3>
         <div class="checklist">
           <ul>
