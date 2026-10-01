@@ -1107,8 +1107,8 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
   }
 
   const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;
-  const issuer = config.leapIssuer || FALLBACK_CONFIG.leapIssuer;
-  const leapCurrency = String(config.leapCurrency || "LEAP").toUpperCase();
+  const issuer = String(config.leapIssuer || FALLBACK_CONFIG.leapIssuer || "").trim();
+  const leapCurrency = String(config.leapCurrency || FALLBACK_CONFIG.leapCurrency || "").trim().toUpperCase();
   const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
   const globalDistributionWallet =
     config.globalDistributionWallet ||
@@ -1148,29 +1148,14 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
   const allocationLogBody = document.getElementById("allocationLogBody");
   const allocationLogNote = document.getElementById("allocationLogNote");
 
-  function decodeCurrency(code) {
-    const value = String(code || "");
-    if (/^[A-Za-z0-9?!@#$%^&*<>(){}\[\]|]{3}$/.test(value)) return value;
-    if (!/^[A-Fa-f0-9]{40}$/.test(value)) return value;
-    let text = "";
-    for (let i = 0; i < value.length; i += 2) {
-      const n = parseInt(value.slice(i, i + 2), 16);
-      if (!n) break;
-      text += String.fromCharCode(n);
-    }
-    return text;
-  }
-
   function isLeapCurrency(code) {
-    const raw = String(code || "").toUpperCase();
-    const decoded = decodeCurrency(raw).toUpperCase();
-    return raw === leapCurrency || decoded === "LEAP";
+    return !!leapCurrency && String(code || "").toUpperCase() === leapCurrency;
   }
 
   function isLeapAmount(amount) {
     return Boolean(
       amount && typeof amount === "object" &&
-      isLeapCurrency(amount.currency) &&
+      !!issuer && isLeapCurrency(amount.currency) &&
       String(amount.issuer || "") === issuer &&
       Number.isFinite(Number(amount.value))
     );

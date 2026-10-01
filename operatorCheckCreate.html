@@ -515,14 +515,12 @@
       try { return new TextDecoder("utf-8", {fatal:false}).decode(new Uint8Array(value.match(/.{2}/g).map(x=>parseInt(x,16)))).replace(/\0+$/g, ""); }
       catch { return value; }
     }
-    function decodeCurrency(value) {
-      const code=String(value||"");
-      if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
-      try { let out=""; for(let i=0;i<code.length;i+=2){const n=parseInt(code.slice(i,i+2),16); if(n===0)break; out+=String.fromCharCode(n);} return out; }
-      catch { return code; }
-    }
     function isLeapAmount(value) {
-      return !!value && typeof value === "object" && value.issuer === LEAP_ISSUER && decodeCurrency(value.currency).toUpperCase() === "LEAP" && Number(value.value) > 0;
+      return !!value && typeof value === "object" &&
+        !!LEAP_ISSUER && !!LEAP_CURRENCY &&
+        String(value.issuer || "") === LEAP_ISSUER &&
+        String(value.currency || "").toUpperCase() === LEAP_CURRENCY.toUpperCase() &&
+        Number(value.value) > 0;
     }
     function normalizeTx(entry){ return entry?.tx_json || entry?.tx || entry?.transaction || entry || {}; }
     function transactionSucceeded(entry){ if(entry?.validated===false)return false; const meta=entry?.meta||entry?.metaData||entry?.metadata||{}; const result=meta?.TransactionResult??meta?.transaction_result; return !result||result==="tesSUCCESS"; }

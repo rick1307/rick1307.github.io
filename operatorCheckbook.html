@@ -821,6 +821,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
   const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
   const LEAP_ISSUER = String(config.leapIssuer || "").trim();
+  const LEAP_CURRENCY = String(config.leapCurrency || "").trim();
   const PROJECT_ID = String(config.walletConnectProjectId || "").trim();
   const FEE_CUSHION = Number(config.xrplFeeCushion || DEFAULT_FEE_CUSHION);
   const NAMESPACE = community?.leapNamespace || `${communityId}-LEAP`;
@@ -887,11 +888,12 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
     if(!/^[A-Fa-f0-9]+$/.test(value)||value.length%2!==0)return value;
     try{const bytes=new Uint8Array(value.match(/.{2}/g).map(pair=>parseInt(pair,16)));return new TextDecoder("utf-8",{fatal:false}).decode(bytes).replace(/\0+$/g,"");}catch{return value;}
   }
-  function decodeCurrency(value){
-    const code=String(value||""); if(!/^[A-Fa-f0-9]{40}$/.test(code))return code;
-    try{let out="";for(let i=0;i<code.length;i+=2){const n=parseInt(code.slice(i,i+2),16);if(n===0)break;out+=String.fromCharCode(n);}return out;}catch{return code;}
+  function isLeapAmount(amount){
+    return !!amount && typeof amount === "object" &&
+      !!LEAP_ISSUER && !!LEAP_CURRENCY &&
+      String(amount.issuer || "") === LEAP_ISSUER &&
+      String(amount.currency || "").toUpperCase() === LEAP_CURRENCY.toUpperCase();
   }
-  function isLeapAmount(amount){return !!amount&&typeof amount==="object"&&amount.issuer===LEAP_ISSUER&&decodeCurrency(amount.currency).toUpperCase()==="LEAP";}
   function normalizeTx(entry){return entry?.tx_json||entry?.tx||entry?.transaction||entry||{};}
   function transactionSucceeded(meta){if(!meta||typeof meta!=="object")return true;const result=meta.TransactionResult??meta.transaction_result;return !result||result==="tesSUCCESS";}
   function ledgerIndex(entry,tx=normalizeTx(entry)){const n=Number(entry?.ledger_index??entry?.ledgerIndex??tx?.ledger_index??tx?.ledgerIndex);return Number.isFinite(n)?n:null;}

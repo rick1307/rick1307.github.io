@@ -199,7 +199,8 @@
       const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
       const feeCushion = Number(config.xrplFeeCushion || 1.2);
       const projectId = String(config.walletConnectProjectId || "").trim();
-      const leapIssuer = config.leapIssuer || "";
+      const leapIssuer = String(config.leapIssuer || "").trim();
+      const leapCurrency = String(config.leapCurrency || "").trim();
       const legacyDistributors = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
 
       const back = document.getElementById("recognitionBack");
@@ -360,26 +361,11 @@
         }
       }
 
-      function decodeCurrency(value) {
-        const code = String(value || "");
-        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
-        try {
-          let out = "";
-          for (let i = 0; i < code.length; i += 2) {
-            const n = parseInt(code.slice(i, i + 2), 16);
-            if (n === 0) break;
-            out += String.fromCharCode(n);
-          }
-          return out;
-        } catch (_) {
-          return code;
-        }
-      }
-
       function isLeapAmount(amount) {
         return !!amount && typeof amount === "object" &&
-          (!leapIssuer || amount.issuer === leapIssuer) &&
-          decodeCurrency(amount.currency).toUpperCase() === "LEAP";
+          !!leapIssuer && !!leapCurrency &&
+          String(amount.issuer || "") === leapIssuer &&
+          String(amount.currency || "").toUpperCase() === leapCurrency.toUpperCase();
       }
 
       function normalizeTx(entry) {

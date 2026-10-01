@@ -1332,7 +1332,8 @@
       let operatingWallet = "";
       const config = window.WILD_LEDGER_CONFIG || {};
       const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
-      const LEAP_ISSUER = config.leapIssuer || "";
+      const LEAP_ISSUER = String(config.leapIssuer || "").trim();
+      const LEAP_CURRENCY = String(config.leapCurrency || "").trim();
       const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
       const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
       const CATEGORIES = ["BADGE", "CHALLENGE", "EVENT"];
@@ -1453,26 +1454,11 @@
         return texts;
       }
 
-      function decodeCurrency(value) {
-        const code = String(value || "");
-        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
-        try {
-          let out = "";
-          for (let i = 0; i < code.length; i += 2) {
-            const n = parseInt(code.slice(i, i + 2), 16);
-            if (n === 0) break;
-            out += String.fromCharCode(n);
-          }
-          return out;
-        } catch (_) {
-          return code;
-        }
-      }
-
       function isLeapAmount(amount) {
         return !!amount && typeof amount === "object" &&
-          (!LEAP_ISSUER || amount.issuer === LEAP_ISSUER) &&
-          decodeCurrency(amount.currency).toUpperCase() === "LEAP";
+          !!LEAP_ISSUER && !!LEAP_CURRENCY &&
+          String(amount.issuer || "") === LEAP_ISSUER &&
+          String(amount.currency || "").toUpperCase() === LEAP_CURRENCY.toUpperCase();
       }
 
       function validId(category, value) {
