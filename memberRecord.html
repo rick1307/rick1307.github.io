@@ -2412,6 +2412,57 @@
         };
       }
 
+      function singleOccurrenceRecognitionRecords(records) {
+        const ordered = [...(Array.isArray(records) ? records : [])].sort((a, b) => {
+          const la = Number(a?.ledger);
+          const lb = Number(b?.ledger);
+          const aHasLedger = Number.isFinite(la);
+          const bHasLedger = Number.isFinite(lb);
+
+          if (aHasLedger && bHasLedger && la !== lb) return la - lb;
+          if (aHasLedger !== bHasLedger) return aHasLedger ? -1 : 1;
+
+          const ia = Number(a?.transactionIndex);
+          const ib = Number(b?.transactionIndex);
+          const aHasIndex = Number.isFinite(ia);
+          const bHasIndex = Number.isFinite(ib);
+
+          if (aHasIndex && bHasIndex && ia !== ib) return ia - ib;
+          if (aHasIndex !== bHasIndex) return aHasIndex ? -1 : 1;
+
+          const ta = a?.time ? new Date(a.time).getTime() : 0;
+          const tb = b?.time ? new Date(b.time).getTime() : 0;
+
+          if (ta !== tb) return ta - tb;
+          return String(a?.hash || "").localeCompare(String(b?.hash || ""));
+        });
+
+        const seen = { EVENT:new Set(), CHALLENGE:new Set() };
+        const kept = [];
+
+        for (const record of ordered) {
+          const fact = Array.isArray(record?.facts) ? record.facts[0] : null;
+
+          if (!fact || fact.key === "BADGE") {
+            kept.push(record);
+            continue;
+          }
+
+          if (fact.key === "EVENT" || fact.key === "CHALLENGE") {
+            const id = String(fact.value || "");
+            const bucket = seen[fact.key];
+
+            if (bucket.has(id)) continue;
+
+            bucket.add(id);
+          }
+
+          kept.push(record);
+        }
+
+        return kept;
+      }
+
       function queryAccountHistory(account) {
         return new Promise((resolve, reject) => {
           const ws = new WebSocket(XRPL_WS);
@@ -2546,7 +2597,7 @@
                 if (record) records.push(record);
               }
 
-              finish(records);
+              finish(singleOccurrenceRecognitionRecords(records));
             }
           });
 
