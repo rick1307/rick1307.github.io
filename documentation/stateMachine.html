@@ -504,7 +504,7 @@
   <div class="wrap">
     <div class="kicker">LEAP • XRPL • AI • Machine-readable history</div>
     <h1>When a logbook becomes a state machine</h1>
-    <p class="lede">A blockchain transaction can do more than move value. It can also record that something happened. With an authorized LEAP Check and one canonical memo, Sailing Frog's Leap can create a permanent, public, machine-readable recognition on the XRP Ledger.</p>
+    <p class="lede">A blockchain transaction can do more than move value. LEAP uses authorized XRPL transactions and canonical public memos to record community authority, recognition lifecycle, member recognition, and allocation history as permanent, machine-readable state.</p>
     <div class="hero-note">The important shift is simple: once events are written in a form that software can read, humans no longer have to reconstruct the history manually. The ledger becomes part of the machine's state.</div>
   </div>
 </header>
@@ -517,23 +517,23 @@
 </div></div></section>
 
 <section><div class="wrap">
-  <div class="section-title"><h2>The simple LEAP mechanic</h2><p>The recognition event itself can be tiny. The value is in the permanent record.</p></div>
+  <div class="section-title"><h2>The simple recognition mechanic</h2><p>LEAP separates the recognition object from the award to a member.</p></div>
   <div class="mechanic">
-    <div class="step"><div class="num">1</div><h3>Choose the recognition</h3><p>Decide whether this award records a badge, an event, or a challenge.</p></div>
-    <div class="step"><div class="num">2</div><h3>Issue one LEAP Check</h3><p>The authorized distributor creates a Check for 1 LEAP to the member's wallet. One Check represents one award.</p></div>
-    <div class="step"><div class="num">3</div><h3>Add one canonical memo</h3><p>Use exactly one recognition record, such as <strong>SFL-LEAP/BADGE=LEAP-OG</strong>, <strong>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE</strong>, or <strong>SFL-LEAP/CHALLENGE=LEAP-001</strong>.</p></div>
-    <div class="step"><div class="num">4</div><h3>The ledger remembers</h3><p>Distributor, recipient, LEAP amount, ledger time, memo, and transaction hash become part of the permanent XRPL transaction history.</p></div>
+    <div class="step"><div class="num">1</div><h3>Create the recognition</h3><p>The authorized Community Operating Wallet publishes a no-op <strong>AccountSet</strong> with a canonical <strong>CREATE</strong> lifecycle memo for a Badge, Event, or Challenge.</p></div>
+    <div class="step"><div class="num">2</div><h3>Offer the recognition</h3><p>The Community Operating Wallet creates a LEAP <strong>Check</strong> to the member. One Check carries one recognition reason; the LEAP amount is a positive whole number.</p></div>
+    <div class="step"><div class="num">3</div><h3>Name it canonically</h3><p>The Check carries exactly one recognition memo, such as <strong>SFL-LEAP/BADGE=LEAP-OG</strong>, <strong>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE</strong>, or <strong>SFL-LEAP/CHALLENGE=LEAP-001</strong>.</p></div>
+    <div class="step"><div class="num">4</div><h3>The member claims it</h3><p>The member cashes the Check. XRPL preserves the Operating Wallet, recipient, LEAP amount, memo, ledger order, transaction hashes, and final Check state.</p></div>
   </div>
 </div></section>
 
 <section><div class="wrap">
   <div class="section-title"><h2>What one event looks like</h2><p>Conceptually, the blockchain now contains a record like this:</p></div>
   <div class="example"><div class="tx">
-    <b>Sender</b><span>Authorized LEAP distributor wallet</span>
+    <b>Sender</b><span>Authorized Community Operating Wallet</span>
     <b>Recipient</b><span>Member's XRPL wallet</span>
     <b>Transaction</b><span>CheckCreate</span>
     <b>Asset</b><span>LEAP</span>
-    <b>Amount</b><span>1 LEAP</span>
+    <b>Amount</b><span>1 LEAP in this example</span>
     <b>Memo</b><span>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE</span>
     <b>Time</b><span>Validated ledger transaction time</span>
     <b>Proof</b><span>Unique transaction hash</span>
@@ -541,24 +541,24 @@
 </div></section>
 
 <section><div class="wrap">
-  <div class="section-title"><h2>That is a state transition.</h2><p>Before the transaction, the ledger did not contain that recognition. After the transaction, it does.</p></div>
+  <div class="section-title"><h2>That is a state transition.</h2><p>The recognition object already exists from its canonical lifecycle <strong>CREATE</strong>. The member award then has its own state.</p></div>
   <div class="flow">
-    <div class="flow-card"><b>State A</b><span>The wallet has no La Cruz Beach Bonfire recognition in its LEAP history.</span></div>
+    <div class="flow-card"><b>State A</b><span>The member has not been offered the La Cruz Beach Bonfire recognition.</span></div>
     <div class="arrow">→</div>
-    <div class="flow-card"><b>Transaction</b><span>The authorized distributor creates a 1 LEAP Check with memo: SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE.</span></div>
+    <div class="flow-card"><b>CheckCreate</b><span>The authorized Community Operating Wallet creates a LEAP Check with memo: SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE.</span></div>
     <div class="arrow">→</div>
-    <div class="flow-card"><b>State B</b><span>The validated ledger now contains permanent evidence that the authorized LEAP distributor issued that recognition to this wallet.</span></div>
+    <div class="flow-card"><b>State B</b><span>The ledger contains a pending recognition offer. When the member cashes the Check, the award becomes redeemed history while the original CheckCreate remains permanent evidence.</span></div>
   </div>
 </div></section>
 
 <section><div class="wrap">
-  <div class="section-title"><h2>Why call this a “real-world state machine”?</h2><p>Because the ledger can increasingly represent facts that matter outside the ledger itself.</p></div>
+  <div class="section-title"><h2>Why call this a “real-world state machine”?</h2><p>Because the ledger can represent facts that matter outside the ledger itself, and Wild Ledger can interpret those facts deterministically.</p></div>
   <div class="machine">
-    <div class="machine-row"><b>Membership state</b><span>This wallet is a member of the Sailing Frog's Leap crew.</span></div>
-    <div class="machine-row"><b>Rank state</b><span>This wallet currently holds enough LEAP to be a Bosun, Quartermaster, First Mate, or Master of the Leap.</span></div>
-    <div class="machine-row"><b>Recognition state</b><span>This wallet received a Panama Canal, Founding Crew, passage, port, or contribution recognition.</span></div>
-    <div class="machine-row"><b>Access state</b><span>A Discord app or website can use that membership and rank state to decide which experiences to unlock.</span></div>
-    <div class="machine-row"><b>Economic state</b><span>Assets, balances, transfers, permissions, claims, and other machine-readable rights can be represented in similar ways.</span></div>
+    <div class="machine-row"><b>Authority state</b><span>The latest valid <strong>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;VALUE&gt;</strong> statement identifies the community's current Operating Wallet.</span></div>
+    <div class="machine-row"><b>Recognition lifecycle</b><span>Validated no-op AccountSet statements move a Badge, Event, or Challenge through CREATE, END, or IGNORE without moving LEAP.</span></div>
+    <div class="machine-row"><b>Member recognition</b><span>The authorized Operating Wallet offers a canonical recognition Check; CheckCash records that the member claimed it.</span></div>
+    <div class="machine-row"><b>Allocation state</b><span>An authorized Distributor's <strong>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</strong> memo says which community owns an allocation; the Check destination records where it was delivered.</span></div>
+    <div class="machine-row"><b>Membership and rank</b><span>Validated LEAP state can support Member Record, rank, recognition history, and other community experiences.</span></div>
   </div>
 </div></section>
 
@@ -568,12 +568,22 @@
 </div></section>
 
 <section><div class="wrap">
+  <div class="section-title"><h2>Same ledger, different protocol jobs</h2><p>The XRPL transaction type, signer, namespace, and memo together tell Wild Ledger what a statement means.</p></div>
+  <div class="machine">
+    <div class="machine-row"><b>Distributor → community</b><span><strong>CheckCreate</strong> with <strong>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</strong>. The namespace determines community attribution; Destination is delivery and audit data.</span></div>
+    <div class="machine-row"><b>Operating Wallet → member</b><span><strong>CheckCreate</strong> with one canonical Badge, Event, or Challenge memo. This is a recognition offer; the member claims it with CheckCash.</span></div>
+    <div class="machine-row"><b>Operating Wallet → recognition object</b><span>No-op <strong>AccountSet</strong> with a self-identifying lifecycle memo. CREATE, END, and IGNORE change protocol lifecycle state without transferring LEAP.</span></div>
+    <div class="machine-row"><b>Operating Wallet → authority state</b><span>No-op <strong>AccountSet</strong> with <strong>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</strong>. For single-valued state such as OPERATING-WALLET, the latest valid statement wins.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
   <div class="section-title"><h2>Where AI enters the picture</h2><p>AI becomes much more useful when it can read trusted state instead of depending entirely on unstructured human descriptions.</p></div>
   <div class="split">
-    <div class="card"><span class="label">AI reads</span><h3>What is true right now?</h3><p>An AI system can query public ledger data and determine balances, transaction history, memos, timestamps, and other recorded facts.</p></div>
-    <div class="card"><span class="label">AI reasons</span><h3>What should happen next?</h3><p>Given the current state, AI can decide whether someone qualifies for a role, badge, benefit, alert, workflow, or next action.</p></div>
-    <div class="card"><span class="label">Software acts</span><h3>Change the experience</h3><p>A Discord bot might assign Quartermaster status. A website might display a badge. An app might unlock a poll or special event.</p></div>
-    <div class="card"><span class="label">The ledger records</span><h3>The new state becomes history</h3><p>Another transaction or attestation can record what happened next, giving the machine a new state from which to continue.</p></div>
+    <div class="card"><span class="label">AI reads</span><h3>What is true right now?</h3><p>An AI system can query validated public ledger data and determine balances, transaction history, canonical memos, authority state, timestamps, and other recorded facts.</p></div>
+    <div class="card"><span class="label">AI reasons</span><h3>What should happen next?</h3><p>Given the current state, AI can help determine whether someone qualifies for a role, recognition, alert, workflow, or next action under the protocol rules.</p></div>
+    <div class="card"><span class="label">Software acts</span><h3>Change the experience</h3><p>Wild Ledger can display rank, recognition, Member Record history, Lounge capabilities, or other community experiences from that interpreted state.</p></div>
+    <div class="card"><span class="label">The ledger records</span><h3>The new state becomes history</h3><p>When a protocol action is needed, the authorized wallet signs the exact XRPL transaction and validated history becomes the next canonical input.</p></div>
   </div>
 </div></section>
 
@@ -589,7 +599,7 @@
 
 <section><div class="wrap"><div class="warning">
   <h3>One important limit</h3>
-  <p>A blockchain only knows what has been written or credibly attested to it. A memo does not magically prove that a physical-world event occurred. For LEAP, official recognition requires more than matching text: software also verifies the authorized LEAP distributor, the correct LEAP asset, the intended destination, and a successful validated transaction. The trustworthiness of the underlying real-world claim still depends on who made the attestation, the rules of the system, and any supporting evidence.</p>
+  <p>A blockchain only knows what has been written or credibly attested to it. A memo does not magically prove that a physical-world event occurred. For LEAP, software validates the transaction type, canonical namespace and memo, the authority that signed it, the LEAP asset when value moves, the intended destination when applicable, and successful validated ledger history. The trustworthiness of the underlying real-world claim still depends on who made the attestation, the protocol rules, and any supporting evidence.</p>
 </div></div></section>
 
 <section><div class="wrap">
@@ -606,7 +616,7 @@
 </div></section>
 <section><div class="wrap"><div class="return-box">
   <h3>See how this idea becomes a real membership system.</h3>
-  <p>Return to the LEAP crew page to see ranks, badges, onboarding, and the community side of the experiment.</p>
+  <p>Return to the LEAP membership page to see ranks, recognition, onboarding, and the community side of the experiment.</p>
   <a class="button" href="../index.html">← Back to the LEAP membership page</a>
 </div></div></section>
 </main>
