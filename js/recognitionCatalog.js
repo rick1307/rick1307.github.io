@@ -308,6 +308,24 @@ function applyLifecycle(records, record) {
   });
 }
 
+function globalRecognitionDefinitions() {
+  const configured = globalThis?.WILD_LEDGER_CONFIG?.globalRecognitions;
+  if (!Array.isArray(configured)) return [];
+
+  const seen = new Set();
+  const definitions = [];
+  for (const item of configured) {
+    const category = String(item?.category || "").trim().toUpperCase();
+    const id = String(item?.id || "").trim().toUpperCase();
+    if (!RECOGNITION_CATEGORIES.includes(category) || !validCanonicalId(category, id)) continue;
+    const key = `${category}:${id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    definitions.push({ category, id, permanent: item?.permanent !== false });
+  }
+  return definitions;
+}
+
 function sortRecords(records) {
   const categoryOrder = new Map(RECOGNITION_CATEGORIES.map((category, index) => [category, index]));
   return [...records].sort((a, b) => {
@@ -417,6 +435,21 @@ export async function loadRecognitionCatalog({
       .sort(compareOrder);
 
     for (const record of lifecycleRecords) applyLifecycle(records, record);
+
+    // Wild Ledger may provide permanent recognition definitions to every community.
+    // These are application-level definitions, not community lifecycle state, so a
+    // community CREATE/END/IGNORE cannot create, retire, or suppress them.
+    for (const definition of globalRecognitionDefinitions()) {
+      records.set(`${definition.category}:${definition.id}`, {
+        category: definition.category,
+        id: definition.id,
+        state: "ACTIVE",
+        source: "global",
+        permanent: definition.permanent,
+        created: null,
+        terminal: null
+      });
+    }
 
     const result = {
       namespace,

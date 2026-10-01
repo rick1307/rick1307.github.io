@@ -11,6 +11,9 @@
     leapDistributors: Object.freeze([
       "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
     ]),
+    globalRecognitions: Object.freeze([
+      Object.freeze({ category: "BADGE", id: "GREAT-CHAT", permanent: true })
+    ]),
     xrplWebSocket: "wss://s1.ripple.com/",
     xrplFeeCushion: 1.2,
     walletConnectProjectId: "be456e8bbaa197eaa9d39bb2e4d3208d",
