@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Simple answers about Wild Ledger, LEAP, XRP Ledger addresses, wallet privacy, Xaman, LEAP Checks, member records, transfers, and wallet safety." name="description"/>
+<meta content="#dce9e5" name="theme-color"/>
+<title>Wild Ledger FAQ</title>
+<style>
+    :root{
+      --paper:#efe8d8;--ink:#1a252c;--navy:#16384b;--foam:#dbece8;
+      --rust:#b84f32;--gold:#d2a34f;--line:rgba(26,37,44,.18);
+      --card:#fffaf0;--max:1000px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:Georgia,"Times New Roman",serif;
+      line-height:1.65;
+    }
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+
+    nav{
+      position:sticky;top:0;z-index:20;
+      background:rgba(239,232,216,.94);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      min-height:64px;display:flex;align-items:center;
+      justify-content:space-between;gap:20px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:11px;text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:850;letter-spacing:.02em;
+    }
+    .topbar-simple{
+      width:100%;display:flex;align-items:center;
+      justify-content:space-between;gap:16px;
+    }
+    .wild-ledger-name{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:13px;font-weight:850;letter-spacing:.02em;
+      white-space:nowrap;
+    }
+    .back-link{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:34px;padding:0 14px;
+      border:1px solid var(--line);border-radius:999px;
+      color:inherit;text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:13px;font-weight:750;line-height:1;white-space:nowrap;
+    }
+    .back-link:hover{background:rgba(255,255,255,.18)}
+    @media (max-width:480px){
+      .topbar-simple{gap:10px}
+      .wild-ledger-name{font-size:12px}
+      .back-link{min-height:32px;padding:0 12px;font-size:12px}
+    }
+
+    header{padding:74px 0 44px}
+    .kicker{
+      color:var(--rust);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      text-transform:uppercase;letter-spacing:.14em;
+      font-size:.78rem;font-weight:900;
+    }
+    h1{
+      margin:.15em 0 .2em;color:var(--navy);
+      font-size:clamp(3rem,8vw,5.8rem);
+      line-height:.95;letter-spacing:-.05em;
+    }
+    .lede{
+      max-width:820px;margin:0;color:#46575f;
+      font-size:clamp(1.2rem,2vw,1.42rem);
+    }
+    .hero-note{
+      margin-top:24px;padding:19px 21px;
+      border-left:4px solid var(--gold);
+      background:rgba(255,250,240,.6);
+      color:#4f5c62;font-size:1.08rem;
+    }
+
+    section{padding:40px 0}
+    h2{
+      margin:0 0 18px;color:var(--navy);
+      font-size:clamp(2rem,5vw,2.7rem);
+      line-height:1.08;letter-spacing:-.03em;
+    }
+
+    .category{
+      display:inline-block;margin-bottom:8px;
+      color:var(--rust);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      text-transform:uppercase;letter-spacing:.09em;
+      font-size:.76rem;font-weight:900;
+    }
+
+    .faq{
+      border-top:2px solid var(--navy);
+    }
+    .row{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:24px;
+      padding:20px 2px;
+      border-bottom:1px solid var(--line);
+    }
+    .row b{
+      color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:1rem;
+    }
+    .row span{color:#58666c}
+    .faq-subhead{
+      margin:26px 0 10px;color:var(--navy);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:1.12rem;font-weight:850;letter-spacing:-.01em;
+    }
+    .technical-note{margin:0 0 18px;color:#58666c;max-width:820px}
+
+    .simple{
+      background:var(--navy);color:white;
+      padding:34px;border-radius:20px;
+    }
+    .simple p{margin:0 0 1rem;font-size:1.16rem}
+    .simple p:last-child{margin-bottom:0}
+
+    .safety{
+      background:#fff7e9;
+      border:1px solid rgba(210,163,79,.42);
+      border-radius:18px;padding:26px;
+    }
+    .safety h3{margin:0 0 8px;color:#714c15}
+    .safety p{margin:0 0 10px;color:#62584b}
+    .safety p:last-child{margin-bottom:0}
+
+    .cta{
+      background:linear-gradient(135deg,#e4efe9,#f8f2e5);
+      border:1px solid var(--line);
+      border-radius:18px;padding:30px;text-align:center;
+    }
+    .cta h3{margin:0 0 8px;color:var(--navy);font-size:1.55rem}
+    .cta p{margin:0;color:#56646a}
+    .button{
+      display:inline-flex;align-items:center;justify-content:center;
+      margin-top:18px;padding:12px 18px;border-radius:8px;
+      text-decoration:none;background:var(--rust);color:white;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:850;
+    }
+
+    footer{
+      padding:38px 0 48px;color:#69757a;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.86rem;
+    }
+    .foot{
+      padding-top:20px;border-top:1px solid var(--line);
+      display:flex;justify-content:space-between;gap:18px;
+    }
+
+    @media(max-width:800px){
+      .row{grid-template-columns:1fr;gap:7px}
+      
+    }
+  
+
+    /* Site-wide navigation: mirrored from ranks.html */
+    nav{position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:850}
+    .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{text-decoration:none;color:#4e5c62;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;font-weight:750}
+    .nav-links a:hover{color:var(--rust)}
+
+    @media(max-width:850px){
+      .nav-links a{display:inline !important}
+      .nav-links a:nth-child(2){display:none !important}
+    }
+
+    /* Wild Ledger site-wide visual system */
+    :root{
+      --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
+      --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
+      --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
+      --card:rgba(250,252,247,.80);
+    }
+
+    body{
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+        radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+        linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      background-size:auto;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
+      background-image:
+        repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+        repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+    }
+
+    nav{
+      background:rgba(226,235,230,.88);
+      backdrop-filter:blur(14px) saturate(120%);
+      border-bottom:1px solid rgba(18,59,70,.15);
+      box-shadow:0 8px 24px rgba(11,45,54,.05);
+    }
+    .brand img{
+      border:1px solid rgba(18,59,70,.16);
+      box-shadow:0 4px 14px rgba(11,45,54,.09);
+    }
+    .nav-links a{color:#45636a}
+    .nav-links a:hover{color:var(--rust)}
+
+    header{
+      background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      border-bottom:1px solid rgba(18,59,70,.08);
+    }
+    h1,h2,.faq-subhead{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .lede,.technical-note{color:#3f5a61}
+    .category,.kicker{color:var(--rust)}
+
+    main{position:relative}
+    section:nth-of-type(even){
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+    }
+
+    .faq{
+      border:1px solid rgba(18,59,70,.15);
+      border-top:3px solid var(--sea);
+      border-radius:20px;
+      overflow:hidden;
+      background:rgba(250,252,247,.76);
+      backdrop-filter:blur(9px);
+      box-shadow:0 14px 32px rgba(11,45,54,.065);
+    }
+    .row{
+      padding:22px 24px;
+      border-bottom:1px solid rgba(18,59,70,.12);
+    }
+    .row:last-child{border-bottom:0}
+    .row b{color:var(--deep)}
+    .row span{color:#526970}
+    .row code{
+      color:var(--deep);
+      background:rgba(215,235,231,.72);
+      border:1px solid rgba(18,59,70,.10);
+      border-radius:5px;
+      padding:.08em .3em;
+    }
+
+    .safety{
+      background:linear-gradient(135deg,rgba(255,250,240,.80),rgba(215,235,231,.62));
+      border:1px solid rgba(215,174,98,.42);
+      box-shadow:0 14px 32px rgba(11,45,54,.06);
+    }
+    .safety h3{color:#7b5620}
+    .safety p{color:#526970}
+
+    .simple{
+      background:linear-gradient(135deg,rgba(16,58,69,.97),rgba(37,96,106,.94));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 22px 46px rgba(11,45,54,.18);
+    }
+
+    .cta{
+      background:linear-gradient(135deg,rgba(16,58,69,.96),rgba(37,96,106,.93));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      box-shadow:0 22px 46px rgba(11,45,54,.18);
+    }
+    .cta h3{color:white}
+    .cta p{color:rgba(255,255,255,.82)}
+    .button{
+      background:var(--rust);
+      box-shadow:0 8px 20px rgba(184,90,64,.22);
+    }
+
+    footer{color:#49636a}
+    .foot{border-top:1px solid rgba(18,59,70,.16)}
+
+    @media(max-width:800px){
+      .faq{border-radius:17px}
+      .row{padding:19px 18px}
+    }
+
+  
+
+    /* Shared button motion standard */
+    button,
+    a.button{
+      transition:
+        transform .16s ease,
+        filter .16s ease,
+        box-shadow .16s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+      button:not(:disabled):hover,
+      a.button:hover{
+        transform:translateY(-1px);
+      }
+    }
+
+    button:not(:disabled):active,
+    a.button:active{
+      transform:translateY(0) scale(.985);
+    }
+
+    button:disabled{
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      button,
+      a.button{
+        transition:none !important;
+      }
+
+      button:not(:disabled):hover,
+      a.button:hover,
+      button:not(:disabled):active,
+      a.button:active{
+        transform:none !important;
+      }
+    }
+
+
+    /* LEAP journey banner: desktop + mobile companion artwork */
+    .leap-journey-banner{
+      width:100%;
+      overflow:hidden;
+      background:#102f38;
+      line-height:0;
+      border-bottom:1px solid rgba(18,59,70,.15);
+    }
+
+    .leap-journey-banner picture,
+    .leap-journey-banner img{
+      display:block;
+      width:100%;
+    }
+
+    .leap-journey-banner img{
+      height:auto;
+    }
+
+
+
+    /* Wild Ledger umbrella visual system */
+    :root{
+      --wl-bg:#080b0a;
+      --wl-ink:#f7f1df;
+      --wl-muted:#c8c0ad;
+      --wl-mint:#7fffd4;
+      --wl-orange:#ff6a00;
+      --wl-red:#b52d00;
+      --wl-panel:rgba(13,17,15,.84);
+      --wl-line:rgba(247,241,223,.16);
+    }
+
+    html{background:var(--wl-bg)}
+    body{
+      color:var(--wl-ink);
+      background:var(--wl-bg);
+      font-family:Georgia,"Times New Roman",serif;
+      position:relative;
+      isolation:isolate;
+    }
+    body::before{
+      content:"";
+      position:fixed;inset:-24%;z-index:-2;pointer-events:none;opacity:1;
+      background:
+        radial-gradient(circle at 18% 18%,rgba(255,92,0,.30),transparent 23%),
+        radial-gradient(circle at 80% 72%,rgba(0,255,177,.16),transparent 27%),
+        repeating-conic-gradient(from 17deg at 50% 50%,rgba(255,255,255,.028) 0 4deg,transparent 4deg 13deg);
+      background-size:auto;
+    }
+    body::after{
+      content:"";
+      position:fixed;inset:0;z-index:-1;pointer-events:none;
+      background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0 1px,transparent 1px 4px);
+      mix-blend-mode:screen;
+    }
+
+    nav{
+      background:rgba(8,11,10,.88);
+      border-bottom:1px solid rgba(127,255,212,.20);
+      box-shadow:0 8px 28px rgba(0,0,0,.30);
+      backdrop-filter:blur(14px);
+    }
+    .wild-ledger-name{
+      color:var(--wl-ink);
+      font-family:Impact,Haettenschweiler,"Arial Narrow Bold",system-ui,sans-serif;
+      font-size:20px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .back-link{
+      color:var(--wl-ink);
+      border:2px solid rgba(247,241,223,.72);
+      border-radius:4px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      background:rgba(255,255,255,.02);
+    }
+    .back-link:hover{
+      background:var(--wl-ink);
+      color:#0a0c0b;
+    }
+
+    header{
+      padding:78px 0 50px;
+      background:transparent;
+      border-bottom:1px solid rgba(247,241,223,.08);
+    }
+    .kicker,.category{
+      color:var(--wl-mint);
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-weight:900;
+      letter-spacing:.18em;
+    }
+    h1{
+      color:var(--wl-ink);
+      font-family:Impact,Haettenschweiler,"Arial Narrow Bold",system-ui,sans-serif;
+      font-size:clamp(3.8rem,9vw,7rem);
+      line-height:.86;
+      letter-spacing:-.045em;
+      text-transform:uppercase;
+      text-shadow:4px 5px 0 var(--wl-red),8px 9px 0 rgba(0,0,0,.30);
+      transform:rotate(-.7deg);
+    }
+    h2,.faq-subhead{
+      color:var(--wl-ink);
+      text-shadow:none;
+    }
+    h2{
+      font-family:Impact,Haettenschweiler,"Arial Narrow Bold",system-ui,sans-serif;
+      text-transform:uppercase;
+      letter-spacing:-.015em;
+    }
+    .lede,.technical-note{color:var(--wl-muted)}
+
+    main{background:transparent}
+    section,section:nth-of-type(even){background:transparent}
+    section{padding:42px 0}
+
+    .faq{
+      border:2px solid rgba(127,255,212,.24);
+      border-top:4px solid var(--wl-mint);
+      border-radius:4px 20px 5px 18px;
+      background:var(--wl-panel);
+      backdrop-filter:blur(8px);
+      box-shadow:9px 10px 0 rgba(0,0,0,.56),0 18px 40px rgba(0,0,0,.24);
+      overflow:hidden;
+    }
+    .row{
+      border-bottom:1px solid rgba(247,241,223,.12);
+      padding:22px 24px;
+    }
+    .row b{
+      color:var(--wl-ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .row span{color:#d5cdbb}
+    .row code{
+      color:var(--wl-mint);
+      background:rgba(127,255,212,.08);
+      border:1px solid rgba(127,255,212,.18);
+    }
+
+    .safety{
+      background:linear-gradient(135deg,rgba(255,106,0,.18),rgba(13,17,15,.88));
+      border:2px solid rgba(255,106,0,.46);
+      border-radius:4px 18px 5px 16px;
+      box-shadow:9px 10px 0 rgba(0,0,0,.50);
+    }
+    .safety h3{color:#ffb179}
+    .safety p{color:#d7cebb}
+
+    .simple{
+      background:linear-gradient(135deg,rgba(127,255,212,.14),rgba(13,17,15,.94));
+      border:2px solid rgba(127,255,212,.28);
+      border-radius:4px 20px 5px 18px;
+      box-shadow:9px 10px 0 rgba(0,0,0,.50);
+    }
+
+    .cta{
+      background:linear-gradient(135deg,rgba(127,255,212,.16),rgba(255,106,0,.12),rgba(13,17,15,.94));
+      border:2px solid rgba(247,241,223,.22);
+      border-radius:4px 22px 5px 18px;
+      box-shadow:9px 10px 0 rgba(0,0,0,.54);
+    }
+    .cta h3{color:var(--wl-ink)}
+    .cta p{color:var(--wl-muted)}
+    .button{
+      background:var(--wl-orange);
+      color:#0a0c0b;
+      border:3px solid #0a0c0b;
+      border-radius:4px 12px 4px 10px;
+      box-shadow:5px 6px 0 #000;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+    .button:hover{filter:brightness(1.08)}
+
+    footer{color:#827d70}
+    .foot{border-top:1px solid rgba(247,241,223,.14)}
+
+    @media(max-width:800px){
+      .faq,.safety,.simple,.cta{box-shadow:6px 7px 0 rgba(0,0,0,.50)}
+      h1{font-size:clamp(3.5rem,17vw,5.4rem)}
+    }
+
+</style>
+  <link rel="stylesheet" href="wildLedgerControls.css">
+</head>
+<body>
+<nav>
+<div class="wrap nav-inner">
+<div class="brand topbar-simple wl-nav-right">
+<a aria-label="Back to Wild Ledger" class="back-link wl-header-control" href="splash.html">Back to Wild Ledger</a>
+</div>
+</div>
+</nav>
+<header>
+<div class="wrap">
+<div class="kicker">Wild Ledger · Frequently Asked Questions</div>
+<h1>Wild Ledger FAQ</h1>
+<p class="lede">These are the rules and mechanics that apply across participating LEAP communities. Each community has its own identity and experience, but LEAP on the XRP Ledger is the common thread that connects them. This technology is still new to many people, so this FAQ is here to explain clearly what we’re building, how it works, and what stays the same in every Wild Ledger community you participate in.</p>
+</div>
+</header>
+<main>
+<section>
+<div class="wrap">
+<span class="category">Getting started</span>
+<h2>The basics</h2>
+<div class="faq">
+<div class="row"><b>What is LEAP?</b><span>LEAP is the membership and recognition token used across participating Wild Ledger communities. Each community decides what participation means inside its own community, while Wild Ledger provides the shared system that uses LEAP underneath.</span></div>
+<div class="row"><b>Do I have to buy LEAP?</b><span>No. LEAP is a membership and recognition token. When you earn LEAP, a participating community can offer it to you by LEAP Check.</span></div>
+<div class="row"><b>Can I transfer LEAP to someone else?</b><span>Yes. Checks are how participating communities can distribute LEAP from a distributor. Once you cash a Check, that LEAP is in your wallet and the Check has done its job. If transfers are enabled, you can send LEAP directly to another LEAP holder — keep it, share it with another member, or give some to someone new.</span></div>
+<div class="row"><b>Is XRP the same as LEAP?</b><span>No. XRP is the native asset of the XRP Ledger. LEAP is the membership and recognition token that lives on the XRP Ledger.</span></div>
+<div class="row"><b>Is LEAP the same across participating communities?</b><span>Yes. LEAP is the common token used across Wild Ledger communities. The communities themselves are different. Each participating community can create its own activities, recognition, badges, challenges, events, ranks, or other ways to take part.</span></div>
+</div>
+</div>
+</section>
+<section>
+<div class="wrap">
+<span class="category">Wallet, privacy &amp; identity</span>
+<h2>Your wallet, your address, and your privacy</h2>
+<div class="safety">
+<h3>Your public address is not your wallet secret.</h3>
+<p>Wild Ledger only needs the public XRP Ledger address you choose to use when an experience requires it. Wild Ledger and participating communities never need your recovery words, private key, family seed, or recovery phrase.</p>
+<p>Wild Ledger is designed to maximize participant anonymity. We engineer toward that objective by minimizing identity linkage.</p>
+</div>
+<div class="faq" style="margin-top:24px">
+<div class="row"><b>Why does Wild Ledger need my XRP Ledger address?</b><span>Your public XRP Ledger address lets Wild Ledger read the LEAP activity associated with that account and build your Member Record from the public XRP Ledger. Some experiences can also result in an XRP Ledger transaction, so the system needs a destination address when that transaction is prepared.</span></div>
+<div class="row"><b>Is my XRP Ledger address private?</b><span>No. XRP Ledger addresses and their transactions are public on the XRP Ledger. Wild Ledger's privacy design is about avoiding unnecessary links between that public ledger identity and the identity you use while participating in a community.</span></div>
+<div class="row"><b>Why do I use an alias in a Lounge?</b><span>Your Lounge alias gives you a social identity inside that live community space without displaying your XRP Ledger address or turning that address into your public community identity.</span></div>
+<div class="row"><b>Can other people in the Lounge see my XRP Ledger address?</b><span>No. Your XRP Ledger address is not displayed with your Lounge alias or messages and is not shared with other Lounge participants as part of the conversation.</span></div>
+<div class="row"><b>Does my Lounge alias identify my XRP Ledger account?</b><span>No. Wild Ledger is designed to keep your Lounge identity separate from your XRP Ledger identity. It does not need a permanent public association between an alias and an XRP Ledger address for ordinary Lounge participation.</span></div>
+<div class="row"><b>How can I receive LEAP recognition without revealing my address in the Lounge?</b><span>When an experience results in an XRP Ledger action, the address needed for that transaction can move privately through the transaction process without becoming part of the public Lounge conversation or being attached to your alias for other participants to see.</span></div>
+<div class="row"><b>What becomes permanent?</b><span>Lounge conversation is temporary. XRP Ledger activity is permanent. That means a conversation can disappear while a LEAP recognition or badge earned from participating can become part of your lasting ledger history. <strong>Conversation disappears. Recognition survives.</strong></span></div>
+<div class="row"><b>Is Wild Ledger building a database that connects my identity to my XRP Ledger address?</b><span>Wild Ledger does not need a permanent identity database tying your Lounge alias to your XRP Ledger address. Your Member Record is built from public XRP Ledger data, while your Lounge identity is kept separate from that ledger identity.</span></div>
+<div class="row"><b>What personal information does Wild Ledger actually need from me?</b><span>For LEAP and XRP Ledger functions, Wild Ledger needs the public XRP Ledger address you choose to use when that address is required. Wild Ledger does not need your private key, recovery phrase, banking information, government ID, or the address of your primary crypto wallet.</span></div>
+<div class="row"><b>Why do you recommend a separate wallet for LEAP?</b><span>A public blockchain address can reveal its public transaction history, and Wild Ledger does not need to know anything about your other crypto activity. A dedicated wallet for LEAP creates a clean boundary between your LEAP activity and everything else.</span></div>
+<div class="row"><b>Can Wild Ledger or a participating community access or control my wallet?</b><span>No. Knowing your public XRP Ledger address does not give anyone control of your wallet. You control it with your private keys. Never send Wild Ledger, a participating community, or anyone else your recovery words, private key, family seed, or recovery phrase.</span></div>
+<div class="row"><b>What is Wild Ledger's approach to my information?</b><span><strong>If Wild Ledger doesn't need it, Wild Ledger doesn't keep it.</strong> The system is designed to use only the information necessary for the experience and to avoid unnecessary identity linkage.</span></div>
+<div class="row"><b>Do I have to put a lot of XRP in this wallet?</b><span>No. XRP pays the XRP Ledger's very small transaction fees and supports its reserve requirements. The current LEAP guidance is to keep enough XRP in the dedicated wallet to satisfy the XRP Ledger reserve and the small transaction costs needed to use LEAP. Reserve requirements can change, and XRP held for reserve is not a LEAP membership fee.</span></div>
+<div class="row"><b>Why do you recommend Xaman?</b><span>Xaman is currently the wallet Wild Ledger supports because it gives members a clear path through the XRP Ledger features used by the LEAP system, including enabling LEAP and cashing LEAP Checks. Supporting one wallet first also lets participating communities give everyone the same simple instructions.</span></div>
+<div class="row"><b>Do I have to use Xaman?</b><span>LEAP is built on the XRP Ledger, not on Xaman. Your Member Record is tied to your XRP Ledger address. Xaman is simply the wallet Wild Ledger currently supports for the full LEAP process. Other XRPL wallets can be supported as their handling of the required XRP Ledger steps is verified.</span></div>
+<div class="row"><b>Why not just use an email address and password?</b><span>Because Wild Ledger uses the XRP Ledger itself as the permanent logbook for LEAP activity. Your public XRP Ledger address connects you to your Member Record without requiring a separate Wild Ledger username and password system. The community website is the front door, your LEAP record is the passport, and the XRP Ledger is the logbook.</span></div>
+</div>
+</div>
+</section>
+<section>
+<div class="wrap">
+<span class="category">LEAP Checks</span>
+<h2>About the Checks</h2>
+<div class="faq">
+<div class="row"><b>What is a LEAP Check?</b><span>A LEAP Check uses the XRP Ledger's built-in Check feature. It lets a participating community offer you LEAP without simply pushing tokens into your wallet. You choose whether to cash the Check and accept the LEAP.</span></div>
+<div class="row"><b>Why use Checks instead of just sending LEAP?</b><span>Checks let you choose whether to accept each LEAP award. They also give each award its own record on the XRP Ledger. Once you cash the Check, the LEAP is in your wallet and can move like any other LEAP.</span></div>
+<div class="row"><b>Do I need to set up LEAP before I receive a Check?</b><span>No separate LEAP setup is required before a community sends the Check. Xaman guides you through what is needed when you cash it.</span></div>
+<div class="row"><b>Do I have to cash a Check?</b><span>No. It is your wallet. A pending Check is an offer of LEAP. You choose whether to cash it and accept the LEAP. A LEAP Check can also carry the reason it was earned along with the LEAP itself, preserving that recognition as part of the XRP Ledger record.</span></div>
+<div class="row"><b>How do I see LEAP Checks waiting for me?</b><span>Your community's Member Record can list LEAP Checks that are currently waiting for you to cash. A Check remains outstanding until it is cashed or canceled.</span></div>
+<div class="row"><b>How do I cash a Check?</b><span>Wild Ledger currently supports Xaman for Check cashing. Your community can guide you to the Check in Xaman so you can review it and choose whether to accept it.</span></div>
+</div>
+</div>
+</section>
+<section>
+<div class="wrap">
+<span class="category">Member Record</span>
+<h2>Your LEAP record</h2>
+<div class="faq">
+<div class="row"><b>What does my Member Record show?</b><span>Your Member Record can show your current LEAP balance and rank, outstanding LEAP Checks waiting for you, and the LEAP history you have actually earned on the XRP Ledger.</span></div>
+<div class="row"><b>What is LEAP Waiting for You?</b><span>It is the list of LEAP Checks that are currently available for you to cash. A Check stays there while it is outstanding and disappears after it is cashed or canceled.</span></div>
+<div class="row"><b>When does something become part of my LEAP history?</b><span>A Check-based recognition becomes part of your earned record after that Check is successfully cashed. A Check that is still waiting or that was canceled does not count as earned.</span></div>
+<div class="row"><b>What happens to old canceled Checks?</b><span>They remain part of the public XRP Ledger transaction history, but they are not shown as earned badges or recognitions in your personal Member Record.</span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<span class="category">About LEAP</span>
+<h2>One more thing</h2>
+<div class="faq">
+<div class="row"><b>Is LEAP an investment promise?</b><span>No. LEAP is being introduced as a membership and recognition system. It is not a promise of profit or future monetary value.</span></div>
+</div>
+</div>
+</section>
+<section><div class="wrap"><div class="cta"><h3>Explore a LEAP community</h3><p>Each participating community explains its own activities, recognition, and ways to take part.</p><a class="button" href="splash.html">Communities →</a></div></div></section>
+</main>
+<footer><div class="wrap foot"><div>Wild Ledger • FAQ</div></div></footer>
+</body>
+</html>

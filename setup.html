@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a34">
+  <title>Community Setup — Wild Ledger</title>
+  <style>
+  :root {
+    --ink: #f5fbfa;
+    --deep: #071f2c;
+    --lagoon: #29b8b1;
+    --sea-glass: #79d5c2;
+    --mango: #f4bd58;
+    --coral: #ef765d;
+    --panel: rgba(10, 45, 58, .70);
+    --panel-soft: rgba(5, 34, 46, .46);
+    --line: rgba(219, 248, 244, .14);
+    --muted: rgba(236,249,247,.62);
+    --shadow: 0 28px 78px rgba(0, 16, 24, .38);
+    --ok: #9fe0b0;
+    --danger: #ffb7aa;
+  }
+
+  * { box-sizing: border-box; }
+  html { min-height: 100%; scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(41, 184, 177, .34) 0, rgba(41, 184, 177, .12) 22%, transparent 44%),
+      radial-gradient(circle at 87% 15%, rgba(244, 189, 88, .24) 0, rgba(244, 189, 88, .07) 21%, transparent 42%),
+      radial-gradient(circle at 88% 86%, rgba(239, 118, 93, .24) 0, rgba(239, 118, 93, .07) 23%, transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(121, 213, 194, .19) 0, transparent 42%),
+      linear-gradient(145deg, #06202e 0%, #0a3444 48%, #071d2a 100%);
+    overflow-x: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::before {
+    inset: 0;
+    opacity: .28;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+  }
+
+  body::after {
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    top: 35%;
+    border-radius: 50%;
+    border: 1px solid rgba(121, 213, 194, .13);
+    box-shadow:
+      0 0 0 54px rgba(121, 213, 194, .035),
+      0 0 0 108px rgba(121, 213, 194, .025),
+      0 0 0 162px rgba(121, 213, 194, .015);
+  }
+
+  button, input, select, textarea { font: inherit; }
+  a { color: inherit; }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    padding: 46px 22px 56px;
+  }
+
+  .console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 32px;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.018)),
+      var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .console::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--lagoon), var(--sea-glass), var(--mango), var(--coral));
+  }
+
+  .console-header {
+    position: relative;
+    padding: 34px 34px 30px;
+    border-bottom: 1px solid rgba(219,248,244,.08);
+  }
+
+  .top-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 34px;
+  }
+
+  .top-actions,
+  .top-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .top-navigation {
+    margin-left: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .owner-back {
+    color: #b7f0df;
+    border-color: rgba(121, 213, 194, .30);
+    background: rgba(121, 213, 194, .09);
+  }
+
+  .owner-back:hover,
+  .owner-back:focus-visible {
+    color: #e5fff8;
+    border-color: rgba(121, 213, 194, .54);
+    background: rgba(121, 213, 194, .15);
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 900px;
+    font-size: clamp(2.25rem, 7vw, 4.75rem);
+    line-height: .96;
+    letter-spacing: -.055em;
+    font-weight: 900;
+  }
+
+  .section-kicker {
+    margin-top: 22px;
+    color: var(--sea-glass);
+    font-size: .78rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .hero-copy {
+    margin: 12px 0 0;
+    max-width: 780px;
+    color: var(--muted);
+    font-size: .96rem;
+    line-height: 1.6;
+  }
+
+  .console-body { padding: 24px; }
+
+  .access-card,
+  .section-card,
+  .preview-card {
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.012)),
+      rgba(5,34,46,.42);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  }
+
+  .access-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .access-card {
+    position: relative;
+    overflow: hidden;
+    padding: 22px;
+    min-height: 188px;
+  }
+
+  .access-card.active-context {
+    border-color: rgba(121,213,194,.30);
+    background:
+      linear-gradient(145deg, rgba(121,213,194,.08), rgba(255,255,255,.012)),
+      rgba(5,34,46,.48);
+  }
+
+  .access-label {
+    margin-bottom: 10px;
+    color: var(--sea-glass);
+    font-size: .66rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .access-community-name {
+    margin: 4px 0 10px;
+    color: var(--ink);
+    font-size: 1.32rem;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -.025em;
+  }
+
+  .access-card::after,
+  .section-card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--lagoon), var(--sea-glass), var(--mango), var(--coral));
+    opacity: .55;
+  }
+
+  .access-card h2 {
+    margin: 0 0 7px;
+    font-size: 1.05rem;
+    font-weight: 900;
+    letter-spacing: -.02em;
+  }
+
+  .access-card p {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.5;
+  }
+
+  .status {
+    margin-top: 10px;
+    min-height: 20px;
+    color: var(--muted);
+    font-size: .78rem;
+  }
+  .status.ok { color: var(--ok); }
+  .status.error { color: var(--danger); }
+
+  .permission-summary {
+    margin-top: 12px;
+    padding: 11px 12px;
+    border: 1px solid rgba(121,213,194,.20);
+    border-radius: 12px;
+    background: rgba(121,213,194,.07);
+    color: #cfeee6;
+    font-size: .76rem;
+    line-height: 1.45;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 22px;
+    align-items: start;
+  }
+
+  .form-column { min-width: 0; }
+
+  .section-card {
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+    margin-bottom: 18px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 19px;
+  }
+
+  .section-head h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.12rem;
+    font-weight: 900;
+    letter-spacing: -.025em;
+  }
+
+  .section-head p {
+    margin: 5px 0 0;
+    max-width: 680px;
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.5;
+  }
+
+  .permission-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 27px;
+    padding: 5px 9px;
+    border: 1px solid rgba(244,189,88,.28);
+    border-radius: 999px;
+    background: rgba(244,189,88,.09);
+    color: #f5d38f;
+    font-size: .62rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-5 {
+    display: grid;
+    gap: 14px;
+  }
+  .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .grid-5 { grid-template-columns: repeat(5, minmax(0,1fr)); }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+  }
+  .field.full { grid-column: 1 / -1; }
+
+  label,
+  .label {
+    color: rgba(236,249,247,.84);
+    font-size: .72rem;
+    font-weight: 850;
+    letter-spacing: .02em;
+  }
+
+  .hint {
+    margin-top: -2px;
+    color: rgba(236,249,247,.45);
+    font-size: .67rem;
+    line-height: 1.4;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid rgba(219,248,244,.14);
+    border-radius: 12px;
+    background: rgba(0,0,0,.14);
+    color: var(--ink);
+    padding: 11px 12px;
+    outline: none;
+  }
+
+  textarea {
+    min-height: 88px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: rgba(121,213,194,.72);
+    box-shadow: 0 0 0 3px rgba(121,213,194,.10);
+  }
+
+  .field.locked input,
+  input[readonly] {
+    border-color: rgba(255,255,255,.08);
+    background: rgba(0,0,0,.20);
+    color: rgba(236,249,247,.48);
+    cursor: default;
+  }
+
+  .field.locked label::after {
+    content: "  ·  Locked";
+    color: #f5d38f;
+    font-size: .60rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  input[type="color"] {
+    min-height: 43px;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .color-field {
+    display: grid;
+    grid-template-columns: 48px minmax(0,1fr);
+    gap: 8px;
+    align-items: center;
+  }
+
+  .rank-row {
+    display: grid;
+    grid-template-columns: 110px minmax(0,1fr);
+    gap: 10px;
+    align-items: end;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(219,248,244,.10);
+    border-radius: 14px;
+    background: rgba(255,255,255,.025);
+  }
+
+  .small-button,
+  .primary-button,
+  .secondary-button,
+  .danger-button {
+    min-height: 42px;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .primary-button {
+    border: 1px solid rgba(121,213,194,.42);
+    background: rgba(121,213,194,.14);
+    color: #e5fff8;
+  }
+
+  .secondary-button,
+  .small-button {
+    border: 1px solid rgba(219,248,244,.14);
+    background: rgba(255,255,255,.05);
+    color: var(--ink);
+  }
+
+  .danger-button {
+    border: 1px solid rgba(239,118,93,.28);
+    background: rgba(239,118,93,.08);
+    color: #ffd2ca;
+  }
+
+  .button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  details {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(219,248,244,.10);
+  }
+
+  summary {
+    cursor: pointer;
+    color: rgba(236,249,247,.84);
+    font-weight: 850;
+    margin-bottom: 14px;
+  }
+
+  .preview-column {
+    position: sticky;
+    top: 22px;
+    min-width: 0;
+  }
+
+  .preview-card { overflow: hidden; }
+
+  .preview-stage {
+    min-height: 250px;
+    padding: 24px;
+    background: #efe8d8;
+    color: #17313a;
+    transition: background .2s ease, color .2s ease;
+  }
+
+  .preview-kicker {
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    opacity: .68;
+  }
+
+  .preview-stage h3 {
+    margin: 8px 0 5px;
+    font-size: 1.85rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.035em;
+  }
+
+  .preview-stage p {
+    margin: 0;
+    font-size: .78rem;
+    line-height: 1.5;
+    opacity: .76;
+  }
+
+  .preview-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 18px;
+  }
+
+  .preview-pill {
+    padding: 7px 9px;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 999px;
+    background: rgba(255,255,255,.45);
+    font-size: .68rem;
+    font-weight: 850;
+  }
+
+  .preview-meta {
+    padding: 16px 18px 18px;
+    border-top: 1px solid var(--line);
+    background: rgba(0,0,0,.13);
+  }
+
+  .preview-meta strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: .82rem;
+    font-weight: 900;
+  }
+
+  .preview-meta span {
+    display: block;
+    color: var(--muted);
+    font-size: .72rem;
+    line-height: 1.45;
+  }
+
+  .output-card textarea { min-height: 260px; }
+
+  .notice {
+    margin-top: 14px;
+    padding: 12px 13px;
+    border: 1px solid rgba(244,189,88,.18);
+    border-radius: 12px;
+    background: rgba(244,189,88,.06);
+    color: rgba(245,211,143,.85);
+    font-size: .72rem;
+    line-height: 1.5;
+  }
+
+  .footer-note {
+    margin-top: 22px;
+    text-align: center;
+    color: rgba(236,249,247,.40);
+    font-size: .70rem;
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; }
+    .preview-column { position: static; }
+  }
+
+  @media (max-width: 720px) {
+    .shell { padding: 22px 14px 36px; }
+    .console { border-radius: 24px; }
+    .console-header { padding: 26px 20px 24px; }
+    .console-body { padding: 16px; }
+    .top-nav { gap: 10px; margin-bottom: 28px; }
+    .section-card, .access-card { padding: 19px; border-radius: 20px; }
+    .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+    .rank-row { grid-template-columns: 1fr; }
+    .section-head { align-items: flex-start; }
+  }
+</style>
+<link rel="stylesheet" href="wildLedgerControls.css">
+<link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="console" aria-labelledby="workspaceTitle">
+      <header class="console-header">
+        <nav class="top-nav" aria-label="Community setup navigation">
+          <div class="top-actions">
+            <a class="owner-back wl-header-control" id="setupBackLink" href="communities.html">← Communities</a>
+          </div>
+          <div class="top-navigation"></div>
+        </nav>
+        <h1 id="workspaceTitle">Community Setup</h1>
+      </header>
+
+      <div class="console-body">
+        <div class="layout">
+      <form class="form-column" id="setupForm" autocomplete="off">
+        <section class="section-card" id="identitySection">
+          <div class="section-head">
+            <div>
+              <h2>Identity</h2>
+              <p>The permanent keys Wild Ledger uses to know who this community is.</p>
+            </div>
+            <span class="permission-tag" id="identityPermissionTag">Owner identity</span>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="id">Community ID</label>
+              <input id="id" data-path="id" placeholder="zach">
+              <div class="hint" id="idHint">Short lowercase key used in URLs and storage.</div>
+            </div>
+            <div class="field">
+              <label for="layout">Layout</label>
+              <select id="layout" data-path="layout">
+                <option value="classic">Classic</option>
+                <option value="garage">Garage</option>
+              </select>
+              <div class="hint">More layout choices can be added without changing the theme.</div>
+            </div>
+            <div class="field full">
+              <label for="communityName">Community name</label>
+              <input id="communityName" data-path="communityName" placeholder="Zach's Hot Rods">
+            </div>
+            <div class="field">
+              <label for="leapNamespace">LEAP namespace</label>
+              <input id="leapNamespace" data-path="leapNamespace" placeholder="ZHR-LEAP">
+              <div class="hint" id="namespaceHint">Protocol namespace used for this community's LEAP recognition.</div>
+            </div>
+            <div class="field">
+              <label for="managerName">Manager display name</label>
+              <input id="managerName" data-path="managerName" placeholder="Zach">
+            </div>
+            <div class="field">
+              <label for="operatorName">Community operator</label>
+              <input id="operatorName" data-path="operatorName" placeholder="Zach">
+            </div>
+            <div class="field">
+              <label for="operatorPossessive">Operator possessive</label>
+              <input id="operatorPossessive" data-path="operatorPossessive" placeholder="Zach's">
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card" id="operatingAccountSection">
+          <div class="section-head">
+            <div>
+              <h2>Community Operating Wallet</h2>
+              <p>This is the community's XRPL operating identity. It creates recognition Checks and publishes community protocol statements. The wallet can change without changing the community.</p>
+            </div>
+            <span class="permission-tag">XRPL authority</span>
+          </div>
+          <div class="grid-2">
+            <div class="field full">
+              <label>Current Operating Wallet</label>
+              <div class="hint" id="operatingWalletDisplay">Resolving from XRPL…</div>
+              <div class="hint" id="operatingWalletState">Checking canonical authority state.</div>
+            </div>
+          </div>
+          <div class="button-row">
+            <a class="secondary-button" id="manageOperatingAccountLink" href="changeCommunityOperatingAccount.html">Manage Operating Wallet</a>
+          </div>
+          <div class="notice"><strong>Authority rule:</strong> Wild Ledger resolves the current Operating Wallet from the latest valid <code>AUTHORITY/OPERATING-WALLET</code> statement on XRPL. Before an existing community's first on-ledger statement exists, its configured current wallet may publish that first statement naming itself.</div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Community language</h2>
+              <p>Words and labels that make the shared system sound like this community.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="membershipLabel">Membership label</label><input id="membershipLabel" data-path="membershipLabel" placeholder="Membership"></div>
+            <div class="field"><label for="recordLabel">Record label</label><input id="recordLabel" data-path="recordLabel" placeholder="Member Record"></div>
+            <div class="field"><label for="memberSingular">Member — singular</label><input id="memberSingular" data-path="memberSingular" placeholder="member"></div>
+            <div class="field"><label for="memberPlural">Member — plural</label><input id="memberPlural" data-path="memberPlural" placeholder="members"></div>
+            <div class="field"><label for="groupName">Group name</label><input id="groupName" data-path="groupName" placeholder="community"></div>
+            <div class="field"><label for="historyLabel">History label</label><input id="historyLabel" data-path="historyLabel" placeholder="community history"></div>
+            <div class="field"><label for="joinLabel">Join button label</label><input id="joinLabel" data-path="joinLabel" placeholder="Join →"></div>
+            <div class="field"><label for="unrankedRankLabel">Unranked label</label><input id="unrankedRankLabel" data-path="unrankedRankLabel" placeholder="Not ranked"></div>
+            <div class="field full"><label for="heading">Main heading</label><input id="heading" data-path="heading" placeholder="Start Your Engines"></div>
+            <div class="field full"><label for="intro">Community introduction</label><textarea id="intro" data-path="intro"></textarea></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Images</h2>
+              <p>Photographic community assets should normally be JPG. Transparent graphics such as the LEAP logo stay PNG.</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="bannerDesktop">Desktop banner</label><input id="bannerDesktop" data-path="bannerDesktop" placeholder="images/zachBannerDesktop.jpg"></div>
+            <div class="field"><label for="bannerMobile">Mobile banner</label><input id="bannerMobile" data-path="bannerMobile" placeholder="images/zachBannerMobile.jpg"><div class="hint">Current mobile banner standard: 1200 × 480 JPG.</div></div>
+            <div class="field"><label for="profileImage">Profile image</label><input id="profileImage" data-path="profileImage" placeholder="images/zachProfileImage.jpg"></div>
+            <div class="field"><label for="heroImage">Hero image</label><input id="heroImage" data-path="heroImage" placeholder="images/zachHeroImage.jpg"></div>
+            <div class="field full"><label for="eventHeroImage">Event hero image</label><input id="eventHeroImage" data-path="eventHeroImage" placeholder="images/zachEventHero.jpg"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Experience</h2>
+              <p>The simple idea members see for how participation works in this community.</p>
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="field full"><label for="experienceLine">Experience line</label><input id="experienceLine" data-path="experienceLine" placeholder="Show up. Get your hands dirty. Leave inspired."></div>
+            <div class="field"><label for="experienceStep1">Step 1</label><input id="experienceStep1" data-array="experienceSteps" data-index="0"></div>
+            <div class="field"><label for="experienceStep2">Step 2</label><input id="experienceStep2" data-array="experienceSteps" data-index="1"></div>
+            <div class="field"><label for="experienceStep3">Step 3</label><input id="experienceStep3" data-array="experienceSteps" data-index="2"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Ranks</h2>
+              <p>Each threshold is the community-earned LEAP required to reach that rank.</p>
+            </div>
+          </div>
+          <div id="ranksEditor"></div>
+        </section>
+
+
+        <section class="section-card" id="browserStorageSection">
+          <div class="section-head">
+            <div>
+              <h2>Browser storage</h2>
+              <p>System keys used to remember the public XRPL address for this community.</p>
+            </div>
+            <span class="permission-tag">Owner system field</span>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="walletStorageKey">Wallet storage key</label><input id="walletStorageKey" data-path="walletStorageKey" placeholder="zach.xrpl.wallet"></div>
+            <div class="field"><label for="activeWalletKey">Active wallet key</label><input id="activeWalletKey" data-path="activeWalletKey" placeholder="zach.xrpl.activeWallet"></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Theme</h2>
+              <p>Theme controls color and visual atmosphere. Layout can remain independent.</p>
+            </div>
+          </div>
+
+          <div class="grid-3" id="colorEditor"></div>
+
+          <details>
+            <summary>Advanced theme CSS</summary>
+            <div class="grid-2" id="advancedThemeEditor"></div>
+          </details>
+        </section>
+
+        <section class="section-card output-card">
+          <div class="section-head">
+            <div>
+              <h2 id="outputTitle">Configuration output</h2>
+              <p id="outputCopy">This is the current browser draft. It does not publish to Wild Ledger yet.</p>
+            </div>
+          </div>
+          <textarea id="configOutput" readonly spellcheck="false" aria-label="Community configuration JSON"></textarea>
+          <div class="button-row">
+            <button class="primary-button" id="saveDraftButton" type="button">Save draft</button>
+            <button class="secondary-button" id="copyConfigButton" type="button">Copy config</button>
+            <button class="secondary-button" id="downloadConfigButton" type="button">Download JSON</button>
+            <button class="danger-button" id="clearDraftButton" type="button">Clear saved draft</button>
+          </div>
+          <div class="status" id="draftStatus" aria-live="polite"></div>
+          <div class="notice" id="publishNotice"><strong>Not publishing yet:</strong> this step defines the Owner / Operator editing boundary only. Real authorization and server-side writes come later.</div>
+        </section>
+      </form>
+
+      <aside class="preview-column">
+        <div class="preview-card">
+          <div class="preview-stage" id="previewStage">
+            <div class="preview-kicker" id="previewLayout">Classic layout</div>
+            <h3 id="previewName">Community Name</h3>
+            <p id="previewIntro">The community's introduction will appear here as the operator edits it.</p>
+            <div class="preview-pill-row" id="previewRanks"></div>
+          </div>
+          <div class="preview-meta">
+            <strong>Live setup preview</strong>
+            <span>Theme colors, community name, copy, and rank labels update while you type.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+        <div class="footer-note">Wild Ledger • Community Setup</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script src="js/communityConfig.js"></script>
+  <script>
+    (() => {
+      const communities = window.WILD_LEDGER_COMMUNITIES || {};
+      const form = document.getElementById("setupForm");
+      const status = document.getElementById("draftStatus");
+      const output = document.getElementById("configOutput");
+      const ranksEditor = document.getElementById("ranksEditor");
+      const colorEditor = document.getElementById("colorEditor");
+      const advancedThemeEditor = document.getElementById("advancedThemeEditor");
+      const workspaceTitle = document.getElementById("workspaceTitle");
+      const setupBackLink = document.getElementById("setupBackLink");
+      const identityPermissionTag = document.getElementById("identityPermissionTag");
+      const idInput = document.getElementById("id");
+      const leapNamespaceInput = document.getElementById("leapNamespace");
+      const idHint = document.getElementById("idHint");
+      const namespaceHint = document.getElementById("namespaceHint");
+      const browserStorageSection = document.getElementById("browserStorageSection");
+      const walletStorageKeyInput = document.getElementById("walletStorageKey");
+      const activeWalletKeyInput = document.getElementById("activeWalletKey");
+      const outputTitle = document.getElementById("outputTitle");
+      const outputCopy = document.getElementById("outputCopy");
+      const copyConfigButton = document.getElementById("copyConfigButton");
+      const downloadConfigButton = document.getElementById("downloadConfigButton");
+      const publishNotice = document.getElementById("publishNotice");
+      const operatingAccountSection = document.getElementById("operatingAccountSection");
+      const operatingWalletDisplay = document.getElementById("operatingWalletDisplay");
+      const operatingWalletState = document.getElementById("operatingWalletState");
+      const manageOperatingAccountLink = document.getElementById("manageOperatingAccountLink");
+      let authorityDisplayRequest = 0;
+
+      const params = new URLSearchParams(window.location.search);
+      const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+      const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+      const requestedMode = (params.get("mode") || "edit").trim().toLowerCase();
+      const mode = role === "operator" ? "edit" : (requestedMode === "new" ? "new" : "edit");
+
+      function resolveCommunityId(value) {
+        return window.WILD_LEDGER_RESOLVE_COMMUNITY_ID?.(value) || "";
+      }
+
+      function backendCommunityId(configId) {
+        return window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(configId) || String(configId || "").toUpperCase();
+      }
+
+      const colorKeys = [
+        ["paper", "Paper"], ["paper2", "Paper 2"], ["ink", "Ink"],
+        ["navy", "Primary dark"], ["deep", "Deep"], ["sea", "Secondary"],
+        ["foam", "Light accent"], ["rust", "Warm accent"], ["gold", "Gold"],
+        ["muted", "Muted text"], ["themeColor", "Browser theme"]
+      ];
+
+      const advancedThemeKeys = [
+        ["line", "Border / line"],
+        ["card", "Card background"],
+        ["pageBackground", "Page background"],
+        ["pageOverlay", "Page overlay"],
+        ["navBackground", "Navigation background"],
+        ["headerBackground", "Header background"],
+        ["sectionBackground", "Section background"],
+        ["manifestoBackground", "Manifesto background"],
+        ["darkFeatureBackground", "Dark feature background"],
+        ["badgeBackground", "Badge background"],
+        ["portraitBackground", "Portrait background"]
+      ];
+
+      const blankCommunity = () => ({
+        id: "",
+        backendId: "",
+        aliases: [],
+        operatingWallet: null,
+        directoryStatus: "Community",
+        directoryTone: "current",
+        directoryDescription: "Wild Ledger community.",
+        layout: "classic",
+        communityName: "",
+        leapNamespace: "",
+        managerName: "",
+        operatorName: "",
+        operatorPossessive: "",
+        membershipLabel: "Membership",
+        memberSingular: "member",
+        memberPlural: "members",
+        groupName: "community",
+        recordLabel: "Member Record",
+        historyLabel: "community history",
+        joinLabel: "Join →",
+        heading: "Welcome",
+        intro: "",
+        bannerDesktop: "images/bannerDesktop.jpg",
+        bannerMobile: "images/bannerMobile.jpg",
+        profileImage: "images/profileImage.jpg",
+        heroImage: "images/heroImage.jpg",
+        eventHeroImage: "images/eventHero.jpg",
+        experienceLine: "Show up. Participate. Build a history.",
+        experienceSteps: ["Show up", "Participate", "Build a history"],
+        walletStorageKey: "",
+        activeWalletKey: "",
+        unrankedRankLabel: "Not ranked",
+        ranks: [
+          { min: 1, name: "Rank 1" },
+          { min: 5, name: "Rank 2" },
+          { min: 10, name: "Rank 3" },
+          { min: 25, name: "Rank 4" },
+          { min: 51, name: "Rank 5" }
+        ],
+        badges: [],
+        theme: {
+          paper: "#efe8d8", paper2: "#f8f3e8", ink: "#17313a", navy: "#123b46",
+          deep: "#0b2d36", sea: "#2f7481", foam: "#d7ebe7", rust: "#b85a40",
+          gold: "#d7ae62", line: "rgba(15,52,64,.16)", card: "rgba(250,252,247,.80)",
+          muted: "#526a70", pageBackground: "linear-gradient(180deg,#eee8dc,#bfd6d4)",
+          pageOverlay: "none", navBackground: "rgba(226,235,230,.88)",
+          headerBackground: "linear-gradient(180deg,rgba(239,232,216,.68),transparent)",
+          sectionBackground: "rgba(255,255,255,.06)", manifestoBackground: "linear-gradient(135deg,#0b2d36,#184d58)",
+          darkFeatureBackground: "linear-gradient(135deg,#103a45,#25606a)",
+          badgeBackground: "rgba(211,235,230,.94)", portraitBackground: "rgba(250,252,247,.84)",
+          themeColor: "#efe8d8"
+        }
+      });
+
+      let current = blankCommunity();
+      let currentSourceId = "new";
+
+      const deepCopy = value => JSON.parse(JSON.stringify(value));
+
+      function draftKey(id) {
+        return `wildLedger.operatorDraft.${id || "new"}`;
+      }
+
+      function readSavedDraft(id) {
+        try {
+          const raw = localStorage.getItem(draftKey(id));
+          return raw ? JSON.parse(raw) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function saveDraft() {
+        syncFromForm();
+        const id = currentSourceId || current.id || "new";
+        try {
+          localStorage.setItem(draftKey(id), JSON.stringify(current));
+          status.textContent = "Draft saved in this browser.";
+          status.className = "status ok";
+        } catch (_) {
+          status.textContent = "This browser could not save the draft.";
+          status.className = "status error";
+        }
+      }
+
+      function setSimpleFields() {
+        form.querySelectorAll("[data-path]").forEach((element) => {
+          const key = element.dataset.path;
+          element.value = current[key] ?? "";
+        });
+        form.querySelectorAll("[data-array='experienceSteps']").forEach((element) => {
+          const index = Number(element.dataset.index);
+          element.value = current.experienceSteps?.[index] ?? "";
+        });
+      }
+
+      function renderRanks() {
+        ranksEditor.innerHTML = "";
+        const ranks = Array.isArray(current.ranks) ? current.ranks : [];
+        ranks.forEach((rank, index) => {
+          const row = document.createElement("div");
+          row.className = "rank-row";
+          row.innerHTML = `
+            <div class="field">
+              <label for="rankMin${index}">LEAP</label>
+              <input id="rankMin${index}" type="number" min="0" step="1" value="${escapeHtml(rank.min)}" data-rank-index="${index}" data-rank-key="min">
+            </div>
+            <div class="field">
+              <label for="rankName${index}">Rank name</label>
+              <input id="rankName${index}" value="${escapeHtml(rank.name)}" data-rank-index="${index}" data-rank-key="name">
+            </div>`;
+          ranksEditor.appendChild(row);
+        });
+      }
+
+      function renderThemeEditors() {
+        colorEditor.innerHTML = "";
+        colorKeys.forEach(([key, label]) => {
+          const value = current.theme?.[key] || "#000000";
+          const wrapper = document.createElement("div");
+          wrapper.className = "field";
+          wrapper.innerHTML = `
+            <label>${label}</label>
+            <div class="color-field">
+              <input type="color" value="${normalizeColor(value)}" data-theme-color-picker="${key}" aria-label="${label} color picker">
+              <input value="${escapeHtml(value)}" data-theme-key="${key}" aria-label="${label} value">
+            </div>`;
+          colorEditor.appendChild(wrapper);
+        });
+
+        advancedThemeEditor.innerHTML = "";
+        advancedThemeKeys.forEach(([key, label]) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "field";
+          wrapper.innerHTML = `<label>${label}</label><textarea data-theme-key="${key}">${escapeHtml(current.theme?.[key] || "")}</textarea>`;
+          advancedThemeEditor.appendChild(wrapper);
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function normalizeColor(value) {
+        return /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#000000";
+      }
+
+      function loadCommunity(id, preferDraft = true) {
+        currentSourceId = id;
+        let value;
+        if (id === "__new__" || id === "new") {
+          value = blankCommunity();
+          currentSourceId = "new";
+        } else {
+          value = deepCopy(communities[id] || blankCommunity());
+        }
+
+        const saved = preferDraft ? readSavedDraft(id === "__new__" ? "new" : id) : null;
+        current = saved || value;
+        ensureShape();
+        renderAll();
+        const isNew = currentSourceId === "new";
+        status.textContent = saved
+          ? "Loaded saved browser draft."
+          : (isNew ? "Started a new community draft." : "Loaded community configuration.");
+        status.className = saved ? "status ok" : "status";
+        applyWorkspacePresentation();
+      }
+
+      function ensureShape() {
+        current.experienceSteps = Array.isArray(current.experienceSteps) ? current.experienceSteps.slice(0,3) : [];
+        while (current.experienceSteps.length < 3) current.experienceSteps.push("");
+        current.ranks = Array.isArray(current.ranks) ? current.ranks : [];
+        current.badges = Array.isArray(current.badges) ? current.badges : [];
+        current.theme = { ...blankCommunity().theme, ...(current.theme || {}) };
+      }
+
+      function renderAll() {
+        setSimpleFields();
+        renderRanks();
+        renderThemeEditors();
+        updateOutputAndPreview();
+      }
+
+      function syncFromForm() {
+        form.querySelectorAll("[data-path]").forEach((element) => {
+          current[element.dataset.path] = element.value;
+        });
+
+        current.experienceSteps = [0,1,2].map((index) => {
+          return form.querySelector(`[data-array='experienceSteps'][data-index='${index}']`)?.value || "";
+        });
+
+        ranksEditor.querySelectorAll("[data-rank-index]").forEach((element) => {
+          const index = Number(element.dataset.rankIndex);
+          const key = element.dataset.rankKey;
+          current.ranks[index] ||= { min: 0, name: "" };
+          current.ranks[index][key] = key === "min" ? Number(element.value || 0) : element.value;
+        });
+
+        form.querySelectorAll("[data-theme-key]").forEach((element) => {
+          current.theme[element.dataset.themeKey] = element.value;
+        });
+      }
+
+      function updateOutputAndPreview() {
+        syncFromForm();
+        output.value = JSON.stringify(current, null, 2);
+
+        document.getElementById("previewName").textContent = current.communityName || "Community Name";
+        document.getElementById("previewIntro").textContent = current.intro || "The community's introduction will appear here as the operator edits it.";
+        document.getElementById("previewLayout").textContent = `${current.layout || "classic"} layout`;
+
+        const stage = document.getElementById("previewStage");
+        stage.style.background = current.theme.pageBackground || current.theme.paper || "#efe8d8";
+        stage.style.color = current.theme.ink || "#17313a";
+
+        const rankWrap = document.getElementById("previewRanks");
+        rankWrap.innerHTML = "";
+        current.ranks.slice(0,5).forEach((rank) => {
+          const pill = document.createElement("span");
+          pill.className = "preview-pill";
+          pill.textContent = rank.name || "Rank";
+          rankWrap.appendChild(pill);
+        });
+      }
+
+      function setLocked(input, locked) {
+        if (!input) return;
+        input.readOnly = Boolean(locked);
+        input.closest(".field")?.classList.toggle("locked", Boolean(locked));
+        input.setAttribute("aria-readonly", locked ? "true" : "false");
+      }
+
+      function applyFieldPermissions() {
+        const isNew = mode === "new" || currentSourceId === "new";
+        const ownerCreating = role === "owner" && isNew;
+
+        // Community ID, LEAP namespace, and storage keys establish system identity.
+        // The Owner defines them during creation; once the community exists they
+        // are deliberately treated as immutable in this interface.
+        setLocked(idInput, !ownerCreating);
+        setLocked(leapNamespaceInput, !ownerCreating);
+        setLocked(walletStorageKeyInput, !ownerCreating);
+        setLocked(activeWalletKeyInput, !ownerCreating);
+
+        if (identityPermissionTag) {
+          identityPermissionTag.textContent = ownerCreating ? "Owner sets at creation" : "Permanent identity";
+        }
+        if (idHint) {
+          idHint.textContent = ownerCreating
+            ? "Permanent community key used in URLs and storage. Choose it carefully; it locks after creation."
+            : "Permanent community key. Locked after community creation.";
+        }
+        if (namespaceHint) {
+          namespaceHint.textContent = ownerCreating
+            ? "Permanent protocol namespace for this community. It locks after creation."
+            : "Permanent LEAP protocol namespace. Locked after community creation.";
+        }
+
+        // Operators do not need the browser-storage plumbing or raw registry JSON.
+        // This is presentation only; real authorization must be enforced server-side
+        // when publishing/persistence is added in later steps.
+        if (browserStorageSection) browserStorageSection.hidden = role === "operator";
+        if (output) output.hidden = role === "operator";
+        if (copyConfigButton) copyConfigButton.hidden = role === "operator";
+        if (downloadConfigButton) downloadConfigButton.hidden = role === "operator";
+
+        if (outputTitle) outputTitle.textContent = role === "operator" ? "Draft controls" : "Configuration output";
+        if (outputCopy) {
+          outputCopy.textContent = role === "operator"
+            ? "Save your current settings as a browser draft while real publishing is still being built."
+            : "Review or export the current browser draft. It does not publish to Wild Ledger yet.";
+        }
+        if (publishNotice) {
+          publishNotice.innerHTML = role === "operator"
+            ? "<strong>Not publishing yet:</strong> these controls save only a local browser draft. Real Operator authorization and publishing come later."
+            : "<strong>Not publishing yet:</strong> 2B defines the Owner / Operator editing boundary. Real authorization and server-side writes come later.";
+        }
+
+      }
+
+      async function refreshOperatingWalletAuthority(sourceCommunity) {
+        const requestId = ++authorityDisplayRequest;
+        if (!operatingWalletDisplay || !operatingWalletState) return;
+
+        if (!sourceCommunity) {
+          operatingWalletDisplay.textContent = "Not established yet.";
+          operatingWalletState.textContent = "No existing community authority state to resolve.";
+          return;
+        }
+
+        const configuredWallet = String(sourceCommunity.operatingWallet || "").trim();
+        if (!configuredWallet) {
+          operatingWalletDisplay.textContent = "No Operating Wallet configured.";
+          operatingWalletState.textContent = "This community does not yet have an Operating Wallet to resolve.";
+          return;
+        }
+
+        operatingWalletDisplay.textContent = "Resolving from XRPL…";
+        operatingWalletState.textContent = "Checking the latest valid OPERATING-WALLET statement.";
+
+        try {
+          const serverUrl = window.WILD_LEDGER_CONFIG?.xrplWebSocket || "";
+          if (!serverUrl) throw new Error("XRPL server is not configured.");
+          const { resolveCommunityAuthority } = await import("./js/communityAuthority.js");
+          const authority = await resolveCommunityAuthority({ community: sourceCommunity, serverUrl });
+          if (requestId !== authorityDisplayRequest) return;
+
+          operatingWalletDisplay.textContent = authority.currentAccount || configuredWallet;
+          if (authority.authorityEstablished) {
+            operatingWalletState.textContent = "Canonical on XRPL — latest valid OPERATING-WALLET statement wins.";
+          } else {
+            operatingWalletState.textContent = "First on-ledger statement not yet published. This configured current wallet must name itself in that first statement.";
+          }
+        } catch (error) {
+          if (requestId !== authorityDisplayRequest) return;
+          operatingWalletDisplay.textContent = configuredWallet;
+          operatingWalletState.textContent = `XRPL authority could not be resolved: ${error?.message || String(error)}`;
+        }
+      }
+
+      function applyWorkspacePresentation() {
+        const configId = currentSourceId === "new" ? "" : currentSourceId;
+        const communityName = configId && communities[configId]
+          ? communities[configId].communityName
+          : (current.communityName || "Community");
+
+        document.title = "Community Setup — Wild Ledger";
+        if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
+
+        const sourceCommunity = configId ? communities[configId] : null;
+        refreshOperatingWalletAuthority(sourceCommunity);
+        if (manageOperatingAccountLink && configId) {
+          const backendId = backendCommunityId(configId);
+          manageOperatingAccountLink.href = `changeCommunityOperatingAccount.html?community=${encodeURIComponent(backendId)}&role=${encodeURIComponent(role)}`;
+          manageOperatingAccountLink.hidden = false;
+        }
+
+        if (mode === "new") {
+          if (setupBackLink) {
+            setupBackLink.textContent = "← Communities";
+            setupBackLink.href = "communities.html";
+          }
+          authorityDisplayRequest += 1;
+          if (manageOperatingAccountLink) manageOperatingAccountLink.hidden = true;
+          if (operatingWalletDisplay) operatingWalletDisplay.textContent = "Not established yet.";
+          if (operatingWalletState) operatingWalletState.textContent = "This is a new community draft; no XRPL Operating Wallet exists yet.";
+          applyFieldPermissions();
+          return;
+        }
+
+        if (setupBackLink && configId) {
+          const backendId = backendCommunityId(configId);
+          setupBackLink.textContent = `← ${communityName}`;
+          setupBackLink.href = `viewCommunity.html?community=${encodeURIComponent(backendId)}&role=${encodeURIComponent(role)}`;
+        }
+
+        applyFieldPermissions();
+      }
+
+      form.addEventListener("input", (event) => {
+        const target = event.target;
+        if (target.matches("[data-theme-color-picker]")) {
+          const key = target.dataset.themeColorPicker;
+          const textInput = form.querySelector(`[data-theme-key='${key}']`);
+          if (textInput) textInput.value = target.value;
+        }
+        if (target.matches("[data-theme-key]")) {
+          const key = target.dataset.themeKey;
+          const pickerInput = form.querySelector(`[data-theme-color-picker='${key}']`);
+          if (pickerInput && /^#[0-9a-f]{6}$/i.test(target.value)) pickerInput.value = target.value;
+        }
+        updateOutputAndPreview();
+      });
+
+      form.addEventListener("change", updateOutputAndPreview);
+
+      document.getElementById("saveDraftButton").addEventListener("click", saveDraft);
+
+      document.getElementById("copyConfigButton").addEventListener("click", async () => {
+        syncFromForm();
+        const text = JSON.stringify(current, null, 2);
+        try {
+          await navigator.clipboard.writeText(text);
+          status.textContent = "Configuration copied.";
+          status.className = "status ok";
+        } catch (_) {
+          output.focus();
+          output.select();
+          status.textContent = "Select and copy the configuration below.";
+          status.className = "status";
+        }
+      });
+
+      document.getElementById("downloadConfigButton").addEventListener("click", () => {
+        syncFromForm();
+        const blob = new Blob([JSON.stringify(current, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${current.id || "community"}-config.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      document.getElementById("clearDraftButton").addEventListener("click", () => {
+        const id = currentSourceId || current.id || "new";
+        try { localStorage.removeItem(draftKey(id)); } catch (_) {}
+        status.textContent = "Saved browser draft cleared.";
+        status.className = "status";
+      });
+
+      const requestedCommunity =
+        params.get("community") ||
+        sessionStorage.getItem("wildLedgerCommunity") ||
+        window.WILD_LEDGER_COMMUNITY_ID ||
+        "";
+      const resolvedRequestedId = resolveCommunityId(requestedCommunity);
+      const initialId = mode === "new"
+        ? "__new__"
+        : (resolvedRequestedId || Object.keys(communities)[0] || "__new__");
+
+      loadCommunity(initialId);
+    })();
+  </script>
+</body>
+</html>

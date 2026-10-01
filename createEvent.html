@@ -307,7 +307,7 @@
         const formatOkay = !!id && validCanonicalId(id);
         const existing = id ? reservedEvents.get(id) : null;
         const historyOkay = historyLoaded && formatOkay && !existing;
-        const authorityOkay = !!authority && !authority.bootstrapNeeded && !!operatingWallet;
+        const authorityOkay = !!authority && !authority.initialStatementNeeded && !!operatingWallet;
         return { id, formatOkay, existing, historyOkay, authorityOkay, ready: formatOkay && historyOkay && authorityOkay && !scanInProgress && !busy };
       }
 
@@ -595,7 +595,7 @@
 
         try {
           authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer });
-          if (authority.bootstrapNeeded) throw new Error("Protocol 0.13 bootstrap required. Publish the community's first canonical OPERATING-WALLET statement before creating new recognition.");
+          if (authority.initialStatementNeeded) throw new Error("Protocol 0.15 initial Operating Wallet statement required. Publish the community's first canonical OPERATING-WALLET statement before creating new recognition.");
           operatingWallet = authority.currentAccount;
           if (!operatingWallet) throw new Error("This community does not yet have a resolvable Community Operating Wallet.");
           authorityStatus.textContent = `${operatingWallet} — canonical XRPL authority; ${authority.transitions.length} routine rotation${authority.transitions.length === 1 ? "" : "s"} resolved.`;

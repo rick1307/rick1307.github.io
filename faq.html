@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en" class="community-pending">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Frequently asked questions about LEAP inside a Wild Ledger community." />
+  <meta name="theme-color" content="#dce9e5" />
+  <title>FAQ — LEAP</title>
+<style>
+    :root{
+      --paper:#efe8d8;--ink:#1a252c;--navy:#16384b;--foam:#dbece8;
+      --rust:#b84f32;--gold:#d2a34f;--line:rgba(26,37,44,.18);
+      --card:#fffaf0;--max:1000px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    html.community-pending body{visibility:hidden}
+    body{
+      margin:0;color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:var(--community-display-font);
+      line-height:1.65;
+    }
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+
+    nav{
+      position:sticky;top:0;z-index:20;
+      background:rgba(239,232,216,.94);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      min-height:64px;display:flex;align-items:center;
+      justify-content:space-between;gap:20px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:11px;text-decoration:none;
+      font-family:var(--community-ui-font);
+      font-weight:850;
+    }
+    .brand img{
+      width:40px;height:40px;border-radius:50%;object-fit:cover;
+      border:1px solid rgba(26,37,44,.14);background:white;
+    }
+    .nav-links{display:flex;gap:16px;align-items:center}
+    .nav-links a{
+      text-decoration:none;color:#4e5c62;
+      font-family:var(--community-ui-font);
+      font-size:.9rem;font-weight:750;
+    }
+
+    header{padding:74px 0 44px}
+    .kicker{
+      color:var(--rust);
+      font-family:var(--community-ui-font);
+      text-transform:uppercase;letter-spacing:.14em;
+      font-size:.78rem;font-weight:900;
+    }
+    h1{
+      margin:.15em 0 .2em;color:var(--navy);
+      font-size:clamp(3rem,8vw,5.8rem);
+      line-height:.95;letter-spacing:-.05em;
+    }
+    .lede{
+      max-width:820px;margin:0;color:#46575f;
+      font-size:clamp(1.2rem,2vw,1.42rem);
+    }
+    .hero-note{
+      margin-top:24px;padding:19px 21px;
+      border-left:4px solid var(--gold);
+      background:rgba(255,250,240,.6);
+      color:#4f5c62;font-size:1.08rem;
+    }
+
+    section{padding:40px 0}
+    h2{
+      margin:0 0 18px;color:var(--navy);
+      font-size:clamp(2rem,5vw,2.7rem);
+      line-height:1.08;letter-spacing:-.03em;
+    }
+
+    .category{
+      display:inline-block;margin-bottom:8px;
+      color:var(--rust);
+      font-family:var(--community-ui-font);
+      text-transform:uppercase;letter-spacing:.09em;
+      font-size:.76rem;font-weight:900;
+    }
+
+    .faq{
+      border-top:2px solid var(--navy);
+    }
+    .row{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:24px;
+      padding:20px 2px;
+      border-bottom:1px solid var(--line);
+    }
+    .row b{
+      color:var(--navy);
+      font-family:var(--community-ui-font);
+      font-size:1rem;
+    }
+    .row span{color:#58666c}
+    .faq-subhead{
+      margin:26px 0 10px;color:var(--navy);
+      font-family:var(--community-ui-font);
+      font-size:1.12rem;font-weight:850;letter-spacing:-.01em;
+    }
+    .technical-note{margin:0 0 18px;color:#58666c;max-width:820px}
+
+    .simple{
+      background:var(--navy);color:white;
+      padding:34px;border-radius:20px;
+    }
+    .simple p{margin:0 0 1rem;font-size:1.16rem}
+    .simple p:last-child{margin-bottom:0}
+
+    .safety{
+      background:#fff7e9;
+      border:1px solid rgba(210,163,79,.42);
+      border-radius:18px;padding:26px;
+    }
+    .safety h3{margin:0 0 8px;color:#714c15}
+    .safety p{margin:0 0 10px;color:#62584b}
+    .safety p:last-child{margin-bottom:0}
+
+    .cta{
+      background:linear-gradient(135deg,#e4efe9,#f8f2e5);
+      border:1px solid var(--line);
+      border-radius:18px;padding:30px;text-align:center;
+    }
+    .cta h3{margin:0 0 8px;color:var(--navy);font-size:1.55rem}
+    .cta p{margin:0;color:#56646a}
+    .button{
+      display:inline-flex;align-items:center;justify-content:center;
+      margin-top:18px;padding:12px 18px;border-radius:8px;
+      text-decoration:none;background:var(--rust);color:white;
+      font-family:var(--community-ui-font);
+      font-weight:850;
+    }
+    .cta-actions{
+      display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px;
+    }
+    .cta-actions .button{margin-top:0}
+    .button.secondary{
+      background:transparent;
+      color:white;
+      border:1px solid rgba(255,255,255,.34);
+      box-shadow:none;
+    }
+
+    footer{
+      padding:38px 0 48px;color:#69757a;
+      font-family:var(--community-ui-font);
+      font-size:.86rem;
+    }
+    .foot{
+      padding-top:20px;border-top:1px solid var(--line);
+      display:flex;justify-content:space-between;gap:18px;
+    }
+
+    @media(max-width:800px){
+      .row{grid-template-columns:1fr;gap:7px}
+      
+    }
+  
+
+    /* Site-wide navigation: mirrored from ranks.html */
+    nav{position:sticky;top:0;z-index:10;background:rgba(239,232,216,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:var(--community-ui-font);font-weight:850}
+    .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(26,37,44,.14);background:white}
+    .nav-links{display:flex;gap:18px;align-items:center}
+    .nav-links a{text-decoration:none;color:#4e5c62;font-family:var(--community-ui-font);font-size:.9rem;font-weight:750}
+    .nav-links a:hover{color:var(--rust)}
+
+    @media(max-width:850px){
+      .nav-links a{display:inline !important}
+      .nav-links a:nth-child(2){display:none !important}
+    }
+
+    /* Shared community visual system */
+    :root{
+      --sand:#efe8d8;--mist:#e9f1ed;--mist2:#dce9e5;--ink:#17313a;
+      --navy:#123b46;--deep:#0b2d36;--sea:#2f7481;--foam:#d7ebe7;
+      --rust:#b85a40;--gold:#d7ae62;--line:rgba(15,52,64,.16);
+      --card:rgba(250,252,247,.80);--muted:#526a70;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:var(--nav-background);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.97),rgba(37,96,106,.94));
+    }
+
+    body{
+      color:var(--ink);
+      background:var(--page-background);
+      background-size:auto;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;
+      background-image:var(--page-overlay);
+    }
+
+    nav{
+      background:rgba(226,235,230,.88);
+      backdrop-filter:blur(14px) saturate(120%);
+      border-bottom:1px solid rgba(18,59,70,.15);
+      box-shadow:0 8px 24px rgba(11,45,54,.05);
+    }
+    .brand img{
+      border:1px solid rgba(18,59,70,.16);
+      box-shadow:0 4px 14px rgba(11,45,54,.09);
+    }
+    .nav-links a{color:#45636a}
+    .nav-links a:hover{color:var(--rust)}
+
+    header{
+      background:var(--header-background);
+      border-bottom:1px solid rgba(18,59,70,.08);
+    }
+    h1,h2,.faq-subhead{color:var(--deep);text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .lede,.technical-note{color:#3f5a61}
+    .category,.kicker{color:var(--rust)}
+
+    main{position:relative}
+    section:nth-of-type(even){
+      background:var(--section-background);
+    }
+
+    .faq{
+      border:1px solid rgba(18,59,70,.15);
+      border-top:3px solid var(--sea);
+      border-radius:20px;
+      overflow:hidden;
+      background:rgba(250,252,247,.76);
+      backdrop-filter:blur(9px);
+      box-shadow:0 14px 32px rgba(11,45,54,.065);
+    }
+    .row{
+      padding:22px 24px;
+      border-bottom:1px solid rgba(18,59,70,.12);
+    }
+    .row:last-child{border-bottom:0}
+    .row b{color:var(--deep)}
+    .row span{color:#526970}
+    .row code{
+      color:var(--deep);
+      background:rgba(215,235,231,.72);
+      border:1px solid rgba(18,59,70,.10);
+      border-radius:5px;
+      padding:.08em .3em;
+    }
+
+    .safety{
+      background:linear-gradient(135deg,rgba(255,250,240,.80),rgba(215,235,231,.62));
+      border:1px solid rgba(215,174,98,.42);
+      box-shadow:0 14px 32px rgba(11,45,54,.06);
+    }
+    .safety h3{color:#7b5620}
+    .safety p{color:#526970}
+
+    .simple{
+      background:var(--dark-feature-background);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 22px 46px rgba(11,45,54,.18);
+    }
+
+    .cta{
+      background:var(--dark-feature-background);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      box-shadow:0 22px 46px rgba(11,45,54,.18);
+    }
+    .cta h3{color:white}
+    .cta p{color:rgba(255,255,255,.82)}
+    .button{
+      background:var(--rust);
+      box-shadow:0 8px 20px rgba(184,90,64,.22);
+    }
+
+    footer{color:#49636a}
+    .foot{border-top:1px solid rgba(18,59,70,.16)}
+
+    body[data-community-layout="garage"] .faq,
+    body[data-community-layout="garage"] .safety,
+    body[data-community-layout="garage"] .cta,
+    body[data-community-layout="garage"] .simple{border-radius:10px}
+    body[data-community-layout="garage"] .button{border-radius:6px}
+
+    @media(max-width:800px){
+      .faq{border-radius:17px}
+      .row{padding:19px 18px}
+      body[data-community-layout="garage"] .faq{border-radius:10px}
+    }
+
+  
+
+    /* Shared button motion standard */
+    button,
+    a.button{
+      transition:
+        transform .16s ease,
+        filter .16s ease,
+        box-shadow .16s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+      button:not(:disabled):hover,
+      a.button:hover{
+        transform:translateY(-1px);
+      }
+    }
+
+    button:not(:disabled):active,
+    a.button:active{
+      transform:translateY(0) scale(.985);
+    }
+
+    button:disabled{
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      button,
+      a.button{
+        transition:none !important;
+      }
+
+      button:not(:disabled):hover,
+      a.button:hover,
+      button:not(:disabled):active,
+      a.button:active{
+        transform:none !important;
+      }
+    }
+
+
+    /* LEAP journey banner: desktop + mobile companion artwork */
+    .leap-journey-banner{
+      width:100%;
+      overflow:hidden;
+      background:#102f38;
+      line-height:0;
+      border-bottom:1px solid rgba(18,59,70,.15);
+    }
+
+    .leap-journey-banner picture,
+    .leap-journey-banner img{
+      display:block;
+      width:100%;
+    }
+
+    .leap-journey-banner img{
+      height:auto;
+    }
+
+</style>
+<link rel="stylesheet" href="communityTypography.css">
+  <link rel="stylesheet" href="wildLedgerControls.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-inner wl-nav-right">
+      <div class="nav-links"><a class="wl-header-control" id="communityHomeLink" href="index.html">← Home</a></div>
+    </div>
+  </nav>
+
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
+    <picture>
+      <source id="communityBannerMobile" media="(max-width: 800px)">
+      <img
+        id="communityBannerDesktop"
+        alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
+    </picture>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <div class="kicker">Frequently Asked Questions</div>
+      <h1>FAQ</h1>
+      <p class="lede" id="communityLede">These answers cover how LEAP works inside this community. For wallets, Xaman, privacy, transfers, Checks, and shared XRP Ledger mechanics, see the Wild Ledger FAQ.</p>
+    </div>
+  </header>
+  <main>
+
+<section>
+<div class="wrap">
+<span class="category">Community</span>
+<h2 id="joiningHeading">Joining the community</h2>
+<div class="faq">
+<div class="row"><b>What is LEAP?</b><span id="whatIsLeapCopy">LEAP is the shared membership and recognition system used by Wild Ledger communities. Inside this community, LEAP is how participation, recognition, and earned progress can become part of your community record.</span></div>
+<div class="row"><b>Who decides how this community uses LEAP?</b><span id="whoDecidesLeapCopy">The community operator decides what participation, recognition, badges, challenges, events, and earned progress mean here. Wild Ledger provides the shared structure underneath; the community decides how to use it.</span></div>
+<div class="row"><b>How does rank work?</b><span id="rankModelCopy">Rank is based on the LEAP officially earned from this community, not simply the LEAP currently sitting in your wallet. Sending LEAP elsewhere does not erase the rank you already earned here. <a id="ranksFaqLink" href="ranks.html">See this community's ranks →</a></span></div>
+<div class="row"><b>Where are the wallet, Xaman, privacy, transfers, and Check instructions?</b><span>Those mechanics apply across Wild Ledger communities, so they live in the <a href="wildLedgerFaq.html">Wild Ledger FAQ</a>.</span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<span class="category">Community Lounge</span>
+<h2>The community Lounge</h2>
+<div class="faq">
+<div class="row"><b>What is the community Lounge?</b><span>The community Lounge is a live gathering place. Members can drop in, choose a temporary alias, and talk with whoever is there.</span></div>
+<div class="row"><b>How do I enter?</b><span>Enter through your Member Record. The Member Record confirms your community membership before opening the community Lounge.</span></div>
+<div class="row"><b>Does the conversation become part of my Member Record?</b><span>No. Lounge conversation is temporary. If the community separately recognizes something you did with an official LEAP award, that recognition can become part of your community history.</span></div>
+<div class="row"><b>Where can I learn about aliases and privacy?</b><span>Those protections are part of Wild Ledger and apply across participating communities. See the <a href="wildLedgerFaq.html">Wild Ledger FAQ</a> for how Lounge identity and XRP Ledger identity are kept separate.</span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<span class="category">Member Record</span>
+<h2 id="historyHeading">Your community history</h2>
+<div class="faq">
+<div class="row"><b>What does my Member Record show?</b><span id="recordShowCopy">Your Member Record separates what you currently hold from what you have officially earned here. It can show your current LEAP balance, earned LEAP, rank, outstanding LEAP Checks, and the community history recorded for you on the XRP Ledger.</span></div>
+<div class="row"><b>What is the difference between Current LEAP and Earned?</b><span id="currentVsEarnedCopy">Current LEAP is the LEAP in your wallet right now. Earned is the cumulative LEAP officially awarded to you by this community and recognized in your validated history. Rank follows Earned, not your current wallet balance.</span></div>
+<div class="row"><b>When does a recognition count as earned?</b><span>A Check-based recognition becomes part of your earned community history after that Check is successfully cashed. A Check that is still waiting or that was canceled does not count as earned.</span></div>
+<div class="row"><b>What happens to old canceled Checks?</b><span>They remain part of the public XRP Ledger transaction history, but they are not shown as earned recognitions in your personal Member Record.</span></div>
+</div>
+</div>
+</section>
+<section>
+<div class="wrap">
+<span class="category">Badges</span>
+<h2>How badges work</h2>
+<div class="faq">
+<div class="row"><b>What is a badge?</b><span>A badge is an open-ended recognition. It has no natural expiration date, so the same badge can keep being awarded for as long as the community operator considers it meaningful.</span></div>
+<div class="row"><b>Does rank control which badges I can have?</b><span id="badgeRankCopy">No. Rank follows the LEAP officially earned from this community, while badges record specific recognitions. A member at one rank can have a badge that a higher-ranking member does not.</span></div>
+<div class="row"><b>Can many people earn the same badge?</b><span>Yes. A badge can recognize one person or many people over time. The important distinction is that the badge itself stays open-ended rather than closing like a challenge or being tied to one fixed event window.</span></div>
+<div class="row"><b>Where can I see this community's badges?</b><span><a id="badgesFaqLink" href="badges.html">See the Badges page →</a></span></div>
+<div class="row"><b>How is a badge recorded?</b><span id="badgeRecordedCopy">A community can record a badge as part of an official LEAP award. Once that award is accepted and validated, the badge can become part of that member's earned community record.</span></div>
+<div class="row"><b>Does the badge record stay on the XRP Ledger?</b><span id="badgeLedgerCopy">Yes. The underlying transaction remains part of the public XRP Ledger history, and the Member Record can interpret that history to show the badges the member has actually earned.</span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<span class="category">Challenges</span>
+<h2>How challenges work</h2>
+<div class="faq">
+<div class="row"><b>What is a challenge?</b><span>A challenge is a temporary invitation to go do something specific. It opens for participation and eventually closes.</span></div>
+<div class="row"><b>Does a challenge need a fixed end date?</b><span>No. A challenge is temporary, but its ending can be known in advance or decided later. It might close on a date, after a goal is reached, after a certain number of completions, or when the community operator decides it has run its course.</span></div>
+<div class="row"><b>Can many people complete the same challenge?</b><span>Yes. A challenge can recognize many members while it remains open. One person's completion does not automatically end it unless that is how the operator designed the challenge.</span></div>
+<div class="row"><b>Where can I see active and completed challenges?</b><span><a id="challengesFaqLink" href="challenges.html">See the Challenges page →</a></span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<span class="category">Events</span>
+<h2>How events work</h2>
+<div class="faq">
+<div class="row"><b>What makes something an event?</b><span>An event is tied to a particular day or defined window of time. It can happen in person or online, but the occurrence itself has a known beginning and end.</span></div>
+<div class="row"><b>Can many people be recognized for the same event?</b><span>Yes. Many members can participate in the same event. They are all being recognized for taking part in that same fixed occurrence.</span></div>
+<div class="row"><b>What happens after the event ends?</b><span>The opportunity to participate is over, but the event remains part of the community's history. Recognized participation can remain part of each member's record.</span></div>
+<div class="row"><b>Where can I see upcoming and past events?</b><span><a id="eventsFaqLink" href="events.html">See the Events page →</a></span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="cta">
+<h3 id="exploreCommunityHeading">Explore this community</h3>
+<p>See how recognition works here, what you can earn, and what is happening now.</p>
+<div class="cta-actions">
+<a class="button secondary" id="exploreRanksLink" href="ranks.html">Ranks →</a>
+<a class="button secondary" id="exploreBadgesLink" href="badges.html">Badges →</a>
+<a class="button secondary" id="exploreChallengesLink" href="challenges.html">Challenges →</a>
+<a class="button secondary" id="exploreEventsLink" href="events.html">Events →</a>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="cta"><h3>Want the Wild Ledger system details?</h3><p>Wallets, Xaman, privacy, transfers, Checks, and XRP Ledger mechanics are shared across all participating communities.</p><a class="button" href="wildLedgerFaq.html">Wild Ledger FAQ →</a></div>
+</div>
+</section>
+
+  </main>
+  <footer><div class="wrap foot"><div id="footerLabel">Community • FAQ</div></div></footer>
+
+  <script src="js/communityConfig.js"></script>
+  <script>
+    (() => {
+      const community = window.WILD_LEDGER_COMMUNITY;
+      const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
+
+      if (!community || !communityId) {
+        throw new Error("Community configuration failed to load.");
+      }
+      const communityName = community.communityName || "Community";
+      const operatorName = community.operatorName || community.managerName || "the community operator";
+      const memberSingular = community.memberSingular || "member";
+      const memberPlural = community.memberPlural || "members";
+      const groupName = community.groupName || "community";
+      const recordLabel = community.recordLabel || "Member Record";
+      const historyLabel = community.historyLabel || "community history";
+      const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
+
+      const theme = community.theme || {};
+      const themeVars = {
+        paper:"--paper", ink:"--ink", navy:"--navy", deep:"--deep",
+        sea:"--sea", foam:"--foam", rust:"--rust", gold:"--gold", line:"--line",
+        card:"--card", muted:"--muted", pageBackground:"--page-background",
+        pageOverlay:"--page-overlay", navBackground:"--nav-background",
+        headerBackground:"--header-background", sectionBackground:"--section-background",
+        darkFeatureBackground:"--dark-feature-background"
+      };
+      for (const [key, cssVar] of Object.entries(themeVars)) {
+        if (theme[key]) document.documentElement.style.setProperty(cssVar, theme[key]);
+      }
+
+      document.body.dataset.communityTheme = communityId;
+      document.body.dataset.communityLayout = community.layout || "classic";
+
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
+
+      document.title = `FAQ — ${communityName}`;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.content = `Frequently asked questions about LEAP inside ${communityName}.`;
+
+      const nameLabel = document.getElementById("communityNameLabel");
+      if (nameLabel) nameLabel.textContent = communityName;
+
+      const homeBrand = document.getElementById("communityHomeBrand");
+      const homeLink = document.getElementById("communityHomeLink");
+      if (homeBrand) homeBrand.href = homeHref;
+      if (homeLink) homeLink.href = homeHref;
+
+      const bannerDesktop = document.getElementById("communityBannerDesktop");
+      const bannerMobile = document.getElementById("communityBannerMobile");
+      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
+      const lede = document.getElementById("communityLede");
+      if (lede) {
+        lede.textContent =
+          `These answers cover how LEAP works inside ${communityName}. For wallets, Xaman, privacy, transfers, Checks, and shared XRP Ledger mechanics, see the Wild Ledger FAQ.`;
+      }
+
+      const whatIsLeap = document.getElementById("whatIsLeapCopy");
+      if (whatIsLeap) {
+        whatIsLeap.textContent =
+          `LEAP is the shared membership and recognition system used by Wild Ledger communities. Inside ${communityName}, LEAP is how participation, recognition, and earned progress can become part of your ${historyLabel}.`;
+      }
+
+      const whoDecidesLeap = document.getElementById("whoDecidesLeapCopy");
+      if (whoDecidesLeap) {
+        whoDecidesLeap.textContent =
+          `${operatorName} decides what participation, recognition, badges, challenges, events, and earned progress mean inside ${communityName}. Wild Ledger provides the shared structure underneath; the community decides how to use it.`;
+      }
+
+      const rankModel = document.getElementById("rankModelCopy");
+      if (rankModel) {
+        rankModel.textContent =
+          `Rank is based on the LEAP officially earned from ${communityName}, not simply the LEAP currently sitting in your wallet. Sending LEAP elsewhere does not erase the rank you already earned here.`;
+      }
+
+      const currentVsEarned = document.getElementById("currentVsEarnedCopy");
+      if (currentVsEarned) {
+        currentVsEarned.textContent =
+          `Current LEAP is the LEAP in your wallet right now. Earned is the cumulative LEAP officially awarded to you by ${communityName} and recognized in your validated history. Rank follows Earned, not your current wallet balance.`;
+      }
+
+      const joiningHeading = document.getElementById("joiningHeading");
+      if (joiningHeading) joiningHeading.textContent = `Joining ${communityName}`;
+
+      const historyHeading = document.getElementById("historyHeading");
+      if (historyHeading) historyHeading.textContent = `Your ${historyLabel}`;
+
+      const recordShow = document.getElementById("recordShowCopy");
+      if (recordShow) {
+        recordShow.textContent =
+          `Your ${recordLabel} separates what you currently hold from what you have officially earned here. It can show your current LEAP balance, earned LEAP, rank, outstanding LEAP Checks, and the ${historyLabel} recorded for you on the XRP Ledger.`;
+      }
+
+      const badgeRank = document.getElementById("badgeRankCopy");
+      if (badgeRank) {
+        badgeRank.textContent =
+          `No. Rank follows the LEAP officially earned from this community, while badges record specific recognitions. A ${memberSingular} at one rank can have a badge that a higher-ranking ${memberSingular} does not.`;
+      }
+
+      const badgeRecorded = document.getElementById("badgeRecordedCopy");
+      if (badgeRecorded) {
+        badgeRecorded.textContent =
+          `A community can record a badge as part of an official LEAP award. Once that award is accepted and validated, the badge can become part of that ${memberSingular}'s earned community record.`;
+      }
+
+      const badgeLedger = document.getElementById("badgeLedgerCopy");
+      if (badgeLedger) {
+        badgeLedger.textContent =
+          `Yes. The underlying transactions remain part of the public XRP Ledger history. The ${recordLabel} interprets that history and shows the badges the ${memberSingular} has actually earned.`;
+      }
+
+      const communityPageLinks = [
+        ["ranksFaqLink", "ranks.html"],
+        ["badgesFaqLink", "badges.html"],
+        ["challengesFaqLink", "challenges.html"],
+        ["eventsFaqLink", "events.html"],
+        ["exploreRanksLink", "ranks.html"],
+        ["exploreBadgesLink", "badges.html"],
+        ["exploreChallengesLink", "challenges.html"],
+        ["exploreEventsLink", "events.html"]
+      ];
+      communityPageLinks.forEach(([id, page]) => {
+        const link = document.getElementById(id);
+        if (link) link.href = `${page}?community=${encodeURIComponent(communityId)}`;
+      });
+
+      const exploreHeading = document.getElementById("exploreCommunityHeading");
+      if (exploreHeading) exploreHeading.textContent = `Explore ${communityName}`;
+
+      const footer = document.getElementById("footerLabel");
+      if (footer) footer.textContent = `${communityName} • FAQ`;
+
+      document.documentElement.classList.remove("community-pending");
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wild Ledger Owner Console</title>
+<style>
+  :root {
+    --ink: #f5fbfa;
+    --muted: rgba(236, 249, 247, .72);
+    --deep: #071f2c;
+    --navy: #0b2f40;
+    --lagoon: #29b8b1;
+    --sea-glass: #79d5c2;
+    --mango: #f4bd58;
+    --coral: #ef765d;
+    --panel: rgba(10, 45, 58, .70);
+    --panel-strong: rgba(10, 49, 63, .90);
+    --line: rgba(219, 248, 244, .14);
+    --shadow: 0 28px 78px rgba(0, 16, 24, .38);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { min-height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(41, 184, 177, .34) 0, rgba(41, 184, 177, .12) 22%, transparent 44%),
+      radial-gradient(circle at 87% 15%, rgba(244, 189, 88, .24) 0, rgba(244, 189, 88, .07) 21%, transparent 42%),
+      radial-gradient(circle at 88% 86%, rgba(239, 118, 93, .24) 0, rgba(239, 118, 93, .07) 23%, transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(121, 213, 194, .19) 0, transparent 42%),
+      linear-gradient(145deg, #06202e 0%, #0a3444 48%, #071d2a 100%);
+    overflow-x: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::before {
+    inset: 0;
+    opacity: .28;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 78%);
+  }
+
+  body::after {
+    width: 420px;
+    height: 420px;
+    right: -180px;
+    top: 35%;
+    border-radius: 50%;
+    border: 1px solid rgba(121, 213, 194, .13);
+    box-shadow:
+      0 0 0 54px rgba(121, 213, 194, .035),
+      0 0 0 108px rgba(121, 213, 194, .025),
+      0 0 0 162px rgba(121, 213, 194, .015);
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: 46px 22px 56px;
+  }
+
+  .console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 32px;
+    background:
+      linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.018)),
+      var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .console::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg, var(--lagoon), var(--sea-glass), var(--mango), var(--coral));
+  }
+
+  .console-header {
+    position: relative;
+    padding: 34px 34px 26px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 21px;
+  }
+
+  /* Backend navigation rule: session/actions left, Wild Ledger navigation right. */
+  .top-actions,
+  .top-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .top-navigation { margin-left: auto; }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--sea-glass);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+
+  .professional-library-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(121, 213, 194, .30);
+    border-radius: 999px;
+    color: #b7f0df;
+    background: rgba(121, 213, 194, .09);
+    text-decoration: none;
+    font-size: .70rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .professional-library-link:hover,
+  .professional-library-link:focus-visible {
+    color: #e5fff8;
+    border-color: rgba(121, 213, 194, .54);
+    background: rgba(121, 213, 194, .15);
+    outline: none;
+  }
+
+  .logout-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid rgba(239, 118, 93, .38);
+    border-radius: 999px;
+    color: #ffd2ca;
+    background: rgba(239, 118, 93, .09);
+    font: inherit;
+    font-size: .70rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .logout-button:hover,
+  .logout-button:focus-visible {
+    color: #fff0ec;
+    border-color: rgba(239, 118, 93, .62);
+    background: rgba(239, 118, 93, .16);
+    outline: none;
+  }
+
+  .brand-mark {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--mango);
+    box-shadow:
+      0 0 0 5px rgba(244, 189, 88, .12),
+      0 0 22px rgba(244, 189, 88, .48);
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 720px;
+    font-size: clamp(2.25rem, 7vw, 4.75rem);
+    line-height: .96;
+    letter-spacing: -.055em;
+    font-weight: 900;
+  }
+
+  .intro {
+    margin: 18px 0 0;
+    max-width: 710px;
+    color: var(--muted);
+    font-size: clamp(1rem, 2.3vw, 1.13rem);
+    line-height: 1.65;
+  }
+
+
+
+  .dashboard-group {
+    padding: 12px 24px 0;
+  }
+
+  .dashboard-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 10px;
+    min-width: 0;
+  }
+
+  .dashboard-title {
+    color: var(--ink);
+    font-size: .96rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .dashboard-subtitle {
+    color: rgba(236, 249, 247, .56);
+    font-size: .74rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  .metrics {
+    padding: 0 0 4px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .metric {
+    --metric-accent: var(--lagoon);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 96px;
+    padding: 14px 12px 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 18px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.055), rgba(255,255,255,.012)),
+      rgba(5, 34, 46, .46);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+    overflow: hidden;
+  }
+
+  .metric::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--metric-accent), transparent 90%);
+    opacity: .8;
+  }
+
+  .metric:nth-child(2) { --metric-accent: var(--sea-glass); }
+  .metric:nth-child(3) { --metric-accent: var(--mango); }
+  .metric:nth-child(4) { --metric-accent: var(--coral); }
+
+  .metric-value {
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 9px;
+    color: var(--ink);
+    font-size: clamp(1.4rem, 4vw, 2.05rem);
+    line-height: 1;
+    letter-spacing: -.045em;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .metric-label {
+    margin-top: 10px;
+    color: rgba(236, 249, 247, .66);
+    font-size: .66rem;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+  }
+
+  .metric-meaning {
+    margin-top: auto;
+    padding-top: 5px;
+    color: var(--metric-accent);
+    font-size: .56rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .075em;
+    text-transform: uppercase;
+  }
+
+  .metric-info {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid rgba(126, 202, 255, .55);
+    border-radius: 50%;
+    background: rgba(77, 167, 235, .16);
+    color: #8fd2ff;
+    font: 900 .68rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .metric-info:focus-visible {
+    outline: 2px solid #8fd2ff;
+    outline-offset: 2px;
+  }
+
+  .metric-info-scrim {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    padding: 22px;
+    background: rgba(2, 19, 28, .72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metric-info-scrim.open { display: flex; }
+
+  .metric-info-panel {
+    width: min(92vw, 430px);
+    border: 1px solid rgba(143, 210, 255, .25);
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(17, 63, 75, .98), rgba(6, 35, 48, .98));
+    box-shadow: 0 24px 70px rgba(0,0,0,.34);
+    padding: 22px;
+    color: var(--ink);
+  }
+
+  .metric-info-panel h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .metric-info-panel p {
+    margin: 10px 0 0;
+    color: rgba(236, 249, 247, .74);
+    font-size: .96rem;
+    line-height: 1.55;
+  }
+
+  .metric-info-detail {
+    margin-top: 15px !important;
+    padding-top: 14px;
+    border-top: 1px solid rgba(143, 210, 255, .16);
+  }
+
+  .metric-info-detail strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #9fddff;
+    font-size: .72rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .metric-info-action {
+    border-top-color: rgba(244, 187, 86, .22);
+  }
+
+  .metric-info-action strong {
+    color: #ffd27a;
+  }
+
+  .metric-info-close {
+    margin-top: 18px;
+    width: 100%;
+    border: 1px solid rgba(143, 210, 255, .28);
+    border-radius: 14px;
+    background: rgba(77, 167, 235, .12);
+    color: #b8e3ff;
+    padding: 10px 14px;
+    font: 800 .88rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    cursor: pointer;
+  }
+
+  .metrics-secondary {
+    padding-top: 0;
+    padding-bottom: 8px;
+  }
+
+  .metrics-secondary .metric {
+    min-height: 88px;
+    background:
+      linear-gradient(150deg, rgba(255,255,255,.04), rgba(255,255,255,.008)),
+      rgba(5, 34, 46, .34);
+  }
+
+  .metrics-secondary .metric-value {
+    color: rgba(246,252,251,.86);
+  }
+
+  .metrics-secondary .metric-label {
+    color: rgba(236,249,247,.58);
+  }
+
+  .navigation {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .nav-card {
+    --accent: var(--lagoon);
+    position: relative;
+    display: flex;
+    min-height: 244px;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 25px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    color: var(--ink);
+    text-decoration: none;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.016)),
+      rgba(5, 34, 46, .54);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    transition: transform .22s ease, border-color .22s ease, background .22s ease, box-shadow .22s ease;
+  }
+
+  .nav-card::before {
+    content: "";
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    right: -70px;
+    top: -75px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent) 0%, transparent 68%);
+    opacity: .9;
+  }
+
+  .nav-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 78%);
+    opacity: .85;
+  }
+
+  .nav-card.manager { --accent: var(--coral); }
+
+  .nav-card:hover,
+  .nav-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.025)),
+      rgba(5, 34, 46, .70);
+    box-shadow: 0 18px 34px rgba(0, 15, 23, .24), inset 0 1px 0 rgba(255,255,255,.08);
+    outline: none;
+  }
+
+  .nav-card:active { transform: translateY(-1px) scale(.995); }
+
+  .nav-copy {
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+  }
+
+  .nav-kicker {
+    color: color-mix(in srgb, var(--accent) 80%, white 20%);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .nav-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 7px;
+  }
+
+  .nav-title {
+    font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+    line-height: 1.05;
+    letter-spacing: -.035em;
+    font-weight: 880;
+  }
+
+  .nav-arrow {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.11);
+    color: rgba(255,255,255,.78);
+    transition: transform .22s ease, background .22s ease;
+  }
+
+  .nav-card:hover .nav-arrow,
+  .nav-card:focus-visible .nav-arrow {
+    transform: translateX(3px);
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  .nav-description {
+    margin: 10px 0 0;
+    color: rgba(234, 247, 245, .64);
+    font-size: .91rem;
+    line-height: 1.5;
+  }
+
+  @supports not (color: color-mix(in srgb, red, blue)) {
+    .nav-card::before { background: radial-gradient(circle, rgba(41,184,177,.28), transparent 68%); }
+    .nav-card.manager::before { background: radial-gradient(circle, rgba(239,118,93,.27), transparent 68%); }
+  }
+
+  @media (max-width: 700px) {
+    .shell { padding: 22px 14px 34px; }
+    .console { border-radius: 25px; }
+    .console-header { padding: 28px 22px 23px; }
+    .brand-row { align-items: flex-start; }
+    .dashboard-group { padding: 10px 12px 0; }
+    .dashboard-heading { margin: 0 0 8px; gap: 6px; flex-wrap: wrap; }
+    .dashboard-title { font-size: .82rem; }
+    .dashboard-subtitle { font-size: .62rem; }
+    .metrics { padding: 0 0 2px; gap: 5px; }
+    .metrics-secondary { padding-top: 0; padding-bottom: 7px; }
+    .metric { min-height: 78px; padding: 11px 7px 9px; border-radius: 14px; }
+    .metrics-secondary .metric { min-height: 82px; }
+    .metric-value { font-size: clamp(1.05rem, 6vw, 1.45rem); }
+    .metric-label { margin-top: 8px; font-size: .49rem; line-height: 1.12; letter-spacing: .035em; }
+    .metric-meaning { margin-top: auto; padding-top: 4px; font-size: .44rem; letter-spacing: .04em; }
+    .navigation { grid-template-columns: 1fr; padding: 16px; gap: 13px; }
+    .nav-card { min-height: 205px; padding: 22px; border-radius: 20px; }
+    .nav-copy { margin-top: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-card,
+    .nav-arrow { transition: none; }
+  }
+</style>
+  <link rel="stylesheet" href="wildLedgerControls.css">
+  <link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="console" aria-labelledby="owner-title">
+      <header class="console-header">
+        <div class="brand-row" aria-label="Owner controls and navigation">
+          <div class="top-actions">
+            <button class="logout-button wl-header-control" id="ownerLogout" type="button">Log Out</button>
+          </div>
+          <div class="top-navigation"></div>
+        </div>
+        <h1 id="owner-title">Owner Console</h1>
+        <p class="intro">Central administration for Wild Ledger. Manage communities, platform settings, operations, and oversight from one place.</p>
+      </header>
+
+
+      <section class="dashboard-group" aria-labelledby="dashboard-state-title">
+        <div class="dashboard-heading">
+          <div class="dashboard-title" id="dashboard-state-title">State</div>
+          <div class="dashboard-subtitle">— What exists</div>
+        </div>
+        <section class="metrics" aria-label="Wild Ledger LEAP state dashboard">
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About LEAP Outstanding" data-info-title="LEAP Outstanding" data-info-calc="Sum of all LEAP balances held outside the issuer account." data-info-text="This is issued supply: the amount of LEAP that currently exists in the ecosystem outside the issuer." data-info-action="Do not try to maximize this number. Increase issued supply when community inventory or operating needs justify it. If Outstanding rises while Holders and 30-Day Distribution stay flat, supply is growing faster than actual use.">i</button>
+          <div class="metric-value" id="metricOutstanding" aria-live="polite">…</div>
+          <div class="metric-label">LEAP Outstanding</div>
+          <div class="metric-meaning">Supply</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Sum of LEAP held in wallets associated with registered communities: current/historical Community Operating Wallets plus protocol-valid community allocation delivery wallets. Distributor inventory is separate." data-info-text="This is community-held LEAP inventory. Distributor inventory is tracked separately and is not counted as Community LEAP." data-info-action="If inventory is falling while 30-Day Distribution is strong, prepare to replenish community accounts. If inventory stays high while distribution is weak, do not add more LEAP—focus on participation and distribution instead.">i</button>
+          <div class="metric-value" id="metricCommunity" aria-live="polite">…</div>
+          <div class="metric-label">Community LEAP</div>
+          <div class="metric-meaning">Inventory</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About LEAP in the Wild" data-info-title="LEAP in the Wild" data-info-calc="LEAP Outstanding minus Community LEAP minus LEAP held in authorized Distributor accounts." data-info-text="This is LEAP outside both community-held inventory and Distributor inventory." data-info-action="Generally you want this to grow over time. Healthy growth should be accompanied by more Holders. If LEAP in the Wild rises but Holders do not, check Holder Concentration because circulation may be accumulating in only a few wallets.">i</button>
+          <div class="metric-value" id="metricWild" aria-live="polite">…</div>
+          <div class="metric-label">LEAP in the Wild</div>
+          <div class="metric-meaning">Circulation</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-calc="Count of non-system accounts with a positive LEAP balance. Community-associated wallets and Distributor accounts are excluded." data-info-text="This is current reach: how many wallets actually hold LEAP now." data-info-action="Generally you want this rising over time. If 30-Day Distribution rises but Holders stay flat, existing holders are receiving more LEAP without reach expanding. Focus on bringing new participants into the ecosystem.">i</button>
+          <div class="metric-value" id="metricHolders" aria-live="polite">…</div>
+          <div class="metric-label">Holders</div>
+          <div class="metric-meaning">Reach</div>
+        </div>
+        </section>
+      </section>
+
+      <section class="dashboard-group" aria-labelledby="dashboard-movement-title">
+        <div class="dashboard-heading">
+          <div class="dashboard-title" id="dashboard-movement-title">Movement</div>
+          <div class="dashboard-subtitle">— Are we moving?</div>
+        </div>
+        <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem movement dashboard">
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Circulation Rate" data-info-title="Circulation Rate" data-info-calc="LEAP in the Wild ÷ LEAP Outstanding × 100." data-info-text="This shows what share of issued LEAP has actually moved beyond community inventory into participant wallets." data-info-action="Aim for a gradual upward trend as the ecosystem grows. Rising Circulation Rate plus rising Holders is healthy deployment. If the rate rises while Community LEAP gets uncomfortably low, replenish inventory. If it stays low despite plenty of inventory, focus on participation and distribution.">i</button>
+          <div class="metric-value" id="metricCirculationRate" aria-live="polite">—</div>
+          <div class="metric-label">Circulation Rate</div>
+          <div class="metric-meaning">Deployment</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Trustlines" data-info-title="Trustlines" data-info-calc="Count of XRP Ledger trust lines established for LEAP, including zero-balance accounts." data-info-text="This is capacity: wallets that are technically ready to receive and hold LEAP." data-info-action="Trustlines should generally grow ahead of or alongside Holders. If Trustlines rise but Holders stay flat, onboarding is creating capacity but not converting into participation. Focus on getting those ready wallets their first meaningful LEAP interaction.">i</button>
+          <div class="metric-value" id="metricTrustlines" aria-live="polite">—</div>
+          <div class="metric-label">Trustlines</div>
+          <div class="metric-meaning">Capacity</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About Pending Recognition" data-info-title="Pending Recognition" data-info-calc="Sum of LEAP in outstanding recognition Checks that have been created but not yet cashed." data-info-text="This is the recognition pipeline: awards that have been made but have not yet completed the trip into a member wallet." data-info-action="Watch both the amount and how long Checks remain pending. Some pipeline is normal. If Pending Recognition keeps growing faster than completed distribution, investigate cashing friction, reminders, wallet steps, or expirations.">i</button>
+          <div class="metric-value" id="metricPendingRecognition" aria-live="polite">—</div>
+          <div class="metric-label">Pending Recognition</div>
+          <div class="metric-meaning">Pipeline</div>
+        </div>
+        <div class="metric">
+          <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-calc="Sum of validated LEAP delivered from community-associated operating/inventory wallets to non-system wallets during the last 30 days. Distributor allocation activity is not counted as member distribution." data-info-text="This is recent momentum: how much LEAP actually reached participants during the current operating period." data-info-action="You generally want sustainable growth as communities and participation expand. Do not overreact to one spike or one quiet month. Compare the trend with Holders and Active Communities to see whether movement is broadening or merely getting heavier in the same places.">i</button>
+          <div class="metric-value" id="metricThirtyDayDistribution" aria-live="polite">—</div>
+          <div class="metric-label">30-Day Distribution</div>
+          <div class="metric-meaning">Momentum</div>
+        </div>
+        </section>
+      </section>
+
+      <section class="dashboard-group" aria-labelledby="dashboard-breadth-title">
+        <div class="dashboard-heading">
+          <div class="dashboard-title" id="dashboard-breadth-title">Breadth &amp; Depth</div>
+          <div class="dashboard-subtitle">— How broad and how deep is the movement?</div>
+        </div>
+        <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem breadth and depth dashboard">
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-calc="Count of communities in the Community Registry that have an Operating Wallet or protocol-valid allocation activity. Distributor accounts are not communities." data-info-text="This is footprint: how broadly Wild Ledger has expanded across independent communities." data-info-action="More is useful only when those communities become active. If Active Communities rises while Holders and 30-Day Distribution do not, community onboarding is not yet turning into member activity. Improve manager activation before simply adding more communities.">i</button>
+            <div class="metric-value" id="metricActiveCommunities" aria-live="polite">—</div>
+            <div class="metric-label">Active Communities</div>
+            <div class="metric-meaning">Footprint</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Recognition Cash Rate" data-info-title="Recognition Cash Rate" data-info-calc="Cashed recognition Checks ÷ all recognition Checks that reached a final outcome (cashed, expired, or cancelled) × 100 for the measurement period." data-info-text="This is completion: how reliably awarded recognition becomes LEAP actually received by participants." data-info-action="Aim for a high, stable rate. If it falls, investigate where people are dropping out—wallet handoff, trustline setup, unclear instructions, or expiration. Improving completion is usually more valuable than issuing more recognition into a broken pipeline.">i</button>
+            <div class="metric-value" id="metricRecognitionCashRate" aria-live="polite">—</div>
+            <div class="metric-label">Recognition Cash Rate</div>
+            <div class="metric-meaning">Completion</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Inventory Runway" data-info-title="Inventory Runway" data-info-calc="Community LEAP ÷ average daily 30-Day Distribution. The result is the estimated number of days current community inventory would last if the recent pace continued." data-info-text="This is a planning estimate, not a target. It tells you how long current operating inventory could support recent distribution activity before replenishment would be needed." data-info-action="Do not try to maximize runway. If runway is shrinking because distribution is accelerating, plan to replenish community inventory. If runway is very long because distribution is weak, adding inventory will not help—focus on getting communities and members active.">i</button>
+            <div class="metric-value" id="metricInventoryRunway" aria-live="polite">—</div>
+            <div class="metric-label">Inventory Runway</div>
+            <div class="metric-meaning">Reserves</div>
+          </div>
+          <div class="metric">
+            <button class="metric-info" type="button" aria-label="About Holder Concentration" data-info-title="Holder Concentration" data-info-calc="Share of LEAP in the Wild held by the largest non-community holders. The dashboard can use a consistent top-holder group, such as the top five wallets." data-info-text="This shows whether circulation is broadly distributed or concentrated in a small number of wallets." data-info-action="Generally you want concentration to fall as Reach grows. If concentration rises, new distribution is accumulating among relatively few holders. Focus on widening participation rather than simply increasing the amount of LEAP distributed.">i</button>
+            <div class="metric-value" id="metricHolderConcentration" aria-live="polite">—</div>
+            <div class="metric-label">Holder Concentration</div>
+            <div class="metric-meaning">Distribution</div>
+          </div>
+        </section>
+      </section>
+
+      <nav class="navigation" aria-label="Owner console navigation">
+        <a class="nav-card manager" href="communities.html">
+          <div class="nav-copy">
+            <div class="nav-kicker">Owner Drill-Down</div>
+            <div class="nav-title-row">
+              <div class="nav-title">Communities</div>
+              <span class="nav-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="nav-description">Select a community and open its management context.</p>
+          </div>
+        </a>
+
+        <a class="nav-card" href="splash.html">
+          <div class="nav-copy">
+            <div class="nav-kicker">Public Experience</div>
+            <div class="nav-title-row">
+              <div class="nav-title">Wild Ledger</div>
+              <span class="nav-arrow" aria-hidden="true">→</span>
+            </div>
+            <p class="nav-description">Open the public Wild Ledger experience and community entry point.</p>
+          </div>
+        </a>
+      </nav>
+    </section>
+  </main>
+
+  <div class="metric-info-scrim" id="metricInfoScrim" role="dialog" aria-modal="true" aria-labelledby="metricInfoTitle">
+    <div class="metric-info-panel">
+      <h2 id="metricInfoTitle">Metric</h2>
+      <p class="metric-info-detail"><strong>How it’s calculated</strong><span id="metricInfoCalc"></span></p>
+      <p class="metric-info-detail"><strong>What it tells you</strong><span id="metricInfoText"></span></p>
+      <p class="metric-info-detail metric-info-action"><strong>Owner action</strong><span id="metricInfoAction"></span></p>
+      <button class="metric-info-close" id="metricInfoClose" type="button">Close</button>
+    </div>
+  </div>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script src="js/communityConfig.js"></script>
+  <script type="module">
+  import { resolveCommunityAuthority } from "./js/communityAuthority.js";
+
+  (() => {
+    const FALLBACK_CONFIG = Object.freeze({
+      leapIssuer: "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq",
+      leapCurrency: "4C45415000000000000000000000000000000000",
+      leapDistributors: Object.freeze([
+        "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU"
+      ]),
+      xrplWebSocket: "wss://s1.ripple.com/"
+    });
+
+    const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;
+    const issuer = config.leapIssuer;
+    const leapCurrency = String(config.leapCurrency || "LEAP").toUpperCase();
+    const distributorAccounts = new Set(Array.isArray(config.leapDistributors) ? config.leapDistributors : []);
+    const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
+
+    const communityRegistry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
+    const communityRecords = Object.values(communityRegistry).filter(community => community?.leapNamespace);
+    const communityByNamespace = new Map(communityRecords.map(community => [String(community.leapNamespace), community]));
+
+    // These sets intentionally model different architectural roles.
+    // Distributor accounts provision communities. They are not communities.
+    // Operating accounts are resolved from Protocol 0.15 authority state.
+    // Allocation delivery accounts preserve community-held inventory even when
+    // a community later changes its Operating Wallet.
+    const operatingAccounts = new Set();
+    const allocationDeliveryAccounts = new Set();
+    const communityAccounts = new Set();
+    const systemAccounts = new Set();
+    const activeCommunityIds = new Set();
+
+    function rebuildAccountSets() {
+      communityAccounts.clear();
+      for (const account of operatingAccounts) communityAccounts.add(account);
+      for (const account of allocationDeliveryAccounts) communityAccounts.add(account);
+
+      systemAccounts.clear();
+      for (const account of distributorAccounts) systemAccounts.add(account);
+      for (const account of communityAccounts) systemAccounts.add(account);
+    }
+
+    const metricOutstanding = document.getElementById("metricOutstanding");
+    const metricCommunity = document.getElementById("metricCommunity");
+    const metricWild = document.getElementById("metricWild");
+    const metricHolders = document.getElementById("metricHolders");
+    const metricCirculationRate = document.getElementById("metricCirculationRate");
+    const metricTrustlines = document.getElementById("metricTrustlines");
+    const metricPendingRecognition = document.getElementById("metricPendingRecognition");
+    const metricThirtyDayDistribution = document.getElementById("metricThirtyDayDistribution");
+    const metricActiveCommunities = document.getElementById("metricActiveCommunities");
+    const metricRecognitionCashRate = document.getElementById("metricRecognitionCashRate");
+    const metricInventoryRunway = document.getElementById("metricInventoryRunway");
+    const metricHolderConcentration = document.getElementById("metricHolderConcentration");
+    const metricsSection = document.querySelector(".metrics");
+    const allMetricValues = [
+      metricOutstanding, metricCommunity, metricWild, metricHolders,
+      metricCirculationRate, metricTrustlines, metricPendingRecognition,
+      metricThirtyDayDistribution, metricActiveCommunities,
+      metricRecognitionCashRate, metricInventoryRunway,
+      metricHolderConcentration
+    ].filter(Boolean);
+
+    const ACTIVITY_CACHE_MS = 5 * 60 * 1000;
+    let communityActivityCache = null;
+
+    function decodeCurrency(code) {
+      const value = String(code || "");
+      if (/^[A-Za-z0-9?!@#$%^&*<>(){}\[\]|]{3}$/.test(value)) return value;
+      if (!/^[A-Fa-f0-9]{40}$/.test(value)) return value;
+
+      let text = "";
+      for (let i = 0; i < value.length; i += 2) {
+        const n = parseInt(value.slice(i, i + 2), 16);
+        if (!n) break;
+        text += String.fromCharCode(n);
+      }
+      return text;
+    }
+
+    function isLeapCurrency(code) {
+      const raw = String(code || "").toUpperCase();
+      const decoded = decodeCurrency(raw).toUpperCase();
+      return raw === leapCurrency || decoded === "LEAP";
+    }
+
+    function formatLeap(value) {
+      if (!Number.isFinite(value)) return "—";
+      return value.toLocaleString(undefined, {
+        maximumFractionDigits: 6
+      });
+    }
+
+    function formatPercent(value) {
+      if (!Number.isFinite(value)) return "—";
+      return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}%`;
+    }
+
+    function formatRunwayDays(value) {
+      if (value === Infinity) return "∞";
+      if (!Number.isFinite(value) || value < 0) return "—";
+      return `${Math.round(value).toLocaleString()} d`;
+    }
+
+    // Keep exact dashboard numbers visible on narrow screens. Values start at
+    // the normal responsive size and step down only when their text is wider
+    // than the space available in the metric card.
+    function fitMetricValue(el) {
+      if (!el) return;
+      el.style.fontSize = "";
+      const startingSize = parseFloat(getComputedStyle(el).fontSize) || 20;
+      let size = startingSize;
+      const minimumSize = 10;
+      while (el.scrollWidth > el.clientWidth && size > minimumSize) {
+        size -= 0.5;
+        el.style.fontSize = `${size}px`;
+      }
+    }
+
+    function fitAllMetricValues() {
+      allMetricValues.forEach(fitMetricValue);
+    }
+
+    function setMetric(el, text) {
+      if (!el) return;
+      el.textContent = text;
+      requestAnimationFrame(() => fitMetricValue(el));
+    }
+
+    function isLeapAmount(amount) {
+      return Boolean(
+        amount && typeof amount === "object" &&
+        isLeapCurrency(amount.currency) &&
+        String(amount.issuer || "") === issuer &&
+        Number.isFinite(Number(amount.value))
+      );
+    }
+
+    function leapAmountValue(amount) {
+      return isLeapAmount(amount) ? Number(amount.value) : 0;
+    }
+
+    function transactionSucceeded(entry) {
+      if (entry?.validated === false) return false;
+      const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+      const result = meta?.TransactionResult ?? meta?.transaction_result;
+      return !result || result === "tesSUCCESS";
+    }
+
+    function hexToUtf8(value) {
+      const hex = String(value || "");
+      if (!hex || !/^(?:[0-9A-Fa-f]{2})+$/.test(hex)) return hex;
+      try {
+        const bytes = new Uint8Array(hex.match(/.{2}/g).map(pair => parseInt(pair, 16)));
+        return new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/\0+$/g, "");
+      } catch (_) {
+        return hex;
+      }
+    }
+
+    function decodedMemoStrings(tx) {
+      const values = [];
+      for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
+        const memo = wrapper?.Memo || {};
+        for (const key of ["MemoData", "MemoType", "MemoFormat"]) {
+          if (!memo[key]) continue;
+          const decoded = hexToUtf8(memo[key]).trim();
+          if (decoded) values.push(decoded);
+        }
+      }
+      return values;
+    }
+
+    function canonicalAllocationMemo(tx) {
+      const matches = [];
+      for (const value of decodedMemoStrings(tx)) {
+        for (const [namespace, community] of communityByNamespace) {
+          const prefix = `${namespace}/ALLOCATION=`;
+          if (!value.startsWith(prefix)) continue;
+          const amountText = value.slice(prefix.length);
+          if (!/^[1-9]\d*$/.test(amountText)) continue;
+          const amount = Number(amountText);
+          if (!Number.isSafeInteger(amount) || amount <= 0) continue;
+          matches.push({ community, namespace, amount, raw: value });
+        }
+      }
+      return matches.length === 1 ? matches[0] : null;
+    }
+
+    async function resolveCommunityRuntime() {
+      operatingAccounts.clear();
+      activeCommunityIds.clear();
+
+      for (const community of communityRecords) {
+        // Protocol 0.15 still uses the documented pre-authority-state wallet
+        // only as the migration anchor. Communities without one are not yet
+        // provisioned for canonical operating authority.
+        if (!community?.operatingWallet) continue;
+        const state = await resolveCommunityAuthority({
+          community,
+          serverUrl: xrplWebSocket
+        });
+        activeCommunityIds.add(String(community.id || community.backendId || community.leapNamespace));
+        for (const account of Array.isArray(state?.accounts) ? state.accounts : []) {
+          if (account) operatingAccounts.add(String(account));
+        }
+        if (state?.currentAccount) operatingAccounts.add(String(state.currentAccount));
+      }
+
+      rebuildAccountSets();
+    }
+
+    async function discoverAllocationDeliveryAccounts(ws, nextId) {
+      allocationDeliveryAccounts.clear();
+
+      for (const distributor of distributorAccounts) {
+        let marker;
+        do {
+          const command = {
+            command: "account_tx",
+            account: distributor,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            binary: false,
+            forward: false,
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-allocations"));
+          const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+
+          for (const entry of transactions) {
+            if (!transactionSucceeded(entry)) continue;
+            const tx = entry.tx_json || entry.tx || {};
+            if (tx.TransactionType !== "CheckCreate") continue;
+            if (String(tx.Account || "") !== distributor) continue;
+            if (!isLeapAmount(tx.SendMax)) continue;
+
+            const sendMax = leapAmountValue(tx.SendMax);
+            if (!Number.isSafeInteger(sendMax) || sendMax <= 0) continue;
+
+            const allocation = canonicalAllocationMemo(tx);
+            if (!allocation || allocation.amount !== sendMax) continue;
+
+            const destination = String(tx.Destination || "");
+            if (!destination) continue;
+            allocationDeliveryAccounts.add(destination);
+            activeCommunityIds.add(String(allocation.community.id || allocation.community.backendId || allocation.namespace));
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      rebuildAccountSets();
+    }
+
+    function setLoading() {
+      allMetricValues.forEach(el => setMetric(el, "…"));
+      if (metricsSection) metricsSection.title = "Loading validated XRP Ledger data…";
+    }
+
+    function setUnavailable(message) {
+      allMetricValues.forEach(el => setMetric(el, "—"));
+      if (metricsSection) metricsSection.title = message || "XRPL data unavailable.";
+    }
+
+    function openSocket() {
+      return new Promise((resolve, reject) => {
+        const ws = new WebSocket(xrplWebSocket);
+        const timer = setTimeout(() => {
+          try { ws.close(); } catch (_) {}
+          reject(new Error("XRPL connection timed out."));
+        }, 12000);
+
+        ws.addEventListener("open", () => {
+          clearTimeout(timer);
+          resolve(ws);
+        }, { once: true });
+
+        ws.addEventListener("error", () => {
+          clearTimeout(timer);
+          reject(new Error("Could not connect to the XRP Ledger."));
+        }, { once: true });
+      });
+    }
+
+    function request(ws, command, id) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error("XRPL request timed out."));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timer);
+          ws.removeEventListener("message", onMessage);
+        }
+
+        function onMessage(event) {
+          let response;
+          try { response = JSON.parse(event.data); } catch (_) { return; }
+          if (response.id !== id) return;
+          cleanup();
+
+          if (response.status === "error" || response.error || response.result?.error) {
+            reject(new Error(response.error || response.result?.error || "XRPL error"));
+            return;
+          }
+          resolve(response.result || {});
+        }
+
+        ws.addEventListener("message", onMessage);
+        ws.send(JSON.stringify({ id, api_version: 2, ...command }));
+      });
+    }
+
+    async function loadPendingRecognition(ws, nextId) {
+      let pendingLeap = 0;
+      let checkCount = 0;
+
+      for (const account of communityAccounts) {
+        let marker;
+        do {
+          const command = {
+            command: "account_objects",
+            account,
+            ledger_index: "validated",
+            type: "check",
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-checks"));
+          const objects = Array.isArray(result.account_objects) ? result.account_objects : [];
+
+          for (const check of objects) {
+            // account_objects can include incoming Checks linked to the account,
+            // so count only Checks actually sent by this community account.
+            if (check?.LedgerEntryType !== "Check" || check.Account !== account) continue;
+            if (!isLeapAmount(check.SendMax)) continue;
+            pendingLeap += leapAmountValue(check.SendMax);
+            checkCount += 1;
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      return { pendingLeap, checkCount };
+    }
+
+    function transactionTimeMs(entry) {
+      if (entry?.close_time_iso) {
+        const parsed = Date.parse(entry.close_time_iso);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+
+      const tx = entry?.tx_json || entry?.tx || {};
+      if (Number.isFinite(Number(tx.date))) {
+        // XRPL/Ripple Epoch begins 2000-01-01T00:00:00Z.
+        return (Number(tx.date) + 946684800) * 1000;
+      }
+      return NaN;
+    }
+
+    function findCashedCheck(meta, senderAccount) {
+      const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
+      for (const wrapped of affected) {
+        const node = wrapped?.DeletedNode;
+        if (!node || node.LedgerEntryType !== "Check") continue;
+        const fields = node.FinalFields || node.NewFields || {};
+        if (fields.Account === senderAccount) return fields;
+      }
+      return null;
+    }
+
+    function findCreatedCheck(meta) {
+      const affected = Array.isArray(meta?.AffectedNodes) ? meta.AffectedNodes : [];
+      for (const wrapped of affected) {
+        const node = wrapped?.CreatedNode;
+        if (!node || node.LedgerEntryType !== "Check") continue;
+        return {
+          id: node.LedgerIndex || "",
+          fields: node.NewFields || node.FinalFields || {}
+        };
+      }
+      return null;
+    }
+
+    function rippleEpochNow() {
+      return Math.floor(Date.now() / 1000) - 946684800;
+    }
+
+    async function loadCommunityActivity(ws, nextId) {
+      if (
+        communityActivityCache &&
+        (Date.now() - communityActivityCache.loadedAt) < ACTIVITY_CACHE_MS
+      ) {
+        return communityActivityCache.data;
+      }
+
+      const cutoff = Date.now() - (30 * 24 * 60 * 60 * 1000);
+      const createdChecks = new Map();
+      const cashedCheckIds = new Set();
+      const cancelledCheckIds = new Set();
+      const countedDistributionHashes = new Set();
+      let distributed30 = 0;
+
+      for (const account of communityAccounts) {
+        let marker;
+
+        do {
+          const command = {
+            command: "account_tx",
+            account,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            binary: false,
+            forward: false,
+            limit: 200
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-activity"));
+          const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+
+          for (const entry of transactions) {
+            if (entry.validated === false) continue;
+
+            const tx = entry.tx_json || entry.tx || {};
+            const meta = entry.meta || {};
+            const resultCode = meta.TransactionResult || meta.transaction_result;
+            if (resultCode && resultCode !== "tesSUCCESS") continue;
+
+            // 30-day distribution: count LEAP actually delivered from a
+            // community-associated account to a non-system wallet.
+            const when = transactionTimeMs(entry);
+            if (Number.isFinite(when) && when >= cutoff) {
+              const hash = entry.hash || tx.hash || tx.Hash;
+              if (!hash || !countedDistributionHashes.has(hash)) {
+                const delivered = meta.delivered_amount ?? meta.DeliveredAmount;
+                if (isLeapAmount(delivered)) {
+                  let destination = null;
+                  let qualifies = false;
+
+                  if (tx.TransactionType === "Payment" && tx.Account === account) {
+                    destination = tx.Destination;
+                    qualifies = Boolean(destination);
+                  } else if (tx.TransactionType === "CheckCash") {
+                    const check = findCashedCheck(meta, account);
+                    if (check && isLeapAmount(check.SendMax)) {
+                      destination = check.Destination;
+                      qualifies = Boolean(destination);
+                    }
+                  }
+
+                  if (
+                    qualifies &&
+                    destination !== issuer &&
+                    !systemAccounts.has(destination)
+                  ) {
+                    distributed30 += leapAmountValue(delivered);
+                    if (hash) countedDistributionHashes.add(hash);
+                  }
+                }
+              }
+            }
+
+            // Recognition completion: reconstruct LEAP Checks created by a
+            // community-associated account and their final outcomes.
+            if (
+              tx.TransactionType === "CheckCreate" &&
+              tx.Account === account &&
+              isLeapAmount(tx.SendMax)
+            ) {
+              const created = findCreatedCheck(meta);
+              if (created?.id) {
+                createdChecks.set(created.id, {
+                  expiration: Number(tx.Expiration ?? created.fields?.Expiration ?? 0) || 0
+                });
+              }
+            } else if (tx.TransactionType === "CheckCash" && tx.CheckID) {
+              cashedCheckIds.add(String(tx.CheckID));
+            } else if (tx.TransactionType === "CheckCancel" && tx.CheckID) {
+              cancelledCheckIds.add(String(tx.CheckID));
+            }
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      const nowRipple = rippleEpochNow();
+      let cashedRecognition = 0;
+      let finalRecognition = 0;
+      let cancelledRecognition = 0;
+      let expiredRecognition = 0;
+
+      for (const [checkId, check] of createdChecks) {
+        if (cashedCheckIds.has(checkId)) {
+          cashedRecognition += 1;
+          finalRecognition += 1;
+        } else if (cancelledCheckIds.has(checkId)) {
+          cancelledRecognition += 1;
+          finalRecognition += 1;
+        } else if (check.expiration > 0 && check.expiration <= nowRipple) {
+          expiredRecognition += 1;
+          finalRecognition += 1;
+        }
+      }
+
+      const recognitionCashRate = finalRecognition > 0
+        ? (cashedRecognition / finalRecognition) * 100
+        : NaN;
+
+      const data = {
+        distributed30,
+        recognitionCashRate,
+        cashedRecognition,
+        finalRecognition,
+        cancelledRecognition,
+        expiredRecognition,
+        recognitionCreated: createdChecks.size
+      };
+
+      communityActivityCache = { loadedAt: Date.now(), data };
+      return data;
+    }
+
+    async function loadLeapDashboard() {
+      setLoading();
+      let ws;
+
+      try {
+        await resolveCommunityRuntime();
+        ws = await openSocket();
+        let marker;
+        let ledgerIndex = "validated";
+        let requestNumber = 0;
+        const nextId = prefix => `${prefix}-${++requestNumber}`;
+
+        // Protocol-valid allocation memos identify the community independently
+        // from the delivery wallet. Discover those delivery wallets so an older
+        // wallet does not become "wild" merely because the Operating Wallet changed.
+        await discoverAllocationDeliveryAccounts(ws, nextId);
+
+        let outstanding = 0;
+        let communityLeap = 0;
+        let distributorLeap = 0;
+        let wildLeap = 0;
+        let holders = 0;
+        let trustlines = 0;
+        const wildHoldings = [];
+
+        do {
+          const command = {
+            command: "account_lines",
+            account: issuer,
+            ledger_index: ledgerIndex,
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-leap"));
+          if (Number.isInteger(result.ledger_index)) ledgerIndex = result.ledger_index;
+
+          const lines = Array.isArray(result.lines) ? result.lines : [];
+          for (const line of lines) {
+            if (!isLeapCurrency(line.currency)) continue;
+            trustlines += 1;
+
+            // account_lines is from the issuer's perspective. A negative issuer
+            // balance means the counterparty holds that amount of issued LEAP.
+            const issuerPerspectiveBalance = Number(line.balance);
+            if (!Number.isFinite(issuerPerspectiveBalance) || issuerPerspectiveBalance >= 0) continue;
+
+            const held = -issuerPerspectiveBalance;
+            outstanding += held;
+
+            if (communityAccounts.has(line.account)) {
+              communityLeap += held;
+            } else if (distributorAccounts.has(line.account)) {
+              distributorLeap += held;
+            } else {
+              wildLeap += held;
+              holders += 1;
+              wildHoldings.push(held);
+            }
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+
+        setMetric(metricOutstanding, formatLeap(outstanding));
+        setMetric(metricCommunity, formatLeap(communityLeap));
+        setMetric(metricWild, formatLeap(wildLeap));
+        setMetric(metricHolders, holders.toLocaleString());
+        setMetric(metricTrustlines, trustlines.toLocaleString());
+        setMetric(metricCirculationRate, formatPercent(outstanding > 0 ? (wildLeap / outstanding) * 100 : 0));
+
+        const communityInfo = document.querySelector('[data-info-title="Community LEAP"]');
+        if (communityInfo) {
+          communityInfo.dataset.infoText = `${formatLeap(communityLeap)} LEAP is held in community-associated wallets. ${formatLeap(distributorLeap)} LEAP remains in Distributor inventory and is excluded from both Community LEAP and LEAP in the Wild.`;
+        }
+
+        const activeInfo = document.querySelector('[data-info-title="Active Communities"]');
+        if (activeInfo) {
+          activeInfo.dataset.infoText = `${activeCommunityIds.size.toLocaleString()} ${activeCommunityIds.size === 1 ? "community is" : "communities are"} currently represented by the Community Registry with Operating Wallet or allocation activity.`;
+        }
+
+        // Footprint comes from the Community Registry plus protocol-valid
+        // community allocation activity. Distributor accounts are never counted
+        // as communities.
+        setMetric(metricActiveCommunities, activeCommunityIds.size.toLocaleString());
+
+        const sortedWildHoldings = wildHoldings.slice().sort((a, b) => b - a);
+        const topFiveWild = sortedWildHoldings.slice(0, 5).reduce((sum, value) => sum + value, 0);
+        const holderConcentration = wildLeap > 0 ? (topFiveWild / wildLeap) * 100 : 0;
+        setMetric(metricHolderConcentration, formatPercent(holderConcentration));
+
+        const concentrationInfo = document.querySelector('[data-info-title="Holder Concentration"]');
+        if (concentrationInfo) {
+          concentrationInfo.dataset.infoCalc = `Share of LEAP in the Wild held by the five largest non-community holders. With fewer than five holders, the calculation uses all current holders.`;
+          concentrationInfo.dataset.infoText = `The largest ${Math.min(5, holders).toLocaleString()} current ${holders === 1 ? "holder owns" : "holders own"} ${formatPercent(holderConcentration)} of LEAP in the Wild.`;
+        }
+
+        // Pending recognition uses current validated ledger objects.
+        try {
+          const pending = await loadPendingRecognition(ws, nextId);
+          setMetric(metricPendingRecognition, formatLeap(pending.pendingLeap));
+          const pendingInfo = document.querySelector('[data-info-title="Pending Recognition"]');
+          if (pendingInfo) {
+            pendingInfo.dataset.infoText = `${formatLeap(pending.pendingLeap)} LEAP across ${pending.checkCount.toLocaleString()} outstanding recognition ${pending.checkCount === 1 ? "Check" : "Checks"}. These Checks have been created but not yet cashed.`;
+          }
+        } catch (error) {
+          console.error("Wild Ledger pending recognition:", error);
+          setMetric(metricPendingRecognition, "—");
+        }
+
+        // Historical activity powers Momentum, Completion, and Reserves.
+        // It is cached briefly because account_tx is the heaviest dashboard query.
+        try {
+          const activity = await loadCommunityActivity(ws, nextId);
+          setMetric(metricThirtyDayDistribution, formatLeap(activity.distributed30));
+          setMetric(metricRecognitionCashRate, formatPercent(activity.recognitionCashRate));
+
+          const cashInfo = document.querySelector('[data-info-title="Recognition Cash Rate"]');
+          if (cashInfo) {
+            cashInfo.dataset.infoText = Number.isFinite(activity.recognitionCashRate)
+              ? `${activity.cashedRecognition.toLocaleString()} of ${activity.finalRecognition.toLocaleString()} recognition Checks with a final outcome were cashed (${formatPercent(activity.recognitionCashRate)}). Pending Checks are not counted as failures.`
+              : `No recognition Checks have reached a final outcome yet, so there is not enough history to calculate a cash rate.`;
+          }
+
+          const runwayDays = activity.distributed30 > 0
+            ? communityLeap / (activity.distributed30 / 30)
+            : (communityLeap > 0 ? Infinity : NaN);
+          setMetric(metricInventoryRunway, formatRunwayDays(runwayDays));
+
+          const runwayInfo = document.querySelector('[data-info-title="Inventory Runway"]');
+          if (runwayInfo) {
+            runwayInfo.dataset.infoText = activity.distributed30 > 0
+              ? `At the last 30 days’ distribution pace, current community inventory would last about ${formatRunwayDays(runwayDays)}.`
+              : `There was no LEAP distribution during the last 30 days, so current inventory does not have a meaningful finite runway at the recent pace.`;
+          }
+        } catch (error) {
+          console.error("Wild Ledger historical activity:", error);
+          setMetric(metricThirtyDayDistribution, "—");
+          setMetric(metricRecognitionCashRate, "—");
+          setMetric(metricInventoryRunway, "—");
+        }
+
+        if (metricsSection) {
+          metricsSection.title = `Validated XRPL ledger ${ledgerIndex}. Communities come from the Community Registry; Operating Wallet authority comes from XRPL; Distributor inventory is tracked separately.`;
+        }
+        fitAllMetricValues();
+      } catch (error) {
+        console.error("Wild Ledger owner dashboard:", error);
+        setUnavailable(error?.message || "XRPL data unavailable.");
+      } finally {
+        if (ws) {
+          try { ws.close(); } catch (_) {}
+        }
+      }
+    }
+
+    const metricInfoScrim = document.getElementById("metricInfoScrim");
+    const metricInfoTitle = document.getElementById("metricInfoTitle");
+    const metricInfoCalc = document.getElementById("metricInfoCalc");
+    const metricInfoText = document.getElementById("metricInfoText");
+    const metricInfoAction = document.getElementById("metricInfoAction");
+    const metricInfoClose = document.getElementById("metricInfoClose");
+
+    document.querySelectorAll(".metric-info").forEach(button => {
+      button.addEventListener("click", () => {
+        metricInfoTitle.textContent = button.dataset.infoTitle || "Metric";
+        metricInfoCalc.textContent = button.dataset.infoCalc || "";
+        metricInfoText.textContent = button.dataset.infoText || "";
+        metricInfoAction.textContent = button.dataset.infoAction || "";
+        metricInfoScrim.classList.add("open");
+        setTimeout(() => metricInfoClose.focus(), 0);
+      });
+    });
+
+    function closeMetricInfo() {
+      metricInfoScrim.classList.remove("open");
+    }
+
+    metricInfoClose.addEventListener("click", closeMetricInfo);
+    metricInfoScrim.addEventListener("click", event => {
+      if (event.target === metricInfoScrim) closeMetricInfo();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && metricInfoScrim.classList.contains("open")) closeMetricInfo();
+    });
+
+
+    const ownerLogout = document.getElementById("ownerLogout");
+    if (ownerLogout) {
+      ownerLogout.addEventListener("click", () => {
+        sessionStorage.removeItem("wildLedgerRole");
+        sessionStorage.removeItem("wildLedgerCommunity");
+        window.location.href = "getWild.html";
+      });
+    }
+
+    loadLeapDashboard();
+    window.addEventListener("resize", fitAllMetricValues);
+    window.addEventListener("orientationchange", () => setTimeout(fitAllMetricValues, 120));
+
+    // Keep the dashboard fresh without turning the static owner page into a
+    // constantly connected client. Refresh only while the page is visible.
+    setInterval(() => {
+      if (!document.hidden) loadLeapDashboard();
+    }, 60000);
+  })();
+  </script>
+
+</body>
+</html>

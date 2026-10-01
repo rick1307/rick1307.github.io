@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create LEAP Check</title>
+  <style>
+    :root {
+      --ink: #10243a;
+      --muted: #66788b;
+      --line: #dbe4ec;
+      --soft: #f4f7fa;
+      --panel: #ffffff;
+      --blue: #0b5fa5;
+      --blue-dark: #084b82;
+      --green: #20734d;
+      --green-soft: #eaf7f1;
+      --amber: #9b6800;
+      --amber-soft: #fff6d8;
+      --red: #a13a3a;
+      --red-soft: #fff0f0;
+      --shadow: 0 12px 34px rgba(16, 36, 58, .10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    .wrap {
+      width: min(92%, 680px);
+      margin: 34px auto 70px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 40px);
+      letter-spacing: -.02em;
+    }
+
+    .back {
+      flex: 0 0 auto;
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .intro {
+      margin: -4px 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .prototype {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border: 1px solid #ead492;
+      border-radius: 12px;
+      background: var(--amber-soft);
+      color: #624c0e;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .prototype strong { color: #4d3b08; }
+
+    .statusbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #8a97a5;
+    }
+
+    .dot.live { background: var(--green); }
+    .dot.error { background: var(--red); }
+
+    #statusText { font-weight: 800; }
+
+    .refresh {
+      margin-left: auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--blue);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 20px 22px 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-head h2 {
+      margin: 0 0 5px;
+      font-size: 20px;
+    }
+
+    .panel-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .form-body { padding: 22px; }
+
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .02em;
+    }
+
+    .hint {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid #c9d5df;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+      font: inherit;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(11, 95, 165, .10);
+    }
+
+    select:disabled {
+      background: #eef2f5;
+      color: #8493a0;
+    }
+
+    .fixed-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 4px 0 18px;
+    }
+
+    .fixed-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 13px;
+      background: var(--soft);
+    }
+
+    .fixed-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 4px;
+    }
+
+    .fixed-card strong { font-size: 17px; }
+
+    .memo-box {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 12px 13px;
+      border: 1px solid #cdd9e3;
+      border-radius: 10px;
+      background: #f7fafc;
+      color: #15334b;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .memo-box.empty { color: #8795a1; }
+
+    .primary {
+      width: 100%;
+      min-height: 50px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .primary:hover { background: var(--blue-dark); }
+    .primary:disabled { opacity: .45; cursor: not-allowed; }
+
+    .review {
+      display: none;
+      margin-top: 18px;
+      border: 1px solid #bdd8cb;
+      border-radius: 16px;
+      background: var(--green-soft);
+      overflow: hidden;
+    }
+
+    .review.show { display: block; }
+
+    .review-head {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid #cde1d7;
+    }
+
+    .review-head h2 {
+      margin: 0 0 4px;
+      font-size: 19px;
+      color: #164d37;
+    }
+
+    .review-head p {
+      margin: 0;
+      color: #456c5a;
+      font-size: 12px;
+    }
+
+    .review-body { padding: 17px 18px 18px; }
+
+    .review-row {
+      display: grid;
+      grid-template-columns: 105px minmax(0, 1fr);
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(32,115,77,.14);
+    }
+
+    .review-row:last-of-type { border-bottom: 0; }
+
+    .review-row span {
+      color: #527363;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .review-row strong {
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .review-row code {
+      color: #153f2d;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+
+
+    .not-wired {
+      margin: 8px 0 0;
+      text-align: center;
+      color: #527363;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .errorbox {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border: 1px solid #e5bebe;
+      border-radius: 11px;
+      background: var(--red-soft);
+      color: #7c2929;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .footnote {
+      margin: 16px 2px 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 560px) {
+      .wrap { width: min(94%, 680px); margin-top: 22px; }
+      .top { align-items: flex-start; }
+      .panel-head, .form-body { padding-left: 17px; padding-right: 17px; }
+      .fixed-grid { grid-template-columns: 1fr; }
+      .review-row { grid-template-columns: 88px minmax(0, 1fr); }
+    }
+  
+
+    /* SFL shared button motion standard */
+    button,
+    a.button{
+      transition:
+        transform .16s ease,
+        filter .16s ease,
+        box-shadow .16s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        color .16s ease;
+    }
+
+    @media (hover:hover) and (pointer:fine){
+      button:not(:disabled):hover,
+      a.button:hover{
+        transform:translateY(-1px);
+      }
+    }
+
+    button:not(:disabled):active,
+    a.button:active{
+      transform:translateY(0) scale(.985);
+    }
+
+    button:disabled{
+      transform:none;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      button,
+      a.button{
+        transition:none !important;
+      }
+
+      button:not(:disabled):hover,
+      a.button:hover,
+      button:not(:disabled):active,
+      a.button:active{
+        transform:none !important;
+      }
+    }
+</style>
+  <link rel="stylesheet" href="wildLedgerControls.css">
+  <link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+  <main class="wrap">
+    <div class="top wl-nav-right">
+      <a class="back wl-header-control" href="operatorCheckbook.html">Checkbook →</a>
+    </div>
+    <h1>Create LEAP Check</h1>
+
+    <p class="intro">
+      Build one LEAP Check from the Badge / Event / Challenge registry already recorded on the XRP Ledger.
+    </p>
+
+    <div class="prototype">
+      <strong>Canonical Check builder.</strong> This page reads live XRPL history, suppresses normal duplicate recognitions for the destination, and builds the Check draft. Review is the next step; Bifrost signs and Wild Ledger submits from there.
+    </div>
+
+    <div class="statusbar">
+      <span id="statusDot" class="dot"></span>
+      <span id="statusText">XRPL: waiting…</span>
+      <span id="updatedText"></span>
+      <button id="refreshButton" class="refresh" type="button">Refresh</button>
+    </div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>New Check</h2>
+        <p>Paste the destination first. Recognition choices come from validated XRPL history and are filtered for that recipient.</p>
+      </div>
+
+      <form id="checkForm" class="form-body" novalidate>
+        <div class="field">
+          <label for="destination">Destination XRP Ledger address</label>
+          <input id="destination" name="destination" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="r…" />
+          <span class="hint">The member wallet that will receive the Check.</span>
+        </div>
+
+        <div class="field">
+          <label for="reason">Reason</label>
+          <select id="reason" name="reason">
+            <option value="">Choose Badge, Event, or Challenge</option>
+            <option value="BADGE">Badge</option>
+            <option value="EVENT">Event</option>
+            <option value="CHALLENGE">Challenge</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label id="recognitionLabel" for="recognition">Recognition</label>
+          <select id="recognition" name="recognition" disabled>
+            <option value="">Choose a reason first</option>
+          </select>
+          <span id="recognitionHint" class="hint">The choices are populated from existing authorized LEAP recognition records on XRPL.</span>
+        </div>
+
+        <div class="field">
+          <label for="amount">LEAP amount</label>
+          <input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 1 or 5" />
+          <span class="hint">Positive whole LEAP only. New Checks do not expire on-ledger; the Operator Checkbook flags them red for cleanup after 7 days.</span>
+        </div>
+
+        <div class="field">
+          <label>Canonical public memo</label>
+          <div id="memoPreview" class="memo-box empty">Choose a reason and recognition.</div>
+        </div>
+
+        <button id="reviewButton" class="primary" type="submit" disabled>Review Check</button>
+      </form>
+    </section>
+
+    <div id="errorBox" class="errorbox"></div>
+
+    <p class="footnote">
+      Registry rule: active Badge, Event, and Challenge choices come from canonical Community Operating Wallet lifecycle history, with backward-compatible legacy recognition history. Current recognition Checks are created by the Community Operating Wallet. For a specific destination, the same exact recognition is hidden while pending or after redemption; canceled or legacy-expired unredeemed Checks reopen it.
+    </p>
+  </main>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script src="js/communityConfig.js" data-registry-only="true"></script>
+  <script type="module">
+    import { DirectXRPLClient, isClassicAddress } from "./js/xrplTransport.js";
+    import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorityCache } from "./js/communityAuthority.js";
+
+    const params = new URLSearchParams(location.search);
+    const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "operator").trim().toLowerCase();
+    const role = requestedRole === "owner" ? "owner" : "operator";
+    const requestedCommunity = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
+    const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunity) || null;
+    const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedCommunity) || String(requestedCommunity).trim().toUpperCase();
+    const config = window.WILD_LEDGER_CONFIG || {};
+    const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
+    const LEAP_ISSUER = String(config.leapIssuer || "").trim();
+    const LEAP_CURRENCY = String(config.leapCurrency || "").trim();
+    const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
+    const NAMESPACE = community?.leapNamespace || `${communityId}-LEAP`;
+    const CATEGORIES = ["BADGE", "EVENT", "CHALLENGE"];
+    const ACCOUNTSET_SPECIFIC_FIELDS = ["ClearFlag","Domain","EmailHash","MessageKey","NFTokenMinter","SetFlag","TransferRate","TickSize","WalletLocator","WalletSize"];
+
+    let authority = null;
+    let operatingWallet = "";
+    let canonicalLeapCurrency = LEAP_CURRENCY;
+
+    const registry = { BADGE:new Set(), EVENT:new Set(), CHALLENGE:new Set() };
+    const legacyRegistry = { BADGE:new Set(), EVENT:new Set(), CHALLENGE:new Set() };
+    const lifecycle = { BADGE:new Map(), EVENT:new Map(), CHALLENGE:new Map() };
+    const issues = [];
+    const resolutions = new Map();
+
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const updatedText = document.getElementById("updatedText");
+    const refreshButton = document.getElementById("refreshButton");
+    const errorBox = document.getElementById("errorBox");
+    const form = document.getElementById("checkForm");
+    const destination = document.getElementById("destination");
+    const reason = document.getElementById("reason");
+    const recognition = document.getElementById("recognition");
+    const recognitionLabel = document.getElementById("recognitionLabel");
+    const recognitionHint = document.getElementById("recognitionHint");
+    const memoPreview = document.getElementById("memoPreview");
+    const amount = document.getElementById("amount");
+    const reviewButton = document.getElementById("reviewButton");
+
+    document.title = `Create LEAP Check | ${community?.communityName || communityId}`;
+
+    function setStatus(text, state="") { statusText.textContent=text; statusDot.className="dot"+(state?" "+state:""); }
+    function showError(message) { errorBox.style.display="block"; errorBox.textContent=message; }
+    function clearError() { errorBox.style.display="none"; errorBox.textContent=""; }
+
+    function hexToText(value) {
+      if (!value || typeof value !== "string") return "";
+      if (!/^[A-Fa-f0-9]+$/.test(value) || value.length % 2 !== 0) return value;
+      try { return new TextDecoder("utf-8", {fatal:false}).decode(new Uint8Array(value.match(/.{2}/g).map(x=>parseInt(x,16)))).replace(/\0+$/g, ""); }
+      catch { return value; }
+    }
+    function decodeCurrency(value) {
+      const code=String(value||"");
+      if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
+      try { let out=""; for(let i=0;i<code.length;i+=2){const n=parseInt(code.slice(i,i+2),16); if(n===0)break; out+=String.fromCharCode(n);} return out; }
+      catch { return code; }
+    }
+    function isLeapAmount(value) {
+      return !!value && typeof value === "object" && value.issuer === LEAP_ISSUER && decodeCurrency(value.currency).toUpperCase() === "LEAP" && Number(value.value) > 0;
+    }
+    function normalizeTx(entry){ return entry?.tx_json || entry?.tx || entry?.transaction || entry || {}; }
+    function transactionSucceeded(entry){ if(entry?.validated===false)return false; const meta=entry?.meta||entry?.metaData||entry?.metadata||{}; const result=meta?.TransactionResult??meta?.transaction_result; return !result||result==="tesSUCCESS"; }
+    function ledgerIndex(entry,tx=normalizeTx(entry)){ const n=Number(entry?.ledger_index??entry?.ledgerIndex??tx?.ledger_index??tx?.ledgerIndex); return Number.isFinite(n)?n:null; }
+    function transactionIndex(entry){ const meta=entry?.meta||entry?.metaData||entry?.metadata||{}; const n=Number(entry?.tx_index??entry?.transaction_index??meta?.TransactionIndex??meta?.transaction_index); return Number.isFinite(n)?n:null; }
+    function txOrder(entry){ return {ledger:ledgerIndex(entry), txIndex:transactionIndex(entry)}; }
+    function compareOrder(a,b){ if(a.ledger!==b.ledger)return a.ledger-b.ledger; return (Number.isFinite(a.txIndex)?a.txIndex:-1)-(Number.isFinite(b.txIndex)?b.txIndex:-1); }
+    function beforeInitial(entry){
+      if(!authority?.initialStatement) return true;
+      const a=txOrder(entry), b={ledger:Number(authority.initialStatement.ledger),txIndex:Number.isFinite(authority.initialStatement.txIndex)?Number(authority.initialStatement.txIndex):-1};
+      if(!Number.isFinite(a.ledger)) return false;
+      return compareOrder(a,b)<0;
+    }
+    function memoTexts(tx){ const out=[]; for(const w of Array.isArray(tx?.Memos)?tx.Memos:[]){const m=w?.Memo||{}; for(const f of [m.MemoData,m.MemoType,m.MemoFormat]){const t=hexToText(f).trim(); if(t)out.push(t);}} return out; }
+    function isCanonicalNoOpAccountSet(tx){ return tx?.TransactionType==="AccountSet" && Number(tx.Flags||0)===0 && ACCOUNTSET_SPECIFIC_FIELDS.every(f=>!(f in tx)); }
+    function validId(category,value){ return category==="CHALLENGE" ? /^LEAP-\d{3,}$/.test(value) : /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(value); }
+
+    function parseCanonicalRecognition(text){
+      const raw=String(text||"").trim(); const prefix=`${NAMESPACE}/`; if(!raw.startsWith(prefix))return null;
+      const payload=raw.slice(prefix.length); const i=payload.indexOf("="); if(i<=0)return null;
+      const key=payload.slice(0,i).trim().toUpperCase(), value=payload.slice(i+1).trim();
+      if(!CATEGORIES.includes(key)||!validId(key,value)||raw!==`${NAMESPACE}/${key}=${value}`)return null;
+      return {key,value};
+    }
+    function recognitionFacts(tx){ const seen=new Set(),out=[]; for(const text of memoTexts(tx)){const f=parseCanonicalRecognition(text); if(!f)continue; const sig=`${f.key}=${f.value}`; if(!seen.has(sig)){seen.add(sig);out.push(f);}} return out; }
+    function lifecycleFact(entry){
+      const tx=normalizeTx(entry), ledger=ledgerIndex(entry,tx);
+      if(!authority||!transactionSucceeded(entry)||!isCanonicalNoOpAccountSet(tx)||!isAuthorizedAtLedger(authority,tx.Account,ledger,transactionIndex(entry)))return null;
+      const prefix=`${NAMESPACE}/RECOGNITION/`, suffix="/LIFECYCLE-TAG=", matches=[];
+      for(const text of memoTexts(tx)){
+        if(!text.startsWith(prefix))continue; const marker=text.indexOf(suffix,prefix.length); if(marker<0)continue;
+        const path=text.slice(prefix.length,marker), parts=path.split("/"), category=parts.shift(), id=parts.join("/"), action=text.slice(marker+suffix.length);
+        if(!CATEGORIES.includes(category)||!validId(category,id)||!["CREATE","END","IGNORE"].includes(action))continue;
+        if(text!==`${NAMESPACE}/RECOGNITION/${category}/${id}/LIFECYCLE-TAG=${action}`)continue;
+        matches.push({category,id,action,ledger});
+      }
+      return matches.length===1?matches[0]:null;
+    }
+    function applyLifecycle(f){
+      if(!f)return; const map=lifecycle[f.category], current=map.get(f.id)||null;
+      if(f.action==="CREATE"){ if(!current)map.set(f.id,{state:"ACTIVE",ledger:f.ledger}); return; }
+      if(f.action==="IGNORE"){ map.set(f.id,{state:"IGNORED",ledger:f.ledger}); return; }
+      if(f.action==="END" && current?.state!=="IGNORED") map.set(f.id,{state:"ENDED",ledger:f.ledger});
+    }
+    function createdCheckId(meta){ for(const w of Array.isArray(meta?.AffectedNodes)?meta.AffectedNodes:[]){const n=w?.CreatedNode; if(n?.LedgerEntryType==="Check"&&n?.LedgerIndex)return n.LedgerIndex;} return ""; }
+    function canonicalRecognitionCheck(entry){
+      const tx=normalizeTx(entry), ledger=ledgerIndex(entry,tx);
+      if(tx?.TransactionType!=="CheckCreate"||!transactionSucceeded(entry)||!isLeapAmount(tx.SendMax))return false;
+      if(authority && isAuthorizedAtLedger(authority,tx.Account,ledger,transactionIndex(entry))) return true;
+      return beforeInitial(entry) && LEGACY_DISTRIBUTORS.includes(String(tx.Account||""));
+    }
+    function legacyVocabularyAllowed(entry){
+      const tx=normalizeTx(entry), ledger=ledgerIndex(entry,tx);
+      if(!beforeInitial(entry))return false;
+      return (authority && isAuthorizedAtLedger(authority,tx.Account,ledger,transactionIndex(entry))) || LEGACY_DISTRIBUTORS.includes(String(tx.Account||""));
+    }
+    function processEntry(entry){
+      if(entry?.validated===false||!transactionSucceeded(entry))return;
+      const tx=normalizeTx(entry), meta=entry?.meta||entry?.metaData||entry?.metadata||{};
+      if(tx.TransactionType==="CheckCash"&&tx.CheckID){resolutions.set(String(tx.CheckID).toUpperCase(),"redeemed");return;}
+      if(tx.TransactionType==="CheckCancel"&&tx.CheckID){resolutions.set(String(tx.CheckID).toUpperCase(),"canceled");return;}
+      const lf=lifecycleFact(entry); if(lf){applyLifecycle(lf);return;}
+      if(tx.TransactionType!=="CheckCreate"||!canonicalRecognitionCheck(entry))return;
+      if(!canonicalLeapCurrency&&tx.SendMax?.currency)canonicalLeapCurrency=String(tx.SendMax.currency);
+      const facts=recognitionFacts(tx), checkId=createdCheckId(meta);
+      for(const fact of facts){
+        if(legacyVocabularyAllowed(entry)) legacyRegistry[fact.key].add(fact.value);
+        issues.push({checkId:checkId?checkId.toUpperCase():"",destination:String(tx.Destination||""),key:fact.key,value:fact.value,memo:`${NAMESPACE}/${fact.key}=${fact.value}`,expiration:Number(tx.Expiration||0)||null});
+      }
+    }
+    function rebuildRegistry(){
+      for(const key of CATEGORIES){
+        registry[key].clear();
+        for(const value of legacyRegistry[key]){ const state=lifecycle[key].get(value)?.state; if(state!=="ENDED"&&state!=="IGNORED")registry[key].add(value); }
+        for(const [value,record] of lifecycle[key]) if(record.state==="ACTIVE")registry[key].add(value);
+      }
+    }
+    function rippleNow(){return Math.floor(Date.now()/1000)-946684800;}
+    function issueState(issue){const r=issue.checkId?resolutions.get(issue.checkId):""; if(r)return r; if(issue.expiration&&issue.expiration<=rippleNow())return "expired"; return "pending";}
+    function recognitionEligible(address,key,value){return !issues.filter(x=>x.destination===address&&x.key===key&&x.value===value).some(x=>["pending","redeemed"].includes(issueState(x)));}
+    function sortValues(key,values){return [...values].sort((a,b)=>{if(key==="CHALLENGE"){const am=a.match(/(\d+)$/),bm=b.match(/(\d+)$/);if(am&&bm){const d=Number(am[1])-Number(bm[1]);if(d)return d;}} return a.localeCompare(b,undefined,{sensitivity:"base",numeric:true});});}
+    function reasonWord(key){return key==="BADGE"?"badge":key==="EVENT"?"event":key==="CHALLENGE"?"challenge":"recognition";}
+    function prettyRecognition(value){return String(value||"").split("-").filter(Boolean).map(part=>/^\d+$/.test(part)||part==="LEAP"||part==="OG"?part:part.charAt(0).toUpperCase()+part.slice(1).toLowerCase()).join(" ");}
+    function currentMemo(){return reason.value&&recognition.value?`${NAMESPACE}/${reason.value}=${recognition.value}`:"";}
+    function validLeapAmount(value){return /^[1-9]\d{0,14}$/.test(String(value||"").trim());}
+
+    function renderRecognitionChoices(){
+      const key=reason.value,address=destination.value.trim(); recognition.replaceChildren();
+      if(!isClassicAddress(address)){recognition.disabled=true;recognitionLabel.textContent="Recognition";recognitionHint.textContent="Paste a valid destination address first so duplicate recognitions can be suppressed.";recognition.append(new Option("Enter destination first",""));updatePreview();return;}
+      if(!key){recognition.disabled=true;recognitionLabel.textContent="Recognition";recognitionHint.textContent="Choices come from canonical lifecycle state plus backward-compatible legacy recognition history.";recognition.append(new Option("Choose a reason first",""));updatePreview();return;}
+      const word=reasonWord(key), all=sortValues(key,registry[key]), values=all.filter(v=>recognitionEligible(address,key,v)), suppressed=all.length-values.length;
+      recognitionLabel.textContent=word.charAt(0).toUpperCase()+word.slice(1); recognition.append(new Option("Choose a "+word,"")); for(const value of values)recognition.append(new Option(prettyRecognition(value),value)); recognition.disabled=values.length===0;
+      if(all.length===0){recognition.replaceChildren(new Option("None active on XRPL yet",""));recognitionHint.textContent=`No active ${word}s were found in canonical lifecycle state.`;}
+      else if(values.length===0){recognition.replaceChildren(new Option("No eligible "+word+"s",""));recognitionHint.textContent=`Every active ${word} is pending or already redeemed for this destination.`;}
+      else recognitionHint.textContent=values.length+" available"+(suppressed?`; ${suppressed} duplicate ${suppressed===1?"recognition":"recognitions"} suppressed.`:".");
+      updatePreview();
+    }
+    function updatePreview(){const memo=currentMemo(); memoPreview.textContent=memo||"Choose a reason and recognition."; memoPreview.classList.toggle("empty",!memo); reviewButton.disabled=!(authority?.authorityEstablished&&operatingWallet&&isClassicAddress(destination.value.trim())&&memo&&validLeapAmount(amount.value));}
+    function resetRegistry(){for(const key of CATEGORIES){registry[key].clear();legacyRegistry[key].clear();lifecycle[key].clear();}issues.length=0;resolutions.clear();canonicalLeapCurrency=LEAP_CURRENCY;renderRecognitionChoices();}
+
+    async function readHistory(client,account){let marker,rows=[];do{const fields={account,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};if(marker!==undefined)fields.marker=marker;const r=await client.request("account_tx",fields,30000);const result=r.result||{};rows.push(...(Array.isArray(result.transactions)?result.transactions:[]));marker=result.marker;}while(marker!==undefined&&marker!==null);return rows;}
+    function uniqueSortedEntries(entries){
+      const map=new Map(); for(const e of entries){const tx=normalizeTx(e),hash=String(e?.hash||e?.tx_hash||tx?.hash||""),key=hash||`${ledgerIndex(e,tx)}:${transactionIndex(e)}:${tx.TransactionType}:${tx.Account||""}`;if(!map.has(key))map.set(key,e);}
+      return [...map.values()].sort((a,b)=>compareOrder(txOrder(a),txOrder(b)));
+    }
+    function restoreDraft(){let draft=null;try{draft=JSON.parse(sessionStorage.getItem("leapCheckDraft")||"null");}catch{} if(!draft||draft.communityId&&draft.communityId!==communityId)return; destination.value="";amount.value=draft.amount||"";reason.value=CATEGORIES.includes(draft.reason)?draft.reason:"";renderRecognitionChoices();if(draft.recognition&&[...recognition.options].some(o=>o.value===draft.recognition))recognition.value=draft.recognition;updatePreview();}
+
+    async function start(){
+      clearError();refreshButton.disabled=true;resetRegistry();setStatus("XRPL: resolving authority…");
+      const client=new DirectXRPLClient(XRPL_SERVER);
+      try{
+        clearCommunityAuthorityCache(); authority=await resolveCommunityAuthority({community,serverUrl:XRPL_SERVER,force:true});
+        if(authority.initialStatementNeeded)throw new Error("First on-ledger Operating Wallet statement required before new recognition Checks. Use Manage Operating Wallet first.");
+        operatingWallet=authority.currentAccount; if(!isClassicAddress(operatingWallet))throw new Error("Canonical Community Operating Wallet could not be resolved.");
+        await client.connect();
+        const accounts=[...new Set([...authority.accounts,...LEGACY_DISTRIBUTORS].filter(isClassicAddress))];
+        const pages=await Promise.all(accounts.map(account=>readHistory(client,account)));
+        for(const entry of uniqueSortedEntries(pages.flat()))processEntry(entry);
+        rebuildRegistry();
+        setStatus(`XRPL: ${community?.communityName||communityId} registry loaded`,"live"); updatedText.textContent="Updated "+new Intl.DateTimeFormat(undefined,{hour:"numeric",minute:"2-digit"}).format(new Date());
+        renderRecognitionChoices();restoreDraft();
+      }catch(error){authority=null;operatingWallet="";setStatus("XRPL: connection problem","error");showError(error?.message||String(error));updatePreview();}
+      finally{client.close();refreshButton.disabled=false;}
+    }
+
+    form.addEventListener("submit",event=>{
+      event.preventDefault();clearError(); const address=destination.value.trim(),memo=currentMemo(),leapAmount=amount.value.trim();
+      if(!authority?.authorityEstablished||!isClassicAddress(operatingWallet)){showError("Canonical Community Operating Wallet authority is not established on XRPL.");return;}
+      if(!isClassicAddress(address)){showError("Enter a valid XRP Ledger classic address before reviewing the Check.");destination.focus();return;}
+      if(!memo){showError("Choose a Badge, Event, or Challenge recognition first.");return;}
+      if(!validLeapAmount(leapAmount)){showError("Enter a positive whole-number LEAP amount.");amount.focus();return;}
+      const draft={communityId,destination:address,reason:reason.value,recognition:recognition.value,memo,amount:leapAmount,createdAt:new Date().toISOString(),operatingWallet,leapIssuer:LEAP_ISSUER,leapCurrency:canonicalLeapCurrency||LEAP_CURRENCY};
+      sessionStorage.setItem("leapCheckDraft",JSON.stringify(draft));
+      window.location.href=`operatorCheckReview.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+    });
+    destination.addEventListener("input",renderRecognitionChoices);amount.addEventListener("input",updatePreview);reason.addEventListener("change",renderRecognitionChoices);recognition.addEventListener("change",updatePreview);refreshButton.addEventListener("click",start);
+    window.addEventListener("pageshow",()=>{destination.value="";renderRecognitionChoices();}); destination.value=""; start();
+  </script>
+</body>
+</html>
