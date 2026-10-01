@@ -428,7 +428,7 @@
         if (!community) throw new Error("Community configuration was not found.");
         if (forceAuthority) clearCommunityAuthorityCache();
         authority = await resolveCommunityAuthority({ community, serverUrl:xrplServer, force:forceAuthority });
-        if (authority.initialStatementNeeded) throw new Error("Protocol 0.15 initial Operating Wallet statement required. Publish the community's first canonical OPERATING-WALLET statement before creating new recognition.");
+        if (authority.initialStatementNeeded) throw new Error("LEAP Protocol 1.0 requires the community's initial canonical OPERATING-WALLET statement before creating new recognition. Publish that statement first.");
         operatingWallet = authority.currentAccount;
         setStatus(authorityStatus, `${operatingWallet} — canonical XRPL authority; ${authority.transitions.length} routine rotation${authority.transitions.length === 1 ? "" : "s"} resolved.`, "good");
         await client.connect();

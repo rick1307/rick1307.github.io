@@ -769,7 +769,7 @@
 
     // These sets intentionally model different architectural roles.
     // Distributor accounts provision communities. They are not communities.
-    // Operating accounts are resolved from Protocol 0.15 authority state.
+    // Operating accounts are resolved from LEAP Protocol 1.0 authority state.
     // Allocation delivery accounts preserve community-held inventory even when
     // a community later changes its Operating Wallet.
     const operatingAccounts = new Set();
@@ -940,9 +940,9 @@
       activeCommunityIds.clear();
 
       for (const community of communityRecords) {
-        // Protocol 0.15 still uses the documented pre-authority-state wallet
-        // only as the migration anchor. Communities without one are not yet
-        // provisioned for canonical operating authority.
+        // LEAP Protocol 1.0 uses the documented pre-authority-state wallet
+        // only as the existing-community migration anchor. Communities without
+        // one are not yet provisioned for canonical operating authority.
         if (!community?.operatingWallet) continue;
         const state = await resolveCommunityAuthority({
           community,

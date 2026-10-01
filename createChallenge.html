@@ -595,7 +595,7 @@
 
         try {
           authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer });
-          if (authority.initialStatementNeeded) throw new Error("Protocol 0.15 initial Operating Wallet statement required. Publish the community's first canonical OPERATING-WALLET statement before creating new recognition.");
+          if (authority.initialStatementNeeded) throw new Error("LEAP Protocol 1.0 requires the community's initial canonical OPERATING-WALLET statement before creating new recognition. Publish that statement first.");
           operatingWallet = authority.currentAccount;
           if (!operatingWallet) throw new Error("This community does not yet have a resolvable Community Operating Wallet.");
           authorityStatus.textContent = `${operatingWallet} — canonical XRPL authority; ${authority.transitions.length} routine rotation${authority.transitions.length === 1 ? "" : "s"} resolved.`;
