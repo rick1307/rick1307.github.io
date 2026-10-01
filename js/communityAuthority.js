@@ -1,21 +1,23 @@
 /*
-  Wild Ledger Community Authority resolver — LEAP Protocol 0.13.
+  Wild Ledger Community Authority resolver — LEAP Protocol 0.15.
 
   Canonical authority state is published as a validated no-op AccountSet:
     <COMMUNITY>-LEAP/AUTHORITY/OPERATING-WALLET=<XRPL-ADDRESS>
 
-  Rules:
-  - The LEAP Issuer may publish the first value for a community namespace.
-  - After bootstrap, the currently authorized Community Operating Wallet may
-    replace itself by publishing a later value for the same key.
+  Existing-community migration rule:
+  - The documented pre-authority-state Community Operating Wallet may publish
+    exactly one initial statement naming itself.
+  - After that statement validates, the currently authorized Community
+    Operating Wallet may replace itself by publishing a later value.
   - Latest valid value wins in canonical XRPL transaction order.
-  - No BEGIN/END records, successor acceptance, rotation IDs, or off-ledger
-    history tables are canonical protocol state.
-  - Emergency recovery is intentionally not implemented in Protocol 0.13.
+  - No BEGIN/END records, successor acceptance, rotation IDs, or separate
+    wallet-history table are canonical protocol state.
+  - Emergency recovery is intentionally not implemented yet.
 
-  community.operatingWallet is accepted only as a pre-0.13 compatibility value
-  for historical reads and as a suggested bootstrap value. Once an on-ledger
-  authority statement exists, validated XRPL history is authoritative.
+  community.operatingWallet is used only to identify the documented
+  pre-authority-state wallet for the one-time migration and historical reads.
+  Once the initial canonical statement exists, validated XRPL history is
+  authoritative.
 */
 
 import { DirectXRPLClient, isClassicAddress } from "./xrplTransport.js";
@@ -180,8 +182,8 @@ function sortStatements(statements) {
   return sorted;
 }
 
-function cacheKey({ namespace, issuerAccount, legacyOperatingWallet, serverUrl }) {
-  return `${serverUrl}|${namespace}|${issuerAccount}|${legacyOperatingWallet || ""}`;
+function cacheKey({ namespace, legacyOperatingWallet, serverUrl }) {
+  return `${serverUrl}|${namespace}|${legacyOperatingWallet || ""}`;
 }
 
 function statementOrder(statement) {
@@ -198,24 +200,19 @@ function intervalContains(interval, order) {
 export async function resolveCommunityAuthority({
   community,
   serverUrl,
-  issuerAccount = null,
   force = false,
   maxTransitions = 50
 }) {
   if (!community) throw new Error("Community configuration is required.");
   const namespace = String(community.leapNamespace || "").trim();
   if (!namespace) throw new Error("Community LEAP namespace is required.");
-
-  const issuer = String(issuerAccount || globalThis?.WILD_LEDGER_CONFIG?.leapIssuer || "").trim();
-  if (!isClassicAddress(issuer)) throw new Error("Canonical LEAP Issuer is required to resolve authority state.");
   if (!serverUrl) throw new Error("XRPL WebSocket URL is required.");
 
-  // Pre-0.13 compatibility only. This is never allowed to override a canonical
-  // on-ledger authority statement once bootstrap has occurred.
-  const legacyOperatingWallet = String(community.operatingWallet || "").trim();
-  const legacyWallet = isClassicAddress(legacyOperatingWallet) ? legacyOperatingWallet : "";
+  const configuredOperatingWallet = String(community.operatingWallet || "").trim();
+  const legacyWallet = isClassicAddress(configuredOperatingWallet) ? configuredOperatingWallet : "";
+  if (!legacyWallet) throw new Error("The existing pre-authority-state Community Operating Wallet is required for migration.");
 
-  const key = cacheKey({ namespace, issuerAccount: issuer, legacyOperatingWallet: legacyWallet, serverUrl });
+  const key = cacheKey({ namespace, legacyOperatingWallet: legacyWallet, serverUrl });
   if (!force && CACHE.has(key)) return clone(CACHE.get(key));
 
   const client = new DirectXRPLClient(serverUrl);
@@ -232,63 +229,60 @@ export async function resolveCommunityAuthority({
   try {
     await client.connect();
 
-    const issuerStatements = await statementsFor(issuer);
-    const bootstrap = issuerStatements[0] || null;
+    const migrationCandidates = (await statementsFor(legacyWallet)).filter(statement =>
+      statement.account === legacyWallet && statement.value === legacyWallet
+    );
+    const initialStatement = migrationCandidates[0] || null;
 
-    // Until bootstrap exists, retain the pre-0.13 configured wallet only for
-    // backward-compatible reads and to prefill the bootstrap UI. It is not
-    // canonical XRPL authority state under 0.13.
-    if (!bootstrap) {
+    if (!initialStatement) {
       const state = {
         namespace,
-        issuerAccount: issuer,
-        bootstrapped: false,
-        bootstrapNeeded: true,
-        bootstrapStatement: null,
+        authorityEstablished: false,
+        initialStatementNeeded: true,
+        initialStatement: null,
         legacyConfiguredAccount: legacyWallet,
         currentAccount: legacyWallet,
         canonicalCurrentAccount: "",
-        accounts: legacyWallet ? [legacyWallet] : [],
+        accounts: [legacyWallet],
         statements: [],
         transitions: [],
-        intervals: legacyWallet ? [{
+        intervals: [{
           account: legacyWallet,
-          source: "pre-0.13",
+          source: "pre-authority-state",
           fromExclusive: null,
           throughInclusive: null,
           fromLedger: 0,
           throughLedger: null
-        }] : [],
-        resolvedAt: new Date().toISOString()
+        }],
+        resolvedAt: new Date().toISOString(),
+        // Compatibility aliases for pages written before the 0.15 naming cleanup.
+        bootstrapped: false,
+        bootstrapNeeded: true,
+        bootstrapStatement: null
       };
       CACHE.set(key, state);
       return clone(state);
     }
 
-    const accounts = [];
-    const statements = [];
+    const accounts = [legacyWallet];
+    const statements = [{ ...initialStatement, kind: "INITIAL" }];
     const transitions = [];
     const intervals = [];
 
-    const bootstrapOrder = statementOrder(bootstrap);
-    if (legacyWallet) {
-      intervals.push({
-        account: legacyWallet,
-        source: "pre-0.13",
-        fromExclusive: null,
-        throughInclusive: bootstrapOrder,
-        fromLedger: 0,
-        throughLedger: bootstrap.ledger
-      });
-      accounts.push(legacyWallet);
-    }
+    const initialOrder = statementOrder(initialStatement);
+    intervals.push({
+      account: legacyWallet,
+      source: "pre-authority-state",
+      fromExclusive: null,
+      throughInclusive: initialOrder,
+      fromLedger: 0,
+      throughLedger: initialStatement.ledger
+    });
 
-    statements.push({ ...bootstrap, kind: "BOOTSTRAP" });
-    let currentAccount = bootstrap.value;
-    let activeFromExclusive = bootstrapOrder;
-    if (!accounts.includes(currentAccount)) accounts.push(currentAccount);
-
+    let currentAccount = legacyWallet;
+    let activeFromExclusive = initialOrder;
     let transitionCount = 0;
+
     while (transitionCount < maxTransitions) {
       const candidates = (await statementsFor(currentAccount)).filter(statement =>
         statement.account === currentAccount && isAfter(statementOrder(statement), activeFromExclusive)
@@ -346,10 +340,9 @@ export async function resolveCommunityAuthority({
 
     const state = {
       namespace,
-      issuerAccount: issuer,
-      bootstrapped: true,
-      bootstrapNeeded: false,
-      bootstrapStatement: { ...bootstrap },
+      authorityEstablished: true,
+      initialStatementNeeded: false,
+      initialStatement: { ...initialStatement },
       legacyConfiguredAccount: legacyWallet,
       currentAccount,
       canonicalCurrentAccount: currentAccount,
@@ -357,7 +350,11 @@ export async function resolveCommunityAuthority({
       statements,
       transitions,
       intervals,
-      resolvedAt: new Date().toISOString()
+      resolvedAt: new Date().toISOString(),
+      // Compatibility aliases for pages written before the 0.15 naming cleanup.
+      bootstrapped: true,
+      bootstrapNeeded: false,
+      bootstrapStatement: { ...initialStatement }
     };
 
     CACHE.set(key, state);
@@ -385,9 +382,6 @@ export function isAuthorizedAtLedger(authorityState, account, ledger, txIndex = 
         .filter(interval => ledgerOnlyCandidate(interval, ledgerNumber))
         .map(interval => interval.account)
     );
-    // Ledger-only lookup is safe when every possible interval for that ledger
-    // resolves to the same wallet. If authority changes to a different wallet
-    // within the ledger, fail closed until TransactionIndex is available.
     return possibleAccounts.size === 1 && possibleAccounts.has(target);
   }
 

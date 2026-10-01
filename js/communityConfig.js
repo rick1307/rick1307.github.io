@@ -8,8 +8,9 @@
       id: "sfl",
       backendId: "SFL",
       aliases: ["SFL", "sfl", "sailing-frogs-leap"],
-      // Pre-0.13 compatibility/bootstrap value only. Canonical current authority resolves from XRPL after bootstrap.
-      operatingWallet: "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q",
+      // Existing pre-authority-state Operating Wallet used only for the one-time Protocol 0.15 migration.
+      // After the first canonical OPERATING-WALLET statement validates, XRPL authority state is authoritative.
+      operatingWallet: "r9BwELxkK5CEvpTeYeCvMnD4KPC6jdq8MF",
       directoryStatus: "Current Community",
       directoryTone: "current",
       directoryDescription: "The current working community and first live Wild Ledger implementation.",
