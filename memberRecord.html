@@ -1120,7 +1120,7 @@
         <div class="record-grid">
           <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
           <div class="record-stat"><b>Earned</b><strong id="recordEarned">—</strong><small id="recordEarnedNote">in this community</small></div>
-          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote">from LEAP held</small></div>
+          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote">from Earned LEAP</small></div>
           <div class="record-stat community-totals" aria-label="Community recognition totals">
             <div class="community-total-row"><span>Badges</span><strong id="recordBadges">—</strong></div>
             <div class="community-total-row"><span>Challenges</span><strong id="recordChallenges">—</strong></div>
@@ -1968,7 +1968,7 @@
         if (!isLeapAmount(amount)) return null;
 
         const value = Number(amount.value);
-        return Number.isFinite(value) && value >= 0 ? value : null;
+        return Number.isFinite(value) && value > 0 && Number.isInteger(value) ? value : null;
       }
 
       function officialIncomingLeapCheck(object, memberAccount) {
