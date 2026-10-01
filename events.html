@@ -376,10 +376,10 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Upcoming events</h2>
-          <p>This is the active event log — the place to see what has been announced and what is coming next.</p>
+          <p>This section is a public-page placeholder. It is not yet a live XRPL-derived event list.</p>
         </div>
         <div class="status-box">
-          <h3 id="upcomingEventStatus">No upcoming event is listed right now.</h3>
+          <h3 id="upcomingEventStatus">No public event example is listed here right now.</h3>
           <p id="upcomingEventCopy">When an event is announced, this page can show the date, time, location or link, what to expect, and what counts as participation.</p>
         </div>
       </div>
@@ -389,10 +389,10 @@
       <div class="wrap">
         <div class="section-title">
           <h2>Past events</h2>
-          <p id="pastEventsIntro">This is the past event log. Once an event is over, it can remain here as part of the public history of the community.</p>
+          <p id="pastEventsIntro">This section is a public-page placeholder for past events. It is not yet a live XRPL-derived event history.</p>
         </div>
         <div class="status-box">
-          <h3 id="pastEventStatus">The past event log starts with the first event.</h3>
+          <h3 id="pastEventStatus">Public event history is not connected here yet.</h3>
           <p id="pastEventsHistory">Over time, this section can become a timeline of the real places and moments where members showed up together.</p>
         </div>
       </div>
@@ -508,7 +508,7 @@
       const pastIntro = document.getElementById("pastEventsIntro");
       if (pastIntro) {
         pastIntro.textContent =
-          `After an event ends, it does not have to disappear. Past events can remain here as part of the public history of the ${groupName}.`;
+          `This section can eventually show past ${groupName} events from XRPL-derived history; it is not connected to that history yet.`;
       }
 
       const pastHistory = document.getElementById("pastEventsHistory");
@@ -526,7 +526,7 @@
       const ctaCopy = document.getElementById("eventCtaCopy");
       if (ctaCopy) {
         ctaCopy.textContent =
-          `When ${operatorName} announces an event, this page is where you can see what is coming and what has already become part of the ${groupName} story.`;
+          `When ${operatorName} announces an event, this page is intended to show what is coming and what has become part of the ${groupName} story once it is connected to XRPL-derived event state.`;
       }
 
       const footer = document.getElementById("footerLabel");

@@ -559,7 +559,7 @@
       const badgeIntro = document.getElementById("communityBadgeIntro");
       if (badgeIntro) {
         badgeIntro.textContent =
-          `These are the recognitions currently defined by ${communityName}. Other Wild Ledger communities can define their own badges.`;
+          `These configured examples show how ${communityName} badges can appear here. The authoritative recognition-definition state comes from validated XRPL lifecycle history.`;
       }
 
       const grid = document.getElementById("communityBadgeGrid");
@@ -571,7 +571,7 @@
           const empty = document.createElement("div");
           empty.className = "badge-empty";
           empty.textContent =
-            `${communityName} has not published its community-specific badge list yet. The shared badge framework below still applies.`;
+            `${communityName} has not added community-specific badge examples to this page yet. The shared badge framework below still applies.`;
           grid.appendChild(empty);
         } else {
           badges.forEach(badge => {
