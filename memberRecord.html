@@ -1340,12 +1340,9 @@
       function saveLeapSession(account, balance) {
         if (!classicAddressPattern.test(account) || !(balance >= 1)) return;
 
-        const crewRank = rankFor(balance);
-
         const leapSession = {
           wallet: account,
           leapBalance: balance,
-          rank: crewRank.name,
           verifiedAt: new Date().toISOString()
         };
 
@@ -2912,7 +2909,7 @@
         renderLogbook(currentLogbookRecords);
       }
 
-      function rankFor(balance) {
+      function rankFor(earnedLeap) {
         const configuredRanks = Array.isArray(community.ranks) && community.ranks.length
           ? community.ranks
           : [
@@ -2927,7 +2924,7 @@
         let currentIndex = -1;
 
         for (let i = 0; i < ranks.length; i += 1) {
-          if (balance >= ranks[i].min) currentIndex = i;
+          if (earnedLeap >= ranks[i].min) currentIndex = i;
         }
 
         if (currentIndex < 0) {
@@ -2957,8 +2954,6 @@
       }
 
       function renderRecord(account, balance) {
-        const rank = rankFor(balance);
-
         walletEl.textContent = shortAddress(account);
         walletEl.title = account;
 
@@ -2966,19 +2961,13 @@
           ? String(balance)
           : String(Number(balance.toFixed(6)));
 
-        rankEl.textContent = rank.name;
-
-        if (rank.threshold === null) {
-          progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
-          progressValue.textContent = `${balance} LEAP`;
-          progressFill.style.width = "100%";
-          return;
-        }
-
-        progressLabel.textContent = `${rank.name} → ${rank.next}`;
-        progressValue.textContent = `${balance} / ${rank.threshold} LEAP`;
-        progressFill.style.width =
-          `${Math.max(0, Math.min(100, (balance / rank.threshold) * 100))}%`;
+        // Current wallet balance is a holdings fact only. Rank is rendered
+        // separately from reconstructed Earned LEAP history.
+        rankEl.textContent = "—";
+        rankNoteEl.textContent = `In ${communityName}`;
+        progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
+        progressValue.textContent = "—";
+        progressFill.style.width = "0%";
       }
 
       async function loadCrewRecord(account) {
@@ -3070,6 +3059,8 @@
           } else {
             earnedEl.textContent = "—";
             earnedNoteEl.textContent = `in ${communityName}`;
+            rankEl.textContent = "Unavailable";
+            rankNoteEl.textContent = "Earned LEAP history unavailable";
             progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
             progressValue.textContent = "—";
             progressFill.style.width = "0%";
