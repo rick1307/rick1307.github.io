@@ -1186,6 +1186,7 @@
   <script src="js/communityConfig.js"></script>
   <script type="module">
     import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
+    import { loadRecognitionCatalog, recognitionAvailabilityFromCatalog } from "./js/recognitionCatalog.js";
     (async () => {
       const community = window.WILD_LEDGER_COMMUNITY;
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
@@ -1244,6 +1245,7 @@
       const LEAP_TRANSFER_LIMIT = wildLedger.leapTransferLimit;
       const LEGACY_DISTRIBUTORS = new Set(Array.isArray(wildLedger.leapDistributors) ? wildLedger.leapDistributors : []);
       let communityAuthority = null;
+      let communityRecognitionCatalog = null;
 
       const LEAP_NAMESPACE = community.leapNamespace;
       const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
@@ -2007,6 +2009,20 @@
         return beforeAuthorityActivation(entry, tx) && LEGACY_DISTRIBUTORS.has(tx.Account);
       }
 
+      function recognitionFactAvailableAtEntry(fact, entry, tx = entry?.tx_json || entry?.tx || entry?.transaction || entry || {}) {
+        if (!fact?.key || !fact?.value) return false;
+
+        const result = recognitionAvailabilityFromCatalog({
+          catalog: communityRecognitionCatalog,
+          category: fact.key,
+          id: fact.value,
+          ledgerIndex: entryLedgerIndex(entry, tx),
+          transactionIndex: entryTransactionIndex(entry)
+        });
+
+        return result.available === true;
+      }
+
       function queryPendingLeapChecks(account) {
         return new Promise((resolve, reject) => {
           const ws = new WebSocket(XRPL_WS);
@@ -2215,6 +2231,7 @@
 
             const facts = extractLeapFacts(tx);
             if (!officialRecognitionSource(txResult, tx) || facts.length !== 1) return null;
+            if (!recognitionFactAvailableAtEntry(facts[0], txResult, tx)) return null;
 
             return {
               ...check,
@@ -2396,6 +2413,7 @@
         const facts = extractLeapFacts(tx);
 
         if (facts.length !== 1) return null;
+        if (!recognitionFactAvailableAtEntry(facts[0], entry, tx)) return null;
 
         const time =
           entry.close_time_iso ||
@@ -3129,6 +3147,19 @@
       } catch (error) {
         console.warn("Community authority could not be fully resolved for Member Record:", error);
         communityAuthority = null;
+      }
+
+      try {
+        communityRecognitionCatalog = await loadRecognitionCatalog({
+          community,
+          serverUrl: XRPL_WS,
+          issuer: LEAP_ISSUER,
+          currency: LEAP_CURRENCY,
+          includeIgnored: true
+        });
+      } catch (error) {
+        console.warn("Recognition definitions could not be fully resolved for Member Record:", error);
+        communityRecognitionCatalog = null;
       }
 
       const rawActiveWallet = getRawActiveWallet();
