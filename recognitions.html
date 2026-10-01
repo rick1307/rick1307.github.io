@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en" class="community-pending">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Explore the recognition catalog established on the XRP Ledger for this Wild Ledger community." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Recognition — LEAP</title>
+  <link rel="stylesheet" href="communityTypography.css" />
+  <link rel="stylesheet" href="wildLedgerControls.css" />
+  <style>
+    :root{
+      --paper:#efe8d8;--paper2:#f8f3e8;--ink:#17313a;--navy:#123b46;--deep:#0b2d36;
+      --sea:#2f7481;--foam:#d7ebe7;--rust:#b85a40;--gold:#d7ae62;
+      --line:rgba(15,52,64,.16);--card:rgba(250,252,247,.82);--muted:#526a70;--max:1060px;
+      --page-background:radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+      --page-overlay:repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+      --nav-background:rgba(226,235,230,.88);
+      --header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+      --section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+      --dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.95),rgba(37,96,106,.92));
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    html.community-pending body{visibility:hidden}
+    body{
+      margin:0;color:var(--ink);background:var(--page-background);
+      font-family:var(--community-display-font);line-height:1.6;
+    }
+    body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;background-image:var(--page-overlay)}
+    a{color:inherit}
+    .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
+    nav{position:sticky;top:0;z-index:10;background:var(--nav-background);backdrop-filter:blur(14px) saturate(120%);border-bottom:1px solid var(--line);box-shadow:0 8px 24px rgba(11,45,54,.05)}
+    .nav-inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .nav-links{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{text-decoration:none;color:#45636a;font-family:var(--community-ui-font);font-size:.9rem;font-weight:750}
+    .nav-links a:hover{color:var(--rust)}
+    .leap-journey-banner{width:100%;overflow:hidden;background:#102f38;line-height:0;border-bottom:1px solid rgba(18,59,70,.15)}
+    .leap-journey-banner picture,.leap-journey-banner img{display:block;width:100%}
+    .leap-journey-banner img{height:auto}
+    header{padding:70px 0 42px;background:var(--header-background);border-bottom:1px solid rgba(18,59,70,.08)}
+    .kicker{color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}
+    h1{margin:.14em 0 .18em;color:var(--deep);font-size:clamp(3.1rem,8vw,6rem);line-height:.95;letter-spacing:-.055em;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .lede{max-width:850px;margin:0;color:#3f5a61;font-size:clamp(1.12rem,2vw,1.35rem)}
+    .truth-note{margin-top:24px;max-width:860px;padding:18px 20px;border-left:4px solid var(--gold);border-radius:0 14px 14px 0;background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.52));color:#3f5960;box-shadow:0 12px 28px rgba(11,45,54,.06)}
+    main{padding:34px 0 54px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}
+    .filter{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 15px;border:1px solid rgba(18,59,70,.18);border-radius:999px;text-decoration:none;background:rgba(250,252,247,.56);color:var(--deep);font-family:var(--community-ui-font);font-weight:800;font-size:.9rem}
+    .filter[aria-current="page"]{background:var(--deep);color:white;border-color:var(--deep)}
+    .status-bar{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:24px;padding:15px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(250,252,247,.66);font-family:var(--community-ui-font)}
+    .status-main{font-weight:800;color:var(--deep)}
+    .status-detail{color:var(--muted);font-size:.88rem;text-align:right}
+    .category-section{margin:0 0 42px}
+    .category-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .category-head h2{margin:0;color:var(--deep);font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.05;letter-spacing:-.035em}
+    .category-head p{margin:6px 0 0;color:var(--muted);max-width:720px}
+    .count{font-family:var(--community-ui-font);font-weight:850;color:var(--rust);white-space:nowrap}
+    .catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .recognition-card{position:relative;overflow:hidden;background:var(--card);backdrop-filter:blur(9px);border:1px solid rgba(18,59,70,.15);border-radius:20px;padding:22px;box-shadow:0 14px 32px rgba(11,45,54,.065)}
+    .recognition-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--sea))}
+    .card-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .category-mark{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:linear-gradient(135deg,var(--foam),rgba(255,255,255,.72));font-family:var(--community-ui-font);font-weight:950;color:var(--deep)}
+    .card-name-wrap{min-width:0;flex:1}
+    .card-name{margin:0;color:var(--deep);font-size:1.4rem;line-height:1.15;overflow-wrap:anywhere}
+    .canonical-id{margin-top:5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;overflow-wrap:anywhere}
+    .state-pill{flex:0 0 auto;padding:6px 9px;border-radius:999px;background:rgba(47,116,129,.12);color:var(--sea);font-family:var(--community-ui-font);font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .state-pill.terminal{background:rgba(184,90,64,.10);color:var(--rust)}
+    .card-copy{margin:16px 0 0;color:#526970}
+    .card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid rgba(18,59,70,.11);color:var(--muted);font-family:var(--community-ui-font);font-size:.78rem}
+    .meta-chip{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.48);border:1px solid rgba(18,59,70,.10)}
+    .empty{padding:28px;border:1px dashed rgba(18,59,70,.24);border-radius:18px;background:rgba(250,252,247,.46);color:var(--muted)}
+    .error{padding:24px;border:1px solid rgba(184,90,64,.30);border-radius:18px;background:rgba(255,246,242,.72);color:#753a2d}
+    .return-box{margin-top:36px;background:var(--dark-feature-background);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:28px;text-align:center;box-shadow:0 22px 46px rgba(11,45,54,.18);color:white}
+    .return-box h3{margin:0 0 7px;font-size:1.5rem}.return-box p{margin:0;color:rgba(255,255,255,.82)}
+    .button{display:inline-flex;align-items:center;justify-content:center;margin-top:17px;padding:11px 17px;border-radius:8px;text-decoration:none;background:var(--rust);color:white;font-family:var(--community-ui-font);font-weight:850;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+    @media(hover:hover) and (pointer:fine){.button:hover{transform:translateY(-1px)}}
+    footer{padding:0 0 46px;color:#49636a;font-family:var(--community-ui-font);font-size:.86rem}
+    .foot{padding-top:20px;border-top:1px solid rgba(18,59,70,.16)}
+    body[data-community-layout="garage"] .recognition-card,body[data-community-layout="garage"] .return-box{border-radius:10px}
+    @media(max-width:760px){
+      .nav-links a:nth-child(2),.nav-links a:nth-child(3){display:none}
+      .catalog-grid{grid-template-columns:1fr}
+      .status-bar,.category-head{align-items:flex-start;flex-direction:column}
+      .status-detail{text-align:left}
+      .card-top{flex-wrap:wrap}.state-pill{order:3}
+    }
+    @media(prefers-reduced-motion:reduce){.button{transition:none!important}}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap nav-inner wl-nav-right">
+      <div class="nav-links">
+        <a id="communityHomeLink" href="index.html">← Home</a>
+        <a id="ranksLink" href="ranks.html">Ranks</a>
+        <a id="faqLink" href="faq.html">FAQs</a>
+        <a id="joinLink" href="join.html">Join</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="leap-journey-banner" aria-label="The LEAP journey: Website is the front door, LEAP is the passport, XRPL is the logbook, and Discord is the community club.">
+    <picture>
+      <source id="communityBannerMobile" media="(max-width: 800px)">
+      <img id="communityBannerDesktop" alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
+    </picture>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <div class="kicker">LEAP Recognition</div>
+      <h1 id="pageTitle">Recognition</h1>
+      <p class="lede" id="pageLede">Badges, Events, and Challenges established by this community.</p>
+      <div class="truth-note">
+        <strong>XRPL decides what exists.</strong> Community metadata can add a friendly name, description, image, and presentation, but it cannot create a recognition definition.
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="filters" id="categoryFilters" aria-label="Recognition categories"></div>
+      <div class="status-bar" aria-live="polite">
+        <div class="status-main" id="catalogStatus">Loading validated XRP Ledger recognition state…</div>
+        <div class="status-detail" id="catalogDetail"></div>
+      </div>
+      <div id="catalog"></div>
+
+      <div class="return-box">
+        <h3 id="returnTitle">Recognition becomes part of the community story.</h3>
+        <p id="returnCopy">What appears above is reconstructed from validated XRP Ledger history.</p>
+        <a class="button" id="backToCommunity" href="index.html">Back to community →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot" id="footerLabel">Community • LEAP Recognition</div>
+  </footer>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script src="js/communityConfig.js"></script>
+  <script type="module">
+    import { loadRecognitionCatalog, RECOGNITION_CATEGORIES } from "./js/recognitionCatalog.js";
+
+    const community = window.WILD_LEDGER_COMMUNITY;
+    const communityId = window.WILD_LEDGER_COMMUNITY_ID || community?.id || "";
+    if (!community || !communityId) throw new Error("Community configuration failed to load.");
+
+    const config = window.WILD_LEDGER_CONFIG || {};
+    const params = new URLSearchParams(window.location.search);
+    const requestedCategory = String(params.get("category") || "all").trim().toLowerCase();
+    const categoryFromQuery = {
+      badge:"BADGE", badges:"BADGE",
+      event:"EVENT", events:"EVENT",
+      challenge:"CHALLENGE", challenges:"CHALLENGE"
+    }[requestedCategory] || "ALL";
+
+    const communityName = community.communityName || "Community";
+    const theme = community.theme || {};
+    const themeVars = {
+      paper:"--paper",paper2:"--paper2",ink:"--ink",navy:"--navy",deep:"--deep",sea:"--sea",foam:"--foam",rust:"--rust",gold:"--gold",line:"--line",card:"--card",muted:"--muted",
+      pageBackground:"--page-background",pageOverlay:"--page-overlay",navBackground:"--nav-background",headerBackground:"--header-background",sectionBackground:"--section-background",darkFeatureBackground:"--dark-feature-background"
+    };
+    for (const [key, cssVar] of Object.entries(themeVars)) if (theme[key]) document.documentElement.style.setProperty(cssVar, theme[key]);
+    document.body.dataset.communityTheme = communityId;
+    document.body.dataset.communityLayout = community.layout || "classic";
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
+
+    const categoryInfo = {
+      BADGE:{ plural:"Badges", singular:"Badge", letter:"B", copy:"Reusable recognition for meaningful participation, contribution, milestones, places, roles, or shared moments." },
+      EVENT:{ plural:"Events", singular:"Event", letter:"E", copy:"Specific community occurrences tied to a real moment or defined window of time." },
+      CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", copy:"Participation opportunities with a clear objective that remain active until the community closes them." }
+    };
+
+    function communityHref(page, extra = {}) {
+      const search = new URLSearchParams({ community: communityId, ...extra });
+      return `${page}?${search.toString()}`;
+    }
+
+    document.getElementById("communityHomeLink").href = communityHref("index.html");
+    document.getElementById("ranksLink").href = communityHref("ranks.html");
+    document.getElementById("faqLink").href = communityHref("faq.html");
+    document.getElementById("joinLink").href = communityHref("join.html");
+    document.getElementById("backToCommunity").href = communityHref("index.html");
+    document.getElementById("backToCommunity").textContent = `Back to ${communityName} →`;
+    document.getElementById("footerLabel").textContent = `${communityName} • LEAP Recognition`;
+
+    const bannerDesktop = document.getElementById("communityBannerDesktop");
+    const bannerMobile = document.getElementById("communityBannerMobile");
+    if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+    if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+
+    const selectedInfo = categoryFromQuery === "ALL" ? null : categoryInfo[categoryFromQuery];
+    document.title = `${selectedInfo?.plural || "Recognition"} — ${communityName}`;
+    document.getElementById("pageTitle").textContent = selectedInfo?.plural || "Recognition";
+    document.getElementById("pageLede").textContent = selectedInfo
+      ? `${selectedInfo.plural} established by ${communityName} and reconstructed from validated XRP Ledger history.`
+      : `Badges, Events, and Challenges established by ${communityName} and reconstructed from validated XRP Ledger history.`;
+
+    function buildFilters() {
+      const target = document.getElementById("categoryFilters");
+      const choices = [
+        ["ALL", "All Recognition", "all"],
+        ["BADGE", "Badges", "badge"],
+        ["EVENT", "Events", "event"],
+        ["CHALLENGE", "Challenges", "challenge"]
+      ];
+      for (const [category, label, query] of choices) {
+        const link = document.createElement("a");
+        link.className = "filter";
+        link.href = communityHref("recognitions.html", { category: query });
+        link.textContent = label;
+        if (category === categoryFromQuery) link.setAttribute("aria-current", "page");
+        target.appendChild(link);
+      }
+    }
+
+    function displayNameFromId(id) {
+      return String(id || "").split("-").map(part => {
+        if (/^\d+$/.test(part)) return part;
+        if (part.length <= 4 && /^[A-Z]+$/.test(part)) return part;
+        return part.charAt(0) + part.slice(1).toLowerCase();
+      }).join(" ");
+    }
+
+    function metadataFor(record) {
+      const direct = community.recognitionMetadata?.[record.category]?.[record.id];
+      if (direct && typeof direct === "object") return direct;
+
+      const collectionName = record.category === "BADGE" ? "badges" : record.category === "EVENT" ? "events" : "challenges";
+      const list = Array.isArray(community[collectionName]) ? community[collectionName] : [];
+      return list.find(item => {
+        const id = String(item?.canonicalId || item?.id || "").trim().toUpperCase();
+        return id === record.id;
+      }) || null;
+    }
+
+    function stateLabel(record) {
+      if (record.state === "ACTIVE") return record.category === "BADGE" ? "Available" : "Active";
+      if (record.state === "ENDED") {
+        if (record.category === "BADGE") return "Retired";
+        if (record.category === "EVENT") return "Completed";
+        return "Closed";
+      }
+      return record.state;
+    }
+
+    function prettyDate(iso) {
+      if (!iso) return "";
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat(undefined, { year:"numeric", month:"short", day:"numeric" }).format(date);
+    }
+
+    function renderCard(record) {
+      const info = categoryInfo[record.category];
+      const metadata = metadataFor(record);
+      const card = document.createElement("article");
+      card.className = "recognition-card";
+
+      const top = document.createElement("div");
+      top.className = "card-top";
+
+      const mark = document.createElement("div");
+      mark.className = "category-mark";
+      mark.textContent = String(metadata?.mark || metadata?.icon || info.letter).slice(0, 3);
+      top.appendChild(mark);
+
+      const nameWrap = document.createElement("div");
+      nameWrap.className = "card-name-wrap";
+      const name = document.createElement("h3");
+      name.className = "card-name";
+      name.textContent = metadata?.name || metadata?.title || displayNameFromId(record.id);
+      nameWrap.appendChild(name);
+      const id = document.createElement("div");
+      id.className = "canonical-id";
+      id.textContent = record.id;
+      nameWrap.appendChild(id);
+      top.appendChild(nameWrap);
+
+      const state = document.createElement("div");
+      state.className = `state-pill${record.state === "ENDED" ? " terminal" : ""}`;
+      state.textContent = stateLabel(record);
+      top.appendChild(state);
+      card.appendChild(top);
+
+      const copy = document.createElement("p");
+      copy.className = "card-copy";
+      copy.textContent = metadata?.description || metadata?.copy || `No display description has been published yet. The ${info.singular.toLowerCase()} itself is established on XRPL.`;
+      card.appendChild(copy);
+
+      const meta = document.createElement("div");
+      meta.className = "card-meta";
+      const categoryChip = document.createElement("span");
+      categoryChip.className = "meta-chip";
+      categoryChip.textContent = info.singular;
+      meta.appendChild(categoryChip);
+
+      const createdDate = prettyDate(record.created?.time);
+      if (createdDate) {
+        const createdChip = document.createElement("span");
+        createdChip.className = "meta-chip";
+        createdChip.textContent = record.source === "legacy" ? `Established before lifecycle activation · ${createdDate}` : `Created · ${createdDate}`;
+        meta.appendChild(createdChip);
+      } else if (record.source === "legacy") {
+        const legacyChip = document.createElement("span");
+        legacyChip.className = "meta-chip";
+        legacyChip.textContent = "Established before lifecycle activation";
+        meta.appendChild(legacyChip);
+      }
+
+      const terminalDate = prettyDate(record.terminal?.time);
+      if (record.state === "ENDED" && terminalDate) {
+        const terminalChip = document.createElement("span");
+        terminalChip.className = "meta-chip";
+        terminalChip.textContent = `${stateLabel(record)} · ${terminalDate}`;
+        meta.appendChild(terminalChip);
+      }
+      card.appendChild(meta);
+      return card;
+    }
+
+    function renderSection(category, records) {
+      const info = categoryInfo[category];
+      const section = document.createElement("section");
+      section.className = "category-section";
+
+      const head = document.createElement("div");
+      head.className = "category-head";
+      const headingWrap = document.createElement("div");
+      const heading = document.createElement("h2");
+      heading.textContent = info.plural;
+      headingWrap.appendChild(heading);
+      const copy = document.createElement("p");
+      copy.textContent = info.copy;
+      headingWrap.appendChild(copy);
+      head.appendChild(headingWrap);
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = `${records.length} on XRPL`;
+      head.appendChild(count);
+      section.appendChild(head);
+
+      if (!records.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = `No ${info.plural.toLowerCase()} are established on XRPL for ${communityName} yet.`;
+        section.appendChild(empty);
+      } else {
+        const grid = document.createElement("div");
+        grid.className = "catalog-grid";
+        for (const record of records) grid.appendChild(renderCard(record));
+        section.appendChild(grid);
+      }
+      return section;
+    }
+
+    function renderCatalog(result) {
+      const catalog = document.getElementById("catalog");
+      catalog.replaceChildren();
+      const visibleCategories = categoryFromQuery === "ALL" ? RECOGNITION_CATEGORIES : [categoryFromQuery];
+      for (const category of visibleCategories) {
+        const rows = result.records.filter(record => record.category === category);
+        catalog.appendChild(renderSection(category, rows));
+      }
+
+      const total = result.records.length;
+      document.getElementById("catalogStatus").textContent = `${total} recognition definition${total === 1 ? "" : "s"} reconstructed from XRPL.`;
+      document.getElementById("catalogDetail").textContent = `Lifecycle activation ledger ${result.activation.ledger.toLocaleString()}`;
+    }
+
+    function renderError(error) {
+      const catalog = document.getElementById("catalog");
+      catalog.replaceChildren();
+      const box = document.createElement("div");
+      box.className = "error";
+      box.innerHTML = "<strong>Recognition catalog unavailable.</strong> Wild Ledger will not substitute configured or cached definitions for XRPL truth.";
+      const detail = document.createElement("div");
+      detail.style.marginTop = "8px";
+      detail.textContent = error?.message || String(error);
+      box.appendChild(detail);
+      catalog.appendChild(box);
+      document.getElementById("catalogStatus").textContent = "XRPL recognition state could not be established.";
+      document.getElementById("catalogDetail").textContent = "Fail closed";
+    }
+
+    buildFilters();
+    document.documentElement.classList.remove("community-pending");
+
+    try {
+      const result = await loadRecognitionCatalog({
+        community,
+        serverUrl: config.xrplWebSocket || "wss://s1.ripple.com/",
+        issuer: config.leapIssuer,
+        currency: config.leapCurrency
+      });
+      renderCatalog(result);
+    } catch (error) {
+      console.warn("Wild Ledger recognition catalog:", error);
+      renderError(error);
+    }
+  </script>
+</body>
+</html>

@@ -443,7 +443,7 @@
 <div class="row"><b>What is a badge?</b><span>A badge is an open-ended recognition. It has no natural expiration date, so the same badge can keep being awarded for as long as the community operator considers it meaningful.</span></div>
 <div class="row"><b>Does rank control which badges I can have?</b><span id="badgeRankCopy">No. Rank follows the LEAP officially earned from this community, while badges record specific recognitions. A member at one rank can have a badge that a higher-ranking member does not.</span></div>
 <div class="row"><b>Can many people earn the same badge?</b><span>Yes. A badge can recognize one person or many people over time. The important distinction is that the badge itself stays open-ended rather than closing like a challenge or being tied to one fixed event window.</span></div>
-<div class="row"><b>Where can I see this community's badges?</b><span><a id="badgesFaqLink" href="badges.html">See the Badges page →</a></span></div>
+<div class="row"><b>Where can I see this community's badges?</b><span><a id="badgesFaqLink" href="recognitions.html?category=badge">See the Badges page →</a></span></div>
 <div class="row"><b>How is a badge recorded?</b><span id="badgeRecordedCopy">A community can record a badge as part of an official LEAP award. Once that award is accepted and validated, the badge can become part of that member's earned community record.</span></div>
 <div class="row"><b>Does the badge record stay on the XRP Ledger?</b><span id="badgeLedgerCopy">Yes. The underlying transaction remains part of the public XRP Ledger history, and the Member Record can interpret that history to show the badges the member has actually earned.</span></div>
 </div>
@@ -458,7 +458,7 @@
 <div class="row"><b>What is a challenge?</b><span>A challenge is a temporary invitation to go do something specific. It opens for participation and eventually closes.</span></div>
 <div class="row"><b>Does a challenge need a fixed end date?</b><span>No. A challenge is temporary, but its ending can be known in advance or decided later. It might close on a date, after a goal is reached, after a certain number of completions, or when the community operator decides it has run its course.</span></div>
 <div class="row"><b>Can many people complete the same challenge?</b><span>Yes. A challenge can recognize many members while it remains open. One person's completion does not automatically end it unless that is how the operator designed the challenge.</span></div>
-<div class="row"><b>Where can I see active and completed challenges?</b><span><a id="challengesFaqLink" href="challenges.html">See the Challenges page →</a></span></div>
+<div class="row"><b>Where can I see active and completed challenges?</b><span><a id="challengesFaqLink" href="recognitions.html?category=challenge">See the Challenges page →</a></span></div>
 </div>
 </div>
 </section>
@@ -471,7 +471,7 @@
 <div class="row"><b>What makes something an event?</b><span>An event is tied to a particular day or defined window of time. It can happen in person or online, but the occurrence itself has a known beginning and end.</span></div>
 <div class="row"><b>Can many people be recognized for the same event?</b><span>Yes. Many members can participate in the same event. They are all being recognized for taking part in that same fixed occurrence.</span></div>
 <div class="row"><b>What happens after the event ends?</b><span>The opportunity to participate is over, but the event remains part of the community's history. Recognized participation can remain part of each member's record.</span></div>
-<div class="row"><b>Where can I see upcoming and past events?</b><span><a id="eventsFaqLink" href="events.html">See the Events page →</a></span></div>
+<div class="row"><b>Where can I see upcoming and past events?</b><span><a id="eventsFaqLink" href="recognitions.html?category=event">See the Events page →</a></span></div>
 </div>
 </div>
 </section>
@@ -483,9 +483,9 @@
 <p>See how recognition works here, what you can earn, and what is happening now.</p>
 <div class="cta-actions">
 <a class="button secondary" id="exploreRanksLink" href="ranks.html">Ranks →</a>
-<a class="button secondary" id="exploreBadgesLink" href="badges.html">Badges →</a>
-<a class="button secondary" id="exploreChallengesLink" href="challenges.html">Challenges →</a>
-<a class="button secondary" id="exploreEventsLink" href="events.html">Events →</a>
+<a class="button secondary" id="exploreBadgesLink" href="recognitions.html?category=badge">Badges →</a>
+<a class="button secondary" id="exploreChallengesLink" href="recognitions.html?category=challenge">Challenges →</a>
+<a class="button secondary" id="exploreEventsLink" href="recognitions.html?category=event">Events →</a>
 </div>
 </div>
 </div>
@@ -616,17 +616,19 @@
 
       const communityPageLinks = [
         ["ranksFaqLink", "ranks.html"],
-        ["badgesFaqLink", "badges.html"],
-        ["challengesFaqLink", "challenges.html"],
-        ["eventsFaqLink", "events.html"],
+        ["badgesFaqLink", "recognitions.html?category=badge"],
+        ["challengesFaqLink", "recognitions.html?category=challenge"],
+        ["eventsFaqLink", "recognitions.html?category=event"],
         ["exploreRanksLink", "ranks.html"],
-        ["exploreBadgesLink", "badges.html"],
-        ["exploreChallengesLink", "challenges.html"],
-        ["exploreEventsLink", "events.html"]
+        ["exploreBadgesLink", "recognitions.html?category=badge"],
+        ["exploreChallengesLink", "recognitions.html?category=challenge"],
+        ["exploreEventsLink", "recognitions.html?category=event"]
       ];
       communityPageLinks.forEach(([id, page]) => {
         const link = document.getElementById(id);
-        if (link) link.href = `${page}?community=${encodeURIComponent(communityId)}`;
+        if (!link) return;
+        const separator = page.includes("?") ? "&" : "?";
+        link.href = `${page}${separator}community=${encodeURIComponent(communityId)}`;
       });
 
       const exploreHeading = document.getElementById("exploreCommunityHeading");

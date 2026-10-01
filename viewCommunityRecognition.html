@@ -1317,6 +1317,7 @@
   <script src="js/communityConfig.js" data-registry-only="true"></script>
   <script type="module">
     import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
+    import { loadRecognitionCatalog } from "./js/recognitionCatalog.js";
     (() => {
       "use strict";
 
@@ -1332,8 +1333,7 @@
       let operatingWallet = "";
       const config = window.WILD_LEDGER_CONFIG || {};
       const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
-      const LEAP_ISSUER = String(config.leapIssuer || "").trim();
-      const LEAP_CURRENCY = String(config.leapCurrency || "").trim();
+      const LEAP_ISSUER = config.leapIssuer || "";
       const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
       const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
       const CATEGORIES = ["BADGE", "CHALLENGE", "EVENT"];
@@ -1454,11 +1454,26 @@
         return texts;
       }
 
+      function decodeCurrency(value) {
+        const code = String(value || "");
+        if (!/^[A-Fa-f0-9]{40}$/.test(code)) return code;
+        try {
+          let out = "";
+          for (let i = 0; i < code.length; i += 2) {
+            const n = parseInt(code.slice(i, i + 2), 16);
+            if (n === 0) break;
+            out += String.fromCharCode(n);
+          }
+          return out;
+        } catch (_) {
+          return code;
+        }
+      }
+
       function isLeapAmount(amount) {
         return !!amount && typeof amount === "object" &&
-          !!LEAP_ISSUER && !!LEAP_CURRENCY &&
-          String(amount.issuer || "") === LEAP_ISSUER &&
-          String(amount.currency || "").toUpperCase() === LEAP_CURRENCY.toUpperCase();
+          (!LEAP_ISSUER || amount.issuer === LEAP_ISSUER) &&
+          decodeCurrency(amount.currency).toUpperCase() === "LEAP";
       }
 
       function validId(category, value) {
@@ -1756,16 +1771,28 @@
         try {
           for (const category of CATEGORIES) { lifecycle[category].clear(); legacy[category].clear(); }
           render();
-          authority = await resolveCommunityAuthority({ community, serverUrl: XRPL_SERVER });
+
+          const catalog = await loadRecognitionCatalog({
+            community,
+            serverUrl: XRPL_SERVER,
+            issuer: config.leapIssuer,
+            currency: config.leapCurrency,
+            includeIgnored: true
+          });
+
+          authority = catalog.authority;
           operatingWallet = authority.currentAccount;
-          if (!operatingWallet) {
-            console.warn("This community does not yet have a resolvable Community Operating Wallet.");
-            return;
-          }
-          await connect();
-          for (const account of authority.accounts) await scanAccount(account, "lifecycle");
-          for (const distributor of LEGACY_DISTRIBUTORS) {
-            if (distributor && !authority.accounts.includes(distributor)) await scanAccount(distributor, "legacy");
+
+          for (const record of catalog.records) {
+            if (record.source === "legacy" && record.state === "ACTIVE") {
+              legacy[record.category].set(record.id, record.created);
+            } else {
+              lifecycle[record.category].set(record.id, {
+                state: record.state,
+                create: record.created || null,
+                terminal: record.terminal || null
+              });
+            }
           }
           render();
         } catch (error) {

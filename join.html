@@ -226,24 +226,15 @@
 
     .leap-request-form{margin-top:16px}
     .leap-request-row{display:flex;gap:10px;align-items:stretch}
-    .wallet-input-wrap{position:relative;flex:1;min-width:0}
-    .leap-request-form .wallet-address-input,
-    .member-record-open .wallet-address-input{
+    .leap-request-form input[type="text"],
+    .member-record-open input{
       flex:1;min-width:0;padding:13px 14px;border-radius:8px;
       border:1px solid rgba(26,37,44,.22);background:#fff;color:var(--ink);
       font-family:var(--community-ui-font);
-      font-size:1rem;outline:none;padding-right:46px;
+      font-size:1rem;outline:none;
     }
-    .wallet-visibility-toggle{
-      position:absolute;right:7px;top:50%;transform:translateY(-50%);
-      width:36px;height:36px;padding:0;border:0;border-radius:8px;
-      background:transparent;color:var(--navy);display:grid;place-items:center;cursor:pointer;
-    }
-    .wallet-visibility-toggle:hover{background:rgba(26,37,44,.06)}
-    .wallet-visibility-toggle:focus-visible{outline:2px solid var(--sea);outline-offset:1px}
-    .wallet-visibility-toggle svg{width:20px;height:20px;display:block}
-    .leap-request-form .wallet-address-input:focus,
-    .member-record-open .wallet-address-input:focus{
+    .leap-request-form input[type="text"]:focus,
+    .member-record-open input:focus{
       border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.14);
     }
     .leap-request-form .button,
@@ -488,7 +479,7 @@
 
     @media(max-width:650px){
       .wrap{width:min(calc(100% - 24px),var(--max))}
-      .leap-request-form .wallet-address-input,.member-record-open .wallet-address-input{min-height:50px}
+      .leap-request-form input[type="text"],.member-record-open input{min-height:50px}
       .leap-request-form .button,.member-record-open .button{min-height:50px}
       .section-title p{font-size:1rem}
       .nav-inner{min-height:58px}
@@ -524,10 +515,7 @@
 <input id="firstLeapCommunityName" name="community_name" type="hidden" value=""/>
 <input id="firstLeapOperatorName" name="operator_name" type="hidden" value=""/>
 <div class="leap-request-row">
-<div class="wallet-input-wrap">
-<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" class="wallet-address-input" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="r..." required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="password"/>
-<button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="firstLeapXrplAddress" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-</div>
+<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="r..." required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="text"/>
 <button class="button" type="submit">Request My First LEAP</button>
 </div>
 </form><div aria-live="polite" class="request-result" id="firstLeapSuccess" role="status" style="display:none;">
@@ -547,10 +535,7 @@
               Once you've cashed your first LEAP Check, enter your XRP Ledger address to open your Member Record.
             </p>
 <div class="member-record-open-row">
-<div class="wallet-input-wrap">
-<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" class="wallet-address-input" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="password"/>
-<button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="memberRecordWallet" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-</div>
+<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="text"/>
 <button class="button" id="openMemberRecordButton" type="button">Open My Member Record →</button>
 </div>
 <p aria-live="polite" class="member-record-status" id="memberRecordStatus" role="status"></p>
@@ -657,9 +642,9 @@
               LEAP Checks can include short notes about why you received them.
               <span id="storyGrowthCopy">Those notes help build your community history and badges.</span>
 </p>
-<a class="button secondary" href="badges.html" id="nextBadgesLink">See the badges →</a>
-<a class="button secondary" href="challenges.html" id="nextChallengesLink">See the challenges →</a>
-<a class="button secondary" href="events.html" id="nextEventsLink">See the events →</a>
+<a class="button secondary" href="recognitions.html?category=badge" id="nextBadgesLink">See the badges →</a>
+<a class="button secondary" href="recognitions.html?category=challenge" id="nextChallengesLink">See the challenges →</a>
+<a class="button secondary" href="recognitions.html?category=event" id="nextEventsLink">See the events →</a>
 </div>
 </div>
 </div>
@@ -717,17 +702,6 @@
       const memberRecordWallet = document.getElementById("memberRecordWallet");
       const openMemberRecordButton = document.getElementById("openMemberRecordButton");
       const memberRecordStatus = document.getElementById("memberRecordStatus");
-
-      document.querySelectorAll("[data-wallet-toggle]").forEach(toggle => {
-        const input = document.getElementById(toggle.dataset.walletToggle || "");
-        if (!input) return;
-        toggle.addEventListener("click", () => {
-          const revealing = input.type === "password";
-          input.type = revealing ? "text" : "password";
-          toggle.setAttribute("aria-pressed", revealing ? "true" : "false");
-          toggle.setAttribute("aria-label", revealing ? "Hide XRP Ledger address" : "Show XRP Ledger address");
-        });
-      });
 
       if (firstLeapCommunityId) firstLeapCommunityId.value = communityId;
       if (firstLeapCommunityName) firstLeapCommunityName.value = communityName;
@@ -811,14 +785,14 @@
       if (meta) meta.content = `Join ${communityName} with your first LEAP.`;
 
       const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
-      const pageHref = page => `${page}?community=${encodeURIComponent(communityId)}`;
+      const pageHref = page => `${page}${page.includes("?") ? "&" : "?"}community=${encodeURIComponent(communityId)}`;
       const routeMap = [
         ["communityHomeBrand", homeHref],
         ["communityHomeLink", homeHref],
         ["nextRanksLink", pageHref("ranks.html")],
-        ["nextBadgesLink", pageHref("badges.html")],
-        ["nextChallengesLink", pageHref("challenges.html")],
-        ["nextEventsLink", pageHref("events.html")],
+        ["nextBadgesLink", pageHref("recognitions.html?category=badge")],
+        ["nextChallengesLink", pageHref("recognitions.html?category=challenge")],
+        ["nextEventsLink", pageHref("recognitions.html?category=event")],
         ["bottomCommunityFaqLink", pageHref("faq.html")]
       ];
       routeMap.forEach(([id, href]) => {
