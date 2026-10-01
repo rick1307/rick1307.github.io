@@ -1,5 +1,5 @@
 /*
-  Wild Ledger Community Authority resolver — LEAP Protocol 0.15.
+  Wild Ledger Community Authority resolver — LEAP Protocol 1.0.
 
   Canonical authority state is published as a validated no-op AccountSet:
     <COMMUNITY>-LEAP/AUTHORITY/OPERATING-WALLET=<XRPL-ADDRESS>
@@ -255,7 +255,7 @@ export async function resolveCommunityAuthority({
           throughLedger: null
         }],
         resolvedAt: new Date().toISOString(),
-        // Compatibility aliases for pages written before the 0.15 naming cleanup.
+        // Legacy compatibility aliases retained for pages using the earlier bootstrap naming.
         bootstrapped: false,
         bootstrapNeeded: true,
         bootstrapStatement: null
@@ -351,7 +351,7 @@ export async function resolveCommunityAuthority({
       transitions,
       intervals,
       resolvedAt: new Date().toISOString(),
-      // Compatibility aliases for pages written before the 0.15 naming cleanup.
+      // Legacy compatibility aliases retained for pages using the earlier bootstrap naming.
       bootstrapped: true,
       bootstrapNeeded: false,
       bootstrapStatement: { ...initialStatement }

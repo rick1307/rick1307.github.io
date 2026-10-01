@@ -8,7 +8,7 @@
       id: "sfl",
       backendId: "SFL",
       aliases: ["SFL", "sfl", "sailing-frogs-leap"],
-      // Existing pre-authority-state Operating Wallet used only for the one-time Protocol 0.15 migration.
+      // Existing pre-authority-state Operating Wallet used only for the one-time existing-community migration.
       // After the first canonical OPERATING-WALLET statement validates, XRPL authority state is authoritative.
       operatingWallet: "r9BwELxkK5CEvpTeYeCvMnD4KPC6jdq8MF",
       directoryStatus: "Current Community",
