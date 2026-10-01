@@ -958,7 +958,7 @@
         </div>
         <section class="metrics" id="communityStateMetrics" aria-label="Community tokenomics dashboard">
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Community Allocation" data-info-title="Community Allocation" data-info-calc="Sum of protocol-valid Allocation Checks from the Global Distribution Wallet to an account authorized for this community at the time of allocation that were successfully cashed." data-info-text="This is how much LEAP Wild Ledger has provisioned to this community over time." data-info-action="Do not replenish just because the community balance is low. Compare Allocation with Inventory, Deployment, and Reach. If Allocation keeps rising while Deployment or Reach stays weak, pause additional LEAP and find out why the community is not converting inventory into participation.">i</button>
+            <button class="metric-info" type="button" aria-label="About Community Allocation" data-info-title="Community Allocation" data-info-calc="Sum of successfully cashed protocol-valid Allocation Checks from the authorized Distributor whose canonical allocation memo names this community. The Check destination is delivery/audit data, not the source of community identity." data-info-text="This is how much LEAP Wild Ledger has provisioned to this community over time." data-info-action="Do not replenish just because the community balance is low. Compare Allocation with Inventory, Deployment, and Reach. If Allocation keeps rising while Deployment or Reach stays weak, pause additional LEAP and find out why the community is not converting inventory into participation.">i</button>
             <div class="metric-value" id="metricCommunityAllocation" aria-live="polite">—</div>
             <div class="metric-label">Community Allocation</div>
             <div class="metric-meaning">Provisioning</div>
@@ -1018,7 +1018,7 @@
             <div class="allocation-log-heading">
               <div class="allocation-log-title-row">
                 <div class="allocation-log-title" id="allocation-log-title">Allocation Log</div>
-                <div class="allocation-log-subtitle">— Owner → Community</div>
+                <div class="allocation-log-subtitle">— Distributor → Community</div>
               </div>
             </div>
             <div class="allocation-log-summary" id="allocationLogSummary" aria-live="polite">Loading…</div>
@@ -1038,7 +1038,7 @@
               </tbody>
             </table>
           </div>
-          <p class="allocation-log-note" id="allocationLogNote">Only protocol-valid Allocation Checks to an XRPL-authorized Community Operating Wallet appear here.</p>
+          <p class="allocation-log-note" id="allocationLogNote">Protocol-valid Allocation Checks are attributed by community namespace; destination is retained as delivery and audit data.</p>
         </div>
       </section>
     </section>
@@ -1397,6 +1397,24 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
     return { raw, amount };
   }
 
+  function allocationDeliveryDestinations(globalHistory) {
+    const destinations = new Set();
+    for (const entry of globalHistory) {
+      if (!transactionSucceeded(entry)) continue;
+      const { tx } = transactionParts(entry);
+      if (tx.TransactionType !== "CheckCreate") continue;
+      if (String(tx.Account || "") !== globalDistributionWallet) continue;
+      if (!isLeapAmount(tx.SendMax)) continue;
+      const sendMax = leapAmountValue(tx.SendMax);
+      if (!Number.isSafeInteger(sendMax) || sendMax <= 0) continue;
+      const memo = canonicalAllocationMemo(tx);
+      if (!memo || memo.amount !== sendMax) continue;
+      const destination = String(tx.Destination || "");
+      if (destination) destinations.add(destination);
+    }
+    return [...destinations];
+  }
+
   function qualifiesExternalDestination(destination, account) {
     return Boolean(
       destination &&
@@ -1444,8 +1462,8 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
     return output;
   }
 
-  function analyzeAllocations(globalHistory, operatingHistory) {
-    const allHistory = dedupeHistory([...globalHistory, ...operatingHistory]);
+  function analyzeAllocations(globalHistory, deliveryHistory) {
+    const allHistory = dedupeHistory([...globalHistory, ...deliveryHistory]);
     const terminalByCheckId = new Map();
 
     for (const entry of allHistory) {
@@ -1468,7 +1486,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
       if (tx.TransactionType !== "CheckCreate") continue;
       if (String(tx.Account || "") !== globalDistributionWallet) continue;
       const allocationDestination = String(tx.Destination || "");
-      if (!authority || !isAuthorizedAtLedger(authority, allocationDestination, entryLedger(entry), entryTransactionIndex(entry))) continue;
+      if (!allocationDestination) continue;
       if (!isLeapAmount(tx.SendMax)) continue;
 
       const sendMax = leapAmountValue(tx.SendMax);
@@ -1489,6 +1507,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
         checkId,
         amount: sendMax,
         memo: memo.raw,
+        destination: allocationDestination,
         status,
         createdDate: entryDate(entry),
         createdHash: transactionHash(entry),
@@ -1610,6 +1629,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
           <td>
             <span class="allocation-amount">${escapeHtml(formatLeap(item.amount))} LEAP</span>
             <span class="allocation-memo">${escapeHtml(item.memo)}</span>
+            <span class="allocation-memo">Delivered to ${escapeHtml(item.destination)}</span>
           </td>
           <td><span class="allocation-status ${escapeHtml(statusClass)}">${escapeHtml(item.status)}</span></td>
           <td>${escapeHtml(cashDate)}</td>
@@ -1653,7 +1673,21 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
       ]);
       const operatingHistory = dedupeHistory(operatingHistories.flat());
 
-      const allocations = analyzeAllocations(globalHistory, operatingHistory);
+      // Allocation ownership is established by the canonical community memo, not by
+      // whether the delivery wallet is or remains an Operating Wallet. Fetch each
+      // matching delivery wallet only so CheckCash/CheckCancel status can be audited.
+      const knownOperatingAccounts = new Set(authority.accounts || []);
+      const allocationDestinations = allocationDeliveryDestinations(globalHistory)
+        .filter(account => account && account !== globalDistributionWallet && !knownOperatingAccounts.has(account));
+      const allocationDeliveryHistories = await Promise.all(allocationDestinations.map((account, index) =>
+        fetchAccountHistory(ws, nextId, account, `allocation-destination-history-${index + 1}`)
+      ));
+      const allocationDeliveryHistory = dedupeHistory([
+        ...operatingHistory,
+        ...allocationDeliveryHistories.flat()
+      ]);
+
+      const allocations = analyzeAllocations(globalHistory, allocationDeliveryHistory);
       const distribution = analyzeCommunityDistribution(operatingHistory);
       const balances = await loadIssuerLines(ws, nextId, distribution.recipients);
       const completedAllocation = allocations
@@ -1685,7 +1719,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityA
         guidingMetricsSection.title = `Notional guidance from validated ${communityName} deployment. Concentration is measured across recipient wallets; eligible replenishment uses a 3% Growth Rate Provision.`;
       }
       if (allocationLogNote) {
-        allocationLogNote.textContent = `Only protocol-valid ${communityNamespace}/ALLOCATION=<AMOUNT> Checks to an account that was authorized for this community at the time of allocation are included.`;
+        allocationLogNote.textContent = `Protocol-valid ${communityNamespace}/ALLOCATION=<AMOUNT> Checks are attributed to ${communityName} by the canonical memo namespace. Destination records where each allocation was delivered and may be an older wallet.`;
       }
     } catch (error) {
       console.error("Wild Ledger community dashboard:", error);
