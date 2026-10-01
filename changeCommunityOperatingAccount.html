@@ -21,16 +21,16 @@
       <div class="top"><a class="back wl-header-control" id="backLink" href="setup.html">← Community Setup</a></div>
       <h1 id="communityTitle">Community</h1>
       <div class="kicker">Operating Wallet</div>
-      <p class="lead">Publish the canonical XRPL protocol statement that identifies this community's current Operating Wallet. The ledger supplies provenance, ordering, and history; Wild Ledger resolves the latest valid value.</p>
+      <p class="lead">This wallet is the community's on-ledger operating identity. It creates recognition Checks and publishes community protocol statements. Wild Ledger resolves the current wallet from the latest valid XRPL authority statement.</p>
     </header>
     <div class="body">
       <div class="grid">
         <section class="card wide">
-          <h2>Canonical authority state</h2>
-          <div class="small">Protocol 0.13 uses one state key: <strong>OPERATING-WALLET</strong>. The LEAP Issuer publishes the first value. After that, the current Operating Wallet may replace itself directly.</div>
+          <h2>Operating Wallet authority</h2>
+          <div class="small">The canonical state key is <strong>OPERATING-WALLET</strong>. If an existing community has not published its first on-ledger value yet, its configured current Operating Wallet publishes that first statement naming itself. After that, the currently resolved Operating Wallet may name a replacement directly.</div>
           <div class="status-grid">
-            <div class="row"><div class="label">LEAP Issuer</div><div class="value" id="issuerAccount">—</div></div>
-            <div class="row"><div class="label">Current wallet</div><div class="value wait" id="currentAccount">Resolving from XRPL…</div></div>
+            <div class="row"><div class="label">Configured current wallet</div><div class="value" id="migrationAccount">—</div></div>
+            <div class="row"><div class="label">Canonical current wallet</div><div class="value wait" id="currentAccount">Resolving from XRPL…</div></div>
             <div class="row"><div class="label">Authority state</div><div class="value wait" id="authorityStatus">Resolving…</div></div>
             <div class="row"><div class="label">Required signer</div><div class="value" id="requiredSigner">—</div></div>
           </div>
@@ -68,7 +68,7 @@
             <div class="row"><div class="label">Publication</div><div class="value wait" id="publicationStatus">Not prepared.</div></div>
             <div class="row"><div class="label">Transaction</div><div class="value" id="txStatus">—</div></div>
           </div>
-          <div class="notice" id="authorityNotice"><strong>Protocol rule:</strong> the first statement must be signed by the LEAP Issuer. Later statements must be signed by the Operating Wallet resolved immediately before the transaction. No successor acceptance is required. Emergency recovery is not defined in Protocol 0.13.</div>
+          <div class="notice" id="authorityNotice"><strong>Authority rule:</strong> for an existing community with no on-ledger Operating Wallet statement yet, the configured current Operating Wallet signs the first statement and names itself. After that, every change must be signed by the Operating Wallet that is canonical immediately before the new statement. The newest valid value becomes current. Emergency recovery is not yet defined.</div>
         </section>
       </div>
     </div>
@@ -94,13 +94,12 @@
   const namespace = community?.leapNamespace || `${communityId}-LEAP`;
   const config = window.WILD_LEDGER_CONFIG || {};
   const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
-  const issuer = String(config.leapIssuer || "").trim();
   const projectId = String(config.walletConnectProjectId || "").trim();
   const feeCushion = Number(config.xrplFeeCushion || 1.2);
 
   const backLink = document.getElementById("backLink");
   const communityTitle = document.getElementById("communityTitle");
-  const issuerAccount = document.getElementById("issuerAccount");
+  const migrationAccount = document.getElementById("migrationAccount");
   const currentAccount = document.getElementById("currentAccount");
   const authorityStatus = document.getElementById("authorityStatus");
   const requiredSignerDisplay = document.getElementById("requiredSigner");
@@ -134,7 +133,7 @@
   communityTitle.textContent = communityName;
   document.title = `${communityName} | Operating Wallet`;
   backLink.href = `setup.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}&mode=edit`;
-  issuerAccount.textContent = issuer || "Missing from Wild Ledger config";
+  migrationAccount.textContent = String(community.operatingWallet || "") || "Missing from community config";
 
   function setStatus(element, text, tone = "") {
     element.textContent = text;
@@ -158,8 +157,13 @@
       prepareButton.disabled = true;
       return;
     }
-    if (authority?.bootstrapped && target === authority.currentAccount) {
-      memoPreview.textContent = "Enter a different wallet for a routine rotation.";
+    if (authority?.initialStatementNeeded && target !== requiredSigner) {
+      memoPreview.textContent = "The first on-ledger statement must name the current Operating Wallet itself.";
+      prepareButton.disabled = true;
+      return;
+    }
+    if (authority?.authorityEstablished && target === authority.currentAccount) {
+      memoPreview.textContent = "Enter a different wallet to change the Operating Wallet.";
       prepareButton.disabled = true;
       return;
     }
@@ -180,7 +184,9 @@
     const signerMatches = !!connectedAccount && connectedAccount === requiredSigner;
     connectButton.disabled = busy || !!signer;
     disconnectButton.disabled = busy || !signer;
-    prepareButton.disabled = busy || !requiredSigner || !isClassicAddress(targetAccount()) || (authority?.bootstrapped && targetAccount() === authority.currentAccount);
+    prepareButton.disabled = busy || !requiredSigner || !isClassicAddress(targetAccount()) ||
+      (authority?.initialStatementNeeded && targetAccount() !== requiredSigner) ||
+      (authority?.authorityEstablished && targetAccount() === authority.currentAccount);
     signButton.disabled = busy || !preparedTransaction || !signerMatches;
     submitButton.disabled = busy || !signedBlob;
   }
@@ -190,24 +196,26 @@
     updateButtons();
     setStatus(authorityStatus, "Resolving validated XRPL authority state…", "wait");
     try {
-      authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer, issuerAccount: issuer, force });
-      if (authority.bootstrapNeeded) {
-        requiredSigner = issuer;
-        currentAccount.textContent = authority.legacyConfiguredAccount || "Not yet established on XRPL";
+      authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer, force });
+      if (authority.initialStatementNeeded) {
+        requiredSigner = authority.legacyConfiguredAccount || authority.currentAccount || "";
+        currentAccount.textContent = requiredSigner || "Not yet established on XRPL";
         currentAccount.className = "value wait";
-        setStatus(authorityStatus, "Bootstrap required — no canonical OPERATING-WALLET statement exists yet.", "wait");
+        setStatus(authorityStatus, "First on-ledger OPERATING-WALLET statement has not been published.", "wait");
         requiredSignerDisplay.textContent = requiredSigner || "—";
-        statementTitle.textContent = "Bootstrap Operating Wallet";
-        statementHelp.textContent = "The LEAP Issuer publishes this community's first canonical OPERATING-WALLET value.";
-        if (!newAccount.value && authority.legacyConfiguredAccount) newAccount.value = authority.legacyConfiguredAccount;
+        statementTitle.textContent = "Publish Operating Wallet to XRPL";
+        statementHelp.textContent = "The configured current Operating Wallet publishes the first canonical statement naming itself.";
+        newAccount.value = requiredSigner;
+        newAccount.readOnly = true;
       } else {
+        newAccount.readOnly = false;
         requiredSigner = authority.currentAccount;
         currentAccount.textContent = authority.currentAccount;
         currentAccount.className = "value good";
-        setStatus(authorityStatus, `Canonical on XRPL. ${authority.transitions.length} routine rotation${authority.transitions.length === 1 ? "" : "s"} resolved.`, "good");
+        setStatus(authorityStatus, `Canonical on XRPL. ${authority.transitions.length} prior wallet change${authority.transitions.length === 1 ? "" : "s"} resolved.`, "good");
         requiredSignerDisplay.textContent = requiredSigner;
-        statementTitle.textContent = "Replace Operating Wallet";
-        statementHelp.textContent = "The currently authorized Operating Wallet may publish a new value directly. The new value becomes authoritative after validation.";
+        statementTitle.textContent = "Change Operating Wallet";
+        statementHelp.textContent = "The current Operating Wallet may publish a replacement value directly. After validation, the new value becomes current.";
       }
       clearPrepared();
       refreshMemo();
@@ -251,7 +259,7 @@
       connectedAccount = String(connection.account || "");
       walletName.textContent = connection.walletName || "Connected wallet";
       signerAccount.textContent = connectedAccount || "—";
-      if (connectedAccount === requiredSigner) setStatus(connectionStatus, "Connected signer matches the authority required by Protocol 0.13.", "good");
+      if (connectedAccount === requiredSigner) setStatus(connectionStatus, "Connected wallet is the required Operating Wallet.", "good");
       else setStatus(connectionStatus, `Connected account is not the required signer (${requiredSigner || "unresolved"}).`, "bad");
     } catch (error) {
       signer = null; connectedAccount = "";
@@ -280,7 +288,8 @@
   prepareButton.addEventListener("click", async () => {
     const target = targetAccount();
     if (!requiredSigner || !isClassicAddress(target)) return;
-    if (authority?.bootstrapped && target === authority.currentAccount) return;
+    if (authority?.initialStatementNeeded && target !== requiredSigner) return;
+    if (authority?.authorityEstablished && target === authority.currentAccount) return;
     busy = true; updateButtons();
     signedBlob = "";
     try {

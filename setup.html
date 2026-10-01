@@ -654,20 +654,21 @@
           <div class="section-head">
             <div>
               <h2>Community Operating Wallet</h2>
-              <p>The community stays the same when its XRPL Operating Wallet changes. Canonical authority is published on XRPL and is not an editable browser-draft field.</p>
+              <p>This is the community's XRPL operating identity. It creates recognition Checks and publishes community protocol statements. The wallet can change without changing the community.</p>
             </div>
             <span class="permission-tag">XRPL authority</span>
           </div>
           <div class="grid-2">
             <div class="field full">
-              <label>Pre-0.13 / bootstrap value</label>
-              <div class="hint" id="operatingWalletDisplay">Not configured.</div>
+              <label>Current Operating Wallet</label>
+              <div class="hint" id="operatingWalletDisplay">Resolving from XRPL…</div>
+              <div class="hint" id="operatingWalletState">Checking canonical authority state.</div>
             </div>
           </div>
           <div class="button-row">
             <a class="secondary-button" id="manageOperatingAccountLink" href="changeCommunityOperatingAccount.html">Manage Operating Wallet</a>
           </div>
-          <div class="notice"><strong>Authority rule:</strong> Protocol 0.13 resolves the current Operating Wallet from the latest valid <code>AUTHORITY/OPERATING-WALLET</code> statement on XRPL. The configured value shown here is only pre-0.13 compatibility/bootstrap data.</div>
+          <div class="notice"><strong>Authority rule:</strong> Wild Ledger resolves the current Operating Wallet from the latest valid <code>AUTHORITY/OPERATING-WALLET</code> statement on XRPL. Before an existing community's first on-ledger statement exists, its configured current wallet may publish that first statement naming itself.</div>
         </section>
 
         <section class="section-card">
@@ -803,6 +804,7 @@
     </section>
   </main>
 
+  <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js"></script>
   <script>
     (() => {
@@ -830,7 +832,9 @@
       const publishNotice = document.getElementById("publishNotice");
       const operatingAccountSection = document.getElementById("operatingAccountSection");
       const operatingWalletDisplay = document.getElementById("operatingWalletDisplay");
+      const operatingWalletState = document.getElementById("operatingWalletState");
       const manageOperatingAccountLink = document.getElementById("manageOperatingAccountLink");
+      let authorityDisplayRequest = 0;
 
       const params = new URLSearchParams(window.location.search);
       const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
@@ -1155,6 +1159,46 @@
 
       }
 
+      async function refreshOperatingWalletAuthority(sourceCommunity) {
+        const requestId = ++authorityDisplayRequest;
+        if (!operatingWalletDisplay || !operatingWalletState) return;
+
+        if (!sourceCommunity) {
+          operatingWalletDisplay.textContent = "Not established yet.";
+          operatingWalletState.textContent = "No existing community authority state to resolve.";
+          return;
+        }
+
+        const configuredWallet = String(sourceCommunity.operatingWallet || "").trim();
+        if (!configuredWallet) {
+          operatingWalletDisplay.textContent = "No Operating Wallet configured.";
+          operatingWalletState.textContent = "This community does not yet have an Operating Wallet to resolve.";
+          return;
+        }
+
+        operatingWalletDisplay.textContent = "Resolving from XRPL…";
+        operatingWalletState.textContent = "Checking the latest valid OPERATING-WALLET statement.";
+
+        try {
+          const serverUrl = window.WILD_LEDGER_CONFIG?.xrplWebSocket || "";
+          if (!serverUrl) throw new Error("XRPL server is not configured.");
+          const { resolveCommunityAuthority } = await import("./js/communityAuthority.js");
+          const authority = await resolveCommunityAuthority({ community: sourceCommunity, serverUrl });
+          if (requestId !== authorityDisplayRequest) return;
+
+          operatingWalletDisplay.textContent = authority.currentAccount || configuredWallet;
+          if (authority.authorityEstablished) {
+            operatingWalletState.textContent = "Canonical on XRPL — latest valid OPERATING-WALLET statement wins.";
+          } else {
+            operatingWalletState.textContent = "First on-ledger statement not yet published. This configured current wallet must name itself in that first statement.";
+          }
+        } catch (error) {
+          if (requestId !== authorityDisplayRequest) return;
+          operatingWalletDisplay.textContent = configuredWallet;
+          operatingWalletState.textContent = `XRPL authority could not be resolved: ${error?.message || String(error)}`;
+        }
+      }
+
       function applyWorkspacePresentation() {
         const configId = currentSourceId === "new" ? "" : currentSourceId;
         const communityName = configId && communities[configId]
@@ -1165,8 +1209,7 @@
         if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
 
         const sourceCommunity = configId ? communities[configId] : null;
-        const configuredOperatingWallet = sourceCommunity?.operatingWallet || "";
-        if (operatingWalletDisplay) operatingWalletDisplay.textContent = configuredOperatingWallet || "No pre-0.13 value configured.";
+        refreshOperatingWalletAuthority(sourceCommunity);
         if (manageOperatingAccountLink && configId) {
           const backendId = backendCommunityId(configId);
           manageOperatingAccountLink.href = `changeCommunityOperatingAccount.html?community=${encodeURIComponent(backendId)}&role=${encodeURIComponent(role)}`;
@@ -1178,8 +1221,10 @@
             setupBackLink.textContent = "← Communities";
             setupBackLink.href = "communities.html";
           }
+          authorityDisplayRequest += 1;
           if (manageOperatingAccountLink) manageOperatingAccountLink.hidden = true;
-          if (operatingWalletDisplay) operatingWalletDisplay.textContent = "Established when the community is activated on XRPL.";
+          if (operatingWalletDisplay) operatingWalletDisplay.textContent = "Not established yet.";
+          if (operatingWalletState) operatingWalletState.textContent = "This is a new community draft; no XRPL Operating Wallet exists yet.";
           applyFieldPermissions();
           return;
         }
