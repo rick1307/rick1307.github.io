@@ -17,6 +17,9 @@ import {
 } from "./communityAuthority.js";
 
 export const RECOGNITION_CATEGORIES = Object.freeze(["BADGE", "CHALLENGE", "EVENT"]);
+export const PROTOCOL_BUILT_IN_RECOGNITIONS = Object.freeze([
+  Object.freeze({ category: "BADGE", id: "GREAT-CHAT", permanent: true })
+]);
 export const PERMANENT_LEAP_DISTRIBUTOR = "rnbmFoUKhnMZ8QCJ6kA5J2uwfP8rm9cUdU";
 
 const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
@@ -309,21 +312,181 @@ function applyLifecycle(records, record) {
 }
 
 function globalRecognitionDefinitions() {
-  const configured = globalThis?.WILD_LEDGER_CONFIG?.globalRecognitions;
-  if (!Array.isArray(configured)) return [];
+  // Protocol-defined built-ins are constants of interpretation, not community
+  // lifecycle state and not configurable protocol facts.
+  return PROTOCOL_BUILT_IN_RECOGNITIONS.map(item => ({ ...item }));
+}
 
-  const seen = new Set();
-  const definitions = [];
-  for (const item of configured) {
-    const category = String(item?.category || "").trim().toUpperCase();
-    const id = String(item?.id || "").trim().toUpperCase();
-    if (!RECOGNITION_CATEGORIES.includes(category) || !validCanonicalId(category, id)) continue;
-    const key = `${category}:${id}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    definitions.push({ category, id, permanent: item?.permanent !== false });
+function protocolBuiltInRecognition(category, id) {
+  const normalizedCategory = String(category || "").trim().toUpperCase();
+  const normalizedId = String(id || "").trim().toUpperCase();
+  return PROTOCOL_BUILT_IN_RECOGNITIONS.find(item =>
+    item.category === normalizedCategory && item.id === normalizedId
+  ) || null;
+}
+
+function positionNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function compareLedgerPosition(a, b) {
+  if (!a || !b) return null;
+  const aLedger = positionNumber(a.ledger);
+  const bLedger = positionNumber(b.ledger);
+  if (aLedger === null || bLedger === null) return null;
+  if (aLedger !== bLedger) return aLedger < bLedger ? -1 : 1;
+
+  const aTxIndex = positionNumber(a.txIndex);
+  const bTxIndex = positionNumber(b.txIndex);
+  if (aTxIndex === null || bTxIndex === null) return null;
+  if (aTxIndex === bTxIndex) return 0;
+  return aTxIndex < bTxIndex ? -1 : 1;
+}
+
+export function recognitionAvailabilityFromCatalog({
+  catalog,
+  category,
+  id,
+  ledgerIndex: awardLedgerIndex,
+  transactionIndex: awardTransactionIndex
+}) {
+  const normalizedCategory = String(category || "").trim().toUpperCase();
+  const normalizedId = String(id || "").trim().toUpperCase();
+  const awardPosition = {
+    ledger: positionNumber(awardLedgerIndex),
+    txIndex: positionNumber(awardTransactionIndex)
+  };
+
+  if (!RECOGNITION_CATEGORIES.includes(normalizedCategory) || !validCanonicalId(normalizedCategory, normalizedId)) {
+    return {
+      available: false,
+      reason: "INVALID_RECOGNITION_ID",
+      category: normalizedCategory,
+      id: normalizedId
+    };
   }
-  return definitions;
+
+  if (awardPosition.ledger === null) {
+    return {
+      available: false,
+      reason: "INVALID_AWARD_POSITION",
+      category: normalizedCategory,
+      id: normalizedId
+    };
+  }
+
+  const builtIn = protocolBuiltInRecognition(normalizedCategory, normalizedId);
+  if (builtIn) {
+    return {
+      available: true,
+      reason: "PROTOCOL_BUILT_IN",
+      category: normalizedCategory,
+      id: normalizedId,
+      source: "protocol",
+      permanent: builtIn.permanent === true
+    };
+  }
+
+  const records = Array.isArray(catalog?.records) ? catalog.records : [];
+  const record = records.find(item =>
+    String(item?.category || "").toUpperCase() === normalizedCategory &&
+    String(item?.id || "").toUpperCase() === normalizedId
+  ) || null;
+
+  if (!record || !record.created) {
+    return {
+      available: false,
+      reason: "DEFINITION_NOT_ESTABLISHED",
+      category: normalizedCategory,
+      id: normalizedId
+    };
+  }
+
+  const createdComparison = compareLedgerPosition(awardPosition, record.created);
+  if (createdComparison === null) {
+    return {
+      available: false,
+      reason: "AMBIGUOUS_CREATE_ORDER",
+      category: normalizedCategory,
+      id: normalizedId,
+      source: record.source || null
+    };
+  }
+  if (createdComparison < 0) {
+    return {
+      available: false,
+      reason: "NOT_YET_ESTABLISHED",
+      category: normalizedCategory,
+      id: normalizedId,
+      source: record.source || null
+    };
+  }
+
+  if (record.terminal) {
+    const terminalComparison = compareLedgerPosition(awardPosition, record.terminal);
+    if (terminalComparison === null) {
+      return {
+        available: false,
+        reason: "AMBIGUOUS_TERMINAL_ORDER",
+        category: normalizedCategory,
+        id: normalizedId,
+        source: record.source || null
+      };
+    }
+    if (terminalComparison >= 0) {
+      return {
+        available: false,
+        reason: record.state === "IGNORED" ? "DEFINITION_IGNORED" : "DEFINITION_ENDED",
+        category: normalizedCategory,
+        id: normalizedId,
+        source: record.source || null
+      };
+    }
+  }
+
+  return {
+    available: true,
+    reason: record.source === "legacy" ? "LEGACY_ESTABLISHED" : "LIFECYCLE_AVAILABLE",
+    category: normalizedCategory,
+    id: normalizedId,
+    source: record.source || null
+  };
+}
+
+export async function recognitionAvailabilityAtPosition({
+  community,
+  serverUrl,
+  issuer,
+  currency,
+  category,
+  id,
+  ledgerIndex,
+  transactionIndex,
+  force = false
+}) {
+  const catalog = await loadRecognitionCatalog({
+    community,
+    serverUrl,
+    issuer,
+    currency,
+    force,
+    includeIgnored: true
+  });
+
+  return recognitionAvailabilityFromCatalog({
+    catalog,
+    category,
+    id,
+    ledgerIndex,
+    transactionIndex
+  });
+}
+
+export async function isRecognitionAvailableAtPosition(options) {
+  const result = await recognitionAvailabilityAtPosition(options);
+  return result.available === true;
 }
 
 function sortRecords(records) {
@@ -436,9 +599,9 @@ export async function loadRecognitionCatalog({
 
     for (const record of lifecycleRecords) applyLifecycle(records, record);
 
-    // Wild Ledger may provide permanent recognition definitions to every community.
-    // These are application-level definitions, not community lifecycle state, so a
-    // community CREATE/END/IGNORE cannot create, retire, or suppress them.
+    // Protocol-defined built-ins are available to every community without a
+    // community lifecycle record. Community CREATE/END/IGNORE cannot create,
+    // retire, or suppress them.
     for (const definition of globalRecognitionDefinitions()) {
       records.set(`${definition.category}:${definition.id}`, {
         category: definition.category,
