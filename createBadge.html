@@ -473,6 +473,42 @@
       busy = false; refreshValidation();
     }
 
+
+    async function assertPreparedAuthorityCurrent(stage) {
+      if (!preparedTransaction?.Account) {
+        throw new Error("No prepared transaction is available for authority verification.");
+      }
+
+      const preparedAccount = preparedTransaction.Account;
+      clearCommunityAuthorityCache();
+      const latestAuthority = await resolveCommunityAuthority({
+        community,
+        serverUrl:xrplServer,
+        force:true
+      });
+
+      if (latestAuthority.initialStatementNeeded || !latestAuthority.currentAccount) {
+        throw new Error("This community does not currently have a resolvable Community Operating Wallet.");
+      }
+
+      authority = latestAuthority;
+      operatingWallet = latestAuthority.currentAccount;
+      setStatus(
+        authorityStatus,
+        `${operatingWallet} — canonical XRPL authority; ${authority.transitions.length} routine rotation${authority.transitions.length === 1 ? "" : "s"} resolved.`,
+        "good"
+      );
+
+      if (operatingWallet !== preparedAccount) {
+        clearPreparedTransaction();
+        throw new Error(
+          `The Community Operating Wallet changed before ${stage}. Recheck validated XRPL history and prepare a new transaction using ${operatingWallet}.`
+        );
+      }
+
+      return operatingWallet;
+    }
+
     form.addEventListener("submit", async event => {
       event.preventDefault();
       const normalized = canonicalizeId(badgeIdInput.value); badgeIdInput.value = normalized;
@@ -493,6 +529,11 @@
       if (!signer || !preparedTransaction) return;
       busy = true; refreshValidation();
       try {
+        setStatus(publicationStatus, "Rechecking Community Operating Wallet authority before signing…", "wait");
+        await assertPreparedAuthorityCurrent("signing");
+        if (connectedAccount !== operatingWallet) {
+          throw new Error(`Connected signer ${connectedAccount || "—"} is not the current Community Operating Wallet ${operatingWallet}.`);
+        }
         setStatus(publicationStatus, "Waiting for signer approval…", "wait");
         const result = await signer.signTransaction(preparedTransaction);
         signedBlob = result.signedBlob;
@@ -505,6 +546,8 @@
       if (!signedBlob) return;
       busy = true; refreshValidation();
       try {
+        setStatus(publicationStatus, "Rechecking Community Operating Wallet authority before submission…", "wait");
+        await assertPreparedAuthorityCurrent("submission");
         setStatus(publicationStatus, "Submitting signed transaction directly to XRPL and waiting for validation…", "wait");
         const result = await submitSignedTransaction({ serverUrl:xrplServer, signedBlob });
         if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated with ${result.finalResult}.`);
