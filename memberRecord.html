@@ -2675,23 +2675,9 @@
       }
 
       function renderPersonalChronological(sorted) {
-        const seenBadges = new Set();
-
         for (const record of sorted) {
-          const factsToShow = [];
-
-          for (const fact of record.facts) {
-            if (fact.key === "BADGE") {
-              const badgeKey = String(fact.value || "").trim().toUpperCase();
-              if (!badgeKey || seenBadges.has(badgeKey)) continue;
-              seenBadges.add(badgeKey);
-            }
-
-            factsToShow.push(fact);
-          }
-
-          if (factsToShow.length) {
-            logbookEntries.appendChild(makeLogbookEntry(record, factsToShow));
+          if (record.facts.length) {
+            logbookEntries.appendChild(makeLogbookEntry(record, record.facts));
           }
         }
       }
@@ -2715,55 +2701,6 @@
 
           head.appendChild(title);
           section.appendChild(head);
-
-          if (key === "BADGE") {
-            const badgeRecords = new Map();
-
-            for (const record of currentLogbookRecords) {
-              for (const fact of record.facts) {
-                if (fact.key !== "BADGE" || !fact.value) continue;
-
-                const badgeValue = fact.value.trim();
-                const badgeKey = badgeValue.toUpperCase();
-                const existing = badgeRecords.get(badgeKey);
-                const candidateTime = record.time ? new Date(record.time).getTime() : Number.POSITIVE_INFINITY;
-                const existingTime = existing?.record?.time
-                  ? new Date(existing.record.time).getTime()
-                  : Number.POSITIVE_INFINITY;
-
-                if (!existing || candidateTime < existingTime) {
-                  badgeRecords.set(badgeKey, {
-                    record,
-                    fact:{ key:"BADGE", value:badgeValue }
-                  });
-                }
-              }
-            }
-
-            const badges = [...badgeRecords.values()].sort((a, b) =>
-              a.fact.value.localeCompare(b.fact.value, undefined, { sensitivity:"base" })
-            );
-
-            const count = document.createElement("span");
-            count.textContent = `${badges.length} badge${badges.length === 1 ? "" : "s"}`;
-            head.appendChild(count);
-
-            if (!badges.length) {
-              const empty = document.createElement("div");
-              empty.className = "logbook-empty";
-              empty.textContent = "No badges recorded yet.";
-              section.appendChild(empty);
-            } else {
-              for (const badge of badges) {
-                section.appendChild(
-                  makeLogbookEntry(badge.record, [badge.fact])
-                );
-              }
-            }
-
-            logbookEntries.appendChild(section);
-            continue;
-          }
 
           const matches = [];
 
