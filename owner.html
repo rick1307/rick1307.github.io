@@ -620,19 +620,19 @@
           <div class="metric-meaning">Supply</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Sum of LEAP held by configured Wild Ledger community and distribution accounts." data-info-text="This is operating inventory available for future awards, recognition, and community distribution." data-info-action="If inventory is falling while 30-Day Distribution is strong, prepare to replenish community accounts. If inventory stays high while distribution is weak, do not add more LEAP—focus on participation and distribution instead.">i</button>
+          <button class="metric-info" type="button" aria-label="About Community LEAP" data-info-title="Community LEAP" data-info-calc="Sum of LEAP held in wallets associated with registered communities: current/historical Community Operating Wallets plus protocol-valid community allocation delivery wallets. Distributor inventory is separate." data-info-text="This is community-held LEAP inventory. Distributor inventory is tracked separately and is not counted as Community LEAP." data-info-action="If inventory is falling while 30-Day Distribution is strong, prepare to replenish community accounts. If inventory stays high while distribution is weak, do not add more LEAP—focus on participation and distribution instead.">i</button>
           <div class="metric-value" id="metricCommunity" aria-live="polite">…</div>
           <div class="metric-label">Community LEAP</div>
           <div class="metric-meaning">Inventory</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About LEAP in the Wild" data-info-title="LEAP in the Wild" data-info-calc="LEAP Outstanding minus Community LEAP." data-info-text="This is LEAP that has moved beyond Wild Ledger-controlled inventory into non-community wallets." data-info-action="Generally you want this to grow over time. Healthy growth should be accompanied by more Holders. If LEAP in the Wild rises but Holders do not, check Holder Concentration because circulation may be accumulating in only a few wallets.">i</button>
+          <button class="metric-info" type="button" aria-label="About LEAP in the Wild" data-info-title="LEAP in the Wild" data-info-calc="LEAP Outstanding minus Community LEAP minus LEAP held in authorized Distributor accounts." data-info-text="This is LEAP outside both community-held inventory and Distributor inventory." data-info-action="Generally you want this to grow over time. Healthy growth should be accompanied by more Holders. If LEAP in the Wild rises but Holders do not, check Holder Concentration because circulation may be accumulating in only a few wallets.">i</button>
           <div class="metric-value" id="metricWild" aria-live="polite">…</div>
           <div class="metric-label">LEAP in the Wild</div>
           <div class="metric-meaning">Circulation</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-calc="Count of non-community accounts with a positive LEAP balance." data-info-text="This is current reach: how many wallets actually hold LEAP now." data-info-action="Generally you want this rising over time. If 30-Day Distribution rises but Holders stay flat, existing holders are receiving more LEAP without reach expanding. Focus on bringing new participants into the ecosystem.">i</button>
+          <button class="metric-info" type="button" aria-label="About Holders" data-info-title="Holders" data-info-calc="Count of non-system accounts with a positive LEAP balance. Community-associated wallets and Distributor accounts are excluded." data-info-text="This is current reach: how many wallets actually hold LEAP now." data-info-action="Generally you want this rising over time. If 30-Day Distribution rises but Holders stay flat, existing holders are receiving more LEAP without reach expanding. Focus on bringing new participants into the ecosystem.">i</button>
           <div class="metric-value" id="metricHolders" aria-live="polite">…</div>
           <div class="metric-label">Holders</div>
           <div class="metric-meaning">Reach</div>
@@ -665,7 +665,7 @@
           <div class="metric-meaning">Pipeline</div>
         </div>
         <div class="metric">
-          <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-calc="Sum of validated LEAP actually delivered from configured community/distribution accounts to non-community wallets during the last 30 days." data-info-text="This is recent momentum: how much LEAP actually reached participants during the current operating period." data-info-action="You generally want sustainable growth as communities and participation expand. Do not overreact to one spike or one quiet month. Compare the trend with Holders and Active Communities to see whether movement is broadening or merely getting heavier in the same places.">i</button>
+          <button class="metric-info" type="button" aria-label="About 30-Day Distribution" data-info-title="30-Day Distribution" data-info-calc="Sum of validated LEAP delivered from community-associated operating/inventory wallets to non-system wallets during the last 30 days. Distributor allocation activity is not counted as member distribution." data-info-text="This is recent momentum: how much LEAP actually reached participants during the current operating period." data-info-action="You generally want sustainable growth as communities and participation expand. Do not overreact to one spike or one quiet month. Compare the trend with Holders and Active Communities to see whether movement is broadening or merely getting heavier in the same places.">i</button>
           <div class="metric-value" id="metricThirtyDayDistribution" aria-live="polite">—</div>
           <div class="metric-label">30-Day Distribution</div>
           <div class="metric-meaning">Momentum</div>
@@ -680,7 +680,7 @@
         </div>
         <section class="metrics metrics-secondary" aria-label="Wild Ledger ecosystem breadth and depth dashboard">
           <div class="metric">
-            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-calc="Current implementation: count of configured Wild Ledger community/distribution accounts. When the Owner Console has a formal community registry, this will count communities marked live there." data-info-text="This is footprint: how broadly Wild Ledger has expanded across independent communities." data-info-action="More is useful only when those communities become active. If Active Communities rises while Holders and 30-Day Distribution do not, community onboarding is not yet turning into member activity. Improve manager activation before simply adding more communities.">i</button>
+            <button class="metric-info" type="button" aria-label="About Active Communities" data-info-title="Active Communities" data-info-calc="Count of communities in the Community Registry that have an Operating Wallet or protocol-valid allocation activity. Distributor accounts are not communities." data-info-text="This is footprint: how broadly Wild Ledger has expanded across independent communities." data-info-action="More is useful only when those communities become active. If Active Communities rises while Holders and 30-Day Distribution do not, community onboarding is not yet turning into member activity. Improve manager activation before simply adding more communities.">i</button>
             <div class="metric-value" id="metricActiveCommunities" aria-live="polite">—</div>
             <div class="metric-label">Active Communities</div>
             <div class="metric-meaning">Footprint</div>
@@ -743,7 +743,10 @@
   </div>
 
   <script src="js/wildLedgerConfig.js"></script>
-  <script>
+  <script src="js/communityConfig.js"></script>
+  <script type="module">
+  import { resolveCommunityAuthority } from "./js/communityAuthority.js";
+
   (() => {
     const FALLBACK_CONFIG = Object.freeze({
       leapIssuer: "rh7SidU91xGW2Za5RvoKiCgS2YB2psTBgq",
@@ -757,8 +760,33 @@
     const config = window.WILD_LEDGER_CONFIG || FALLBACK_CONFIG;
     const issuer = config.leapIssuer;
     const leapCurrency = String(config.leapCurrency || "LEAP").toUpperCase();
-    const communityAccounts = new Set(config.leapDistributors || []);
+    const distributorAccounts = new Set(Array.isArray(config.leapDistributors) ? config.leapDistributors : []);
     const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
+
+    const communityRegistry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
+    const communityRecords = Object.values(communityRegistry).filter(community => community?.leapNamespace);
+    const communityByNamespace = new Map(communityRecords.map(community => [String(community.leapNamespace), community]));
+
+    // These sets intentionally model different architectural roles.
+    // Distributor accounts provision communities. They are not communities.
+    // Operating accounts are resolved from Protocol 0.15 authority state.
+    // Allocation delivery accounts preserve community-held inventory even when
+    // a community later changes its Operating Wallet.
+    const operatingAccounts = new Set();
+    const allocationDeliveryAccounts = new Set();
+    const communityAccounts = new Set();
+    const systemAccounts = new Set();
+    const activeCommunityIds = new Set();
+
+    function rebuildAccountSets() {
+      communityAccounts.clear();
+      for (const account of operatingAccounts) communityAccounts.add(account);
+      for (const account of allocationDeliveryAccounts) communityAccounts.add(account);
+
+      systemAccounts.clear();
+      for (const account of distributorAccounts) systemAccounts.add(account);
+      for (const account of communityAccounts) systemAccounts.add(account);
+    }
 
     const metricOutstanding = document.getElementById("metricOutstanding");
     const metricCommunity = document.getElementById("metricCommunity");
@@ -858,6 +886,122 @@
 
     function leapAmountValue(amount) {
       return isLeapAmount(amount) ? Number(amount.value) : 0;
+    }
+
+    function transactionSucceeded(entry) {
+      if (entry?.validated === false) return false;
+      const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+      const result = meta?.TransactionResult ?? meta?.transaction_result;
+      return !result || result === "tesSUCCESS";
+    }
+
+    function hexToUtf8(value) {
+      const hex = String(value || "");
+      if (!hex || !/^(?:[0-9A-Fa-f]{2})+$/.test(hex)) return hex;
+      try {
+        const bytes = new Uint8Array(hex.match(/.{2}/g).map(pair => parseInt(pair, 16)));
+        return new TextDecoder("utf-8", { fatal: false }).decode(bytes).replace(/\0+$/g, "");
+      } catch (_) {
+        return hex;
+      }
+    }
+
+    function decodedMemoStrings(tx) {
+      const values = [];
+      for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
+        const memo = wrapper?.Memo || {};
+        for (const key of ["MemoData", "MemoType", "MemoFormat"]) {
+          if (!memo[key]) continue;
+          const decoded = hexToUtf8(memo[key]).trim();
+          if (decoded) values.push(decoded);
+        }
+      }
+      return values;
+    }
+
+    function canonicalAllocationMemo(tx) {
+      const matches = [];
+      for (const value of decodedMemoStrings(tx)) {
+        for (const [namespace, community] of communityByNamespace) {
+          const prefix = `${namespace}/ALLOCATION=`;
+          if (!value.startsWith(prefix)) continue;
+          const amountText = value.slice(prefix.length);
+          if (!/^[1-9]\d*$/.test(amountText)) continue;
+          const amount = Number(amountText);
+          if (!Number.isSafeInteger(amount) || amount <= 0) continue;
+          matches.push({ community, namespace, amount, raw: value });
+        }
+      }
+      return matches.length === 1 ? matches[0] : null;
+    }
+
+    async function resolveCommunityRuntime() {
+      operatingAccounts.clear();
+      activeCommunityIds.clear();
+
+      for (const community of communityRecords) {
+        // Protocol 0.15 still uses the documented pre-authority-state wallet
+        // only as the migration anchor. Communities without one are not yet
+        // provisioned for canonical operating authority.
+        if (!community?.operatingWallet) continue;
+        const state = await resolveCommunityAuthority({
+          community,
+          serverUrl: xrplWebSocket
+        });
+        activeCommunityIds.add(String(community.id || community.backendId || community.leapNamespace));
+        for (const account of Array.isArray(state?.accounts) ? state.accounts : []) {
+          if (account) operatingAccounts.add(String(account));
+        }
+        if (state?.currentAccount) operatingAccounts.add(String(state.currentAccount));
+      }
+
+      rebuildAccountSets();
+    }
+
+    async function discoverAllocationDeliveryAccounts(ws, nextId) {
+      allocationDeliveryAccounts.clear();
+
+      for (const distributor of distributorAccounts) {
+        let marker;
+        do {
+          const command = {
+            command: "account_tx",
+            account: distributor,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            binary: false,
+            forward: false,
+            limit: 400
+          };
+          if (marker !== undefined) command.marker = marker;
+
+          const result = await request(ws, command, nextId("owner-allocations"));
+          const transactions = Array.isArray(result.transactions) ? result.transactions : [];
+
+          for (const entry of transactions) {
+            if (!transactionSucceeded(entry)) continue;
+            const tx = entry.tx_json || entry.tx || {};
+            if (tx.TransactionType !== "CheckCreate") continue;
+            if (String(tx.Account || "") !== distributor) continue;
+            if (!isLeapAmount(tx.SendMax)) continue;
+
+            const sendMax = leapAmountValue(tx.SendMax);
+            if (!Number.isSafeInteger(sendMax) || sendMax <= 0) continue;
+
+            const allocation = canonicalAllocationMemo(tx);
+            if (!allocation || allocation.amount !== sendMax) continue;
+
+            const destination = String(tx.Destination || "");
+            if (!destination) continue;
+            allocationDeliveryAccounts.add(destination);
+            activeCommunityIds.add(String(allocation.community.id || allocation.community.backendId || allocation.namespace));
+          }
+
+          marker = result.marker;
+        } while (marker !== undefined && marker !== null);
+      }
+
+      rebuildAccountSets();
     }
 
     function setLoading() {
@@ -1039,7 +1183,7 @@
             if (resultCode && resultCode !== "tesSUCCESS") continue;
 
             // 30-day distribution: count LEAP actually delivered from a
-            // configured community/distribution account to a non-community wallet.
+            // community-associated account to a non-system wallet.
             const when = transactionTimeMs(entry);
             if (Number.isFinite(when) && when >= cutoff) {
               const hash = entry.hash || tx.hash || tx.Hash;
@@ -1063,7 +1207,7 @@
                   if (
                     qualifies &&
                     destination !== issuer &&
-                    !communityAccounts.has(destination)
+                    !systemAccounts.has(destination)
                   ) {
                     distributed30 += leapAmountValue(delivered);
                     if (hash) countedDistributionHashes.add(hash);
@@ -1073,7 +1217,7 @@
             }
 
             // Recognition completion: reconstruct LEAP Checks created by a
-            // configured community account and their final outcomes.
+            // community-associated account and their final outcomes.
             if (
               tx.TransactionType === "CheckCreate" &&
               tx.Account === account &&
@@ -1138,13 +1282,21 @@
       let ws;
 
       try {
+        await resolveCommunityRuntime();
         ws = await openSocket();
         let marker;
         let ledgerIndex = "validated";
         let requestNumber = 0;
         const nextId = prefix => `${prefix}-${++requestNumber}`;
+
+        // Protocol-valid allocation memos identify the community independently
+        // from the delivery wallet. Discover those delivery wallets so an older
+        // wallet does not become "wild" merely because the Operating Wallet changed.
+        await discoverAllocationDeliveryAccounts(ws, nextId);
+
         let outstanding = 0;
         let communityLeap = 0;
+        let distributorLeap = 0;
         let wildLeap = 0;
         let holders = 0;
         let trustlines = 0;
@@ -1177,6 +1329,8 @@
 
             if (communityAccounts.has(line.account)) {
               communityLeap += held;
+            } else if (distributorAccounts.has(line.account)) {
+              distributorLeap += held;
             } else {
               wildLeap += held;
               holders += 1;
@@ -1194,11 +1348,20 @@
         setMetric(metricTrustlines, trustlines.toLocaleString());
         setMetric(metricCirculationRate, formatPercent(outstanding > 0 ? (wildLeap / outstanding) * 100 : 0));
 
-        // Footprint currently uses the configured Wild Ledger community/
-        // distribution accounts. When the Owner Console gains a formal
-        // community registry, this metric can move to that registry without
-        // changing the dashboard UI.
-        setMetric(metricActiveCommunities, communityAccounts.size.toLocaleString());
+        const communityInfo = document.querySelector('[data-info-title="Community LEAP"]');
+        if (communityInfo) {
+          communityInfo.dataset.infoText = `${formatLeap(communityLeap)} LEAP is held in community-associated wallets. ${formatLeap(distributorLeap)} LEAP remains in Distributor inventory and is excluded from both Community LEAP and LEAP in the Wild.`;
+        }
+
+        const activeInfo = document.querySelector('[data-info-title="Active Communities"]');
+        if (activeInfo) {
+          activeInfo.dataset.infoText = `${activeCommunityIds.size.toLocaleString()} ${activeCommunityIds.size === 1 ? "community is" : "communities are"} currently represented by the Community Registry with Operating Wallet or allocation activity.`;
+        }
+
+        // Footprint comes from the Community Registry plus protocol-valid
+        // community allocation activity. Distributor accounts are never counted
+        // as communities.
+        setMetric(metricActiveCommunities, activeCommunityIds.size.toLocaleString());
 
         const sortedWildHoldings = wildHoldings.slice().sort((a, b) => b - a);
         const topFiveWild = sortedWildHoldings.slice(0, 5).reduce((sum, value) => sum + value, 0);
@@ -1257,7 +1420,7 @@
         }
 
         if (metricsSection) {
-          metricsSection.title = `Validated XRPL ledger ${ledgerIndex}. Community LEAP uses configured Wild Ledger distributor/community accounts.`;
+          metricsSection.title = `Validated XRPL ledger ${ledgerIndex}. Communities come from the Community Registry; Operating Wallet authority comes from XRPL; Distributor inventory is tracked separately.`;
         }
         fitAllMetricValues();
       } catch (error) {
