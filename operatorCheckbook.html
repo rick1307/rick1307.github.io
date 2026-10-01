@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Operator Checkbook</title>
+  <title>Community Checkbook</title>
   <style>
     :root {
       --ink:#10243a; --muted:#66788b; --line:#dbe4ec; --soft:#f4f7fa; --panel:#fff;
@@ -94,8 +94,8 @@
 </head>
 <body>
 <main class="wrap">
-  <div class="top wl-nav-right"><a class="back wl-header-control" href="viewCommunityLibrary.html">View Community Library →</a></div>
-  <h1>Operator Checkbook</h1>
+  <div class="top wl-nav-right"><a class="back wl-header-control" id="communityBackLink" href="viewCommunity.html">View Community →</a></div>
+  <h1>Community Checkbook</h1>
   <p class="intro">The working view of every outstanding official LEAP Check. Cashed and canceled Checks disappear automatically because they are no longer open ledger objects.</p>
 
   <div class="statusbar">
@@ -176,6 +176,12 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   const requestedCommunity = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
   const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunity) || null;
   const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedCommunity) || String(requestedCommunity).trim().toUpperCase();
+  const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "operator").trim().toLowerCase();
+  const role = requestedRole === "owner" ? "owner" : "operator";
+  const communityBackLink = document.getElementById("communityBackLink");
+  if (communityBackLink) {
+    communityBackLink.href = `viewCommunity.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+  }
   const config = window.WILD_LEDGER_CONFIG || {};
   const XRPL_SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
   const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
@@ -345,7 +351,7 @@ import { resolveCommunityAuthority, isAuthorizedAtLedger, clearCommunityAuthorit
   async function selectCancel(object,create){
     const checkId=checkObjectId(object);
     if(!/^[A-Fa-f0-9]{64}$/.test(checkId)){showError("This Check does not have a valid Check ID, so a cancellation request cannot be prepared.");return;}
-    if(!operatorCanCancel(object)){showError("This is a legacy Distributor-owned recognition Check. It remains visible for history, but the Operator Checkbook does not use the Distributor wallet for cleanup.");return;}
+    if(!operatorCanCancel(object)){showError("This is a legacy Distributor-owned recognition Check. It remains visible for history, but the Community Checkbook does not use the Distributor wallet for cleanup.");return;}
     const source=String(object.Account||"");
     if(!isClassicAddress(source)){showError("This Check does not identify a valid source wallet.");return;}
     cancelSelection={checkId,source,amount:`${object.SendMax?.value??create?.amount?.value??"?"} LEAP`,reason:formatReason(create)};

@@ -237,6 +237,7 @@
         <div class="community-links">
           <a class="community-link" id="communityTokenomicsLink" href="viewCommunityTokenomics.html">Tokenomics</a>
           <a class="community-link" id="communityRecognitionLink" href="viewCommunityRecognition.html">Recognition</a>
+          <a class="community-link" id="communityCheckbookLink" href="operatorCheckbook.html">Checkbook</a>
           <a class="community-link" id="communityLibraryLink" href="viewCommunityLibrary.html">Library</a>
         </div>
       </header>
@@ -261,6 +262,7 @@
   const operatorLogout = document.getElementById("operatorLogout");
   const communityTokenomicsLink = document.getElementById("communityTokenomicsLink");
   const communityRecognitionLink = document.getElementById("communityRecognitionLink");
+  const communityCheckbookLink = document.getElementById("communityCheckbookLink");
   const communityLibraryLink = document.getElementById("communityLibraryLink");
   const communityEditLink = document.getElementById("communityEditLink");
 
@@ -285,6 +287,12 @@
 
   if (communityRecognitionLink) {
     communityRecognitionLink.href = `viewCommunityRecognition.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
+  }
+
+  if (communityCheckbookLink && role !== "operator") {
+    communityCheckbookLink.remove();
+  } else if (communityCheckbookLink) {
+    communityCheckbookLink.href = `operatorCheckbook.html?community=${encodeURIComponent(requestedId)}&role=operator`;
   }
 
   if (communityLibraryLink) {
