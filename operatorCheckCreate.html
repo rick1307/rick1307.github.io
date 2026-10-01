@@ -453,7 +453,7 @@
     <div id="errorBox" class="errorbox"></div>
 
     <p class="footnote">
-      Registry rule: active Badge, Event, and Challenge choices come from canonical Community Operating Wallet lifecycle history, with backward-compatible legacy recognition history. Current recognition Checks are created by the Community Operating Wallet. Badges are reusable and remain available for repeat awards. For a specific destination, the same exact Event or Challenge is hidden while pending or after redemption; canceled or legacy-expired unredeemed Checks reopen it.
+      Registry rule: active Badge, Event, and Challenge choices come from canonical Community Operating Wallet lifecycle history, backward-compatible legacy recognition history, and permanent Wild Ledger-supplied definitions such as Great Chat. Current recognition Checks are created by the Community Operating Wallet. Badges are reusable and remain available for repeat awards. For a specific destination, the same exact Event or Challenge is hidden while pending or after redemption; canceled or legacy-expired unredeemed Checks reopen it.
     </p>
   </main>
 
@@ -476,6 +476,12 @@
     const LEGACY_DISTRIBUTORS = Array.isArray(config.leapDistributors) ? config.leapDistributors.map(String) : [];
     const NAMESPACE = community?.leapNamespace || `${communityId}-LEAP`;
     const CATEGORIES = ["BADGE", "EVENT", "CHALLENGE"];
+    const GLOBAL_RECOGNITIONS = (Array.isArray(config.globalRecognitions) ? config.globalRecognitions : [])
+      .map(item => ({
+        key:String(item?.category || "").trim().toUpperCase(),
+        value:String(item?.id || "").trim().toUpperCase()
+      }))
+      .filter(item => CATEGORIES.includes(item.key) && item.value);
     const ACCOUNTSET_SPECIFIC_FIELDS = ["ClearFlag","Domain","EmailHash","MessageKey","NFTokenMinter","SetFlag","TransferRate","TickSize","WalletLocator","WalletSize"];
 
     let authority = null;
@@ -598,6 +604,7 @@
         for(const value of legacyRegistry[key]){ const state=lifecycle[key].get(value)?.state; if(state!=="ENDED"&&state!=="IGNORED")registry[key].add(value); }
         for(const [value,record] of lifecycle[key]) if(record.state==="ACTIVE")registry[key].add(value);
       }
+      for(const item of GLOBAL_RECOGNITIONS) registry[item.key]?.add(item.value);
     }
     function rippleNow(){return Math.floor(Date.now()/1000)-946684800;}
     function issueState(issue){const r=issue.checkId?resolutions.get(issue.checkId):""; if(r)return r; if(issue.expiration&&issue.expiration<=rippleNow())return "expired"; return "pending";}

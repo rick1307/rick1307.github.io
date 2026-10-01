@@ -199,6 +199,12 @@
     const leapIssuer = String(config.leapIssuer || "").trim();
     const leapCurrency = String(config.leapCurrency || "").trim();
     const legacyDistributors = Array.isArray(config.leapDistributors) ? [...config.leapDistributors] : [];
+    const globalBadgeIds = new Set(
+      (Array.isArray(config.globalRecognitions) ? config.globalRecognitions : [])
+        .filter(item => String(item?.category || "").trim().toUpperCase() === "BADGE")
+        .map(item => canonicalizeId(item?.id))
+        .filter(Boolean)
+    );
 
     const back = document.getElementById("recognitionBack");
     const title = document.getElementById("communityTitle");
@@ -389,6 +395,7 @@
     }
     function describeExisting(record) {
       if (!record) return "";
+      if (record.state === "GLOBAL") return "Reserved — this Badge is supplied by Wild Ledger and is permanently available to every community.";
       if (record.state === "IGNORED") return `Reserved — this Badge ID was previously marked IGNORE on XRPL${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
       if (record.state === "ENDED") return `Reserved — this Badge ID was ended/retired on XRPL${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
       if (record.state === "AVAILABLE") return `Reserved — this Badge ID already has a CREATE lifecycle record${record.ledger ? ` (ledger ${record.ledger})` : ""}.`;
@@ -417,6 +424,7 @@
     async function scanHistory(forceAuthority = false) {
       if (scanInProgress) return;
       scanInProgress = true; historyLoaded = false; reservedBadges = new Map();
+      for (const id of globalBadgeIds) reservedBadges.set(id, { state:"GLOBAL", ledger:null, source:"global" });
       clearPreparedTransaction();
       setStatus(xrplStatus, "Resolving authority and scanning validated XRPL history…", "wait");
       refreshValidation();

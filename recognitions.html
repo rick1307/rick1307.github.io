@@ -288,7 +288,9 @@
 
       const copy = document.createElement("p");
       copy.className = "card-copy";
-      copy.textContent = metadata?.description || metadata?.copy || `No display description has been published yet. The ${info.singular.toLowerCase()} itself is established on XRPL.`;
+      copy.textContent = metadata?.description || metadata?.copy || (record.source === "global"
+        ? `This ${info.singular.toLowerCase()} is supplied by Wild Ledger and is available to every community.`
+        : `No display description has been published yet. The ${info.singular.toLowerCase()} itself is established on XRPL.`);
       card.appendChild(copy);
 
       const meta = document.createElement("div");
@@ -304,6 +306,11 @@
         createdChip.className = "meta-chip";
         createdChip.textContent = record.source === "legacy" ? `Established before lifecycle activation · ${createdDate}` : `Created · ${createdDate}`;
         meta.appendChild(createdChip);
+      } else if (record.source === "global") {
+        const globalChip = document.createElement("span");
+        globalChip.className = "meta-chip";
+        globalChip.textContent = "Wild Ledger built-in · Permanent";
+        meta.appendChild(globalChip);
       } else if (record.source === "legacy") {
         const legacyChip = document.createElement("span");
         legacyChip.className = "meta-chip";
@@ -367,7 +374,11 @@
       }
 
       const total = result.records.length;
-      document.getElementById("catalogStatus").textContent = `${total} recognition definition${total === 1 ? "" : "s"} reconstructed from XRPL.`;
+      const globalCount = result.records.filter(record => record.source === "global").length;
+      const xrplCount = total - globalCount;
+      document.getElementById("catalogStatus").textContent = globalCount
+        ? `${xrplCount} XRPL recognition definition${xrplCount === 1 ? "" : "s"} plus ${globalCount} permanent Wild Ledger built-in.`
+        : `${total} recognition definition${total === 1 ? "" : "s"} reconstructed from XRPL.`;
       document.getElementById("catalogDetail").textContent = `Lifecycle activation ledger ${result.activation.ledger.toLocaleString()}`;
     }
 

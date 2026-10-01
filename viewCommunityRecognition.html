@@ -1614,7 +1614,7 @@
           rows.push({
             id,
             state,
-            source: life ? "lifecycle" : "legacy",
+            source: life?.source || (life ? "lifecycle" : "legacy"),
             created: life?.create || old || null,
             terminal: life?.terminal || null
           });
@@ -1666,6 +1666,10 @@
             const label = category === "BADGE" ? "Retired" : category === "CHALLENGE" ? "Closed" : "Completed";
             const status = document.createElement("div");
             status.textContent = rowData.terminal?.time ? `${label} · ${prettyDate(rowData.terminal.time)}` : label;
+            meta.appendChild(status);
+          } else if (rowData.source === "global") {
+            const status = document.createElement("div");
+            status.textContent = "Wild Ledger built-in";
             meta.appendChild(status);
           } else if (rowData.source === "legacy") {
             const status = document.createElement("div");
@@ -1789,6 +1793,7 @@
             } else {
               lifecycle[record.category].set(record.id, {
                 state: record.state,
+                source: record.source || "lifecycle",
                 create: record.created || null,
                 terminal: record.terminal || null
               });
