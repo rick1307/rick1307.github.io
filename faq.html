@@ -368,11 +368,15 @@
       height:auto;
     }
 
+
+    /* Shared surface owns the public shell; FAQ keeps its established content width. */
+    body.wl-community-surface{--community-surface-max:var(--max)}
 </style>
 <link rel="stylesheet" href="communityTypography.css">
+  <link rel="stylesheet" href="communitySurface.css">
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
-<body>
+<body class="wl-community-surface">
   <nav>
     <div class="wrap nav-inner wl-nav-right">
       <div class="nav-links"><a class="wl-header-control" id="communityHomeLink" href="index.html">← Home</a></div>
