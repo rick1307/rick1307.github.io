@@ -1,0 +1,168 @@
+/* Wild Ledger public/community surface
+   Step 1 foundation only.
+
+   This file is intentionally inert until a page BOTH:
+   1) loads communitySurface.css, and
+   2) adds class="wl-community-surface" to <body>.
+
+   Scope: shared appearance only. No page behavior belongs here.
+   Page-specific layout stays in each page.
+*/
+
+:root{
+  /* Core Wild Ledger public palette */
+  --paper:#efe8d8;
+  --paper2:#f8f3e8;
+  --ink:#1a252c;
+  --navy:#16384b;
+  --sea:#2f7481;
+  --foam:#dbece8;
+  --rust:#b84f32;
+  --gold:#d2a34f;
+  --line:rgba(26,37,44,.18);
+  --card:#fffaf0;
+  --muted:#58666c;
+  --deep:#0b2d36;
+
+  /* Shared public-page surfaces already used across the member front end */
+  --community-page-background:
+    radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
+    radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
+    linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
+  --community-page-overlay:
+    repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
+    repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
+  --community-nav-background:rgba(226,235,230,.88);
+  --community-header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+  --community-section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+  --community-dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.96),rgba(37,96,106,.93));
+  --community-surface-max:1060px;
+}
+
+/* The class is the safety switch. Loading this file alone changes nothing. */
+body.wl-community-surface{
+  margin:0;
+  color:var(--ink);
+  background:var(--community-page-background);
+  background-size:auto;
+  font-family:var(--community-display-font, Georgia, "Times New Roman", serif);
+  line-height:1.62;
+}
+
+body.wl-community-surface::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.48;
+  background-image:var(--community-page-overlay);
+}
+
+.wl-community-surface a{color:inherit}
+.wl-community-surface .sans{font-family:var(--community-ui-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif)}
+.wl-community-surface .wrap{width:min(calc(100% - 34px),var(--community-surface-max));margin:auto}
+
+.wl-community-surface nav{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:var(--community-nav-background);
+  backdrop-filter:blur(10px) saturate(120%);
+  border-bottom:1px solid var(--line);
+}
+
+.wl-community-surface .nav-inner{
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.wl-community-surface .brand,
+.wl-community-surface .nav-links,
+.wl-community-surface .kicker,
+.wl-community-surface button,
+.wl-community-surface input,
+.wl-community-surface select,
+.wl-community-surface textarea{
+  font-family:var(--community-ui-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+}
+
+.wl-community-surface .nav-links{display:flex;gap:16px;align-items:center}
+.wl-community-surface .nav-links a{
+  text-decoration:none;
+  color:#4e5c62;
+  font-size:.9rem;
+  font-weight:750;
+}
+.wl-community-surface .nav-links a:hover{color:var(--rust)}
+
+.wl-community-surface .kicker{
+  color:var(--rust);
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:.78rem;
+  font-weight:900;
+}
+
+.wl-community-surface .wl-public-header{
+  background:var(--community-header-background);
+  border-bottom:1px solid var(--line);
+}
+
+.wl-community-surface .wl-public-section:nth-of-type(even){
+  background:var(--community-section-background);
+}
+
+.wl-community-surface .wl-public-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 14px 32px rgba(11,45,54,.06);
+}
+
+.wl-community-surface .wl-public-dark-feature{
+  background:var(--community-dark-feature-background);
+  color:white;
+}
+
+.wl-community-surface .button,
+.wl-community-surface button.wl-public-action{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  border-radius:8px;
+  padding:11px 17px;
+  background:var(--rust);
+  color:white;
+  text-decoration:none;
+  font-weight:850;
+}
+
+.wl-community-surface .button.secondary,
+.wl-community-surface button.wl-public-action.secondary{
+  background:transparent;
+  color:var(--deep);
+  border:1px solid rgba(18,59,70,.18);
+}
+
+.wl-community-surface input,
+.wl-community-surface select,
+.wl-community-surface textarea{
+  color:var(--ink);
+}
+
+@media(max-width:760px){
+  .wl-community-surface .wrap{width:min(calc(100% - 24px),var(--community-surface-max))}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .wl-community-surface *,
+  .wl-community-surface *::before,
+  .wl-community-surface *::after{
+    scroll-behavior:auto!important;
+  }
+}
