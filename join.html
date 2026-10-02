@@ -442,8 +442,8 @@
     .gateway-card h3{margin:0 0 7px;color:var(--navy);font-size:1.65rem;line-height:1.12}
     .gateway-card > p{margin:0;color:var(--muted)}
     .gateway-note{margin-top:10px;color:#5a686e;font-size:.9rem}
-    .gateway-card .leap-request-form{margin-top:18px}
-    .gateway-card .member-record-open{max-width:none;margin:16px 0 0;padding-top:14px}
+    .gateway-card .leap-request-form{margin-top:0}
+    .gateway-card .member-record-open{max-width:none;margin:0;padding-top:0;border-top:0}
     .gateway-card .member-record-open p{font-size:.98rem;color:var(--muted)}
     #request-first-leap,#returning-member{scroll-margin-top:84px}
 
@@ -495,13 +495,56 @@
       .brand img{width:36px;height:36px}
     }
 
-    /* Public wallet addresses are obscured for shoulder-surfing without
-       declaring them password credentials to the browser/Keychain. */
-    .wallet-address-input.masked-wallet{
-      -webkit-text-security:disc;
+    /* Public XRPL addresses stay ordinary text fields.
+       A visual overlay obscures the typed address without using password-field styling. */
+    .wallet-input-wrap.wallet-mask-wrap .wallet-address-input{
+      position:relative;
+      z-index:1;
     }
-    .wallet-address-input.masked-wallet.wallet-visible{
-      -webkit-text-security:none;
+    .wallet-input-wrap.wallet-mask-wrap.is-masked .wallet-address-input:not(:placeholder-shown){
+      color:transparent;
+      caret-color:var(--ink);
+    }
+    .wallet-mask-display{
+      position:absolute;
+      z-index:2;
+      left:0;
+      right:46px;
+      top:0;
+      bottom:0;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+      white-space:nowrap;
+      pointer-events:none;
+      padding:13px 14px;
+      color:var(--ink);
+      font-family:var(--community-ui-font);
+      font-size:1rem;
+      letter-spacing:.08em;
+    }
+    .wallet-input-wrap.wallet-mask-wrap:not(.is-masked) .wallet-mask-display{
+      display:none;
+    }
+
+    /* Keep the two gateway cards compact and visually balanced. */
+    .gateway-card{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .gateway-title-only{
+      margin:0 0 16px;
+      font-size:.82rem;
+    }
+    .gateway-card .leap-request-form,
+    .gateway-card .member-record-open{
+      margin:0;
+      padding:0;
+      border-top:0;
+    }
+    .gateway-card .member-record-status:empty{
+      display:none;
     }
 
 </style>
@@ -525,16 +568,15 @@
 <div class="wrap">
 <div class="gateway-grid">
 <div class="gateway-card gateway-primary" id="request-first-leap">
-<div class="gateway-label">New member</div>
-<h3>Request your first LEAP</h3>
-<div class="gateway-note">Public address only. Never send secret words or private keys.</div>
+<div class="gateway-label gateway-title-only">New Member</div>
 <form action="https://usebasin.com/f/93034286b67b" class="leap-request-form" data-basin-error-id="firstLeapError" data-basin-form="" data-basin-success-action="render" data-basin-success-id="firstLeapSuccess" id="firstLeapRequestForm" method="POST">
 <input id="firstLeapCommunityId" name="community_id" type="hidden" value=""/>
 <input id="firstLeapCommunityName" name="community_name" type="hidden" value=""/>
 <input id="firstLeapOperatorName" name="operator_name" type="hidden" value=""/>
 <div class="leap-request-row">
-<div class="wallet-input-wrap">
-<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" class="wallet-address-input masked-wallet" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="Enter your XRP Ledger address" required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="text"/>
+<div class="wallet-input-wrap wallet-mask-wrap is-masked">
+<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" data-1p-ignore="true" data-lpignore="true" data-form-type="other" class="wallet-address-input" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="XRPL address" required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="text"/>
+<span class="wallet-mask-display" aria-hidden="true"></span>
 <button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="firstLeapXrplAddress" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </div>
 <button class="button" type="submit">Request My First LEAP</button>
@@ -549,15 +591,12 @@
                 Could not send request. Please try again.
               </div></div>
 <div class="gateway-card" id="returning-member">
-<div class="gateway-label">Already cashed your first LEAP?</div>
-<h3>Open your Member Record</h3>
+<div class="gateway-label gateway-title-only">Already cashed your first LEAP?</div>
 <div class="member-record-open">
-<p id="memberRecordHandoffCopy">
-              Once you've cashed your first LEAP Check, enter your XRP Ledger address to open your Member Record.
-            </p>
 <div class="member-record-open-row">
-<div class="wallet-input-wrap">
-<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" class="wallet-address-input masked-wallet" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="text"/>
+<div class="wallet-input-wrap wallet-mask-wrap is-masked">
+<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" data-1p-ignore="true" data-lpignore="true" data-form-type="other" class="wallet-address-input" id="memberRecordWallet" inputmode="text" placeholder="XRPL address" spellcheck="false" type="text"/>
+<span class="wallet-mask-display" aria-hidden="true"></span>
 <button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="memberRecordWallet" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </div>
 <button class="button" id="openMemberRecordButton" type="button">Open My Member Record →</button>
@@ -726,12 +765,22 @@
 
       document.querySelectorAll("[data-wallet-toggle]").forEach(toggle => {
         const input = document.getElementById(toggle.dataset.walletToggle || "");
-        if (!input) return;
+        const wrap = input ? input.closest(".wallet-mask-wrap") : null;
+        const mask = wrap ? wrap.querySelector(".wallet-mask-display") : null;
+        if (!input || !wrap || !mask) return;
+
+        const refreshMask = () => {
+          mask.textContent = input.value ? "•".repeat(input.value.length) : "";
+        };
+        refreshMask();
+        input.addEventListener("input", refreshMask);
+
         toggle.addEventListener("click", () => {
-          const revealing = !input.classList.contains("wallet-visible");
-          input.classList.toggle("wallet-visible", revealing);
+          const revealing = wrap.classList.contains("is-masked");
+          wrap.classList.toggle("is-masked", !revealing);
           toggle.setAttribute("aria-pressed", revealing ? "true" : "false");
-          toggle.setAttribute("aria-label", revealing ? "Hide XRP Ledger address" : "Show XRP Ledger address");
+          toggle.setAttribute("aria-label", revealing ? "Hide XRPL address" : "Show XRPL address");
+          input.focus();
         });
       });
 
@@ -889,11 +938,6 @@
       const safetyCopy = document.getElementById("safetyCommunityCopy");
       if (safetyCopy) safetyCopy.textContent = `${communityName} only needs your public Xaman wallet address.`;
 
-      const memberRecordHandoffCopy = document.getElementById("memberRecordHandoffCopy");
-      if (memberRecordHandoffCopy) {
-        memberRecordHandoffCopy.textContent =
-          `Once you've cashed your first LEAP Check, enter your XRP Ledger address to open your ${community.recordLabel || "Member Record"}.`;
-      }
       if (openMemberRecordButton) {
         openMemberRecordButton.textContent = `Open My ${community.recordLabel || "Member Record"} →`;
       }
