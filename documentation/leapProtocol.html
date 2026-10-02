@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>LEAP Protocol 1.0</title>
+<title>LEAP Protocol 0.18</title>
 <style>
     :root{
       --ink:#10243a;
@@ -295,14 +295,15 @@
 <div class="shell">
 <header class="hero">
 <div class="eyebrow">Wild Ledger</div>
-<h1>LEAP Protocol 1.0</h1>
+<h1>LEAP Protocol 0.18</h1>
 <p>
       This is LEAP. Sections 1–6 are the authoritative Protocol Core. If you cannot accurately explain Sections 1–6, do not modify Wild Ledger protocol behavior.
     </p>
 <div class="meta">
 <span class="pill">XRPL Mainnet</span>
 <span class="pill">Protocol Core + Implementation Guide</span>
-<span class="pill">Last revised: 2026-10-01</span>
+<span class="pill">Authoritative current protocol</span>
+<span class="pill">Last revised: 2026-10-02</span>
 </div>
 </header>
 <div class="layout">
@@ -338,6 +339,12 @@
 </div>
 </nav>
 <main>
+<div class="decision">
+<div class="tag">Authoritative Current Protocol</div>
+<div>
+            Protocol 0.18 is the current authoritative LEAP Protocol for Wild Ledger. It defines the distinction between <strong>protocol-defined</strong> and <strong>community-defined</strong> recognition and defines <code>GREAT-CHAT</code> as the one recognition currently defined directly by the Protocol Core. It remains authoritative until changed by an explicit protocol revision under Section 15.
+          </div>
+</div>
 <section id="purpose">
 <h2>1. Purpose</h2>
 <p class="lead">
@@ -372,7 +379,7 @@
 </div>
 <div class="status-card">
 <b>Lifecycle State</b>
-<span class="mini">No LEAP moves. The community publishes which recognition definitions exist and whether they are available.</span>
+<span class="mini">No LEAP moves. The community publishes lifecycle state for community-defined recognition definitions.</span>
 </div>
 <div class="status-card">
 <b>Authority</b>
@@ -382,9 +389,9 @@
 <div class="rule">
 <div class="tag">Canonical State Principle</div>
 <div>
-            <strong>Canonical state exists only on XRPL. Wild Ledger is an interpreter of canonical state, never its keeper.</strong>
-            Any fact required to reconstruct authoritative Wild Ledger state <strong>MUST</strong> be recoverable from validated XRPL ledger history.
-            Off-ledger storage, browser storage, configuration files, caches, or presentation logic <strong>MUST NOT</strong> constitute authoritative protocol state.
+            <strong>Canonical community state exists only on XRPL. Wild Ledger is an interpreter of canonical state, never its keeper.</strong>
+            Protocol-defined constants, grammar, and meanings come from this Protocol Core. Every authoritative community-specific fact required to reconstruct what happened — including authority, lifecycle state, recognition awards, allocations, Earned LEAP, and rank inputs — <strong>MUST</strong> be recoverable from validated XRPL ledger history.
+            Off-ledger storage, browser storage, configuration files, caches, or presentation logic <strong>MUST NOT</strong> constitute authoritative community protocol state.
           </div>
 </div>
 <h3>Operating rules</h3>
@@ -394,7 +401,7 @@
 <li>Never treat a memo by itself as proof of official LEAP activity.</li>
 <li>Member recognition always involves LEAP moving to a member.</li>
 <li>Recognition-definition lifecycle state never moves LEAP and never recognizes a member.</li>
-<li>Recognition definitions and member recognition history are separate ledger-derived views and must never be substituted for one another.</li>
+<li>Recognition opportunities and member recognition history are separate views and must never be substituted for one another. Protocol-defined recognition comes from this Protocol Core; community-defined recognition state comes from validated XRPL lifecycle history; member-earned recognition comes from validated LEAP-bearing XRPL transactions.</li>
 <li>Current LEAP balance is a current wallet fact. Earned LEAP is cumulative community history. They are not interchangeable.</li>
 <li>Community rank is derived from that community's cumulative Earned LEAP, not from current wallet balance.</li>
 <li>Moving LEAP after it has been earned does not erase the earning history or reduce rank.</li>
@@ -492,7 +499,7 @@
 <tr><th>Object</th><th>Canonical pattern</th><th>Example</th></tr>
 <tr><td>Community ID</td><td>UPPERCASE-HYPHENATED</td><td><code>SFL</code></td></tr>
 <tr><td>Community root namespace</td><td><code>&lt;COMMUNITY&gt;-LEAP</code></td><td><code>SFL-LEAP</code></td></tr>
-<tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>GOOD-CHAT</code></td></tr>
+<tr><td>Badge ID</td><td>UPPERCASE-HYPHENATED</td><td><code>GREAT-CHAT</code></td></tr>
 <tr><td>Event ID</td><td>UPPERCASE-HYPHENATED</td><td><code>LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
 <tr><td>Challenge ID</td><td><code>LEAP-NNN</code></td><td><code>LEAP-001</code></td></tr>
 </table>
@@ -510,10 +517,30 @@
             A different community must not reuse the ID and inherit another community's namespace history. The same continuing community may retain its existing ID across Operating Wallet changes or operator succession.
           </div>
 </div>
-<h3>Recognition IDs</h3>
+<h3>Recognition Definition Origins</h3>
 <p>
-          A Badge, Event, or Challenge definition is created before it can be awarded. Wild Ledger should validate or generate compliant canonical IDs so Operators do not have to manually construct protocol strings.
-          Before creating a new definition, software must check the complete XRPL-derived history for that community and category and reject an ID that has already been established, ended, or ignored.
+          Every recognition definition has one of two origins: <strong>protocol-defined</strong> or <strong>community-defined</strong>. The origin determines how the definition exists; it does not create a new recognition category. Badge, Event, and Challenge remain the recognition categories.
+        </p>
+<div class="rule">
+<div class="tag">Two Definition Origins</div>
+<div>
+            A <strong>protocol-defined recognition</strong> exists because the LEAP Protocol Core defines it. It is available to every established LEAP community without a community lifecycle <code>CREATE</code>, and a Community Operator cannot <code>CREATE</code>, <code>END</code>, <code>IGNORE</code>, rename, or redefine it.
+            A <strong>community-defined recognition</strong> exists only after a valid canonical lifecycle <code>CREATE</code> for that community and is thereafter governed by the community lifecycle rules.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Protocol-Defined Recognition</div>
+<div>
+            The LEAP Protocol currently defines one protocol-defined recognition: <code>GREAT-CHAT</code>. <code>GREAT-CHAT</code> is a Badge. It exists automatically for every established LEAP community and requires no community lifecycle transaction.
+            Because <code>GREAT-CHAT</code> is a Badge, it follows the ordinary Badge recognition rules, including repeatability. Its protocol-defined status changes how the definition exists; it does not create a separate award mechanism or recognition category.
+            Each award remains scoped to the awarding community through that community's namespace, for example <code>SFL-LEAP/BADGE=GREAT-CHAT</code>. A Great Chat award contributes only to that member's Earned LEAP and rank in the awarding community.
+            The Protocol does not prescribe a Great Chat award amount; any award must satisfy the general LEAP recognition transaction rules.
+          </div>
+</div>
+<h3>Community-Defined Recognition IDs</h3>
+<p>
+          A community-defined Badge, Event, or Challenge definition must be created before it can be awarded. Wild Ledger should validate or generate compliant canonical IDs so Operators do not have to manually construct protocol strings.
+          Before creating a new community-defined definition, software must check the complete XRPL-derived history for that community and category and reject an ID that has already been established, ended, ignored, or reserved by the Protocol Core.
         </p>
 <h3>Broad-to-narrow specificity</h3>
 <p>
@@ -525,12 +552,12 @@ PANAMA-CREW-2026
 PANAMA-CREW-2026-MARCH
 PANAMA-CREW-2026-MARCH-13</code></pre>
 <div class="note">
-          A repeatable Badge such as <code>GOOD-CHAT</code> keeps the same canonical ID across awards. Individual XRPL transactions distinguish the individual awards.
+          A repeatable Badge such as <code>GREAT-CHAT</code> keeps the same canonical ID across awards. Individual XRPL transactions distinguish the individual awards.
         </div>
 <h3>Examples</h3>
 <pre><code>NEW-MEMBER
 FIRST-MEMBER
-GOOD-CHAT
+GREAT-CHAT
 PANAMA-CREW-2026
 LA-CRUZ-BEACH-BONFIRE-2026
 PACIFIC-CROSSING
@@ -563,21 +590,21 @@ LEAP-002</code></pre>
 <div>
             <strong>Member recognition and recognition-definition lifecycle are separate by design.</strong>
             A member recognition transaction transfers LEAP to a member and records what that member earned.
-            A lifecycle no-op <code>AccountSet</code> transfers no LEAP and records whether a Badge, Event, or Challenge definition exists and is available.
-            A lifecycle <code>CREATE</code> does not award recognition. A member recognition transaction does not create a recognition definition.
+            A lifecycle no-op <code>AccountSet</code> transfers no LEAP and records whether a <strong>community-defined</strong> Badge, Event, or Challenge definition exists and is available.
+            Protocol-defined recognition does not use community lifecycle transactions. A lifecycle <code>CREATE</code> does not award recognition, and a member recognition transaction does not create or redefine a recognition definition.
           </div>
 </div>
 <div class="decision">
-<div class="tag">Two Ledger-Derived Views</div>
+<div class="tag">Two Recognition Views</div>
 <div>
-            Wild Ledger reconstructs <strong>available recognition opportunities</strong> from validated lifecycle history and reconstructs <strong>member-earned recognition</strong> from validated LEAP-bearing recognition transactions.
-            Neither list substitutes for the other.
+            Wild Ledger constructs <strong>available recognition opportunities</strong> from protocol-defined recognition in this Protocol Core plus validated community lifecycle history, and reconstructs <strong>member-earned recognition</strong> from validated LEAP-bearing recognition transactions.
+            Neither view substitutes for the other.
           </div>
 </div>
 <h3>Recognition categories</h3>
 <table>
 <tr><th>Category</th><th>Meaning</th><th>Example award memo</th></tr>
-<tr><td><code>BADGE</code></td><td>Reusable recognition for something a member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=GOOD-CHAT</code></td></tr>
+<tr><td><code>BADGE</code></td><td>Reusable recognition for something a member did, contributed to, attended, or was recognized for</td><td><code>SFL-LEAP/BADGE=GREAT-CHAT</code></td></tr>
 <tr><td><code>EVENT</code></td><td>A specific real-world or community occurrence</td><td><code>SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026</code></td></tr>
 <tr><td><code>CHALLENGE</code></td><td>A numbered participation opportunity</td><td><code>SFL-LEAP/CHALLENGE=LEAP-001</code></td></tr>
 </table>
@@ -589,18 +616,19 @@ LEAP-002</code></pre>
           </div>
 </div>
 <h3>Lifecycle actions</h3>
+<p>Lifecycle actions apply only to community-defined recognitions. Protocol-defined recognitions do not participate in the community lifecycle.</p>
 <ul>
-<li><code>CREATE</code> establishes the recognition definition and makes it available according to its category.</li>
+<li><code>CREATE</code> establishes the community-defined recognition and makes it available according to its category.</li>
 <li><code>END</code> normally ends future availability without erasing prior valid awards.</li>
 <li><code>IGNORE</code> terminally marks an erroneous, invalid, test, or otherwise non-operational definition. The ID remains permanently reserved.</li>
 </ul>
 <h3>Canonical examples</h3>
-<pre><code>SFL-LEAP/BADGE=GOOD-CHAT
+<pre><code>SFL-LEAP/BADGE=GREAT-CHAT
 SFL-LEAP/EVENT=LA-CRUZ-BEACH-BONFIRE-2026
 SFL-LEAP/CHALLENGE=LEAP-001
 
-SFL-LEAP/RECOGNITION/BADGE/GOOD-CHAT/LIFECYCLE-TAG=CREATE
-SFL-LEAP/RECOGNITION/BADGE/GOOD-CHAT/LIFECYCLE-TAG=END
+SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=CREATE
+SFL-LEAP/RECOGNITION/BADGE/PANAMA-CREW-2026/LIFECYCLE-TAG=END
 SFL-LEAP/RECOGNITION/BADGE/TEST-BADGE/LIFECYCLE-TAG=IGNORE
 
 SFL-LEAP/ALLOCATION=500
@@ -631,7 +659,7 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 <tr><td>Community allocation delivery</td><td><code>CheckCash</code></td><td>The allocation Check is redeemed and LEAP is delivered.</td></tr>
 <tr><td>Member recognition by Check</td><td><code>CheckCreate</code> + successful <code>CheckCash</code></td><td>The Operating Wallet offers recognition; the member later accepts and receives the LEAP.</td></tr>
 <tr><td>Member recognition by direct delivery</td><td><code>Payment</code></td><td>The Operating Wallet delivers LEAP immediately to a member already able to receive it.</td></tr>
-<tr><td>Recognition-definition lifecycle</td><td>No-op <code>AccountSet</code></td><td>Creates, ends, or ignores a Badge, Event, or Challenge definition without moving LEAP.</td></tr>
+<tr><td>Recognition-definition lifecycle</td><td>No-op <code>AccountSet</code></td><td>Creates, ends, or ignores a community-defined Badge, Event, or Challenge without moving LEAP.</td></tr>
 <tr><td>Community authority state</td><td>No-op <code>AccountSet</code></td><td>Publishes a canonical community authority value without moving LEAP.</td></tr>
 <tr><td>Owner authority state</td><td>No-op <code>AccountSet</code></td><td>Publishes the canonical Owner Wallet without moving LEAP.</td></tr>
 <tr><td>Check cancellation</td><td><code>CheckCancel</code></td><td>Removes an unredeemed Check; no LEAP is earned from that canceled Check.</td></tr>
@@ -663,7 +691,7 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
           Authorized Community Operating Wallet → CheckCreate → member → CheckCash → Earned LEAP
         </div>
 <ul class="checklist">
-<li>The recognition definition already exists and is available at the ledger position of the <code>CheckCreate</code>.</li>
+<li>The recognition is protocol-defined and available under the Protocol Core, or its community-defined definition already exists and is available at the ledger position of the <code>CheckCreate</code>.</li>
 <li><code>Account</code> is the Community Operating Wallet authorized for that community at that ledger position.</li>
 <li><code>Destination</code> is the intended member wallet.</li>
 <li><code>SendMax</code> identifies canonical LEAP and contains a positive whole-number amount.</li>
@@ -689,7 +717,7 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
           Authorized Community Operating Wallet → Payment → member → Earned LEAP
         </div>
 <ul class="checklist">
-<li>The recognition definition already exists and is available at the ledger position of the Payment.</li>
+<li>The recognition is protocol-defined and available under the Protocol Core, or its community-defined definition already exists and is available at the ledger position of the Payment.</li>
 <li><code>Account</code> is the Community Operating Wallet authorized for that community at that ledger position.</li>
 <li><code>Destination</code> is the intended member wallet.</li>
 <li>The Payment successfully delivers a positive whole-number amount of canonical LEAP.</li>
@@ -726,9 +754,9 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 <div class="note">
           Cleanup timing, reminders, buttons, wallet-specific navigation, and other operating conveniences are Wild Ledger policy and UI behavior, not LEAP Protocol state.
         </div>
-<h3>7.5 Recognition-definition lifecycle — no-op <code>AccountSet</code></h3>
+<h3>7.5 Community-defined recognition lifecycle — no-op <code>AccountSet</code></h3>
 <p>
-          Lifecycle state is separate from member recognition. It moves no LEAP, names no member, and tells Wild Ledger what recognition opportunities exist and whether they remain available.
+          Community-defined lifecycle state is separate from member recognition. It moves no LEAP, names no member, and tells Wild Ledger which community-defined recognition opportunities exist and whether they remain available. Protocol-defined recognition does not use this lifecycle.
         </p>
 <div class="rule">
 <div class="tag">Canonical Lifecycle Transaction</div>
@@ -753,12 +781,12 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 <div class="rule">
 <div class="tag">Permanent ID Reservation</div>
 <div>
-            Before creating a Badge, Event, or Challenge, Wild Ledger must reject a canonical ID already established in that community and category, including IDs later ended or ignored.
+            Before creating a community-defined Badge, Event, or Challenge, Wild Ledger must reject a canonical ID already established in that community and category, including IDs later ended or ignored, and must reject an ID reserved by the Protocol Core such as <code>GREAT-CHAT</code>.
           </div>
 </div>
 <div class="note">
           For a community that existed before canonical community authority state, the validated position of its one-time existing-community migration statement is that community's recognition lifecycle activation point. Definitions supported by valid authorized historical recognition records before that point remain readable as legacy-established definitions. Their IDs remain reserved and may later receive <code>END</code> or <code>IGNORE</code> without a retroactive <code>CREATE</code>.
-          For a newly provisioned community, its first valid <code>OPERATING-WALLET</code> establishment transaction is both its canonical community-establishment point and its recognition lifecycle activation point. From that point forward, a recognition definition must be established by canonical <code>CREATE</code> before it can be awarded.
+          For a newly provisioned community, its first valid <code>OPERATING-WALLET</code> establishment transaction is both its canonical community-establishment point and its recognition lifecycle activation point. From that point forward, every <strong>community-defined</strong> recognition must be established by canonical <code>CREATE</code> before it can be awarded. Protocol-defined <code>GREAT-CHAT</code> is available automatically when the community is established and requires no lifecycle <code>CREATE</code>.
         </div>
 <h3>7.6 Community authority state — no-op <code>AccountSet</code></h3>
 <div class="rule">
@@ -848,12 +876,12 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 <section id="badges">
 <h2>9. Badge &amp; Historical Recognition Rules</h2>
 <p>
-          A Badge is a reusable recognition definition for something a member did, contributed to, attended, or was recognized for. <code>NEW-MEMBER</code> and <code>GOOD-CHAT</code> are Badges; onboarding and chat are not separate recognition categories.
+          A Badge is a reusable recognition definition for something a member did, contributed to, attended, or was recognized for. The LEAP Protocol currently defines one Badge directly: <code>GREAT-CHAT</code>. Because it is a Badge, <code>GREAT-CHAT</code> follows the ordinary Badge rules, including repeatability. Other Badges are community-defined when established by valid community lifecycle history. Chat is not a separate recognition category.
         </p>
 <div class="rule">
 <div class="tag">Badge Lifecycle</div>
 <div>
-            A valid lifecycle <code>CREATE</code> makes a Badge <strong>Available</strong>. A valid <code>END</code> makes it <strong>Retired</strong> for future awards. Retirement does not erase prior valid awards.
+            For a community-defined Badge, a valid lifecycle <code>CREATE</code> makes it <strong>Available</strong> and a valid <code>END</code> makes it <strong>Retired</strong> for future awards. Retirement does not erase prior valid awards. A protocol-defined Badge is available according to the Protocol Core and does not use the community lifecycle.
           </div>
 </div>
 <div class="rule">
@@ -864,7 +892,7 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 </div>
 <h3>Badge award validity</h3>
 <pre><code>validated success
-AND Badge definition exists and is available at the award ledger position
+AND Badge is protocol-defined OR its community-defined definition exists and is available at the award ledger position
 AND source = Community Operating Wallet authorized at that ledger position
 AND destination = member wallet
 AND asset = canonical LEAP
@@ -873,19 +901,19 @@ AND (successful matching CheckCash OR successful recognition Payment)</code></pr
 <div class="rule">
 <div class="tag">LEAP Standard</div>
 <div>
-            Correct memo text from an unauthorized account does not establish official Badge recognition. The authoritative Badge catalog comes from lifecycle history; member-earned Badge history comes from valid LEAP-bearing recognition transactions.
+            Correct memo text from an unauthorized account does not establish official Badge recognition. The authoritative Badge catalog comes from protocol-defined recognition in this Protocol Core plus valid community lifecycle history; member-earned Badge history comes from valid LEAP-bearing recognition transactions.
           </div>
 </div>
 <h3>Illustrative Badge IDs</h3>
 <pre><code>NEW-MEMBER
 FIRST-MEMBER
-GOOD-CHAT
+GREAT-CHAT
 LEAP-OG
 PANAMA-CREW-2026
 PACIFIC-CREW
 SFL-CAMEO</code></pre>
 <div class="note">
-          These examples are explanatory, not a separately maintained canonical registry. Production definitions are reconstructed from XRPL history.
+          <code>GREAT-CHAT</code> is protocol-defined. The other IDs above are illustrative community-defined examples; their production definitions exist only when established by valid XRPL lifecycle history. The Protocol does not create a separate recognition registry or off-ledger source of recognition truth.
         </div>
 </section>
 <section id="events">
@@ -939,12 +967,12 @@ SFL-CAMEO</code></pre>
 <p>Filter by the canonical LEAP issuer and currency value. The resulting balance answers current holdings only; it does not determine Earned LEAP or rank.</p>
 <h3>11.2 Member Earned LEAP and recognition history — <code>account_tx</code></h3>
 <p>
-          Scan validated member history with pagination. For each candidate recognition, validate the community namespace, recognition definition state at that ledger position, authorized Community Operating Wallet, asset identity, destination, transaction type, result, and memo.
+          Scan validated member history with pagination. For each candidate recognition, validate the community namespace, recognition origin and applicable definition state at that ledger position, authorized Community Operating Wallet, asset identity, destination, transaction type, result, and memo.
           For Check recognition, link the originating <code>CheckCreate</code> to the successful <code>CheckCash</code> by Check ID and use the amount actually delivered. For Payment recognition, use the amount actually delivered by the successful Payment.
         </p>
 <h3>11.3 Recognition opportunity catalog</h3>
 <p>
-          Reconstruct Badge, Event, and Challenge availability from validated lifecycle <code>AccountSet</code> history produced by wallets that were authorized for the community at the relevant ledger positions.
+          Begin with protocol-defined recognition in this Protocol Core, which currently defines <code>BADGE=GREAT-CHAT</code> for every established LEAP community. Add community-defined Badge, Event, and Challenge availability from validated lifecycle <code>AccountSet</code> history produced by wallets that were authorized for the community at the relevant ledger positions.
           Process lifecycle records in canonical XRPL order. This catalog answers what exists and is available; it is not member-earned history.
         </p>
 <h3>11.4 Outstanding Checks — <code>account_objects</code></h3>
@@ -964,7 +992,7 @@ SFL-CAMEO</code></pre>
 <tr><td>How much LEAP has this member earned here?</td><td>Sum actual LEAP delivered by valid community recognition Checks and Payments</td></tr>
 <tr><td>What is this member's rank here?</td><td>Apply the rank ladder to community Earned LEAP</td></tr>
 <tr><td>What recognitions has this member earned?</td><td>Validated recognition history after lifecycle/provenance validation</td></tr>
-<tr><td>What recognition opportunities exist now?</td><td>Validated recognition-definition lifecycle history</td></tr>
+<tr><td>What recognition opportunities exist now?</td><td>Protocol-defined recognition in the Protocol Core + validated community recognition lifecycle history</td></tr>
 <tr><td>Is a Check still outstanding?</td><td>Validated Check ledger object / <code>account_objects</code></td></tr>
 <tr><td>What is the current Owner Wallet?</td><td>Latest valid <code>OWNER-WALLET</code> authority-state value</td></tr>
 <tr><td>What is the current Operating Wallet?</td><td>Latest valid <code>OPERATING-WALLET</code> authority-state value</td></tr>
@@ -984,10 +1012,10 @@ SFL-CAMEO</code></pre>
 <li>The account that initiated the transaction was authorized for that act at that ledger position.</li>
 <li>LEAP-moving acts use the canonical LEAP issuer and canonical LEAP currency value.</li>
 <li>Member-facing recognition identifies the intended member destination and exactly one canonical Badge, Event, or Challenge memo.</li>
-<li>A new recognition award references a definition that already exists and is available at the award's ledger position, except where explicit legacy rules apply.</li>
+<li>A new recognition award references either a protocol-defined recognition available under the Protocol Core or a community-defined recognition that already exists and is available at the award's ledger position.</li>
 <li>A Check-based recognition is pending at <code>CheckCreate</code> and becomes earned only after the matching Check is successfully cashed.</li>
 <li>A Payment-based recognition becomes earned only when the LEAP Payment successfully validates and delivers LEAP.</li>
-<li>A lifecycle record is a no-op <code>AccountSet</code> from the authorized Community Operating Wallet, contains exactly one canonical lifecycle memo, and changes no AccountSet-specific setting.</li>
+<li>A community-defined lifecycle record is a no-op <code>AccountSet</code> from the authorized Community Operating Wallet, contains exactly one canonical lifecycle memo, and changes no AccountSet-specific setting. Protocol-defined recognition does not use community lifecycle records.</li>
 <li>A lifecycle <code>CREATE</code> does not reuse an already-reserved recognition ID.</li>
 <li>An allocation Check is created by the LEAP Distributor and contains exactly one canonical allocation memo whose amount matches the offered whole-number LEAP amount.</li>
 <li>Allocation ownership comes from the community namespace in the memo, not from the delivery address.</li>
@@ -1008,7 +1036,7 @@ SFL-CAMEO</code></pre>
 <table>
 <tr><th>Canonical ledger ID</th><th>Possible display label</th></tr>
 <tr><td><code>FIRST-MEMBER</code></td><td>First Member</td></tr>
-<tr><td><code>GOOD-CHAT</code></td><td>Good Chat</td></tr>
+<tr><td><code>GREAT-CHAT</code></td><td>Great Chat <span class="mini">(protocol-defined Badge)</span></td></tr>
 <tr><td><code>LEAP-OG</code></td><td>LEAP OG</td></tr>
 <tr><td><code>PANAMA-CREW-2026</code></td><td>Panama Crew 2026</td></tr>
 <tr><td><code>LEAP-001</code></td><td>LEAP 001</td></tr>
@@ -1046,6 +1074,9 @@ SFL-CAMEO</code></pre>
             Backward-compatible reading must not make an old draft form current again. Writers follow one current protocol; readers may understand older approved history where necessary.
           </div>
 </div>
+<div class="note">
+          <code>GREAT-CHAT</code> is not a legacy exception. It is protocol-defined and therefore requires no retroactive or future community lifecycle <code>CREATE</code>. Genuine legacy compatibility remains a separate evidence-based concern.
+        </div>
 </section>
 <section id="change">
 <h2>15. Versioning &amp; Change Control</h2>
@@ -1089,6 +1120,7 @@ SFL-CAMEO</code></pre>
 <tr><td>0.15</td><td>2026-09-30</td><td>Defined allocation attribution independently from wallet rotation. A valid Distributor allocation belongs to the community named by the canonical <code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code> memo; <code>Destination</code> records delivery and audit history but does not define community ownership. Historical allocations remain attributable to the same community after Operating Wallet changes.</td></tr>
 <tr><td>0.16</td><td>2026-10-01</td><td>Protocol hardening pass. Distinguished current LEAP from community Earned LEAP; made rank community-specific and cumulative; clarified one protocol-defined LEAP Distributor and Community Operator vs. Community Operating Wallet; removed the historical 1,000,000 supply cap as a protocol rule; made community namespaces generic and permanently reserved; clarified that recognition definitions are created and managed by no-op lifecycle <code>AccountSet</code> transactions while member recognition always transfers LEAP; added first-class recognition by <code>Payment</code> for payment-enabled members alongside recognition by Check; made Badges repeatable while Events and Challenges remain occurrence-specific; removed wallet-specific and seven-day UI procedures from the protocol; and rewrote implementation/query/validity guidance to conform to the core protocol.</td></tr>
 <tr><td>0.17</td><td>2026-10-01</td><td>Added protocol-level Owner Wallet authority, separate from the LEAP Issuer and LEAP Distributor. The current Owner Wallet may provision the first Community Operating Wallet for a brand-new Community ID and may transfer Owner authority to a successor Owner Wallet. After a community is established, the Owner Wallet has no continuing authority to replace that community's Operating Wallet; subsequent community authority changes are controlled by the current Community Operating Wallet.</td></tr>
+<tr><td>0.18</td><td>2026-10-02</td><td>Defined two recognition-definition origins: protocol-defined and community-defined. Defined <code>GREAT-CHAT</code> as the one recognition currently defined directly by the Protocol Core: a repeatable Badge automatically available to every established LEAP community without <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code>. Great Chat awards remain community-scoped through the community namespace and follow the ordinary Badge recognition rules. The Protocol does not prescribe a Great Chat award amount and does not create a separate recognition registry.</td></tr>
 </table>
 <div class="note">
           The change log records the evolution of earlier drafts. Superseded rules described in older rows are historical context, not current protocol requirements.
@@ -1132,7 +1164,7 @@ SFL-CAMEO</code></pre>
 </main>
 </div>
 <footer>
-    LEAP Protocol — working internal standard for Wild Ledger communities.
+    LEAP Protocol — current authoritative standard for Wild Ledger communities.
   </footer>
 </div>
 
