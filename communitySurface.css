@@ -24,18 +24,21 @@
   --muted:#58666c;
   --deep:#0b2d36;
 
-  /* Shared public-page surfaces already used across the member front end */
-  --community-page-background:
+  /* Fallbacks only. Existing community pages already expose --page-background,
+     --page-overlay, --nav-background, etc., and communityConfig may replace
+     those values at runtime. The shared surface consumes those canonical theme
+     variables first and falls back to these defaults only when they are absent. */
+  --wl-default-page-background:
     radial-gradient(circle at 12% -8%,rgba(215,174,98,.22),transparent 29%),
     radial-gradient(circle at 88% 4%,rgba(47,116,129,.22),transparent 31%),
     linear-gradient(180deg,#eee8dc 0%,#e2ebe6 24%,#d3e3df 56%,#bfd6d4 100%);
-  --community-page-overlay:
+  --wl-default-page-overlay:
     repeating-radial-gradient(ellipse at 18% 32%,transparent 0 30px,rgba(18,59,70,.045) 31px 32px,transparent 33px 64px),
     repeating-radial-gradient(ellipse at 82% 70%,transparent 0 40px,rgba(255,255,255,.18) 41px 42px,transparent 43px 80px);
-  --community-nav-background:rgba(226,235,230,.88);
-  --community-header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
-  --community-section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
-  --community-dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.96),rgba(37,96,106,.93));
+  --wl-default-nav-background:rgba(226,235,230,.88);
+  --wl-default-header-background:linear-gradient(180deg,rgba(239,232,216,.68),rgba(229,239,234,.18) 78%,transparent);
+  --wl-default-section-background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(18,59,70,.018),rgba(255,255,255,.06));
+  --wl-default-dark-feature-background:linear-gradient(135deg,rgba(16,58,69,.96),rgba(37,96,106,.93));
   --community-surface-max:1060px;
 }
 
@@ -43,7 +46,7 @@
 body.wl-community-surface{
   margin:0;
   color:var(--ink);
-  background:var(--community-page-background);
+  background:var(--page-background,var(--wl-default-page-background));
   background-size:auto;
   font-family:var(--community-display-font, Georgia, "Times New Roman", serif);
   line-height:1.62;
@@ -56,7 +59,7 @@ body.wl-community-surface::before{
   z-index:-1;
   pointer-events:none;
   opacity:.48;
-  background-image:var(--community-page-overlay);
+  background-image:var(--page-overlay,var(--wl-default-page-overlay));
 }
 
 .wl-community-surface a{color:inherit}
@@ -67,7 +70,7 @@ body.wl-community-surface::before{
   position:sticky;
   top:0;
   z-index:20;
-  background:var(--community-nav-background);
+  background:var(--nav-background,var(--wl-default-nav-background));
   backdrop-filter:blur(10px) saturate(120%);
   border-bottom:1px solid var(--line);
 }
@@ -108,12 +111,12 @@ body.wl-community-surface::before{
 }
 
 .wl-community-surface .wl-public-header{
-  background:var(--community-header-background);
+  background:var(--header-background,var(--wl-default-header-background));
   border-bottom:1px solid var(--line);
 }
 
 .wl-community-surface .wl-public-section:nth-of-type(even){
-  background:var(--community-section-background);
+  background:var(--section-background,var(--wl-default-section-background));
 }
 
 .wl-community-surface .wl-public-card{
@@ -124,7 +127,7 @@ body.wl-community-surface::before{
 }
 
 .wl-community-surface .wl-public-dark-feature{
-  background:var(--community-dark-feature-background);
+  background:var(--dark-feature-background,var(--wl-default-dark-feature-background));
   color:white;
 }
 
