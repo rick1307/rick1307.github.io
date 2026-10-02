@@ -404,9 +404,19 @@
       box-shadow:0 8px 18px rgba(4,18,22,.14);
     }
 
-    .lounge-header-action.show{display:inline-flex}
+    .lounge-header-action.show,
+    .lounge-header-action.pending{
+      display:inline-flex;
+    }
 
-    .lounge-header-action:hover{
+    .lounge-header-action.pending{
+      opacity:.42;
+      cursor:default;
+      box-shadow:none;
+      filter:grayscale(.35);
+    }
+
+    .lounge-header-action.show:hover{
       filter:brightness(1.05);
       transform:translateY(-1px);
     }
@@ -1146,7 +1156,8 @@
           <a
             class="lounge-header-action"
             id="leaperLoungeEntry"
-            href="chat.html?community=sailing-frogs-leap">
+            aria-disabled="true"
+            tabindex="-1">
             Leaper Lounge
           </a>
         </div>
@@ -1462,6 +1473,29 @@
 
         crewStateMessage.hidden = false;
         crewStateMessage.classList.add("show");
+      }
+
+      function setLoungeReady(ready = false) {
+        if (!leaperLoungeEntry) return;
+
+        if (communityId !== "sfl") {
+          leaperLoungeEntry.classList.remove("pending", "show");
+          leaperLoungeEntry.removeAttribute("href");
+          leaperLoungeEntry.setAttribute("aria-disabled", "true");
+          leaperLoungeEntry.setAttribute("tabindex", "-1");
+          return;
+        }
+
+        leaperLoungeEntry.classList.toggle("pending", !ready);
+        leaperLoungeEntry.classList.toggle("show", ready);
+        leaperLoungeEntry.setAttribute("aria-disabled", ready ? "false" : "true");
+        leaperLoungeEntry.setAttribute("tabindex", ready ? "0" : "-1");
+
+        if (ready) {
+          leaperLoungeEntry.href = `chat.html?community=${encodeURIComponent(communityId)}`;
+        } else {
+          leaperLoungeEntry.removeAttribute("href");
+        }
       }
 
       function setTrustlineStatus(leapLine, state = "loaded") {
@@ -1901,7 +1935,7 @@
       }
 
       function resetRecord() {
-        if (leaperLoungeEntry) leaperLoungeEntry.classList.remove("show");
+        setLoungeReady(false);
         walletEl.textContent = "";
         walletEl.removeAttribute("title");
         setStateMessage();
@@ -3111,9 +3145,7 @@
           const firstLeapPending = safeBalance < 1 && pending.length > 0;
 
           renderRecord(account, safeBalance);
-          if (communityId === "sfl" && leaperLoungeEntry) {
-            leaperLoungeEntry.classList.add("show");
-          }
+          setLoungeReady(true);
 
           if (firstLeapPending) {
             setStateMessage(
