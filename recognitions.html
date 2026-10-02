@@ -43,7 +43,6 @@
     .kicker{color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}
     h1{margin:.14em 0 .18em;color:var(--deep);font-size:clamp(3.1rem,8vw,6rem);line-height:.95;letter-spacing:-.055em;text-shadow:0 1px 0 rgba(255,255,255,.35)}
     .lede{max-width:850px;margin:0;color:#3f5a61;font-size:clamp(1.12rem,2vw,1.35rem)}
-    .truth-note{margin-top:24px;max-width:860px;padding:18px 20px;border-left:4px solid var(--gold);border-radius:0 14px 14px 0;background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.52));color:#3f5960;box-shadow:0 12px 28px rgba(11,45,54,.06)}
     main{padding:34px 0 54px}
     .filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}
     .filter{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 15px;border:1px solid rgba(18,59,70,.18);border-radius:999px;text-decoration:none;background:rgba(250,252,247,.56);color:var(--deep);font-family:var(--community-ui-font);font-weight:800;font-size:.9rem}
@@ -112,9 +111,6 @@
       <div class="kicker">LEAP Recognition</div>
       <h1 id="pageTitle">Recognition</h1>
       <p class="lede" id="pageLede">Show up. Do the thing. Make a difference.</p>
-      <div class="truth-note">
-        <strong>XRPL decides what exists.</strong> Community metadata can add a friendly name, description, image, and presentation, but it cannot create a recognition definition.
-      </div>
     </div>
   </header>
 
@@ -171,9 +167,9 @@
     if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
 
     const categoryInfo = {
-      EVENT:{ plural:"Events", singular:"Event", letter:"E", mantra:"Show up.", copy:"Real-world moments where the community and the adventure cross paths." },
-      BADGE:{ plural:"Badges", singular:"Badge", letter:"B", mantra:"Do the thing.", copy:"Repeatable recognition for participation, contribution, skills, or shared moments." },
-      CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", mantra:"Make a difference.", copy:"A defined objective you take on and complete." }
+      EVENT:{ plural:"Events", singular:"Event", letter:"E", mantra:"Show up.", copy:"" },
+      BADGE:{ plural:"Badges", singular:"Badge", letter:"B", mantra:"Do the thing.", copy:"" },
+      CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", mantra:"Make a difference.", copy:"" }
     };
 
     const recognitionNameOverrides = {
@@ -213,7 +209,7 @@
       document.title = `${selectedInfo?.plural || "Recognition"} — ${communityName}`;
       document.getElementById("pageTitle").textContent = selectedInfo?.plural || "Recognition";
       document.getElementById("pageLede").textContent = selectedInfo
-        ? `${selectedInfo.mantra} ${selectedInfo.copy}`
+        ? selectedInfo.mantra
         : `Show up. Do the thing. Make a difference.`;
 
       document.querySelectorAll(".filter").forEach(filter => {
@@ -383,7 +379,7 @@
       heading.textContent = info.plural;
       headingWrap.appendChild(heading);
       const copy = document.createElement("p");
-      copy.textContent = `${info.mantra} ${info.copy}`;
+      copy.textContent = info.mantra;
       headingWrap.appendChild(copy);
       head.appendChild(headingWrap);
       const count = document.createElement("div");
