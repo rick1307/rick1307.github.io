@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="See what is available now, what is coming up, and how to participate in this Wild Ledger community." />
+  <meta name="description" content="Explore the recognition catalog established on the XRP Ledger for this Wild Ledger community." />
   <meta name="theme-color" content="#efe8d8" />
   <title>Recognition — LEAP</title>
   <link rel="stylesheet" href="communityTypography.css" />
+  <link rel="stylesheet" href="communitySurface.css" />
   <link rel="stylesheet" href="wildLedgerControls.css" />
   <style>
     :root{
@@ -23,7 +24,10 @@
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     html.community-pending body{visibility:hidden}
-    body{margin:0;color:var(--ink);background:var(--page-background);font-family:var(--community-display-font);line-height:1.6}
+    body{
+      margin:0;color:var(--ink);background:var(--page-background);
+      font-family:var(--community-display-font);line-height:1.6;
+    }
     body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.48;background-image:var(--page-overlay)}
     a{color:inherit}
     .wrap{width:min(calc(100% - 34px),var(--max));margin:auto}
@@ -35,80 +39,56 @@
     .leap-journey-banner{width:100%;overflow:hidden;background:#102f38;line-height:0;border-bottom:1px solid rgba(18,59,70,.15)}
     .leap-journey-banner picture,.leap-journey-banner img{display:block;width:100%}
     .leap-journey-banner img{height:auto}
-
-    header{padding:52px 0 34px;background:var(--header-background);border-bottom:1px solid rgba(18,59,70,.08)}
-    .kicker{color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.16em;font-size:.76rem;font-weight:900}
-    h1{margin:.12em 0 .18em;color:var(--deep);font-size:clamp(2.8rem,7vw,5.2rem);line-height:.98;letter-spacing:-.052em;text-shadow:0 1px 0 rgba(255,255,255,.35)}
-    .lede{max-width:760px;margin:0;color:#3f5a61;font-size:clamp(1.08rem,2vw,1.3rem)}
-
-    main{padding:28px 0 54px}
-    .filters{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 17px}
-    .filter{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 14px;border:1px solid rgba(18,59,70,.18);border-radius:999px;text-decoration:none;background:rgba(250,252,247,.60);color:var(--deep);font-family:var(--community-ui-font);font-weight:800;font-size:.88rem}
+    header{padding:70px 0 42px;background:var(--header-background);border-bottom:1px solid rgba(18,59,70,.08)}
+    .kicker{color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:900}
+    h1{margin:.14em 0 .18em;color:var(--deep);font-size:clamp(3.1rem,8vw,6rem);line-height:.95;letter-spacing:-.055em;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+    .lede{max-width:850px;margin:0;color:#3f5a61;font-size:clamp(1.12rem,2vw,1.35rem)}
+    .truth-note{margin-top:24px;max-width:860px;padding:18px 20px;border-left:4px solid var(--gold);border-radius:0 14px 14px 0;background:linear-gradient(135deg,rgba(255,250,240,.78),rgba(216,235,231,.52));color:#3f5960;box-shadow:0 12px 28px rgba(11,45,54,.06)}
+    main{padding:34px 0 54px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}
+    .filter{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 15px;border:1px solid rgba(18,59,70,.18);border-radius:999px;text-decoration:none;background:rgba(250,252,247,.56);color:var(--deep);font-family:var(--community-ui-font);font-weight:800;font-size:.9rem}
     .filter[aria-current="page"]{background:var(--deep);color:white;border-color:var(--deep)}
-
-    .opportunity-summary{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:30px;padding:13px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(250,252,247,.62);font-family:var(--community-ui-font)}
-    .summary-main{font-weight:850;color:var(--deep)}
-    .summary-detail{color:var(--muted);font-size:.84rem;text-align:right}
-
-    .opportunity-section{margin:0 0 42px}
-    .opportunity-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
-    .opportunity-head h2{margin:0;color:var(--deep);font-size:clamp(1.85rem,4vw,2.45rem);line-height:1.05;letter-spacing:-.035em}
-    .opportunity-head p{margin:6px 0 0;color:var(--muted);max-width:650px}
-    .section-count{font-family:var(--community-ui-font);font-weight:850;color:var(--rust);white-space:nowrap}
+    .status-bar{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:24px;padding:15px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(250,252,247,.66);font-family:var(--community-ui-font)}
+    .status-main{font-weight:800;color:var(--deep)}
+    .status-detail{color:var(--muted);font-size:.88rem;text-align:right}
+    .category-section{margin:0 0 42px}
+    .category-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .category-head h2{margin:0;color:var(--deep);font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.05;letter-spacing:-.035em}
+    .category-head p{margin:6px 0 0;color:var(--muted);max-width:720px}
+    .count{font-family:var(--community-ui-font);font-weight:850;color:var(--rust);white-space:nowrap}
     .catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-
-    .recognition-card{position:relative;overflow:hidden;background:var(--card);backdrop-filter:blur(9px);border:1px solid rgba(18,59,70,.15);border-radius:20px;padding:21px;box-shadow:0 14px 32px rgba(11,45,54,.065)}
-    .recognition-card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--sea))}
-    .recognition-card[data-opportunity="UPCOMING"]::before{background:linear-gradient(90deg,var(--rust),var(--gold))}
-    .recognition-card[data-opportunity="ALWAYS"]::before{background:linear-gradient(90deg,var(--sea),var(--foam))}
-    .card-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;font-family:var(--community-ui-font)}
-    .type-tag{font-size:.72rem;font-weight:950;letter-spacing:.12em;color:var(--muted)}
-    .state-pill{padding:6px 9px;border-radius:999px;background:rgba(47,116,129,.12);color:var(--sea);font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.045em;white-space:nowrap}
-    .state-pill.upcoming{background:rgba(184,90,64,.10);color:var(--rust)}
-    .state-pill.always{background:rgba(215,174,98,.18);color:#765620}
-    .card-name{margin:0;color:var(--deep);font-size:1.55rem;line-height:1.12;letter-spacing:-.025em;overflow-wrap:anywhere}
-    .card-copy{margin:11px 0 0;color:#4b656c}
-    .participation{margin-top:15px;padding-top:13px;border-top:1px solid rgba(18,59,70,.10);color:#3f5960}
-    .participation strong{display:block;margin-bottom:2px;color:var(--deep);font-family:var(--community-ui-font);font-size:.76rem;text-transform:uppercase;letter-spacing:.08em}
-    .schedule-line{margin-top:13px;color:var(--rust);font-family:var(--community-ui-font);font-weight:850;font-size:.9rem}
-    details.ledger-details{margin-top:15px;padding-top:12px;border-top:1px solid rgba(18,59,70,.10);font-family:var(--community-ui-font);font-size:.77rem;color:var(--muted)}
-    details.ledger-details summary{cursor:pointer;list-style:none;font-weight:800;color:#587078}
-    details.ledger-details summary::-webkit-details-marker{display:none}
-    details.ledger-details summary::after{content:" +"}
-    details.ledger-details[open] summary::after{content:" −"}
-    .ledger-detail-body{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
-    .meta-chip{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.48);border:1px solid rgba(18,59,70,.10);overflow-wrap:anywhere}
-
-    .empty{padding:24px;border:1px dashed rgba(18,59,70,.24);border-radius:18px;background:rgba(250,252,247,.46);color:var(--muted)}
+    .recognition-card{position:relative;overflow:hidden;background:var(--card);backdrop-filter:blur(9px);border:1px solid rgba(18,59,70,.15);border-radius:20px;padding:22px;box-shadow:0 14px 32px rgba(11,45,54,.065)}
+    .recognition-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--sea))}
+    .card-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .category-mark{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:linear-gradient(135deg,var(--foam),rgba(255,255,255,.72));font-family:var(--community-ui-font);font-weight:950;color:var(--deep)}
+    .card-name-wrap{min-width:0;flex:1}
+    .card-name{margin:0;color:var(--deep);font-size:1.4rem;line-height:1.15;overflow-wrap:anywhere}
+    .canonical-id{margin-top:5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;overflow-wrap:anywhere}
+    .state-pill{flex:0 0 auto;padding:6px 9px;border-radius:999px;background:rgba(47,116,129,.12);color:var(--sea);font-family:var(--community-ui-font);font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .state-pill.terminal{background:rgba(184,90,64,.10);color:var(--rust)}
+    .card-copy{margin:16px 0 0;color:#526970}
+    .card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid rgba(18,59,70,.11);color:var(--muted);font-family:var(--community-ui-font);font-size:.78rem}
+    .meta-chip{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.48);border:1px solid rgba(18,59,70,.10)}
+    .empty{padding:28px;border:1px dashed rgba(18,59,70,.24);border-radius:18px;background:rgba(250,252,247,.46);color:var(--muted)}
     .error{padding:24px;border:1px solid rgba(184,90,64,.30);border-radius:18px;background:rgba(255,246,242,.72);color:#753a2d}
-
-    .ledger-note{margin:6px 0 34px;padding:14px 16px;border-left:3px solid var(--gold);background:rgba(250,252,247,.50);color:#526a70;font-size:.92rem}
-    .ledger-note strong{color:var(--deep)}
-
-    .return-box{margin-top:20px;background:var(--dark-feature-background);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:28px;text-align:center;box-shadow:0 22px 46px rgba(11,45,54,.18);color:white}
-    .return-box h3{margin:0 0 7px;font-size:1.65rem;line-height:1.15}.return-box p{margin:0 auto;max-width:620px;color:rgba(255,255,255,.82)}
+    .return-box{margin-top:36px;background:var(--dark-feature-background);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:28px;text-align:center;box-shadow:0 22px 46px rgba(11,45,54,.18);color:white}
+    .return-box h3{margin:0 0 7px;font-size:1.5rem}.return-box p{margin:0;color:rgba(255,255,255,.82)}
     .button{display:inline-flex;align-items:center;justify-content:center;margin-top:17px;padding:11px 17px;border-radius:8px;text-decoration:none;background:var(--rust);color:white;font-family:var(--community-ui-font);font-weight:850;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
-    .secondary-link{display:inline-block;margin-left:14px;color:rgba(255,255,255,.82);font-family:var(--community-ui-font);font-size:.9rem}
     @media(hover:hover) and (pointer:fine){.button:hover{transform:translateY(-1px)}}
-
     footer{padding:0 0 46px;color:#49636a;font-family:var(--community-ui-font);font-size:.86rem}
     .foot{padding-top:20px;border-top:1px solid rgba(18,59,70,.16)}
     body[data-community-layout="garage"] .recognition-card,body[data-community-layout="garage"] .return-box{border-radius:10px}
-
     @media(max-width:760px){
       .nav-links a:nth-child(2),.nav-links a:nth-child(3){display:none}
-      header{padding:38px 0 28px}
-      main{padding-top:22px}
       .catalog-grid{grid-template-columns:1fr}
-      .opportunity-summary,.opportunity-head{align-items:flex-start;flex-direction:column}
-      .summary-detail{text-align:left}
-      .recognition-card{padding:19px}
-      .secondary-link{display:block;margin:12px 0 0}
+      .status-bar,.category-head{align-items:flex-start;flex-direction:column}
+      .status-detail{text-align:left}
+      .card-top{flex-wrap:wrap}.state-pill{order:3}
     }
     @media(prefers-reduced-motion:reduce){.button{transition:none!important}}
   </style>
 </head>
-<body>
+<body class="wl-community-surface">
   <nav>
     <div class="wrap nav-inner wl-nav-right">
       <div class="nav-links">
@@ -131,29 +111,26 @@
     <div class="wrap">
       <div class="kicker">LEAP Recognition</div>
       <h1 id="pageTitle">Recognition</h1>
-      <p class="lede" id="pageLede">See what's happening, what's coming, and what you can take part in.</p>
+      <p class="lede" id="pageLede">I was there. I did that. I made a difference.</p>
+      <div class="truth-note">
+        <strong>XRPL decides what exists.</strong> Community metadata can add a friendly name, description, image, and presentation, but it cannot create a recognition definition.
+      </div>
     </div>
   </header>
 
   <main>
     <div class="wrap">
       <div class="filters" id="categoryFilters" aria-label="Recognition categories"></div>
-      <div class="opportunity-summary" aria-live="polite">
-        <div class="summary-main" id="catalogStatus">Loading participation opportunities…</div>
-        <div class="summary-detail" id="catalogDetail">Verified from validated XRP Ledger history</div>
+      <div class="status-bar" aria-live="polite">
+        <div class="status-main" id="catalogStatus">Loading validated XRP Ledger recognition state…</div>
+        <div class="status-detail" id="catalogDetail"></div>
       </div>
-
       <div id="catalog"></div>
 
-      <div class="ledger-note">
-        <strong>XRPL decides what exists.</strong> Wild Ledger uses community display information to make those ledger-established opportunities easier to understand; display information never creates a recognition definition.
-      </div>
-
       <div class="return-box">
-        <h3 id="returnTitle">See something you want to do?</h3>
-        <p id="returnCopy">Come aboard so Wild Ledger can start connecting your participation to your Crew Record.</p>
-        <a class="button" id="joinCta" href="join.html">Join →</a>
-        <a class="secondary-link" id="backToCommunity" href="index.html">Back to community</a>
+        <h3 id="returnTitle">Recognition becomes part of the community story.</h3>
+        <p id="returnCopy">What appears above is reconstructed from validated XRP Ledger history.</p>
+        <a class="button" id="backToCommunity" href="index.html">Back to community →</a>
       </div>
     </div>
   </main>
@@ -193,24 +170,9 @@
     if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
 
     const categoryInfo = {
-      BADGE:{ plural:"Badges", singular:"Badge" },
-      EVENT:{ plural:"Events", singular:"Event" },
-      CHALLENGE:{ plural:"Challenges", singular:"Challenge" }
-    };
-
-    const opportunityInfo = {
-      NOW:{
-        title:"Available Now",
-        copy:"Things you can take part in today."
-      },
-      UPCOMING:{
-        title:"Coming Up",
-        copy:"Events and challenges on the horizon."
-      },
-      ALWAYS:{
-        title:"Always Available",
-        copy:"Ongoing ways to participate whenever the moment is right."
-      }
+      EVENT:{ plural:"Events", singular:"Event", letter:"E", mantra:"I was there.", copy:"Real-world moments where the community and the adventure cross paths." },
+      BADGE:{ plural:"Badges", singular:"Badge", letter:"B", mantra:"I did that.", copy:"Repeatable recognition for participation, contribution, skills, or shared moments." },
+      CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", mantra:"I made a difference.", copy:"A defined objective you take on and complete." }
     };
 
     function communityHref(page, extra = {}) {
@@ -222,10 +184,8 @@
     document.getElementById("ranksLink").href = communityHref("ranks.html");
     document.getElementById("faqLink").href = communityHref("faq.html");
     document.getElementById("joinLink").href = communityHref("join.html");
-    document.getElementById("joinCta").href = communityHref("join.html");
-    document.getElementById("joinCta").textContent = community.joinLabel || "Join →";
     document.getElementById("backToCommunity").href = communityHref("index.html");
-    document.getElementById("backToCommunity").textContent = `Back to ${communityName}`;
+    document.getElementById("backToCommunity").textContent = `Back to ${communityName} →`;
     document.getElementById("footerLabel").textContent = `${communityName} • LEAP Recognition`;
 
     const bannerDesktop = document.getElementById("communityBannerDesktop");
@@ -237,15 +197,15 @@
     document.title = `${selectedInfo?.plural || "Recognition"} — ${communityName}`;
     document.getElementById("pageTitle").textContent = selectedInfo?.plural || "Recognition";
     document.getElementById("pageLede").textContent = selectedInfo
-      ? `See which ${selectedInfo.plural.toLowerCase()} are available now and what's ahead in ${communityName}.`
-      : `See what's happening, what's coming, and what you can take part in with ${communityName}.`;
+      ? `${selectedInfo.mantra} ${selectedInfo.copy}`
+      : `I was there. I did that. I made a difference.`;
 
     function buildFilters() {
       const target = document.getElementById("categoryFilters");
       const choices = [
         ["ALL", "All Recognition", "all"],
-        ["BADGE", "Badges", "badge"],
         ["EVENT", "Events", "event"],
+        ["BADGE", "Badges", "badge"],
         ["CHALLENGE", "Challenges", "challenge"]
       ];
       for (const [category, label, query] of choices) {
@@ -278,224 +238,149 @@
       }) || null;
     }
 
-    function parsedDate(value) {
-      if (!value) return null;
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    function firstDate(metadata, keys) {
-      for (const key of keys) {
-        const date = parsedDate(metadata?.[key]);
-        if (date) return date;
+    function stateLabel(record) {
+      if (record.state === "ACTIVE") return record.category === "BADGE" ? "Available" : "Active";
+      if (record.state === "ENDED") {
+        if (record.category === "BADGE") return "Retired";
+        if (record.category === "EVENT") return "Completed";
+        return "Closed";
       }
-      return null;
+      return record.state;
     }
 
-    function opportunityFor(record, metadata) {
-      const start = firstDate(metadata, ["startDate", "startsAt", "startAt", "eventDate", "date"]);
-      const mode = String(metadata?.availability || metadata?.availabilityMode || "").trim().toLowerCase();
-      const always = record.source === "global" && record.permanent === true ||
-        metadata?.alwaysAvailable === true ||
-        ["always", "ongoing", "permanent"].includes(mode);
-
-      if (start && start.getTime() > Date.now()) return { group:"UPCOMING", start };
-      if (always) return { group:"ALWAYS", start };
-      return { group:"NOW", start };
-    }
-
-    function prettyDate(value, { includeYear = true } = {}) {
-      const date = value instanceof Date ? value : parsedDate(value);
-      if (!date) return "";
-      return new Intl.DateTimeFormat(undefined, includeYear
-        ? { year:"numeric", month:"short", day:"numeric" }
-        : { month:"short", day:"numeric" }
-      ).format(date);
-    }
-
-    function publicDescription(record, metadata) {
-      const info = categoryInfo[record.category];
-      if (metadata?.description || metadata?.copy) return metadata.description || metadata.copy;
-      if (record.source === "global") return `A Wild Ledger ${info.singular.toLowerCase()} available in every community.`;
-      return `A ${info.singular.toLowerCase()} opportunity established for ${communityName}.`;
-    }
-
-    function participationText(metadata) {
-      return metadata?.howToParticipate || metadata?.howToEarn || metadata?.participation || metadata?.instructions || "";
-    }
-
-    function statusLabel(opportunity, metadata) {
-      if (metadata?.statusLabel) return String(metadata.statusLabel);
-      if (opportunity.group === "UPCOMING") {
-        const when = metadata?.scheduleLabel || prettyDate(opportunity.start, { includeYear:false });
-        return when ? `Coming ${when}` : "Coming Up";
-      }
-      if (opportunity.group === "ALWAYS") return "Always Available";
-      return "Available Now";
-    }
-
-    function scheduleText(opportunity, metadata) {
-      if (metadata?.scheduleLabel) return String(metadata.scheduleLabel);
-      if (opportunity.start) return prettyDate(opportunity.start);
-      return "";
+    function prettyDate(iso) {
+      if (!iso) return "";
+      const date = new Date(iso);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat(undefined, { year:"numeric", month:"short", day:"numeric" }).format(date);
     }
 
     function renderCard(record) {
       const info = categoryInfo[record.category];
       const metadata = metadataFor(record);
-      const opportunity = opportunityFor(record, metadata);
       const card = document.createElement("article");
       card.className = "recognition-card";
-      card.dataset.opportunity = opportunity.group;
 
-      const eyebrow = document.createElement("div");
-      eyebrow.className = "card-eyebrow";
+      const top = document.createElement("div");
+      top.className = "card-top";
 
-      const type = document.createElement("div");
-      type.className = "type-tag";
-      type.textContent = info.singular.toUpperCase();
-      eyebrow.appendChild(type);
+      const mark = document.createElement("div");
+      mark.className = "category-mark";
+      mark.textContent = String(metadata?.mark || metadata?.icon || info.letter).slice(0, 3);
+      top.appendChild(mark);
 
-      const state = document.createElement("div");
-      state.className = `state-pill${opportunity.group === "UPCOMING" ? " upcoming" : opportunity.group === "ALWAYS" ? " always" : ""}`;
-      state.textContent = statusLabel(opportunity, metadata);
-      eyebrow.appendChild(state);
-      card.appendChild(eyebrow);
-
+      const nameWrap = document.createElement("div");
+      nameWrap.className = "card-name-wrap";
       const name = document.createElement("h3");
       name.className = "card-name";
       name.textContent = metadata?.name || metadata?.title || displayNameFromId(record.id);
-      card.appendChild(name);
+      nameWrap.appendChild(name);
+      const id = document.createElement("div");
+      id.className = "canonical-id";
+      id.textContent = record.id;
+      nameWrap.appendChild(id);
+      top.appendChild(nameWrap);
+
+      const state = document.createElement("div");
+      state.className = `state-pill${record.state === "ENDED" ? " terminal" : ""}`;
+      state.textContent = stateLabel(record);
+      top.appendChild(state);
+      card.appendChild(top);
 
       const copy = document.createElement("p");
       copy.className = "card-copy";
-      copy.textContent = publicDescription(record, metadata);
+      copy.textContent = metadata?.description || metadata?.copy || (record.source === "global"
+        ? `This ${info.singular.toLowerCase()} is supplied by Wild Ledger and is available to every community.`
+        : `No display description has been published yet. The ${info.singular.toLowerCase()} itself is established on XRPL.`);
       card.appendChild(copy);
 
-      const participation = participationText(metadata);
-      if (participation) {
-        const block = document.createElement("div");
-        block.className = "participation";
-        const label = document.createElement("strong");
-        label.textContent = record.category === "BADGE" ? "How to earn it" : "How to participate";
-        block.appendChild(label);
-        const text = document.createElement("div");
-        text.textContent = participation;
-        block.appendChild(text);
-        card.appendChild(block);
-      }
-
-      const schedule = scheduleText(opportunity, metadata);
-      if (schedule && (opportunity.group === "UPCOMING" || metadata?.showDate === true)) {
-        const line = document.createElement("div");
-        line.className = "schedule-line";
-        line.textContent = schedule;
-        card.appendChild(line);
-      }
-
-      const details = document.createElement("details");
-      details.className = "ledger-details";
-      const summary = document.createElement("summary");
-      summary.textContent = "Ledger details";
-      details.appendChild(summary);
-      const detailBody = document.createElement("div");
-      detailBody.className = "ledger-detail-body";
-
-      const idChip = document.createElement("span");
-      idChip.className = "meta-chip";
-      idChip.textContent = record.id;
-      detailBody.appendChild(idChip);
+      const meta = document.createElement("div");
+      meta.className = "card-meta";
+      const categoryChip = document.createElement("span");
+      categoryChip.className = "meta-chip";
+      categoryChip.textContent = info.singular;
+      meta.appendChild(categoryChip);
 
       const createdDate = prettyDate(record.created?.time);
       if (createdDate) {
         const createdChip = document.createElement("span");
         createdChip.className = "meta-chip";
-        createdChip.textContent = record.source === "legacy" ? `Established · ${createdDate}` : `Created · ${createdDate}`;
-        detailBody.appendChild(createdChip);
+        createdChip.textContent = record.source === "legacy" ? `Established before lifecycle activation · ${createdDate}` : `Created · ${createdDate}`;
+        meta.appendChild(createdChip);
       } else if (record.source === "global") {
         const globalChip = document.createElement("span");
         globalChip.className = "meta-chip";
         globalChip.textContent = "Wild Ledger built-in · Permanent";
-        detailBody.appendChild(globalChip);
+        meta.appendChild(globalChip);
+      } else if (record.source === "legacy") {
+        const legacyChip = document.createElement("span");
+        legacyChip.className = "meta-chip";
+        legacyChip.textContent = "Established before lifecycle activation";
+        meta.appendChild(legacyChip);
       }
-      details.appendChild(detailBody);
-      card.appendChild(details);
+
+      const terminalDate = prettyDate(record.terminal?.time);
+      if (record.state === "ENDED" && terminalDate) {
+        const terminalChip = document.createElement("span");
+        terminalChip.className = "meta-chip";
+        terminalChip.textContent = `${stateLabel(record)} · ${terminalDate}`;
+        meta.appendChild(terminalChip);
+      }
+      card.appendChild(meta);
       return card;
     }
 
-    function sortOpportunityRecords(rows) {
-      return [...rows].sort((a, b) => {
-        const am = metadataFor(a), bm = metadataFor(b);
-        const ao = opportunityFor(a, am), bo = opportunityFor(b, bm);
-        const at = ao.start?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
-        const bt = bo.start?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
-        if (at !== bt) return at - bt;
-        return displayNameFromId(a.id).localeCompare(displayNameFromId(b.id), undefined, { sensitivity:"base", numeric:true });
-      });
-    }
-
-    function renderOpportunitySection(group, records) {
-      const info = opportunityInfo[group];
+    function renderSection(category, records) {
+      const info = categoryInfo[category];
       const section = document.createElement("section");
-      section.className = "opportunity-section";
+      section.className = "category-section";
 
       const head = document.createElement("div");
-      head.className = "opportunity-head";
+      head.className = "category-head";
       const headingWrap = document.createElement("div");
       const heading = document.createElement("h2");
-      heading.textContent = info.title;
+      heading.textContent = info.plural;
       headingWrap.appendChild(heading);
       const copy = document.createElement("p");
-      copy.textContent = info.copy;
+      copy.textContent = `${info.mantra} ${info.copy}`;
       headingWrap.appendChild(copy);
       head.appendChild(headingWrap);
-
       const count = document.createElement("div");
-      count.className = "section-count";
-      count.textContent = `${records.length} ${records.length === 1 ? "opportunity" : "opportunities"}`;
+      count.className = "count";
+      count.textContent = `${records.length} on XRPL`;
       head.appendChild(count);
       section.appendChild(head);
 
-      const grid = document.createElement("div");
-      grid.className = "catalog-grid";
-      for (const record of sortOpportunityRecords(records)) grid.appendChild(renderCard(record));
-      section.appendChild(grid);
+      if (!records.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = `No ${info.plural.toLowerCase()} are established on XRPL for ${communityName} yet.`;
+        section.appendChild(empty);
+      } else {
+        const grid = document.createElement("div");
+        grid.className = "catalog-grid";
+        for (const record of records) grid.appendChild(renderCard(record));
+        section.appendChild(grid);
+      }
       return section;
     }
 
     function renderCatalog(result) {
       const catalog = document.getElementById("catalog");
       catalog.replaceChildren();
-
-      const activeRecords = result.records.filter(record => record.state === "ACTIVE");
-      const filtered = activeRecords.filter(record => categoryFromQuery === "ALL" || record.category === categoryFromQuery);
-      const groups = { NOW:[], UPCOMING:[], ALWAYS:[] };
-
-      for (const record of filtered) {
-        const metadata = metadataFor(record);
-        groups[opportunityFor(record, metadata).group].push(record);
+      const visibleCategories = categoryFromQuery === "ALL" ? ["EVENT", "BADGE", "CHALLENGE"] : [categoryFromQuery];
+      for (const category of visibleCategories) {
+        const rows = result.records.filter(record => record.category === category);
+        catalog.appendChild(renderSection(category, rows));
       }
 
-      let rendered = 0;
-      for (const group of ["NOW", "UPCOMING", "ALWAYS"]) {
-        if (!groups[group].length) continue;
-        catalog.appendChild(renderOpportunitySection(group, groups[group]));
-        rendered += groups[group].length;
-      }
-
-      if (!rendered) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = selectedInfo
-          ? `No ${selectedInfo.plural.toLowerCase()} are available for participation right now.`
-          : `No recognition opportunities are available for participation right now.`;
-        catalog.appendChild(empty);
-      }
-
-      document.getElementById("catalogStatus").textContent = rendered
-        ? `${rendered} ${rendered === 1 ? "way" : "ways"} to participate`
-        : "No current participation opportunities";
-      document.getElementById("catalogDetail").textContent = "Verified from validated XRP Ledger history";
+      const total = result.records.length;
+      const globalCount = result.records.filter(record => record.source === "global").length;
+      const xrplCount = total - globalCount;
+      document.getElementById("catalogStatus").textContent = globalCount
+        ? `${xrplCount} XRPL recognition definition${xrplCount === 1 ? "" : "s"} plus ${globalCount} permanent Wild Ledger built-in.`
+        : `${total} recognition definition${total === 1 ? "" : "s"} reconstructed from XRPL.`;
+      document.getElementById("catalogDetail").textContent = `Lifecycle activation ledger ${result.activation.ledger.toLocaleString()}`;
     }
 
     function renderError(error) {
@@ -503,7 +388,7 @@
       catalog.replaceChildren();
       const box = document.createElement("div");
       box.className = "error";
-      box.innerHTML = "<strong>Recognition opportunities are temporarily unavailable.</strong> Wild Ledger will not substitute configured or cached definitions for XRPL truth.";
+      box.innerHTML = "<strong>Recognition catalog unavailable.</strong> Wild Ledger will not substitute configured or cached definitions for XRPL truth.";
       const detail = document.createElement("div");
       detail.style.marginTop = "8px";
       detail.textContent = error?.message || String(error);
