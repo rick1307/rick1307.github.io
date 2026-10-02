@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>LEAP Protocol 0.19</title>
+<title>LEAP Protocol 0.20</title>
 <style>
     :root{
       --ink:#10243a;
@@ -295,7 +295,7 @@
 <div class="shell">
 <header class="hero">
 <div class="eyebrow">Wild Ledger</div>
-<h1>LEAP Protocol 0.19</h1>
+<h1>LEAP Protocol 0.20</h1>
 <p>
       This is LEAP. Sections 1–6 are the authoritative Protocol Core. If you cannot accurately explain Sections 1–6, do not modify Wild Ledger protocol behavior.
     </p>
@@ -342,7 +342,7 @@
 <div class="decision">
 <div class="tag">Authoritative Current Protocol</div>
 <div>
-            Protocol 0.19 is the current authoritative LEAP Protocol for Wild Ledger. It preserves the protocol-defined and community-defined recognition model of 0.18, including <code>GREAT-CHAT</code>, and adds the <strong>Data Minimization Principle</strong> as a Core Principle. Wild Ledger should derive what it can from validated XRPL history and require, retain, or expose no more participant information than the requested function actually needs. It remains authoritative until changed by an explicit protocol revision under Section 15.
+            Protocol 0.20 is the current authoritative LEAP Protocol for Wild Ledger. It preserves Protocol 0.19 and clarifies the terminal meanings of <code>END</code> and <code>IGNORE</code> for community-defined recognitions. <code>END</code> stops future use while preserving legitimate recognition history. <code>IGNORE</code> quarantines an erroneous, invalid, test, or otherwise non-operational recognition definition and its associated recognition entries from normal recognition presentation. Neither action reverses or subtracts LEAP already delivered by an otherwise valid member-recognition transaction; that LEAP remains Earned LEAP and continues to count toward rank. It remains authoritative until changed by an explicit protocol revision under Section 15.
           </div>
 </div>
 <section id="purpose">
@@ -634,8 +634,8 @@ LEAP-002</code></pre>
 <p>Lifecycle actions apply only to community-defined recognitions. Protocol-defined recognitions do not participate in the community lifecycle.</p>
 <ul>
 <li><code>CREATE</code> establishes the community-defined recognition and makes it available according to its category.</li>
-<li><code>END</code> normally ends future availability without erasing prior valid awards.</li>
-<li><code>IGNORE</code> terminally marks an erroneous, invalid, test, or otherwise non-operational definition. The ID remains permanently reserved.</li>
+<li><code>END</code> permanently ends future availability while preserving prior valid recognition history and the Earned LEAP already delivered by valid awards.</li>
+<li><code>IGNORE</code> terminally quarantines an erroneous, invalid, test, or otherwise non-operational definition from normal recognition presentation. Associated recognition entries are suppressed from normal recognition history; LEAP already delivered by otherwise valid member-recognition transactions remains Earned LEAP and continues to count toward rank. The ID remains permanently reserved.</li>
 </ul>
 <h3>Canonical examples</h3>
 <pre><code>SFL-LEAP/BADGE=GREAT-CHAT
@@ -783,14 +783,14 @@ LEAP/AUTHORITY/OWNER-WALLET=&lt;ADDRESS&gt;</code></pre>
 <table>
 <tr><th>Action</th><th>Protocol meaning</th></tr>
 <tr><td><code>CREATE</code></td><td>Birth of the definition. Badge = Available; Event = Active; Challenge = Active.</td></tr>
-<tr><td><code>END</code></td><td>Normal terminal state. Badge = Retired; Event = Completed; Challenge = Closed. Prior valid earned recognition remains valid.</td></tr>
-<tr><td><code>IGNORE</code></td><td>Exceptional terminal state for an erroneous, invalid, test, or non-operational definition. It is suppressed from normal recognition use and the ID remains permanently reserved.</td></tr>
+<tr><td><code>END</code></td><td>Normal terminal state. Badge = Retired; Event = Completed; Challenge = Closed. Future awards stop. Prior valid recognition entries remain part of official recognition history, and LEAP already delivered by valid awards remains Earned LEAP and continues to count toward rank.</td></tr>
+<tr><td><code>IGNORE</code></td><td>Exceptional terminal state for an erroneous, invalid, test, or non-operational definition. The definition and its associated recognition entries are quarantined from normal recognition presentation and history. <code>IGNORE</code> does not reverse, subtract, or reclassify LEAP already delivered by an otherwise valid member-recognition transaction; that LEAP remains Earned LEAP and continues to count toward rank. The ID remains permanently reserved.</td></tr>
 </table>
 <div class="rule">
 <div class="tag">Cradle-to-Grave Rule</div>
 <div>
             <code>CREATE</code> begins the definition's lifecycle. <code>END</code> and <code>IGNORE</code> are terminal. There is no reopen, unend, or unignore action in the current protocol.
-            Lifecycle changes do not erase the XRPL transaction history or reverse any token transfer that already occurred.
+            Lifecycle changes do not erase XRPL transaction history or reverse any token transfer that already occurred. <code>END</code> preserves prior recognition history. <code>IGNORE</code> suppresses the affected recognition definition and associated recognition entries from normal recognition presentation, but it does not reduce Earned LEAP or rank from otherwise valid member-recognition transactions.
           </div>
 </div>
 <div class="rule">
@@ -1137,6 +1137,7 @@ SFL-CAMEO</code></pre>
 <tr><td>0.17</td><td>2026-10-01</td><td>Added protocol-level Owner Wallet authority, separate from the LEAP Issuer and LEAP Distributor. The current Owner Wallet may provision the first Community Operating Wallet for a brand-new Community ID and may transfer Owner authority to a successor Owner Wallet. After a community is established, the Owner Wallet has no continuing authority to replace that community's Operating Wallet; subsequent community authority changes are controlled by the current Community Operating Wallet.</td></tr>
 <tr><td>0.18</td><td>2026-10-02</td><td>Defined two recognition-definition origins: protocol-defined and community-defined. Defined <code>GREAT-CHAT</code> as the one recognition currently defined directly by the Protocol Core: a repeatable Badge automatically available to every established LEAP community without <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code>. Great Chat awards remain community-scoped through the community namespace and follow the ordinary Badge recognition rules. The Protocol does not prescribe a Great Chat award amount and does not create a separate recognition registry.</td></tr>
 <tr><td>0.19</td><td>2026-10-02</td><td>Added the Data Minimization Principle to the Protocol Core. Wild Ledger must collect, require, retain, or expose no more participant information than the requested function or protocol interpretation requires; should derive protocol facts from validated XRPL history instead of creating unnecessary personal profiles; defines an XRPL account address as the minimum persistent technical participant identifier required for LEAP; and keeps ephemeral application identity non-authoritative.</td></tr>
+<tr><td>0.20</td><td>2026-10-02</td><td>Clarified terminal recognition lifecycle semantics. <code>END</code> stops future use while preserving legitimate recognition history. <code>IGNORE</code> quarantines an erroneous, invalid, test, or non-operational definition and its associated recognition entries from normal recognition presentation and history. Neither action reverses LEAP already delivered by otherwise valid member-recognition transactions; that LEAP remains Earned LEAP and continues to count toward rank. Ignored IDs remain permanently reserved.</td></tr>
 </table>
 <div class="note">
           The change log records the evolution of earlier drafts. Superseded rules described in older rows are historical context, not current protocol requirements.
@@ -1151,7 +1152,6 @@ SFL-CAMEO</code></pre>
 <li>Verify the configured LEAP 160-bit currency value against live XRPL state and then remove the verification qualifier from Section 4.</li>
 
 <li>Define an emergency recovery rule for a lost, inaccessible, or compromised current Community Operating Wallet.</li>
-<li>Define the Earned LEAP / rank treatment of any prior awards if a recognition definition is later marked <code>IGNORE</code>. The underlying XRPL token transfers cannot be reversed by the lifecycle marker, but Protocol 1.0 must state whether those amounts remain official Earned LEAP.</li>
 </ul>
 </section>
 <section id="sources">
