@@ -494,6 +494,16 @@
       .nav-inner{min-height:58px}
       .brand img{width:36px;height:36px}
     }
+
+    /* Public wallet addresses are obscured for shoulder-surfing without
+       declaring them password credentials to the browser/Keychain. */
+    .wallet-address-input.masked-wallet{
+      -webkit-text-security:disc;
+    }
+    .wallet-address-input.masked-wallet.wallet-visible{
+      -webkit-text-security:none;
+    }
+
 </style>
 <link rel="stylesheet" href="communityTypography.css">
   <link rel="stylesheet" href="wildLedgerControls.css">
@@ -517,7 +527,6 @@
 <div class="gateway-card gateway-primary" id="request-first-leap">
 <div class="gateway-label">New member</div>
 <h3>Request your first LEAP</h3>
-<p id="sendAddressCopy">Give me your public XRP Ledger address. That is all I need.</p>
 <div class="gateway-note">Public address only. Never send secret words or private keys.</div>
 <form action="https://usebasin.com/f/93034286b67b" class="leap-request-form" data-basin-error-id="firstLeapError" data-basin-form="" data-basin-success-action="render" data-basin-success-id="firstLeapSuccess" id="firstLeapRequestForm" method="POST">
 <input id="firstLeapCommunityId" name="community_id" type="hidden" value=""/>
@@ -525,7 +534,7 @@
 <input id="firstLeapOperatorName" name="operator_name" type="hidden" value=""/>
 <div class="leap-request-row">
 <div class="wallet-input-wrap">
-<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" class="wallet-address-input" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="r..." required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="password"/>
+<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" class="wallet-address-input masked-wallet" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="Enter your XRP Ledger address" required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="text"/>
 <button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="firstLeapXrplAddress" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </div>
 <button class="button" type="submit">Request My First LEAP</button>
@@ -548,7 +557,7 @@
             </p>
 <div class="member-record-open-row">
 <div class="wallet-input-wrap">
-<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" class="wallet-address-input" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="password"/>
+<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" class="wallet-address-input masked-wallet" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="text"/>
 <button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="memberRecordWallet" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </div>
 <button class="button" id="openMemberRecordButton" type="button">Open My Member Record →</button>
@@ -719,8 +728,8 @@
         const input = document.getElementById(toggle.dataset.walletToggle || "");
         if (!input) return;
         toggle.addEventListener("click", () => {
-          const revealing = input.type === "password";
-          input.type = revealing ? "text" : "password";
+          const revealing = !input.classList.contains("wallet-visible");
+          input.classList.toggle("wallet-visible", revealing);
           toggle.setAttribute("aria-pressed", revealing ? "true" : "false");
           toggle.setAttribute("aria-label", revealing ? "Hide XRP Ledger address" : "Show XRP Ledger address");
         });
