@@ -128,7 +128,6 @@
       <div id="catalog"></div>
 
       <div class="return-box">
-        <h3 id="returnTitle">Recognition becomes part of the community story.</h3>
         <p id="returnCopy">What appears above is reconstructed from validated XRP Ledger history.</p>
         <a class="button" id="backToCommunity" href="index.html">Back to community →</a>
       </div>
@@ -203,7 +202,7 @@
     function buildFilters() {
       const target = document.getElementById("categoryFilters");
       const choices = [
-        ["ALL", "All Recognition", "all"],
+        ["ALL", "All", "all"],
         ["EVENT", "Events", "event"],
         ["BADGE", "Badges", "badge"],
         ["CHALLENGE", "Challenges", "challenge"]
@@ -289,8 +288,11 @@
 
       const copy = document.createElement("p");
       copy.className = "card-copy";
-      copy.textContent = metadata?.description || metadata?.copy || (record.source === "global"
-        ? `This ${info.singular.toLowerCase()} is supplied by Wild Ledger and is available to every community.`
+      const builtInCopy = record.id === "GREAT-CHAT"
+        ? "Get LEAP with Great Chats. I love sharing LEAP with people who contribute great engagement."
+        : "";
+      copy.textContent = metadata?.description || metadata?.copy || builtInCopy || (record.source === "global"
+        ? `This ${info.singular.toLowerCase()} is available to every community.`
         : `No display description has been published yet. The ${info.singular.toLowerCase()} itself is established on XRPL.`);
       card.appendChild(copy);
 
@@ -332,6 +334,12 @@
 
     function renderSection(category, records) {
       const info = categoryInfo[category];
+      const displayRecords = [...records].sort((a, b) => {
+        if (category !== "BADGE") return 0;
+        if (a.id === "GREAT-CHAT" && b.id !== "GREAT-CHAT") return -1;
+        if (b.id === "GREAT-CHAT" && a.id !== "GREAT-CHAT") return 1;
+        return 0;
+      });
       const section = document.createElement("section");
       section.className = "category-section";
 
@@ -347,11 +355,11 @@
       head.appendChild(headingWrap);
       const count = document.createElement("div");
       count.className = "count";
-      count.textContent = `${records.length} on XRPL`;
+      count.textContent = `${displayRecords.length} on XRPL`;
       head.appendChild(count);
       section.appendChild(head);
 
-      if (!records.length) {
+      if (!displayRecords.length) {
         const empty = document.createElement("div");
         empty.className = "empty";
         empty.textContent = `No ${info.plural.toLowerCase()} are established on XRPL for ${communityName} yet.`;
@@ -359,7 +367,7 @@
       } else {
         const grid = document.createElement("div");
         grid.className = "catalog-grid";
-        for (const record of records) grid.appendChild(renderCard(record));
+        for (const record of displayRecords) grid.appendChild(renderCard(record));
         section.appendChild(grid);
       }
       return section;
