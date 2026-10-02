@@ -47,9 +47,6 @@
     .filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}
     .filter{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 15px;border:1px solid rgba(18,59,70,.18);border-radius:999px;text-decoration:none;background:rgba(250,252,247,.56);color:var(--deep);font-family:var(--community-ui-font);font-weight:800;font-size:.9rem}
     .filter[aria-current="page"]{background:var(--deep);color:white;border-color:var(--deep)}
-    .status-bar{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:24px;padding:15px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(250,252,247,.66);font-family:var(--community-ui-font)}
-    .status-main{font-weight:800;color:var(--deep)}
-    .status-detail{color:var(--muted);font-size:.88rem;text-align:right}
     .category-section{margin:0 0 42px}
     .category-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
     .category-head h2{margin:0;color:var(--deep);font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.05;letter-spacing:-.035em}
@@ -80,8 +77,7 @@
     @media(max-width:760px){
       .nav-links a:nth-child(2),.nav-links a:nth-child(3){display:none}
       .catalog-grid{grid-template-columns:1fr}
-      .status-bar,.category-head{align-items:flex-start;flex-direction:column}
-      .status-detail{text-align:left}
+      .category-head{align-items:flex-start;flex-direction:column}
       .card-top{flex-wrap:wrap}.state-pill{order:3}
     }
     @media(prefers-reduced-motion:reduce){.button{transition:none!important}}
@@ -117,10 +113,6 @@
   <main>
     <div class="wrap">
       <div class="filters" id="categoryFilters" aria-label="Recognition categories"></div>
-      <div class="status-bar" aria-live="polite">
-        <div class="status-main" id="catalogStatus">Loading validated XRP Ledger recognition state…</div>
-        <div class="status-detail" id="catalogDetail"></div>
-      </div>
       <div id="catalog"></div>
 
       <div class="return-box">
@@ -410,14 +402,6 @@
         const rows = result.records.filter(record => record.category === category);
         catalog.appendChild(renderSection(category, rows));
       }
-
-      const total = result.records.length;
-      const globalCount = result.records.filter(record => record.source === "global").length;
-      const xrplCount = total - globalCount;
-      document.getElementById("catalogStatus").textContent = globalCount
-        ? `${xrplCount} XRPL recognition definition${xrplCount === 1 ? "" : "s"} plus ${globalCount} permanent Wild Ledger built-in.`
-        : `${total} recognition definition${total === 1 ? "" : "s"} reconstructed from XRPL.`;
-      document.getElementById("catalogDetail").textContent = `Lifecycle activation ledger ${result.activation.ledger.toLocaleString()}`;
     }
 
     function renderError(error) {
@@ -431,13 +415,9 @@
       detail.textContent = error?.message || String(error);
       box.appendChild(detail);
       catalog.appendChild(box);
-      document.getElementById("catalogStatus").textContent = "XRPL recognition state could not be established.";
-      document.getElementById("catalogDetail").textContent = "Fail closed";
     }
 
     async function refreshCatalog() {
-      document.getElementById("catalogStatus").textContent = "Loading validated XRP Ledger recognition state…";
-      document.getElementById("catalogDetail").textContent = "";
       try {
         const result = await loadRecognitionCatalog({
           community,
