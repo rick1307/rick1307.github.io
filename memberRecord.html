@@ -385,36 +385,30 @@
     }
 
 
-    .lounge-entry{
+    .lounge-header-action{
       display:none;
-      margin:0 0 14px;
-      padding:14px;
-      border:1px solid rgba(215,174,98,.34);
-      border-radius:14px;
-      background:rgba(215,174,98,.07);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
-    }
-
-    .lounge-entry.show{display:block}
-
-    .lounge-entry b{
-      display:block;
-      color:white;
-      font-size:.84rem;
-      line-height:1.3;
-    }
-
-    .lounge-entry span{
-      display:block;
-      margin-top:3px;
-      color:rgba(255,255,255,.72);
-      font-size:.76rem;
-      line-height:1.5;
-    }
-
-    .lounge-entry .crew-state-action{
-      width:max-content;
+      flex:0 0 auto;
+      align-items:center;
+      justify-content:center;
+      padding:9px 13px;
+      border:1px solid rgba(215,174,98,.70);
+      border-radius:10px;
+      background:var(--gold);
+      color:var(--ink);
+      font-family:var(--community-ui-font);
+      font-size:.72rem;
+      font-weight:900;
+      line-height:1.1;
       text-decoration:none;
+      white-space:nowrap;
+      box-shadow:0 8px 18px rgba(4,18,22,.14);
+    }
+
+    .lounge-header-action.show{display:inline-flex}
+
+    .lounge-header-action:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
     }
 
     .record-grid{
@@ -1012,6 +1006,13 @@
     @media(max-width:600px){
       header{padding-top:54px}
       .crew-console{padding:18px;border-radius:20px}
+      .console-head{gap:10px}
+      .console-title{min-width:0}
+      .console-title img{width:44px;height:44px}
+      .lounge-header-action{
+        padding:8px 10px;
+        font-size:.66rem;
+      }
       .record-grid{grid-template-columns:1fr 1fr}
       .pending-check-card{
         grid-template-columns:minmax(0,1fr) 100px;
@@ -1141,16 +1142,17 @@
               </div>
             </div>
           </div>
+
+          <a
+            class="lounge-header-action"
+            id="leaperLoungeEntry"
+            href="chat.html?community=sailing-frogs-leap">
+            Leaper Lounge
+          </a>
         </div>
 
         <div class="crew-state-message" id="crewStateMessage" role="status" aria-live="polite"></div>
         <div class="record-wallet" id="recordWallet" hidden></div>
-
-        <div class="lounge-entry" id="leaperLoungeEntry">
-          <b>Leaper Lounge</b>
-          <span>Pull up a chair and join the conversation.</span>
-          <a class="crew-state-action button" href="chat.html?community=sailing-frogs-leap">Enter the Leaper Lounge</a>
-        </div>
 
         <div class="record-grid">
           <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong></div>
