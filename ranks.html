@@ -48,7 +48,7 @@
     .rank-body{padding:26px}
     .rank-body h4{margin:0 0 7px;color:var(--navy);font-family:var(--community-ui-font);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em}
     .rank-body p{margin:0 0 18px;color:#56646a}.rank-body p:last-child{margin-bottom:0}
-    .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
     .principle{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
     .principle b{display:block;margin-bottom:7px;color:var(--rust);font-family:var(--community-ui-font);text-transform:uppercase;letter-spacing:.08em;font-size:.76rem}
     .principle h3{margin:0 0 7px;color:var(--navy);font-size:1.25rem}.principle p{margin:0;color:#58666c}
@@ -267,9 +267,7 @@
     <div class="wrap">
       <div class="kicker" id="communityKicker">Community Ranks</div>
       <h1>Ranks</h1>
-      <p class="lede" id="communityLede">
-        LEAP ranks recognize growing participation within a community.
-      </p>
+      <p class="lede" id="communityLede">Your history leaves a mark.</p>
     </div>
   </header>
 
@@ -277,8 +275,7 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>Three rules keep the rank system honest</h2>
-          <p>These rules keep rank tied to real participation in the active community.</p>
+          <h2>Two rules</h2>
         </div>
         <div class="principles">
           <div class="principle">
@@ -291,11 +288,6 @@
             <h3>Earned stays earned</h3>
             <p>Sending LEAP to another wallet or member can change your current balance, but it does not erase rank you already earned.</p>
           </div>
-          <div class="principle">
-            <b>Rule three</b>
-            <h3>Each community stands alone</h3>
-            <p>The same wallet can have different ranks in different communities because each community counts only its own official awards.</p>
-          </div>
         </div>
       </div>
     </section>
@@ -304,7 +296,7 @@
       <div class="wrap">
         <div class="section-title">
           <h2>The rank ladder</h2>
-          <p id="rankLadderIntro">Five rank levels create progression without turning LEAP into a complicated game.</p>
+          <p id="rankLadderIntro">Five rank levels create progression.</p>
         </div>
 
         <div class="rank-grid" id="rankGrid"></div>
@@ -315,7 +307,7 @@
     <section>
       <div class="wrap">
         <div class="return-box">
-          <h3 id="returnHeading">Ready to earn your first rank?</h3>
+          <h3 id="returnHeading">People will see it.</h3>
           <p id="returnCopy">Earn 1 LEAP from this community and your rank journey begins.</p>
           <a class="button" id="joinButton" href="join.html">Join →</a>
         </div>
@@ -400,12 +392,7 @@
       if (kicker) kicker.textContent = `${communityName} Ranks`;
 
       const lede = document.getElementById("communityLede");
-      if (lede) {
-        lede.textContent =
-          `LEAP ranks recognize how deeply someone has become part of ${communityName}. ` +
-          `Rank is based on LEAP officially earned from ${communityName}. ` +
-          `Your current wallet balance can change without erasing rank you have already earned.`;
-      }
+      if (lede) lede.textContent = "Your history leaves a mark.";
 
       const ruleEarned = document.getElementById("ruleEarned");
       if (ruleEarned) {
@@ -491,7 +478,7 @@
       }
 
       const returnHeading = document.getElementById("returnHeading");
-      if (returnHeading) returnHeading.textContent = `Ready to earn your first rank in ${communityName}?`;
+      if (returnHeading) returnHeading.textContent = "People will see it.";
 
       const returnCopy = document.getElementById("returnCopy");
       if (returnCopy) {
