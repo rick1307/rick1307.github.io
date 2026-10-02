@@ -462,9 +462,13 @@
 
     .record-stat.community-totals{
       display:grid;
-      grid-template-rows:repeat(4,1fr);
+      grid-template-rows:auto repeat(4,1fr);
       gap:0;
       padding:8px 10px;
+    }
+
+    .recognition-summary-label{
+      margin:0 0 2px !important;
     }
 
     .community-total-row{
@@ -1132,12 +1136,11 @@
             <img src="leap-logo.png" alt="LEAP coin">
             <div>
               <b id="memberRecordTitle">Member Record</b>
-              <div class="trustline-row" id="trustlineStatus">
-                <span id="trustlineStatusText">Checking transfers…</span>
+              <div class="trustline-row" id="trustlineStatus" hidden>
+                <span id="trustlineStatusText"></span>
               </div>
             </div>
           </div>
-          <div class="live-pill">Ledger<br>Live</div>
         </div>
 
         <div class="crew-state-message" id="crewStateMessage" role="status" aria-live="polite"></div>
@@ -1150,10 +1153,11 @@
         </div>
 
         <div class="record-grid">
-          <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
-          <div class="record-stat"><b>Earned</b><strong id="recordEarned">—</strong><small id="recordEarnedNote">in this community</small></div>
-          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote">from Earned LEAP</small></div>
-          <div class="record-stat community-totals" aria-label="Community recognition totals">
+          <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong></div>
+          <div class="record-stat"><b>Earned LEAP</b><strong id="recordEarned">—</strong><small id="recordEarnedNote" hidden></small></div>
+          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote" hidden></small></div>
+          <div class="record-stat community-totals" aria-label="Recognition totals">
+            <b class="recognition-summary-label">Recognition</b>
             <div class="community-total-row great-chat-total"><span>Great Chats</span><strong id="recordGreatChats">—</strong></div>
             <div class="community-total-row"><span>Badges</span><strong id="recordBadges">—</strong></div>
             <div class="community-total-row"><span>Challenges</span><strong id="recordChallenges">—</strong></div>
@@ -1255,7 +1259,7 @@
       const communityNameLabel = document.getElementById("communityNameLabel");
       if (communityNameLabel) communityNameLabel.textContent = communityName;
       const memberRecordTitle = document.getElementById("memberRecordTitle");
-      if (memberRecordTitle) memberRecordTitle.textContent = `Member Record --- ${communityName}`;
+      if (memberRecordTitle) memberRecordTitle.textContent = "Member Record";
       const memberRecordConsole = document.getElementById("memberRecordConsole");
       if (memberRecordConsole) memberRecordConsole.setAttribute("aria-label", `${communityName} Member Record`);
       const communityHomeBrand = document.getElementById("communityHomeBrand");
@@ -1466,14 +1470,19 @@
           "trustline-warn",
           "trustline-bad"
         );
+
+        // Healthy/checking transfer state stays quiet. This line only appears
+        // when the member needs to notice something.
         if (state === "checking") {
-          trustlineStatusText.textContent = "Checking transfers…";
+          trustlineStatusText.textContent = "";
+          trustlineStatus.hidden = true;
           return;
         }
 
         if (state === "unavailable") {
-          trustlineStatusText.textContent = "Unrecognized User";
+          trustlineStatusText.textContent = "Not joined";
           trustlineStatus.classList.add("trustline-bad");
+          trustlineStatus.hidden = false;
           return;
         }
 
@@ -1481,15 +1490,18 @@
           const limit = Number(leapLine.limit);
 
           if (Number.isFinite(limit) && limit === 0) {
-            trustlineStatusText.textContent = "Transfers currently disabled";
+            trustlineStatusText.textContent = "LEAP transfers are off";
             trustlineStatus.classList.add("trustline-warn");
+            trustlineStatus.hidden = false;
           } else {
-            trustlineStatusText.textContent = "Transfers enabled";
+            trustlineStatusText.textContent = "";
             trustlineStatus.classList.add("trustline-good");
+            trustlineStatus.hidden = true;
           }
         } else {
-          trustlineStatusText.textContent = "Unrecognized User";
+          trustlineStatusText.textContent = "Not joined";
           trustlineStatus.classList.add("trustline-bad");
+          trustlineStatus.hidden = false;
         }
       }
 
@@ -2882,8 +2894,14 @@
           rankNoteEl.textContent = `In ${communityName}`;
         }
 
-        progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
-        progressValue.textContent = `${total} LEAP`;
+        progressLabel.textContent = earnedRank.name;
+
+        if (earnedRank.threshold === null) {
+          progressValue.textContent = "Top rank reached";
+        } else {
+          const remaining = Math.max(0, earnedRank.threshold - total);
+          progressValue.textContent = `${remaining} LEAP to ${earnedRank.next}`;
+        }
 
         if (earnedRank.threshold === null) {
           progressFill.style.width = "100%";
@@ -3036,7 +3054,7 @@
         // separately from reconstructed Earned LEAP history.
         rankEl.textContent = "—";
         rankNoteEl.textContent = `In ${communityName}`;
-        progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
+        progressLabel.textContent = "Rank progress";
         progressValue.textContent = "—";
         progressFill.style.width = "0%";
       }
@@ -3134,7 +3152,7 @@
             earnedNoteEl.textContent = `in ${communityName}`;
             rankEl.textContent = "Unavailable";
             rankNoteEl.textContent = "Earned LEAP history unavailable";
-            progressLabel.textContent = `Highest Rank Reached in ${communityName}`;
+            progressLabel.textContent = "Rank progress";
             progressValue.textContent = "—";
             progressFill.style.width = "0%";
             resetLogbook(
