@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a34">
+  <title>Recognition Lifecycle — Wild Ledger</title>
+  <style>
+    :root {
+      --ink:#f5fbfa; --deep:#071f2c; --lagoon:#29b8b1; --sea-glass:#79d5c2;
+      --mango:#f4bd58; --coral:#ef765d; --green:#9fe0b0; --red:#ffb7b7;
+      --panel:rgba(10,45,58,.70); --line:rgba(219,248,244,.14);
+      --muted:rgba(236,249,247,.62); --shadow:0 28px 78px rgba(0,16,24,.38);
+    }
+    *{box-sizing:border-box} html{min-height:100%}
+    body{
+      margin:0; min-height:100vh; color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 14%,rgba(41,184,177,.34) 0,rgba(41,184,177,.12) 22%,transparent 44%),
+        radial-gradient(circle at 87% 15%,rgba(244,189,88,.24) 0,rgba(244,189,88,.07) 21%,transparent 42%),
+        radial-gradient(circle at 88% 86%,rgba(239,118,93,.24) 0,rgba(239,118,93,.07) 23%,transparent 46%),
+        linear-gradient(145deg,#06202e 0%,#0a3444 48%,#071d2a 100%);
+      overflow-x:hidden;
+    }
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 78%)}
+    button{font:inherit} a{color:inherit}
+    .shell{position:relative;z-index:1;width:min(100%,980px);margin:0 auto;padding:46px 22px 56px}
+    .console{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:32px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+    .console::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
+    .console-header{padding:34px 34px 30px;border-bottom:1px solid rgba(219,248,244,.08)}
+    .top-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:34px}
+    .back{color:#b7f0df;text-decoration:none;font-weight:800}
+    h1{margin:0;max-width:800px;font-size:clamp(2.2rem,7vw,4.6rem);line-height:.96;letter-spacing:-.055em;font-weight:900}
+    .section-kicker{margin-top:22px;color:var(--sea-glass);font-size:.78rem;line-height:1;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .hero-copy{margin:12px 0 0;max-width:790px;color:var(--muted);font-size:.96rem;line-height:1.6}
+    .console-body{padding:24px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:18px;align-items:start}
+    .card{border:1px solid rgba(255,255,255,.10);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),rgba(5,34,46,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.035);padding:22px}
+    .preview{position:sticky;top:20px}
+    .section-head h2{margin:0;font-size:1.15rem;letter-spacing:-.02em}
+    .section-head p{margin:7px 0 0;color:var(--muted);font-size:.83rem;line-height:1.5}
+    .recognition-name{margin-top:18px;font-size:1.55rem;font-weight:900;overflow-wrap:anywhere}
+    .recognition-id{margin-top:7px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.82rem;overflow-wrap:anywhere}
+    .action-pill{display:inline-block;margin-top:13px;padding:7px 10px;border:1px solid rgba(244,189,88,.34);border-radius:999px;background:rgba(244,189,88,.10);color:#f5d38f;font-size:.70rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    body[data-action="IGNORE"] .action-pill{border-color:rgba(239,118,93,.42);background:rgba(239,118,93,.10);color:#ffd4cb}
+    .rule-box{margin-top:18px;padding:15px;border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(0,0,0,.10);color:rgba(236,249,247,.78);font-size:.84rem;line-height:1.55}
+    .rule-box strong{color:#fff}
+    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+    .primary,.secondary{min-height:42px;border-radius:12px;padding:10px 14px;font-weight:850;cursor:pointer}
+    .primary{border:1px solid rgba(121,213,194,.42);background:rgba(121,213,194,.14);color:#e5fff8}
+    body[data-action="IGNORE"] .primary.action{border-color:rgba(239,118,93,.46);background:rgba(239,118,93,.13);color:#ffe3dc}
+    .secondary{border:1px solid rgba(219,248,244,.14);background:rgba(255,255,255,.05);color:var(--ink)}
+    button:disabled{opacity:.42;cursor:not-allowed}
+    .status-grid{display:grid;gap:10px;margin-top:20px}
+    .status-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:start;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.10)}
+    .status-label{color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .status-value{font-size:.80rem;line-height:1.45;overflow-wrap:anywhere}
+    .status-value.good{color:var(--green)} .status-value.bad{color:var(--red)} .status-value.wait{color:#f5d38f}
+    .preview-label{color:var(--sea-glass);font-size:.68rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    .protocol-block{margin-top:14px;padding:16px;border:1px solid rgba(121,213,194,.18);border-radius:18px;background:rgba(121,213,194,.055)}
+    .protocol-title{margin:0 0 7px;color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .protocol-value{margin:0;color:#e8fbf7;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.75rem;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+    .qr-wrap{display:none;margin-top:14px;padding:14px;border:1px solid rgba(121,213,194,.18);border-radius:16px;background:#fff;text-align:center}.qr-wrap.show{display:block}.qr-wrap img{width:min(100%,300px);height:auto}.qr-uri{margin-top:8px;color:#223;font-size:.62rem;overflow-wrap:anywhere}
+    .success-link{display:none;margin-top:16px}.success-link.show{display:block}.success-link a{color:#b7f0df;font-weight:850}
+    .footer-note{padding:0 24px 24px;color:rgba(236,249,247,.35);font-size:.70rem;text-align:center}
+    @media(max-width:800px){.shell{padding:20px 12px 34px}.console{border-radius:24px}.console-header{padding:26px 20px}.console-body{padding:16px}.workspace{grid-template-columns:1fr}.preview{position:static}.status-row{grid-template-columns:100px minmax(0,1fr)}}
+  </style>
+  <link rel="stylesheet" href="wildLedgerControls.css">
+  <link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="console" aria-labelledby="communityTitle">
+      <header class="console-header">
+        <nav class="top-nav" aria-label="Recognition lifecycle navigation">
+          <a class="back wl-header-control" id="recognitionBack" href="viewCommunityRecognition.html">← Recognition</a>
+        </nav>
+        <h1 id="communityTitle">Community</h1>
+        <div class="section-kicker" id="pageKicker">Recognition Lifecycle</div>
+        <p class="hero-copy" id="heroCopy">Loading the recognition definition from validated XRPL history.</p>
+      </header>
+
+      <div class="console-body">
+        <div class="workspace">
+          <section class="card">
+            <div class="section-head">
+              <h2 id="actionHeading">Recognition</h2>
+              <p id="actionExplanation">END and IGNORE are terminal lifecycle actions recorded on XRPL.</p>
+            </div>
+
+            <div class="recognition-name" id="friendlyName">Recognition</div>
+            <div class="recognition-id" id="canonicalId">—</div>
+            <div class="action-pill" id="actionPill">Action</div>
+
+            <div class="rule-box" id="ruleBox"></div>
+
+            <div class="button-row">
+              <button class="secondary" id="recheckButton" type="button">Recheck XRPL</button>
+              <button class="primary action" id="prepareButton" type="button" disabled>Prepare</button>
+              <button class="secondary" id="connectButton" type="button">Connect Signer</button>
+              <button class="secondary" id="disconnectButton" type="button" disabled>Disconnect</button>
+              <button class="primary action" id="signButton" type="button" disabled>Sign</button>
+              <button class="primary action" id="submitButton" type="button" disabled>Submit + Validate</button>
+            </div>
+
+            <div class="status-grid" aria-live="polite">
+              <div class="status-row"><div class="status-label">Definition</div><div class="status-value wait" id="definitionStatus">Reading XRPL…</div></div>
+              <div class="status-row"><div class="status-label">Authority</div><div class="status-value wait" id="authorityStatus">Resolving current Operating Wallet…</div></div>
+              <div class="status-row"><div class="status-label">Signer</div><div class="status-value wait" id="signerStatus">Not connected.</div></div>
+              <div class="status-row"><div class="status-label">Publication</div><div class="status-value wait" id="publicationStatus">Nothing prepared.</div></div>
+            </div>
+
+            <div class="qr-wrap" id="qrWrap">
+              <img id="qrImage" alt="WalletConnect QR code">
+              <div class="qr-uri" id="qrUri"></div>
+            </div>
+
+            <div class="success-link" id="successLink"><a id="returnLink" href="viewCommunityRecognition.html">Return to Community Recognition</a></div>
+          </section>
+
+          <aside class="card preview">
+            <div class="preview-label">Canonical XRPL statement</div>
+            <div class="protocol-block">
+              <div class="protocol-title">Memo</div>
+              <pre class="protocol-value" id="memoPreview">—</pre>
+            </div>
+            <div class="protocol-block">
+              <div class="protocol-title">Meaning</div>
+              <p class="protocol-value" id="meaningPreview">—</p>
+            </div>
+            <div class="protocol-block">
+              <div class="protocol-title">Transaction</div>
+              <p class="protocol-value">Validated no-op AccountSet from the current Community Operating Wallet. No LEAP moves in this lifecycle transaction.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="footer-note">Wild Ledger • Community Recognition Lifecycle</div>
+    </section>
+  </main>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script src="js/communityConfig.js" data-registry-only="true"></script>
+  <script type="module">
+    import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+    import { prepareNoOpAccountSet, submitSignedTransaction } from "./js/xrplTransport.js";
+    import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+    import { clearCommunityAuthorityCache } from "./js/communityAuthority.js";
+    import { loadRecognitionCatalog, clearRecognitionCatalogCache } from "./js/recognitionCatalog.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+    const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+    const requestedValue = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
+    const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedValue) || null;
+    const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
+    const communityName = community?.communityName || "Community";
+    const namespace = community?.leapNamespace || `${communityId}-LEAP`;
+    const category = String(params.get("category") || "").trim().toUpperCase();
+    const id = String(params.get("id") || "").trim().toUpperCase();
+    const action = String(params.get("action") || "").trim().toUpperCase();
+    const CATEGORIES = ["BADGE", "CHALLENGE", "EVENT"];
+    const ACTIONS = ["END", "IGNORE"];
+
+    const config = window.WILD_LEDGER_CONFIG || {};
+    const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
+    const feeCushion = Number(config.xrplFeeCushion || 1.2);
+    const projectId = String(config.walletConnectProjectId || "").trim();
+    const leapIssuer = String(config.leapIssuer || "").trim();
+    const leapCurrency = String(config.leapCurrency || "").trim();
+
+    const back = document.getElementById("recognitionBack");
+    const title = document.getElementById("communityTitle");
+    const pageKicker = document.getElementById("pageKicker");
+    const heroCopy = document.getElementById("heroCopy");
+    const actionHeading = document.getElementById("actionHeading");
+    const actionExplanation = document.getElementById("actionExplanation");
+    const friendlyName = document.getElementById("friendlyName");
+    const canonicalId = document.getElementById("canonicalId");
+    const actionPill = document.getElementById("actionPill");
+    const ruleBox = document.getElementById("ruleBox");
+    const memoPreview = document.getElementById("memoPreview");
+    const meaningPreview = document.getElementById("meaningPreview");
+    const definitionStatus = document.getElementById("definitionStatus");
+    const authorityStatus = document.getElementById("authorityStatus");
+    const signerStatus = document.getElementById("signerStatus");
+    const publicationStatus = document.getElementById("publicationStatus");
+    const recheckButton = document.getElementById("recheckButton");
+    const prepareButton = document.getElementById("prepareButton");
+    const connectButton = document.getElementById("connectButton");
+    const disconnectButton = document.getElementById("disconnectButton");
+    const signButton = document.getElementById("signButton");
+    const submitButton = document.getElementById("submitButton");
+    const qrWrap = document.getElementById("qrWrap");
+    const qrImage = document.getElementById("qrImage");
+    const qrUri = document.getElementById("qrUri");
+    const successLink = document.getElementById("successLink");
+    const returnLink = document.getElementById("returnLink");
+
+    let catalog = null;
+    let record = null;
+    let operatingWallet = "";
+    let preparedTransaction = null;
+    let signedBlob = "";
+    let signer = null;
+    let connectedAccount = "";
+    let busy = false;
+    let stateReady = false;
+
+    document.body.dataset.action = action;
+    title.textContent = communityName;
+    back.href = `viewCommunityRecognition.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}`;
+    returnLink.href = back.href;
+
+    function setStatus(element, text, tone) {
+      element.textContent = text;
+      element.classList.remove("good", "bad", "wait");
+      if (tone) element.classList.add(tone);
+    }
+
+    function validCanonicalId(categoryValue, value) {
+      if (categoryValue === "CHALLENGE") return /^LEAP-\d{3,}$/.test(value);
+      return /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(value);
+    }
+
+    function displayNameFromId(value) {
+      if (!value) return "Recognition";
+      const preserved = new Set(["LEAP", "XRPL", "SFL", "OG"]);
+      return value.split("-").filter(Boolean).map(part => {
+        if (/^\d+$/.test(part) || preserved.has(part)) return part;
+        const lower = part.toLowerCase();
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+      }).join(" ");
+    }
+
+    function categoryWord() {
+      return category === "BADGE" ? "Badge" : category === "CHALLENGE" ? "Challenge" : category === "EVENT" ? "Event" : "Recognition";
+    }
+
+    function endLabel() {
+      return category === "BADGE" ? "Retired" : category === "CHALLENGE" ? "Closed" : "Completed";
+    }
+
+    function lifecycleMemo() {
+      return `${namespace}/RECOGNITION/${category}/${id}/LIFECYCLE-TAG=${action}`;
+    }
+
+    function actionMeaning() {
+      if (action === "END") {
+        return `${endLabel()} — future use stops. Prior legitimate recognition history remains visible. LEAP already delivered is unchanged.`;
+      }
+      return "Quarantined — the mistaken definition and its recognition entries are suppressed from normal Wild Ledger recognition views. LEAP already delivered is unchanged.";
+    }
+
+    function clearPrepared() {
+      preparedTransaction = null;
+      signedBlob = "";
+      successLink.classList.remove("show");
+    }
+
+    function refreshButtons() {
+      const active = stateReady && record?.state === "ACTIVE" && record?.source !== "global";
+      prepareButton.disabled = busy || !active;
+      connectButton.disabled = busy || !!signer;
+      disconnectButton.disabled = busy || !signer;
+      signButton.disabled = busy || !active || !preparedTransaction || !signer || connectedAccount !== operatingWallet;
+      submitButton.disabled = busy || !active || !signedBlob;
+      recheckButton.disabled = busy;
+    }
+
+    function renderStatic() {
+      const word = categoryWord();
+      document.title = `${communityName} | ${action === "IGNORE" ? "Ignore" : "End"} ${word}`;
+      pageKicker.textContent = `${action === "IGNORE" ? "Ignore" : "End"} ${word}`;
+      actionHeading.textContent = `${action === "IGNORE" ? "Ignore" : "End"} ${word}`;
+      friendlyName.textContent = displayNameFromId(id);
+      canonicalId.textContent = `${category} / ${id}`;
+      actionPill.textContent = action || "Action";
+      memoPreview.textContent = lifecycleMemo();
+      meaningPreview.textContent = actionMeaning();
+
+      if (action === "END") {
+        heroCopy.textContent = "End a legitimate recognition that should no longer be awarded. Its prior history remains part of Wild Ledger.";
+        actionExplanation.textContent = "END is terminal. It stops future use without erasing prior recognition history or changing LEAP already delivered.";
+        ruleBox.innerHTML = `<strong>END = retire it.</strong> This recognition cannot be reopened. Prior legitimate awards remain visible. The lifecycle transaction moves no LEAP.`;
+        prepareButton.textContent = "Prepare END";
+        signButton.textContent = "Sign END";
+      } else {
+        heroCopy.textContent = "Quarantine a mistaken, test, invalid, or otherwise non-operational recognition definition from normal Wild Ledger use.";
+        actionExplanation.textContent = "IGNORE is terminal. It quarantines the recognition from normal application interpretation while leaving XRPL and delivered LEAP untouched.";
+        ruleBox.innerHTML = `<strong>IGNORE = quarantine it.</strong> The definition and its recognition entries disappear from normal Wild Ledger recognition views. Its ID stays reserved forever. LEAP already delivered remains Earned LEAP and still counts toward rank.`;
+        prepareButton.textContent = "Prepare IGNORE";
+        signButton.textContent = "Sign IGNORE";
+      }
+    }
+
+    function validRequest() {
+      return !!community && CATEGORIES.includes(category) && ACTIONS.includes(action) && validCanonicalId(category, id);
+    }
+
+    async function loadState(force = false, preservePrepared = false) {
+      stateReady = false;
+      if (!preservePrepared) clearPrepared();
+      refreshButtons();
+
+      if (!validRequest()) {
+        setStatus(definitionStatus, "Invalid lifecycle request. Return to Community Recognition and choose an active recognition.", "bad");
+        setStatus(authorityStatus, "Not checked.", "bad");
+        return false;
+      }
+
+      setStatus(definitionStatus, "Reading validated XRPL recognition state…", "wait");
+      setStatus(authorityStatus, "Resolving current Community Operating Wallet…", "wait");
+
+      try {
+        if (force) {
+          clearCommunityAuthorityCache();
+          clearRecognitionCatalogCache();
+        }
+
+        catalog = await loadRecognitionCatalog({
+          community,
+          serverUrl: xrplServer,
+          issuer: leapIssuer,
+          currency: leapCurrency,
+          force,
+          includeIgnored: true
+        });
+
+        operatingWallet = String(catalog?.authority?.currentAccount || "");
+        record = (Array.isArray(catalog?.records) ? catalog.records : []).find(item =>
+          String(item?.category || "").toUpperCase() === category &&
+          String(item?.id || "").toUpperCase() === id
+        ) || null;
+
+        if (!operatingWallet) throw new Error("Current Community Operating Wallet could not be resolved.");
+        setStatus(authorityStatus, `${operatingWallet} — canonical XRPL authority.`, "good");
+
+        if (!record) {
+          setStatus(definitionStatus, "This recognition definition is not established on XRPL.", "bad");
+          return false;
+        }
+
+        if (record.source === "global") {
+          setStatus(definitionStatus, "Protocol-defined recognitions cannot be ended or ignored by a Community Operator.", "bad");
+          return false;
+        }
+
+        if (record.state !== "ACTIVE") {
+          const terminal = record.state === "IGNORED" ? "already ignored" : "already ended";
+          setStatus(definitionStatus, `This recognition is ${terminal}. Lifecycle actions are terminal.`, "bad");
+          return false;
+        }
+
+        stateReady = true;
+        setStatus(definitionStatus, `ACTIVE on XRPL — eligible for ${action}.`, "good");
+        return true;
+      } catch (error) {
+        catalog = null;
+        record = null;
+        operatingWallet = "";
+        setStatus(definitionStatus, error?.message || String(error), "bad");
+        setStatus(authorityStatus, "Authority unavailable.", "bad");
+        return false;
+      } finally {
+        refreshButtons();
+      }
+    }
+
+    async function assertStillCurrent(stage) {
+      if (!preparedTransaction?.Account) throw new Error("No prepared transaction is available.");
+      const preparedAccount = preparedTransaction.Account;
+      const ok = await loadState(true, true);
+      if (!ok) {
+        clearPrepared();
+        throw new Error(`Recognition lifecycle changed before ${stage}. Nothing was submitted.`);
+      }
+      if (operatingWallet !== preparedAccount) {
+        clearPrepared();
+        throw new Error(`The Community Operating Wallet changed before ${stage}. Prepare a new transaction using ${operatingWallet}.`);
+      }
+      return true;
+    }
+
+    async function connectSigner() {
+      try {
+        if (!projectId) throw new Error("Reown / WalletConnect Project ID is missing from Wild Ledger config.");
+        busy = true; refreshButtons();
+        setStatus(signerStatus, "Initializing WalletConnect…", "wait");
+        signer = new WalletConnectXrplSigner({
+          projectId,
+          metadata:{
+            name:"Wild Ledger",
+            description:"Wild Ledger XRPL external signer",
+            url:location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+            icons:[location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+          }
+        });
+        const connection = await signer.connect({ onUri: async uri => {
+          qrImage.src = await QRCode.toDataURL(uri, { width:560, margin:2, errorCorrectionLevel:"M" });
+          qrUri.textContent = uri;
+          qrWrap.classList.add("show");
+          setStatus(signerStatus, "QR ready. Approve the connection in Bifrost or another compatible XRPL signer.", "wait");
+        }});
+        qrWrap.classList.remove("show");
+        qrUri.textContent = "";
+        connectedAccount = connection.account;
+        if (connectedAccount === operatingWallet) setStatus(signerStatus, `${connection.walletName}: ${connectedAccount}`, "good");
+        else setStatus(signerStatus, `${connection.walletName}: ${connectedAccount} — not the current Community Operating Wallet.`, "bad");
+      } catch (error) {
+        signer = null;
+        connectedAccount = "";
+        setStatus(signerStatus, error?.message || String(error), "bad");
+      } finally {
+        busy = false;
+        refreshButtons();
+      }
+    }
+
+    async function disconnectSigner() {
+      busy = true; refreshButtons();
+      try { if (signer) await signer.disconnect(); } catch (_) {}
+      signer = null;
+      connectedAccount = "";
+      setStatus(signerStatus, "Not connected.", "wait");
+      busy = false;
+      refreshButtons();
+    }
+
+    prepareButton.addEventListener("click", async () => {
+      if (!validRequest()) return;
+      const warning = action === "IGNORE"
+        ? `IGNORE ${category} ${id}?\n\nThis is permanent. Wild Ledger will quarantine this recognition from normal recognition/history views. Its ID stays reserved. LEAP already delivered is unchanged.`
+        : `END ${category} ${id}?\n\nThis is permanent. Future awards stop, but prior legitimate recognition history and LEAP already delivered remain unchanged.`;
+      if (!window.confirm(warning)) return;
+
+      busy = true; refreshButtons();
+      try {
+        const ok = await loadState(true);
+        if (!ok) throw new Error("Recognition is not currently eligible for this lifecycle action.");
+        setStatus(publicationStatus, "XRPL is simulating and autofilling the no-op AccountSet…", "wait");
+        const prepared = await prepareNoOpAccountSet({
+          serverUrl:xrplServer,
+          account:operatingWallet,
+          memoText:lifecycleMemo(),
+          feeCushion
+        });
+        preparedTransaction = prepared.preparedTx;
+        signedBlob = "";
+        setStatus(publicationStatus, `Prepared ${action}: tesSUCCESS simulation, Fee ${preparedTransaction.Fee} drops.`, "good");
+      } catch (error) {
+        clearPrepared();
+        setStatus(publicationStatus, error?.message || String(error), "bad");
+      } finally {
+        busy = false; refreshButtons();
+      }
+    });
+
+    signButton.addEventListener("click", async () => {
+      if (!signer || !preparedTransaction) return;
+      busy = true; refreshButtons();
+      try {
+        setStatus(publicationStatus, "Rechecking definition and Operating Wallet authority before signing…", "wait");
+        await assertStillCurrent("signing");
+        if (connectedAccount !== operatingWallet) throw new Error(`Connected signer ${connectedAccount || "—"} is not the current Community Operating Wallet ${operatingWallet}.`);
+        setStatus(publicationStatus, "Waiting for signer approval…", "wait");
+        const result = await signer.signTransaction(preparedTransaction);
+        signedBlob = result.signedBlob;
+        setStatus(publicationStatus, `${result.signatureType} received. Signed ${action} transaction is ready for submission.`, "good");
+      } catch (error) {
+        signedBlob = "";
+        setStatus(publicationStatus, error?.message || String(error), "bad");
+      } finally {
+        busy = false; refreshButtons();
+      }
+    });
+
+    submitButton.addEventListener("click", async () => {
+      if (!signedBlob) return;
+      busy = true; refreshButtons();
+      try {
+        setStatus(publicationStatus, "Rechecking definition and Operating Wallet authority before submission…", "wait");
+        await assertStillCurrent("submission");
+        setStatus(publicationStatus, "Submitting signed transaction directly to XRPL and waiting for validation…", "wait");
+        const result = await submitSignedTransaction({ serverUrl:xrplServer, signedBlob });
+        if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated with ${result.finalResult}.`);
+        const successText = `${action} validated in ledger ${result.ledgerIndex ?? "?"}. Hash ${result.txHash}.`;
+        preparedTransaction = null;
+        signedBlob = "";
+        await loadState(true);
+        setStatus(
+          definitionStatus,
+          action === "END" ? `${endLabel()} on XRPL.` : "IGNORED on XRPL — recognition quarantined from normal Wild Ledger views.",
+          "good"
+        );
+        setStatus(publicationStatus, successText, "good");
+        successLink.classList.add("show");
+      } catch (error) {
+        setStatus(publicationStatus, error?.message || String(error), "bad");
+      } finally {
+        busy = false; refreshButtons();
+      }
+    });
+
+    recheckButton.addEventListener("click", () => loadState(true));
+    connectButton.addEventListener("click", connectSigner);
+    disconnectButton.addEventListener("click", disconnectSigner);
+
+    renderStatic();
+    refreshButtons();
+    loadState();
+  </script>
+</body>
+</html>

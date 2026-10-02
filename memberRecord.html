@@ -2031,6 +2031,23 @@
         return result.available === true;
       }
 
+      function recognitionFactCurrentlyIgnored(fact) {
+        if (!fact?.key || !fact?.value || !communityRecognitionCatalog) return false;
+
+        const category = String(fact.key || "").trim().toUpperCase();
+        const id = String(fact.value || "").trim().toUpperCase();
+
+        const record = (Array.isArray(communityRecognitionCatalog.records)
+          ? communityRecognitionCatalog.records
+          : []
+        ).find(item =>
+          String(item?.category || "").trim().toUpperCase() === category &&
+          String(item?.id || "").trim().toUpperCase() === id
+        );
+
+        return record?.state === "IGNORED";
+      }
+
       function queryPendingLeapChecks(account) {
         return new Promise((resolve, reject) => {
           const ws = new WebSocket(XRPL_WS);
@@ -2240,6 +2257,7 @@
             const facts = extractLeapFacts(tx);
             if (!officialRecognitionSource(txResult, tx) || facts.length !== 1) return null;
             if (!recognitionFactAvailableAtEntry(facts[0], txResult, tx)) return null;
+            if (recognitionFactCurrentlyIgnored(facts[0])) return null;
 
             return {
               ...check,
@@ -2423,6 +2441,8 @@
         if (facts.length !== 1) return null;
         if (!recognitionFactAvailableAtEntry(facts[0], entry, tx)) return null;
 
+        const recognitionIgnored = recognitionFactCurrentlyIgnored(facts[0]);
+
         const time =
           entry.close_time_iso ||
           rippleTimeToIso(typeof entry.date === "number" ? entry.date : tx.date);
@@ -2434,7 +2454,8 @@
           ledger: entry.ledger_index || tx.ledger_index || null,
           transactionIndex: meta.TransactionIndex ?? meta.transaction_index ?? null,
           time,
-          facts
+          facts,
+          recognitionIgnored
         };
       }
 
@@ -2848,7 +2869,11 @@
       function renderLogbook(records = currentLogbookRecords) {
         currentLogbookRecords = Array.isArray(records) ? records : [];
 
-        const sorted = sortLogbookRecords(currentLogbookRecords);
+        // IGNORE is interpretive quarantine. Keep the underlying earned LEAP
+        // record for totals/rank, but suppress the recognition from normal
+        // Member Record history and recognition counts.
+        const visibleRecords = currentLogbookRecords.filter(record => !record?.recognitionIgnored);
+        const sorted = sortLogbookRecords(visibleRecords);
         const recognitionTotals = {
           BADGE:new Set(),
           CHALLENGE:new Set(),

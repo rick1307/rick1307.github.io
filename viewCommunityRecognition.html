@@ -311,6 +311,48 @@
       line-height: 1.45;
     }
 
+    .item-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 7px;
+      margin-top: 7px;
+    }
+
+    .lifecycle-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 9px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      color: #e5fff8;
+      text-decoration: none;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .lifecycle-action:hover,
+    .lifecycle-action:focus-visible {
+      border-color: rgba(121,213,194,.52);
+      background: rgba(121,213,194,.10);
+      outline: none;
+    }
+
+    .lifecycle-action.ignore {
+      border-color: rgba(239,118,93,.34);
+      color: #ffd4cb;
+    }
+
+    .lifecycle-action.ignore:hover,
+    .lifecycle-action.ignore:focus-visible {
+      border-color: rgba(239,118,93,.62);
+      background: rgba(239,118,93,.10);
+    }
+
     .history-status {
       display: inline-block;
       margin-top: 5px;
@@ -1398,7 +1440,7 @@
 
 
     <p class="footnote">
-      Available and Active are reconstructed from XRPL lifecycle state. History shows recognitions that reached their normal END state. Ignored recognitions remain on XRPL but are excluded from these normal operating views.
+      Available and Active are reconstructed from XRPL lifecycle state. END stops future use while preserving legitimate recognition history. IGNORE quarantines a mistaken definition from normal Wild Ledger recognition views. LEAP already delivered is unchanged.
     </p>
   </main>
 
@@ -1767,6 +1809,25 @@
             status.textContent = "Legacy-established";
             meta.appendChild(status);
           }
+
+          if (wantedState === "ACTIVE" && rowData.source !== "global") {
+            const actions = document.createElement("div");
+            actions.className = "item-actions";
+
+            for (const [action, label, extraClass] of [
+              ["END", "End", ""],
+              ["IGNORE", "Ignore", "ignore"]
+            ]) {
+              const link = document.createElement("a");
+              link.className = `lifecycle-action${extraClass ? ` ${extraClass}` : ""}`;
+              link.textContent = label;
+              link.href = `recognitionLifecycle.html?community=${encodeURIComponent(communityId)}&role=${encodeURIComponent(role)}&category=${encodeURIComponent(category)}&id=${encodeURIComponent(rowData.id)}&action=${encodeURIComponent(action)}`;
+              actions.appendChild(link);
+            }
+
+            meta.appendChild(actions);
+          }
+
           if (meta.childNodes.length) row.appendChild(meta);
           target.appendChild(row);
         }
