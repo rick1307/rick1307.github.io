@@ -111,7 +111,7 @@
     <div class="wrap">
       <div class="kicker">LEAP Recognition</div>
       <h1 id="pageTitle">Recognition</h1>
-      <p class="lede" id="pageLede">I was there. I did that. I made a difference.</p>
+      <p class="lede" id="pageLede">Show up. Do the thing. Make a difference.</p>
       <div class="truth-note">
         <strong>XRPL decides what exists.</strong> Community metadata can add a friendly name, description, image, and presentation, but it cannot create a recognition definition.
       </div>
@@ -170,9 +170,9 @@
     if (themeColor && theme.themeColor) themeColor.content = theme.themeColor;
 
     const categoryInfo = {
-      EVENT:{ plural:"Events", singular:"Event", letter:"E", mantra:"I was there.", copy:"Real-world moments where the community and the adventure cross paths." },
-      BADGE:{ plural:"Badges", singular:"Badge", letter:"B", mantra:"I did that.", copy:"Repeatable recognition for participation, contribution, skills, or shared moments." },
-      CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", mantra:"I made a difference.", copy:"A defined objective you take on and complete." }
+      EVENT:{ plural:"Events", singular:"Event", letter:"E", mantra:"Show up.", copy:"Real-world moments where the community and the adventure cross paths." },
+      BADGE:{ plural:"Badges", singular:"Badge", letter:"B", mantra:"Do the thing.", copy:"Repeatable recognition for participation, contribution, skills, or shared moments." },
+      CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", mantra:"Make a difference.", copy:"A defined objective you take on and complete." }
     };
 
     function communityHref(page, extra = {}) {
@@ -198,7 +198,7 @@
     document.getElementById("pageTitle").textContent = selectedInfo?.plural || "Recognition";
     document.getElementById("pageLede").textContent = selectedInfo
       ? `${selectedInfo.mantra} ${selectedInfo.copy}`
-      : `I was there. I did that. I made a difference.`;
+      : `Show up. Do the thing. Make a difference.`;
 
     function buildFilters() {
       const target = document.getElementById("categoryFilters");
