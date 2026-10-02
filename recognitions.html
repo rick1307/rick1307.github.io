@@ -59,7 +59,6 @@
     .category-mark{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:linear-gradient(135deg,var(--foam),rgba(255,255,255,.72));font-family:var(--community-ui-font);font-weight:950;color:var(--deep)}
     .card-name-wrap{min-width:0;flex:1}
     .card-name{margin:0;color:var(--deep);font-size:1.4rem;line-height:1.15;overflow-wrap:anywhere}
-    .canonical-id{margin-top:5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;overflow-wrap:anywhere}
     .state-pill{flex:0 0 auto;padding:6px 9px;border-radius:999px;background:rgba(47,116,129,.12);color:var(--sea);font-family:var(--community-ui-font);font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
     .state-pill.terminal{background:rgba(184,90,64,.10);color:var(--rust)}
     .card-copy{margin:16px 0 0;color:#526970}
@@ -297,10 +296,6 @@
       name.className = "card-name";
       name.textContent = metadata?.name || metadata?.title || recognitionNameOverrides[record.id] || displayNameFromId(record.id);
       nameWrap.appendChild(name);
-      const id = document.createElement("div");
-      id.className = "canonical-id";
-      id.textContent = record.id;
-      nameWrap.appendChild(id);
       top.appendChild(nameWrap);
 
       const state = document.createElement("div");
