@@ -228,6 +228,72 @@
     }
 
     .returning-crew-status.error{color:#a24731}
+    .returning-crew-status:empty{display:none}
+
+    .returning-wallet-wrap{
+      position:relative;
+      min-width:0;
+    }
+
+    .returning-wallet-wrap input{
+      padding-right:46px;
+    }
+
+    .returning-wallet-wrap.is-masked input:not(:placeholder-shown){
+      color:transparent;
+      caret-color:var(--deep);
+    }
+
+    .returning-wallet-mask{
+      position:absolute;
+      z-index:2;
+      left:0;
+      right:46px;
+      top:0;
+      bottom:0;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+      white-space:nowrap;
+      pointer-events:none;
+      padding:11px 12px;
+      color:var(--deep);
+      font:inherit;
+      font-size:.86rem;
+      letter-spacing:.08em;
+    }
+
+    .returning-wallet-wrap:not(.is-masked) .returning-wallet-mask{
+      display:none;
+    }
+
+    .returning-crew .returning-wallet-toggle{
+      position:absolute;
+      z-index:3;
+      right:5px;
+      top:50%;
+      transform:translateY(-50%);
+      width:34px;
+      height:34px;
+      padding:0;
+      border:0;
+      border-radius:8px;
+      background:transparent;
+      color:var(--navy);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+
+    .returning-crew .returning-wallet-toggle:hover{
+      background:rgba(18,59,70,.06);
+    }
+
+    .returning-crew .returning-wallet-toggle svg{
+      width:19px;
+      height:19px;
+      display:block;
+    }
 
     .learn-more-links{
       display:flex;
@@ -1015,18 +1081,34 @@
         <div class="returning-crew" id="communityRecordPanel" aria-label="Member Record access">
           <div class="returning-crew-head">
             <strong data-community="recordLabel">Member Record</strong>
-            <span>Your home base for LEAP, rank, badges, and <span data-community="historyLabel">community history</span>.</span>
           </div>
           <div class="returning-crew-row">
-            <input
-              id="returningCrewWallet"
-              type="text"
-              inputmode="text"
-              autocomplete="off"
-              autocapitalize="off"
-              spellcheck="false"
-              placeholder="Enter your XRPL wallet address"
-              aria-label="Returning crew XRPL wallet address">
+            <div class="returning-wallet-wrap is-masked">
+              <input
+                id="returningCrewWallet"
+                type="text"
+                inputmode="text"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                data-1p-ignore="true"
+                data-lpignore="true"
+                data-form-type="other"
+                placeholder="XRPL address"
+                aria-label="Returning crew XRPL address">
+              <span class="returning-wallet-mask" aria-hidden="true"></span>
+              <button
+                class="returning-wallet-toggle"
+                id="returningWalletToggle"
+                type="button"
+                aria-label="Show XRPL address"
+                aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
             <button id="openCrewRecord" type="button">Enter <span data-community="recordLabel">Member Record</span> →</button>
           </div>
           <p class="returning-crew-status" id="returningCrewStatus" role="status" aria-live="polite"></p>
@@ -1080,7 +1162,7 @@
             </div>
             <h3>Build a <span data-community="historyLabel">crew history</span></h3>
             <p>
-              Your LEAP balance advances your rank. Badges, challenges, and events help turn the things you do into a <span data-community="historyLabel">crew history</span> you can look back on.
+              The LEAP you earn here advances your rank. Badges, challenges, and events add to the story of what you have done along the way.
             </p>
           </article>
         </div>
@@ -1090,43 +1172,41 @@
     <section id="participation">
       <div class="wrap">
         <div class="section-title">
-          <h2>Earning Recognition</h2>
-          <p>
-            Rank shows where you stand. These are the three ways LEAP records what you actually did along the way.
-          </p>
+          <h2>Recognition</h2>
+          <p>Show up. Do the thing. Make a difference.</p>
         </div>
 
         <div class="three">
           <article class="card">
             <div class="card-topline">
-              <b>Badges</b>
-              <a class="card-more" href="recognitions.html">Learn More →</a>
+              <b>Events</b>
+              <a class="card-more" href="recognitions.html?category=event">Learn More →</a>
             </div>
-            <h3>Recognition that stays with your story</h3>
+            <h3>Show up.</h3>
             <p>
-              Badges recognize meaningful things about your crew history. Some are standard and always available. Others are limited to a particular time or moment.
+              Be there for a real-world moment we share. If you were there, I can recognize you for it.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-topline">
+              <b>Badges</b>
+              <a class="card-more" href="recognitions.html?category=badge">Learn More →</a>
+            </div>
+            <h3>Do the thing.</h3>
+            <p>
+              Badges recognize things I want to notice and remember. A badge can be earned more than once.
             </p>
           </article>
 
           <article class="card">
             <div class="card-topline">
               <b>Challenges</b>
-              <a class="card-more" href="recognitions.html">Learn More →</a>
+              <a class="card-more" href="recognitions.html?category=challenge">Learn More →</a>
             </div>
-            <h3>Something to go do</h3>
+            <h3>Make a difference.</h3>
             <p>
-              Challenges give a clear objective. Some can stay open for months. Smaller challenges may appear for a much shorter window.
-            </p>
-          </article>
-
-          <article class="card">
-            <div class="card-topline">
-              <b>Events</b>
-              <a class="card-more" href="recognitions.html">Learn More →</a>
-            </div>
-            <h3>Be there when it happens</h3>
-            <p>
-              Events are shared moments. Take part in an announced event and that moment can become part of your LEAP history.
+              Take on something meaningful and complete it. If I see that you did it, I can recognize you for it.
             </p>
           </article>
         </div>
@@ -1136,9 +1216,7 @@
     <section>
       <div class="wrap">
         <div class="deep-dive">
-          <p>
-            Joining takes a few steps, and we'll walk you through each one.
-          </p>
+          <p>Ready to come aboard?</p>
           <div class="cta-links">
             <a class="button" id="communityJoinButton" href="join.html">Join the Crew →</a>
             <a class="button secondary" href="faq.html">FAQs →</a>
@@ -1215,7 +1293,7 @@
       if (metaDescription) {
         metaDescription.setAttribute(
           "content",
-          `Join ${community.communityName}. LEAP is the on-chain membership credential for people who take part in the community.`
+          `Come aboard ${community.communityName}. Show up, earn recognition, and build your history with LEAP.`
         );
       }
 
@@ -1279,6 +1357,27 @@
       const walletInput = document.getElementById("returningCrewWallet");
       const openButton = document.getElementById("openCrewRecord");
       const status = document.getElementById("returningCrewStatus");
+      const walletWrap = walletInput ? walletInput.closest(".returning-wallet-wrap") : null;
+      const walletMask = walletWrap ? walletWrap.querySelector(".returning-wallet-mask") : null;
+      const walletToggle = document.getElementById("returningWalletToggle");
+
+      const refreshWalletMask = () => {
+        if (walletMask && walletInput) {
+          walletMask.textContent = walletInput.value ? "•".repeat(walletInput.value.length) : "";
+        }
+      };
+
+      if (walletInput) walletInput.addEventListener("input", refreshWalletMask);
+
+      if (walletToggle && walletWrap && walletInput) {
+        walletToggle.addEventListener("click", () => {
+          const revealing = walletWrap.classList.contains("is-masked");
+          walletWrap.classList.toggle("is-masked", !revealing);
+          walletToggle.setAttribute("aria-pressed", revealing ? "true" : "false");
+          walletToggle.setAttribute("aria-label", revealing ? "Hide XRPL address" : "Show XRPL address");
+          walletInput.focus();
+        });
+      }
 
       try {
         sessionStorage.removeItem(activeWalletKey);
@@ -1288,6 +1387,7 @@
         const rememberedWallet = sessionStorage.getItem(walletStorageKey);
         if (rememberedWallet && classicAddressPattern.test(rememberedWallet)) {
           walletInput.value = rememberedWallet;
+          refreshWalletMask();
         }
       } catch (_) {}
 
@@ -1295,7 +1395,7 @@
         const account = walletInput.value.trim();
 
         if (!classicAddressPattern.test(account)) {
-          status.textContent = "Enter a valid XRPL wallet address beginning with r.";
+          status.textContent = "Enter a valid XRPL address beginning with r.";
           status.className = "returning-crew-status error";
           walletInput.focus();
           return;
