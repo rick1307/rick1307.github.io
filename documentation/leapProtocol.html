@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>LEAP Protocol 0.18</title>
+<title>LEAP Protocol 0.19</title>
 <style>
     :root{
       --ink:#10243a;
@@ -295,7 +295,7 @@
 <div class="shell">
 <header class="hero">
 <div class="eyebrow">Wild Ledger</div>
-<h1>LEAP Protocol 0.18</h1>
+<h1>LEAP Protocol 0.19</h1>
 <p>
       This is LEAP. Sections 1–6 are the authoritative Protocol Core. If you cannot accurately explain Sections 1–6, do not modify Wild Ledger protocol behavior.
     </p>
@@ -342,7 +342,7 @@
 <div class="decision">
 <div class="tag">Authoritative Current Protocol</div>
 <div>
-            Protocol 0.18 is the current authoritative LEAP Protocol for Wild Ledger. It defines the distinction between <strong>protocol-defined</strong> and <strong>community-defined</strong> recognition and defines <code>GREAT-CHAT</code> as the one recognition currently defined directly by the Protocol Core. It remains authoritative until changed by an explicit protocol revision under Section 15.
+            Protocol 0.19 is the current authoritative LEAP Protocol for Wild Ledger. It preserves the protocol-defined and community-defined recognition model of 0.18, including <code>GREAT-CHAT</code>, and adds the <strong>Data Minimization Principle</strong> as a Core Principle. Wild Ledger should derive what it can from validated XRPL history and require, retain, or expose no more participant information than the requested function actually needs. It remains authoritative until changed by an explicit protocol revision under Section 15.
           </div>
 </div>
 <section id="purpose">
@@ -394,9 +394,24 @@
             Off-ledger storage, browser storage, configuration files, caches, or presentation logic <strong>MUST NOT</strong> constitute authoritative community protocol state.
           </div>
 </div>
+<div class="rule">
+<div class="tag">Data Minimization Principle</div>
+<div>
+            <strong>Wild Ledger MUST collect, require, retain, or expose no more participant information than is necessary to perform the requested function or to interpret LEAP Protocol state.</strong>
+            If a fact can be derived from validated XRPL history, implementations <strong>SHOULD</strong> derive that fact rather than ask the member to provide it again or maintain a separate authoritative profile copy.
+            An XRPL account address is the minimum persistent technical identifier required for LEAP participation. The LEAP Protocol does not require a member's legal name, email address, phone number, date of birth, demographic profile, interests, location history, or other unrelated personal information.
+            Ephemeral application data, such as a chat nickname or opaque live-session identifier, may be used only for the function that requires it and <strong>MUST NOT</strong> become authoritative LEAP identity or protocol state.
+          </div>
+</div>
+<div class="note">
+          <strong>Plain-language rule:</strong> If Wild Ledger does not need the information, it should not collect it. If the ledger already tells Wild Ledger what it needs, do not ask the person to tell it again.
+        </div>
 <h3>Operating rules</h3>
 <ul>
 <li>Use validated XRPL data for canonical protocol facts.</li>
+<li>Prefer ledger-derived facts over separate personal profiles when validated XRPL history already supplies the required protocol fact.</li>
+<li>Do not make unrelated personal information a condition of LEAP participation when an XRPL address and ledger-derived history are sufficient.</li>
+<li>Keep ephemeral application identity, such as nicknames and opaque session IDs, non-authoritative and limited to the function that requires it.</li>
 <li>Interpret protocol meaning from the transaction type, authorized provenance, canonical asset identity, canonical memo, and validated result together.</li>
 <li>Never treat a memo by itself as proof of official LEAP activity.</li>
 <li>Member recognition always involves LEAP moving to a member.</li>
@@ -1121,6 +1136,7 @@ SFL-CAMEO</code></pre>
 <tr><td>0.16</td><td>2026-10-01</td><td>Protocol hardening pass. Distinguished current LEAP from community Earned LEAP; made rank community-specific and cumulative; clarified one protocol-defined LEAP Distributor and Community Operator vs. Community Operating Wallet; removed the historical 1,000,000 supply cap as a protocol rule; made community namespaces generic and permanently reserved; clarified that recognition definitions are created and managed by no-op lifecycle <code>AccountSet</code> transactions while member recognition always transfers LEAP; added first-class recognition by <code>Payment</code> for payment-enabled members alongside recognition by Check; made Badges repeatable while Events and Challenges remain occurrence-specific; removed wallet-specific and seven-day UI procedures from the protocol; and rewrote implementation/query/validity guidance to conform to the core protocol.</td></tr>
 <tr><td>0.17</td><td>2026-10-01</td><td>Added protocol-level Owner Wallet authority, separate from the LEAP Issuer and LEAP Distributor. The current Owner Wallet may provision the first Community Operating Wallet for a brand-new Community ID and may transfer Owner authority to a successor Owner Wallet. After a community is established, the Owner Wallet has no continuing authority to replace that community's Operating Wallet; subsequent community authority changes are controlled by the current Community Operating Wallet.</td></tr>
 <tr><td>0.18</td><td>2026-10-02</td><td>Defined two recognition-definition origins: protocol-defined and community-defined. Defined <code>GREAT-CHAT</code> as the one recognition currently defined directly by the Protocol Core: a repeatable Badge automatically available to every established LEAP community without <code>CREATE</code>, <code>END</code>, or <code>IGNORE</code>. Great Chat awards remain community-scoped through the community namespace and follow the ordinary Badge recognition rules. The Protocol does not prescribe a Great Chat award amount and does not create a separate recognition registry.</td></tr>
+<tr><td>0.19</td><td>2026-10-02</td><td>Added the Data Minimization Principle to the Protocol Core. Wild Ledger must collect, require, retain, or expose no more participant information than the requested function or protocol interpretation requires; should derive protocol facts from validated XRPL history instead of creating unnecessary personal profiles; defines an XRPL account address as the minimum persistent technical participant identifier required for LEAP; and keeps ephemeral application identity non-authoritative.</td></tr>
 </table>
 <div class="note">
           The change log records the evolution of earlier drafts. Superseded rules described in older rows are historical context, not current protocol requirements.
