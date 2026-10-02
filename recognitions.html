@@ -155,6 +155,8 @@
       event:"EVENT", events:"EVENT",
       challenge:"CHALLENGE", challenges:"CHALLENGE"
     }[requestedCategory] || "ALL";
+    let currentCategory = categoryFromQuery;
+    let latestCatalogResult = null;
 
     const communityName = community.communityName || "Community";
     const theme = community.theme || {};
@@ -172,6 +174,20 @@
       EVENT:{ plural:"Events", singular:"Event", letter:"E", mantra:"Show up.", copy:"Real-world moments where the community and the adventure cross paths." },
       BADGE:{ plural:"Badges", singular:"Badge", letter:"B", mantra:"Do the thing.", copy:"Repeatable recognition for participation, contribution, skills, or shared moments." },
       CHALLENGE:{ plural:"Challenges", singular:"Challenge", letter:"C", mantra:"Make a difference.", copy:"A defined objective you take on and complete." }
+    };
+
+    const recognitionNameOverrides = {
+      "GREAT-CHAT":"Great chat",
+      "FIRST-MEMBER":"First member",
+      "LEAP-OG":"LEAP OG",
+      "NEW-MEMBER":"New member"
+    };
+
+    const recognitionCopyOverrides = {
+      "GREAT-CHAT":"Get LEAP with great chats. I love sharing LEAP with people who contribute great engagement.",
+      "FIRST-MEMBER":"Awarded to the first member of the Sailing Frog's Leap community.",
+      "LEAP-OG":"Awarded to the first 25 members of the Sailing Frog's Leap community.",
+      "NEW-MEMBER":"Awarded to everyone who becomes a member of the Sailing Frog's Leap community."
     };
 
     function communityHref(page, extra = {}) {
@@ -192,12 +208,19 @@
     if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
     if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
 
-    const selectedInfo = categoryFromQuery === "ALL" ? null : categoryInfo[categoryFromQuery];
-    document.title = `${selectedInfo?.plural || "Recognition"} — ${communityName}`;
-    document.getElementById("pageTitle").textContent = selectedInfo?.plural || "Recognition";
-    document.getElementById("pageLede").textContent = selectedInfo
-      ? `${selectedInfo.mantra} ${selectedInfo.copy}`
-      : `Show up. Do the thing. Make a difference.`;
+    function applyCategoryPresentation() {
+      const selectedInfo = currentCategory === "ALL" ? null : categoryInfo[currentCategory];
+      document.title = `${selectedInfo?.plural || "Recognition"} — ${communityName}`;
+      document.getElementById("pageTitle").textContent = selectedInfo?.plural || "Recognition";
+      document.getElementById("pageLede").textContent = selectedInfo
+        ? `${selectedInfo.mantra} ${selectedInfo.copy}`
+        : `Show up. Do the thing. Make a difference.`;
+
+      document.querySelectorAll(".filter").forEach(filter => {
+        if (filter.dataset.category === currentCategory) filter.setAttribute("aria-current", "page");
+        else filter.removeAttribute("aria-current");
+      });
+    }
 
     function buildFilters() {
       const target = document.getElementById("categoryFilters");
@@ -211,8 +234,20 @@
         const link = document.createElement("a");
         link.className = "filter";
         link.href = communityHref("recognitions.html", { category: query });
+        link.dataset.category = category;
         link.textContent = label;
-        if (category === categoryFromQuery) link.setAttribute("aria-current", "page");
+        link.addEventListener("click", async event => {
+          event.preventDefault();
+          currentCategory = category;
+          history.replaceState(null, "", link.href);
+          applyCategoryPresentation();
+
+          if (category === "ALL") {
+            await refreshCatalog();
+          } else if (latestCatalogResult) {
+            renderCatalog(latestCatalogResult);
+          }
+        });
         target.appendChild(link);
       }
     }
@@ -272,7 +307,7 @@
       nameWrap.className = "card-name-wrap";
       const name = document.createElement("h3");
       name.className = "card-name";
-      name.textContent = metadata?.name || metadata?.title || displayNameFromId(record.id);
+      name.textContent = metadata?.name || metadata?.title || recognitionNameOverrides[record.id] || displayNameFromId(record.id);
       nameWrap.appendChild(name);
       const id = document.createElement("div");
       id.className = "canonical-id";
@@ -288,10 +323,8 @@
 
       const copy = document.createElement("p");
       copy.className = "card-copy";
-      const builtInCopy = record.id === "GREAT-CHAT"
-        ? "Get LEAP with Great Chats. I love sharing LEAP with people who contribute great engagement."
-        : "";
-      copy.textContent = metadata?.description || metadata?.copy || builtInCopy || (record.source === "global"
+      const overrideCopy = recognitionCopyOverrides[record.id] || "";
+      copy.textContent = metadata?.description || metadata?.copy || overrideCopy || (record.source === "global"
         ? `This ${info.singular.toLowerCase()} is available to every community.`
         : `No display description has been published yet. The ${info.singular.toLowerCase()} itself is established on XRPL.`);
       card.appendChild(copy);
@@ -376,7 +409,7 @@
     function renderCatalog(result) {
       const catalog = document.getElementById("catalog");
       catalog.replaceChildren();
-      const visibleCategories = categoryFromQuery === "ALL" ? ["EVENT", "BADGE", "CHALLENGE"] : [categoryFromQuery];
+      const visibleCategories = currentCategory === "ALL" ? ["EVENT", "BADGE", "CHALLENGE"] : [currentCategory];
       for (const category of visibleCategories) {
         const rows = result.records.filter(record => record.category === category);
         catalog.appendChild(renderSection(category, rows));
@@ -406,21 +439,28 @@
       document.getElementById("catalogDetail").textContent = "Fail closed";
     }
 
-    buildFilters();
-    document.documentElement.classList.remove("community-pending");
-
-    try {
-      const result = await loadRecognitionCatalog({
-        community,
-        serverUrl: config.xrplWebSocket || "wss://s1.ripple.com/",
-        issuer: config.leapIssuer,
-        currency: config.leapCurrency
-      });
-      renderCatalog(result);
-    } catch (error) {
-      console.warn("Wild Ledger recognition catalog:", error);
-      renderError(error);
+    async function refreshCatalog() {
+      document.getElementById("catalogStatus").textContent = "Loading validated XRP Ledger recognition state…";
+      document.getElementById("catalogDetail").textContent = "";
+      try {
+        const result = await loadRecognitionCatalog({
+          community,
+          serverUrl: config.xrplWebSocket || "wss://s1.ripple.com/",
+          issuer: config.leapIssuer,
+          currency: config.leapCurrency
+        });
+        latestCatalogResult = result;
+        renderCatalog(result);
+      } catch (error) {
+        console.warn("Wild Ledger recognition catalog:", error);
+        renderError(error);
+      }
     }
+
+    buildFilters();
+    applyCategoryPresentation();
+    document.documentElement.classList.remove("community-pending");
+    await refreshCatalog();
   </script>
 </body>
 </html>
