@@ -225,7 +225,7 @@
     .bolt-status:focus-within .bolt-popover{
       opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;
     }
-    .bolt-popover strong{display:block;color:var(--navy);font-size:.79rem;margin-bottom:4px}
+    .bolt-popover strong{display:block;color:var(--navy);font-size:.79rem;margin-bottom:0}
     .bolt-popover p{margin:0}
     .bolt-future-action{
       width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px 10px;
@@ -585,8 +585,8 @@
                   <span class="name" id="managerSampleName">Community Manager</span>
                   <button class="manager-tip" id="managerSampleTip" type="button" data-manager-tip-name="" data-test-only hidden>Tip Community Manager in XRP</button>
                   <span class="bolt-status" data-transfer-status="enabled">
-                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
-                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Enabled</strong><p>This Leaper can receive LEAP directly.</p></span>
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats enabled</strong></span>
                   </span>
                   <span class="time">8:42 PM</span>
                 </div>
@@ -601,8 +601,8 @@
                   <span class="name" data-demo-name>Member One</span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="1" data-test-only hidden>Great Chat</button>
                   <span class="bolt-status" data-transfer-status="enabled">
-                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
-                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Enabled</strong><p>This Leaper can receive LEAP directly.</p></span>
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats enabled</strong></span>
                   </span>
                   <span class="time">8:43 PM</span>
                 </div>
@@ -617,8 +617,8 @@
                   <span class="name" data-demo-name>Member Two</span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="2" data-test-only hidden>Great Chat</button>
                   <span class="bolt-status" data-transfer-status="disabled">
-                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers not enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
-                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Not Enabled</strong><p>This Leaper has not enabled direct LEAP transfers yet.</p></span>
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats not enabled yet"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats not enabled yet</strong></span>
                   </span>
                   <span class="time">8:44 PM</span>
                 </div>
@@ -633,8 +633,8 @@
                   <span class="name" data-demo-name>Member Three</span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="3" data-test-only hidden>Great Chat</button>
                   <span class="bolt-status" data-transfer-status="enabled">
-                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
-                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Enabled</strong><p>This Leaper can receive LEAP directly.</p></span>
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats enabled</strong></span>
                   </span>
                   <span class="time">8:45 PM</span>
                 </div>
@@ -643,7 +643,7 @@
             </div>
           </div>
 
-          <div class="legend"><span class="bolt">⚡</span> Bright = LEAP transfers enabled · Dim = not enabled</div>
+          <div class="legend"><span class="bolt">⚡</span> Bright = Great Chats enabled · Dim = not enabled yet</div>
 
           <form class="composer" id="messageForm">
             <input id="messageInput" maxlength="280" autocomplete="off" placeholder="Say something..." aria-label="Message" />
@@ -1073,26 +1073,17 @@
       const copy = document.createElement("p");
 
       if (status === "enabled") {
-        trigger.setAttribute("aria-label", "LEAP transfers enabled");
-        title.textContent = "LEAP Transfers Enabled";
-        copy.textContent = isMe
-          ? "Your wallet can receive LEAP directly."
-          : "This Leaper can receive LEAP directly.";
+        trigger.setAttribute("aria-label", "Great Chats enabled");
+        title.textContent = "Great Chats enabled";
       } else if (status === "disabled") {
-        trigger.setAttribute("aria-label", "LEAP transfers not enabled");
-        title.textContent = "LEAP Transfers Not Enabled";
-        copy.textContent = isMe
-          ? "Your wallet has not enabled direct LEAP transfers yet."
-          : "This Leaper has not enabled direct LEAP transfers yet.";
+        trigger.setAttribute("aria-label", "Great Chats not enabled yet");
+        title.textContent = "Great Chats not enabled yet";
       } else {
-        trigger.setAttribute("aria-label", "LEAP transfer status not connected yet");
-        title.textContent = isMe ? "Your LEAP Transfer Status" : "LEAP Transfer Status";
-        copy.textContent = isMe
-          ? "Wild Ledger will check your wallet privately here once the wallet/session bridge is connected."
-          : "This live participant's transfer status is not connected to the room yet.";
+        trigger.setAttribute("aria-label", "Great Chats not enabled yet");
+        title.textContent = "Great Chats not enabled yet";
       }
 
-      popover.append(title, copy);
+      popover.append(title);
 
       if (isMe && status !== "enabled") {
         const futureButton = document.createElement("button");
