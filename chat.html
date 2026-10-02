@@ -600,8 +600,8 @@
       </section>
 
       <div class="prototype-note">
-        <strong class="sans">Live-room Step 1A.</strong>
-        New chat messages use Supabase Realtime Broadcast for the selected community room. If Realtime is unavailable, messages fall back to this browser tab only. Presence, private participant identity, and recent-history continuity come later in Steps 1B and 1C. XRP-tip and Great Chat signing checkpoints remain unchanged; this page still cannot submit either XRPL transaction.
+        <strong class="sans">Live-room Step 1B — Presence.</strong>
+        New chat messages use Supabase Realtime Broadcast for the selected community room, and the online count now comes from Supabase Presence. If Realtime is unavailable, messages fall back to this browser tab only. Private participant identity and recent-history continuity still come later. XRP-tip and Great Chat signing checkpoints remain unchanged; this page still cannot submit either XRPL transaction.
       </div>
     </div>
   </main>
@@ -966,6 +966,15 @@
       roomConnectionStatus.textContent = label;
     }
 
+    function updateRoomPresenceCount() {
+      if (!chatChannel) return;
+      const state = chatChannel.presenceState();
+      const onlineCount = Object.values(state || {}).reduce((total, presences) => {
+        return total + (Array.isArray(presences) ? presences.length : 0);
+      }, 0);
+      setRoomConnectionState("online", `${onlineCount} online`);
+    }
+
     function showChatToast(message, milliseconds = 2200) {
       toast.textContent = message;
       toast.classList.add("show");
@@ -1042,18 +1051,33 @@
         });
 
         chatChannel = supabaseClient.channel(CHAT_CHANNEL_TOPIC, {
-          config: { broadcast: { self: false, ack: true } }
+          config: {
+            broadcast: { self: false, ack: true },
+            presence: { key: chatClientId }
+          }
         });
 
         chatChannel
           .on("broadcast", { event: "chat-message" }, ({ payload }) => handleRealtimeChatMessage(payload))
-          .subscribe(status => {
+          .on("presence", { event: "sync" }, () => updateRoomPresenceCount())
+          .subscribe(async (status, error) => {
             if (status === "SUBSCRIBED") {
               chatRealtimeReady = true;
               setRoomConnectionState("online", "Live room connected");
+              try {
+                const trackStatus = await chatChannel.track({
+                  online_at: new Date().toISOString()
+                });
+                if (trackStatus !== "ok") {
+                  console.error("Supabase Presence track returned", trackStatus);
+                }
+              } catch (presenceError) {
+                console.error("Supabase Presence tracking failed", presenceError);
+              }
               return;
             }
             if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+              console.error("Supabase Realtime channel status", status, error || "");
               chatRealtimeReady = false;
               setRoomConnectionState("offline", "Live room disconnected");
             }
@@ -1107,6 +1131,12 @@
     });
 
     void initializeRealtimeChat();
+
+    window.addEventListener("pagehide", () => {
+      if (chatChannel) {
+        void chatChannel.untrack().catch(() => {});
+      }
+    });
 
     document.querySelectorAll("[data-manager-tip-name]").forEach(button => {
       button.addEventListener("click", () => {
