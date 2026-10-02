@@ -232,19 +232,24 @@
 
     .console-title b{
       display:block;
-      font-size:1.12rem;
-      letter-spacing:.02em;
+      font-family:var(--community-display-font);
+      font-size:1.22rem;
+      font-weight:700;
+      line-height:1.08;
+      letter-spacing:0;
     }
 
     .trustline-row{
       display:flex;
       align-items:center;
       gap:6px;
-      margin-top:1px;
+      margin-top:3px;
       color:rgba(255,255,255,.62);
-      font-size:.76rem;
+      font-family:var(--community-ui-font);
+      font-size:.68rem;
+      line-height:1.2;
       text-transform:uppercase;
-      letter-spacing:.12em;
+      letter-spacing:.09em;
       font-weight:800;
     }
 
@@ -396,9 +401,10 @@
       background:var(--gold);
       color:var(--ink);
       font-family:var(--community-ui-font);
-      font-size:.72rem;
-      font-weight:900;
+      font-size:.74rem;
+      font-weight:850;
       line-height:1.1;
+      letter-spacing:.01em;
       text-decoration:none;
       white-space:nowrap;
       box-shadow:0 8px 18px rgba(4,18,22,.14);
@@ -440,19 +446,23 @@
 
     .record-stat b{
       display:block;
-      color:rgba(255,255,255,.5);
-      font-size:.64rem;
+      color:rgba(255,255,255,.54);
+      font-family:var(--community-ui-font);
+      font-size:.67rem;
+      font-weight:800;
+      line-height:1.15;
       text-transform:uppercase;
-      letter-spacing:.1em;
-      margin-bottom:4px;
+      letter-spacing:.085em;
+      margin-bottom:5px;
     }
 
     .record-stat strong{
       display:block;
       color:white;
       font-family:var(--community-display-font);
-      font-size:1.18rem;
-      line-height:1.05;
+      font-size:1.30rem;
+      font-weight:700;
+      line-height:1.02;
       overflow-wrap:anywhere;
     }
 
@@ -489,18 +499,20 @@
     }
 
     .community-total-row span{
-      color:rgba(255,255,255,.58);
-      font-size:.62rem;
+      color:rgba(255,255,255,.60);
+      font-family:var(--community-ui-font);
+      font-size:.64rem;
       font-weight:800;
       text-transform:uppercase;
-      letter-spacing:.08em;
-      line-height:1.1;
+      letter-spacing:.075em;
+      line-height:1.15;
     }
 
     .community-total-row strong{
       color:white;
       font-family:var(--community-display-font);
-      font-size:1rem;
+      font-size:1.04rem;
+      font-weight:700;
       line-height:1;
       text-align:right;
     }
@@ -523,14 +535,17 @@
       display:flex;
       justify-content:space-between;
       gap:14px;
-      color:rgba(255,255,255,.66);
-      font-size:.72rem;
-      margin-bottom:7px;
+      color:rgba(255,255,255,.68);
+      font-family:var(--community-ui-font);
+      font-size:.74rem;
+      font-weight:700;
+      line-height:1.25;
+      margin-bottom:8px;
     }
 
     .rank-progress-copy strong{
       color:#f2d99f;
-      font-weight:800;
+      font-weight:850;
     }
 
     .progress-track{
@@ -624,17 +639,20 @@
       display:block;
       color:#ffe3a0;
       font-family:var(--community-display-font);
-      font-size:1.12rem;
-      line-height:1.15;
+      font-size:1.18rem;
+      font-weight:700;
+      line-height:1.10;
     }
 
     .pending-checks-title span{
       display:block;
-      margin-top:3px;
-      color:rgba(255,255,255,.58);
-      font-size:.62rem;
-      font-weight:900;
-      letter-spacing:.11em;
+      margin-top:4px;
+      color:rgba(255,255,255,.60);
+      font-family:var(--community-ui-font);
+      font-size:.64rem;
+      font-weight:850;
+      line-height:1.15;
+      letter-spacing:.09em;
       text-transform:uppercase;
     }
 
@@ -654,9 +672,10 @@
 
     .pending-checks-copy{
       margin:0 0 12px;
-      color:rgba(255,255,255,.78);
-      font-size:.76rem;
-      line-height:1.5;
+      color:rgba(255,255,255,.80);
+      font-family:var(--community-ui-font);
+      font-size:.78rem;
+      line-height:1.48;
     }
 
     .pending-check-list{
@@ -827,14 +846,18 @@
     .logbook-head b{
       color:white;
       font-family:var(--community-display-font);
-      font-size:1.08rem;
+      font-size:1.16rem;
+      font-weight:700;
+      line-height:1.10;
     }
 
     .logbook-head span{
-      color:rgba(255,255,255,.48);
+      color:rgba(255,255,255,.52);
+      font-family:var(--community-ui-font);
       font-size:.64rem;
+      line-height:1.15;
       text-transform:uppercase;
-      letter-spacing:.11em;
+      letter-spacing:.09em;
       font-weight:850;
     }
 
@@ -851,9 +874,10 @@
       padding:7px 10px;
       background:rgba(255,255,255,.05);
       color:rgba(255,255,255,.58);
-      font:inherit;
-      font-size:.66rem;
+      font-family:var(--community-ui-font);
+      font-size:.68rem;
       font-weight:850;
+      line-height:1.15;
       cursor:pointer;
     }
 
@@ -874,10 +898,11 @@
       padding:5px 2px;
       background:transparent;
       color:#f2d99f;
-      font:inherit;
-      font-size:.64rem;
+      font-family:var(--community-ui-font);
+      font-size:.65rem;
       font-weight:850;
-      letter-spacing:.025em;
+      line-height:1.15;
+      letter-spacing:.02em;
       cursor:pointer;
     }
 
@@ -912,9 +937,10 @@
 
     .logbook-empty{
       padding:12px 0 3px;
-      color:rgba(255,255,255,.53);
-      font-size:.76rem;
-      line-height:1.45;
+      color:rgba(255,255,255,.56);
+      font-family:var(--community-ui-font);
+      font-size:.78rem;
+      line-height:1.48;
     }
 
     .logbook-entry{
@@ -1196,13 +1222,13 @@
           <div class="pending-checks-head">
             <div class="pending-checks-title">
               <b id="pendingChecksTitle">LEAP Waiting for You</b>
-              <span>Pending LEAP Checks</span>
+              <span>Ready in Xaman</span>
             </div>
             <div class="pending-check-count" id="pendingCheckCount">0 Waiting</div>
           </div>
 
           <p class="pending-checks-copy" id="pendingChecksCopy">
-            Open Xaman → Events and cash these Checks. New pending Checks are shown here for 7 days.
+            Open Xaman → Events to cash your LEAP Checks. New Checks stay visible here for 7 days.
           </p>
 
           <div class="pending-check-list" id="pendingCheckList"></div>
@@ -1211,7 +1237,7 @@
         <div class="crew-logbook" id="crewLogbook">
           <div class="logbook-head">
             <b>Your Logbook</b>
-            <span>Validated XRPL history</span>
+            <span>Your LEAP history</span>
           </div>
 
           <div class="logbook-view-toggle" aria-label="Personal logbook view">
@@ -1224,7 +1250,7 @@
           </div>
 
           <div id="logbookEntries" class="logbook-empty">
-            Your LEAP history will appear here after your Member Record is opened through the LEAP flow.
+            Your LEAP history will appear here as you earn recognition.
           </div>
         </div>
       </aside>
@@ -1604,7 +1630,7 @@
         pendingCheckCount.textContent = "0 Waiting";
         pendingChecksTitle.textContent = "LEAP Waiting for You";
         pendingChecksCopy.textContent =
-          "Open Xaman → Events and cash these Checks. New pending Checks are shown here for 7 days.";
+          "Open Xaman → Events to cash your LEAP Checks. New Checks stay visible here for 7 days.";
       }
 
       function checkObjectId(check) {
@@ -1798,7 +1824,7 @@
           pendingCheckCount.textContent = parts.join(" • ");
 
           pendingChecksCopy.textContent =
-            "Open Xaman → Events and cash these Checks. New pending Checks are shown here for 7 days. Your Member Record updates after the LEAP reaches your wallet.";
+            "Open Xaman → Events to cash your LEAP Checks. New Checks stay visible here for 7 days. Your Member Record updates when the LEAP reaches your wallet.";
         } else {
           pendingChecksTitle.textContent =
             expiredCount === 1 ? "Expired LEAP Check" : "Expired LEAP Checks";
