@@ -390,73 +390,6 @@
       text-decoration:none;
     }
 
-    .great-chat-summary{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:9px;
-      margin:0 0 14px;
-    }
-
-    .great-chat-metric{
-      min-width:0;
-      padding:13px 10px 12px;
-      border:1px solid #d6bf63;
-      border-radius:16px;
-      background:linear-gradient(180deg,#fff3b8 0%,#f4e7ae 100%);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 5px 14px rgba(0,0,0,.10);
-      text-align:center;
-    }
-
-    .great-chat-metric:nth-child(2){
-      border-color:#8fc9aa;
-      background:linear-gradient(180deg,#d9f1e4 0%,#cce8d9 100%);
-    }
-
-    .great-chat-value{
-      display:inline-grid;
-      place-items:center;
-      min-width:88px;
-      min-height:48px;
-      padding:6px 16px;
-      border:1px solid rgba(102,79,0,.18);
-      border-radius:999px;
-      background:#efd04f;
-      color:#302700;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 2px 8px rgba(72,57,0,.12);
-      font-family:var(--community-display-font);
-      font-size:clamp(28px,7vw,42px);
-      font-weight:900;
-      line-height:1;
-      font-variant-numeric:tabular-nums;
-    }
-
-    .great-chat-metric:nth-child(2) .great-chat-value{
-      border-color:rgba(14,76,45,.16);
-      background:#93d8b1;
-      color:#123c29;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 8px rgba(14,76,45,.10);
-    }
-
-    .great-chat-label{
-      display:block;
-      margin-top:8px;
-      color:#18313b;
-      font-size:.72rem;
-      font-weight:900;
-      letter-spacing:.055em;
-      text-transform:uppercase;
-      line-height:1.25;
-    }
-
-    .great-chat-note{
-      display:block;
-      margin-top:3px;
-      color:#526970;
-      font-size:.64rem;
-      font-weight:700;
-      line-height:1.3;
-    }
-
     .record-grid{
       display:grid;
       grid-template-columns:repeat(4,minmax(0,1fr));
@@ -502,7 +435,7 @@
 
     .record-stat.community-totals{
       display:grid;
-      grid-template-rows:repeat(3,1fr);
+      grid-template-rows:repeat(4,1fr);
       gap:0;
       padding:8px 10px;
     }
@@ -535,6 +468,11 @@
       font-size:1rem;
       line-height:1;
       text-align:right;
+    }
+
+    .community-total-row.great-chat-total span,
+    .community-total-row.great-chat-total strong{
+      color:#f2d77a;
     }
 
     .rank-progress{
@@ -1184,24 +1122,12 @@
           <a class="crew-state-action button" href="chat.html?community=sailing-frogs-leap">Enter the Leaper Lounge</a>
         </div>
 
-        <div class="great-chat-summary" aria-label="Great Chat totals received by this member from validated XRP Ledger history">
-          <div class="great-chat-metric">
-            <strong class="great-chat-value" id="memberGreatChatCount">0</strong>
-            <span class="great-chat-label">Great Chats Received</span>
-            <small class="great-chat-note">Completed recognitions</small>
-          </div>
-          <div class="great-chat-metric">
-            <strong class="great-chat-value" id="memberGreatChatLeap">0</strong>
-            <span class="great-chat-label">LEAP Received</span>
-            <small class="great-chat-note">From Great Chats</small>
-          </div>
-        </div>
-
         <div class="record-grid">
           <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong><small>current balance</small></div>
           <div class="record-stat"><b>Earned</b><strong id="recordEarned">—</strong><small id="recordEarnedNote">in this community</small></div>
           <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote">from Earned LEAP</small></div>
           <div class="record-stat community-totals" aria-label="Community recognition totals">
+            <div class="community-total-row great-chat-total"><span>Great Chats</span><strong id="recordGreatChats">—</strong></div>
             <div class="community-total-row"><span>Badges</span><strong id="recordBadges">—</strong></div>
             <div class="community-total-row"><span>Challenges</span><strong id="recordChallenges">—</strong></div>
             <div class="community-total-row"><span>Events</span><strong id="recordEvents">—</strong></div>
@@ -1355,6 +1281,7 @@
       const earnedNoteEl = document.getElementById("recordEarnedNote");
       const rankEl = document.getElementById("recordRank");
       const rankNoteEl = document.getElementById("recordRankNote");
+      const greatChatsEl = document.getElementById("recordGreatChats");
       const badgesEl = document.getElementById("recordBadges");
       const challengesEl = document.getElementById("recordChallenges");
       const eventsEl = document.getElementById("recordEvents");
@@ -1372,8 +1299,6 @@
       const pendingCheckCount = document.getElementById("pendingCheckCount");
       const pendingChecksCopy = document.getElementById("pendingChecksCopy");
       const pendingCheckList = document.getElementById("pendingCheckList");
-      const memberGreatChatCountEl = document.getElementById("memberGreatChatCount");
-      const memberGreatChatLeapEl = document.getElementById("memberGreatChatLeap");
 
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
 
@@ -1564,6 +1489,7 @@
 
       function resetLogbook(message = "Your LEAP history will appear here after your Member Record is opened through the LEAP flow.") {
         currentLogbookRecords = [];
+        greatChatsEl.textContent = "—";
         badgesEl.textContent = "—";
         challengesEl.textContent = "—";
         eventsEl.textContent = "—";
@@ -2891,34 +2817,6 @@
         return Number(total.toFixed(6));
       }
 
-      function greatChatStatsFromRecords(records) {
-        let count = 0;
-        let leap = 0;
-
-        for (const record of Array.isArray(records) ? records : []) {
-          const facts = Array.isArray(record?.facts) ? record.facts : [];
-          if (facts.length !== 1) continue;
-          const fact = facts[0];
-          if (fact?.key !== "BADGE" || fact?.value !== "GREAT-CHAT") continue;
-
-          const amount = Number(record?.earnedAmount);
-          if (!Number.isFinite(amount) || amount <= 0) continue;
-
-          count += 1;
-          leap += amount;
-        }
-
-        return { count, leap:Number(leap.toFixed(6)) };
-      }
-
-      function renderGreatChatStats(records) {
-        const stats = greatChatStatsFromRecords(records);
-        memberGreatChatCountEl.textContent = stats.count.toLocaleString();
-        memberGreatChatLeapEl.textContent = Number.isInteger(stats.leap)
-          ? stats.leap.toLocaleString()
-          : stats.leap.toLocaleString(undefined, { maximumFractionDigits:6 });
-      }
-
       function renderEarnedLeap(records) {
         const total = earnedLeapTotal(records);
         earnedEl.textContent = Number.isInteger(total)
@@ -2956,15 +2854,22 @@
           CHALLENGE:new Set(),
           EVENT:new Set()
         };
+        let greatChatCount = 0;
 
         for (const record of sorted) {
           for (const fact of record.facts) {
+            if (fact?.key === "BADGE" && fact?.value === "GREAT-CHAT") {
+              greatChatCount += 1;
+              continue;
+            }
+
             if (recognitionTotals[fact.key]) {
               recognitionTotals[fact.key].add(fact.value);
             }
           }
         }
 
+        greatChatsEl.textContent = String(greatChatCount);
         badgesEl.textContent = String(recognitionTotals.BADGE.size);
         challengesEl.textContent = String(recognitionTotals.CHALLENGE.size);
         eventsEl.textContent = String(recognitionTotals.EVENT.size);
@@ -3169,11 +3074,9 @@
 
           if (historyLoaded) {
             renderEarnedLeap(historyResult.value);
-            renderGreatChatStats(historyResult.value);
             renderLogbook(historyResult.value);
           } else {
-            memberGreatChatCountEl.textContent = "—";
-            memberGreatChatLeapEl.textContent = "—";
+            greatChatsEl.textContent = "—";
             earnedEl.textContent = "—";
             earnedNoteEl.textContent = `in ${communityName}`;
             rankEl.textContent = "Unavailable";
