@@ -226,15 +226,24 @@
 
     .leap-request-form{margin-top:16px}
     .leap-request-row{display:flex;gap:10px;align-items:stretch}
-    .leap-request-form input[type="text"],
-    .member-record-open input{
+    .wallet-input-wrap{position:relative;flex:1;min-width:0}
+    .leap-request-form .wallet-address-input,
+    .member-record-open .wallet-address-input{
       flex:1;min-width:0;padding:13px 14px;border-radius:8px;
       border:1px solid rgba(26,37,44,.22);background:#fff;color:var(--ink);
       font-family:var(--community-ui-font);
-      font-size:1rem;outline:none;
+      font-size:1rem;outline:none;padding-right:46px;
     }
-    .leap-request-form input[type="text"]:focus,
-    .member-record-open input:focus{
+    .wallet-visibility-toggle{
+      position:absolute;right:7px;top:50%;transform:translateY(-50%);
+      width:36px;height:36px;padding:0;border:0;border-radius:8px;
+      background:transparent;color:var(--navy);display:grid;place-items:center;cursor:pointer;
+    }
+    .wallet-visibility-toggle:hover{background:rgba(26,37,44,.06)}
+    .wallet-visibility-toggle:focus-visible{outline:2px solid var(--sea);outline-offset:1px}
+    .wallet-visibility-toggle svg{width:20px;height:20px;display:block}
+    .leap-request-form .wallet-address-input:focus,
+    .member-record-open .wallet-address-input:focus{
       border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.14);
     }
     .leap-request-form .button,
@@ -479,7 +488,7 @@
 
     @media(max-width:650px){
       .wrap{width:min(calc(100% - 24px),var(--max))}
-      .leap-request-form input[type="text"],.member-record-open input{min-height:50px}
+      .leap-request-form .wallet-address-input,.member-record-open .wallet-address-input{min-height:50px}
       .leap-request-form .button,.member-record-open .button{min-height:50px}
       .section-title p{font-size:1rem}
       .nav-inner{min-height:58px}
@@ -508,21 +517,24 @@
 <div class="gateway-card gateway-primary" id="request-first-leap">
 <div class="gateway-label">New member</div>
 <h3>Request your first LEAP</h3>
-<p id="sendAddressCopy">Enter the public XRP Ledger address from your Xaman Wallet.</p>
+<p id="sendAddressCopy">Give me your public XRP Ledger address. That is all I need.</p>
 <div class="gateway-note">Public address only. Never send secret words or private keys.</div>
 <form action="https://usebasin.com/f/93034286b67b" class="leap-request-form" data-basin-error-id="firstLeapError" data-basin-form="" data-basin-success-action="render" data-basin-success-id="firstLeapSuccess" id="firstLeapRequestForm" method="POST">
 <input id="firstLeapCommunityId" name="community_id" type="hidden" value=""/>
 <input id="firstLeapCommunityName" name="community_name" type="hidden" value=""/>
 <input id="firstLeapOperatorName" name="operator_name" type="hidden" value=""/>
 <div class="leap-request-row">
-<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="r..." required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="text"/>
+<div class="wallet-input-wrap">
+<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" class="wallet-address-input" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="r..." required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="password"/>
+<button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="firstLeapXrplAddress" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+</div>
 <button class="button" type="submit">Request My First LEAP</button>
 </div>
 </form><div aria-live="polite" class="request-result" id="firstLeapSuccess" role="status" style="display:none;">
 <div class="result-mark">✓</div>
 <h4>Request received. You're on your way.</h4>
-<p>We received your request.</p>
-<p>Your first LEAP Check will be sent to this XRP Ledger address, usually within 24 hours.</p>
+<p>I got your request.</p>
+<p>I’ll send your first LEAP Check to this XRP Ledger address, usually within 24 hours.</p>
 <p><strong>Nothing else is needed right now.</strong></p>
 </div><div class="leap-request-message error" id="firstLeapError" role="alert" style="display:none;">
                 Could not send request. Please try again.
@@ -535,7 +547,10 @@
               Once you've cashed your first LEAP Check, enter your XRP Ledger address to open your Member Record.
             </p>
 <div class="member-record-open-row">
-<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="text"/>
+<div class="wallet-input-wrap">
+<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" class="wallet-address-input" id="memberRecordWallet" inputmode="text" placeholder="Enter your XRP Ledger address" spellcheck="false" type="password"/>
+<button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="memberRecordWallet" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+</div>
 <button class="button" id="openMemberRecordButton" type="button">Open My Member Record →</button>
 </div>
 <p aria-live="polite" class="member-record-status" id="memberRecordStatus" role="status"></p>
@@ -547,21 +562,21 @@
 <section class="prep-section">
 <div class="wrap">
 <div class="section-title compact-title">
-<h2>Requesting your first LEAP?</h2>
+<h2>Before you start</h2>
 <p>You only need three things.</p>
 </div>
 <div class="prep-grid">
 <div class="prep-item">
 <b>Xaman Wallet</b>
-<span>Use Xaman on your mobile device.</span>
+<span>You’ll need Xaman on your phone.</span>
 </div>
 <div class="prep-item">
 <b>A little XRP</b>
-<span>It covers XRP Ledger fees and wallet reserve.</span>
+<span>Xaman needs a small amount of XRP to use the XRP Ledger.</span>
 </div>
 <div class="prep-item">
 <b>Your public address</b>
-<span>It begins with <strong>r</strong>. That is all we need.</span>
+<span>It begins with <strong>r</strong>. That is the only address I need from you.</span>
 </div>
 </div>
 </div>
@@ -571,24 +586,24 @@
 <div class="wrap">
 <div class="section-title compact-title">
 <h2>Then this happens</h2>
-<p>No crypto maze. Just three steps.</p>
+<p>Just three steps.</p>
 </div>
 <div class="three process-three">
 <div class="mini">
 <div class="num">1</div>
-<h3 id="sendCheckHeading">We send your LEAP Check</h3>
+<h3 id="sendCheckHeading">I send your first LEAP</h3>
 <p>Your first Check is for 1 LEAP.</p>
-<p><strong id="inviteCopy">This is your invite to join the community.</strong></p>
+<p><strong id="inviteCopy">That first LEAP is your invitation aboard.</strong></p>
 </div>
 <div class="mini">
 <div class="num">2</div>
 <h3>Cash it in Xaman</h3>
-<p>Open the Check in the Events tab in the Xaman app, confirm the Check is for LEAP, and cash it there.</p>
+<p>Open the Check in Xaman, make sure it is for LEAP, and cash it.</p>
 </div>
 <div class="mini">
 <div class="num">3</div>
-<h3>Your Member Record is ready</h3>
-<p id="threeStepWelcome">Your first LEAP starts your first rank.</p>
+<h3>Your crew history begins</h3>
+<p id="threeStepWelcome">You’ve earned your first LEAP and your first rank.</p>
 </div>
 </div>
 </div>
@@ -598,8 +613,8 @@
 <div class="invite after-cash">
 <h3 id="welcomeRankHeading">After you cash it</h3>
 <p id="welcomeHistoryCopy">
-            You now hold your first LEAP.
-            Your community story has started.
+            You earned your first LEAP.
+            Your history here has started.
           </p>
 <div class="status">
 <div>
@@ -626,21 +641,18 @@
 </div>
 <div class="two">
 <div class="panel">
-<h3>You earn more LEAP</h3>
+<h3>Show up. Do the thing. Make a difference.</h3>
 <p>
 <span id="takePartCopy">Take part in the community.</span>
-              Help out.
-              Join an event.
-              Earn recognition.
-              When you earn LEAP, we send another Check to your Xaman Wallet.
+              When you do something I want to recognize, I can award you more LEAP.
             </p>
 <a class="button secondary" href="ranks.html" id="nextRanksLink">See the ranks →</a>
 </div>
 <div class="panel">
 <h3>Your story grows</h3>
 <p>
-              LEAP Checks can include short notes about why you received them.
-              <span id="storyGrowthCopy">Those notes help build your community history and badges.</span>
+              Every recognition adds another piece to the story of what you’ve done here.
+              <span id="storyGrowthCopy">Your history grows as you earn badges, complete challenges, and show up for events.</span>
 </p>
 <a class="button secondary" href="recognitions.html?category=badge" id="nextBadgesLink">See the badges →</a>
 <a class="button secondary" href="recognitions.html?category=challenge" id="nextChallengesLink">See the challenges →</a>
@@ -654,7 +666,7 @@
 <div class="help-box">
 <div class="help-copy">
 <h3>Need help before you start?</h3>
-<p id="bottomHelpCopy">For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For Community ranks, badges, events, and participation, use the Community FAQ.</p>
+<p id="bottomHelpCopy">If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about ranks, badges, challenges, events, or participation here, use the Community FAQ.</p>
 </div>
 <div class="help-actions">
 <a class="button secondary" href="wildLedgerFaq.html" id="wildLedgerFaqLink">Wild Ledger FAQ →</a>
@@ -702,6 +714,17 @@
       const memberRecordWallet = document.getElementById("memberRecordWallet");
       const openMemberRecordButton = document.getElementById("openMemberRecordButton");
       const memberRecordStatus = document.getElementById("memberRecordStatus");
+
+      document.querySelectorAll("[data-wallet-toggle]").forEach(toggle => {
+        const input = document.getElementById(toggle.dataset.walletToggle || "");
+        if (!input) return;
+        toggle.addEventListener("click", () => {
+          const revealing = input.type === "password";
+          input.type = revealing ? "text" : "password";
+          toggle.setAttribute("aria-pressed", revealing ? "true" : "false");
+          toggle.setAttribute("aria-label", revealing ? "Hide XRP Ledger address" : "Show XRP Ledger address");
+        });
+      });
 
       if (firstLeapCommunityId) firstLeapCommunityId.value = communityId;
       if (firstLeapCommunityName) firstLeapCommunityName.value = communityName;
@@ -785,14 +808,14 @@
       if (meta) meta.content = `Join ${communityName} with your first LEAP.`;
 
       const homeHref = `index.html?community=${encodeURIComponent(communityId)}`;
-      const pageHref = page => `${page}${page.includes("?") ? "&" : "?"}community=${encodeURIComponent(communityId)}`;
+      const pageHref = page => `${page}?community=${encodeURIComponent(communityId)}`;
       const routeMap = [
         ["communityHomeBrand", homeHref],
         ["communityHomeLink", homeHref],
         ["nextRanksLink", pageHref("ranks.html")],
-        ["nextBadgesLink", pageHref("recognitions.html?category=badge")],
-        ["nextChallengesLink", pageHref("recognitions.html?category=challenge")],
-        ["nextEventsLink", pageHref("recognitions.html?category=event")],
+        ["nextBadgesLink", `recognitions.html?category=badge&community=${encodeURIComponent(communityId)}`],
+        ["nextChallengesLink", `recognitions.html?category=challenge&community=${encodeURIComponent(communityId)}`],
+        ["nextEventsLink", `recognitions.html?category=event&community=${encodeURIComponent(communityId)}`],
         ["bottomCommunityFaqLink", pageHref("faq.html")]
       ];
       routeMap.forEach(([id, href]) => {
@@ -806,7 +829,7 @@
       const bottomHelpCopy = document.getElementById("bottomHelpCopy");
       if (bottomHelpCopy) {
         bottomHelpCopy.textContent =
-          `For Xaman, public wallet addresses, LEAP Checks, and how Wild Ledger works, use the Wild Ledger FAQ. For ${communityName} ranks, badges, events, and participation, use the ${communityName} FAQ.`;
+          `If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about ranks, badges, challenges, events, or participation in ${communityName}, use the ${communityName} FAQ.`;
       }
 
       const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
@@ -820,19 +843,19 @@
       const threeStepWelcome = document.getElementById("threeStepWelcome");
       if (threeStepWelcome) {
         threeStepWelcome.textContent =
-          `Welcome, ${firstRankName}.`;
+          `You’ve earned your first LEAP and your first rank: ${firstRankName}.`;
       }
 
       const sendAddressHeading = document.getElementById("sendAddressHeading");
       if (sendAddressHeading) sendAddressHeading.textContent = "Your XRP Ledger address";
       const sendAddressCopy = document.getElementById("sendAddressCopy");
-      if (sendAddressCopy) sendAddressCopy.textContent = `Enter the public XRP Ledger address where ${operatorName} should send your first LEAP Check.`;
+      if (sendAddressCopy) sendAddressCopy.textContent = `Give me your public XRP Ledger address. That is all I need.`;
 
       const sendCheckHeading = document.getElementById("sendCheckHeading");
-      if (sendCheckHeading) sendCheckHeading.textContent = `${operatorName} sends a LEAP Check to your Xaman Wallet`;
+      if (sendCheckHeading) sendCheckHeading.textContent = `I send your first LEAP`;
 
       const inviteCopy = document.getElementById("inviteCopy");
-      if (inviteCopy) inviteCopy.textContent = `This is your invite to join ${communityName}.`;
+      if (inviteCopy) inviteCopy.textContent = `That first LEAP is your invitation aboard.`;
 
       const welcomeRankHeading = document.getElementById("welcomeRankHeading");
       if (welcomeRankHeading) {
@@ -842,7 +865,7 @@
       const welcomeHistoryCopy = document.getElementById("welcomeHistoryCopy");
       if (welcomeHistoryCopy) {
         welcomeHistoryCopy.textContent =
-          `You now hold your first LEAP. Your ${historyLabel} has started.`;
+          `You earned your first LEAP. Your ${historyLabel} has started.`;
       }
 
       const firstRankLabel = document.getElementById("firstRankLabel");
@@ -852,7 +875,7 @@
       if (takePartCopy) takePartCopy.textContent = `Take part in the ${groupName}.`;
 
       const storyGrowthCopy = document.getElementById("storyGrowthCopy");
-      if (storyGrowthCopy) storyGrowthCopy.textContent = `Those notes help build your ${historyLabel} and badges.`;
+      if (storyGrowthCopy) storyGrowthCopy.textContent = `Your ${historyLabel} grows as you earn badges, complete challenges, and show up for events.`;
 
       const safetyCopy = document.getElementById("safetyCommunityCopy");
       if (safetyCopy) safetyCopy.textContent = `${communityName} only needs your public Xaman wallet address.`;
