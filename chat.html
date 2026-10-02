@@ -23,6 +23,7 @@
     }
 
     *{box-sizing:border-box}
+    [hidden]{display:none!important}
     html,body{min-height:100%}
     body{
       margin:0;
@@ -505,7 +506,7 @@
       <h1 id="loungeHeading">Community Lounge</h1>
       <p class="lede" id="loungeLede">A place for members to pull up a chair, pick a name, and join the conversation.</p>
 
-      <div class="prototype-role-switch" aria-label="Prototype view">
+      <div class="prototype-role-switch" aria-label="Prototype view" data-test-only hidden>
         <span class="prototype-role-label">Prototype view</span>
         <button class="role-toggle" type="button" data-role-view="member" aria-pressed="false">Member</button>
         <button class="role-toggle" type="button" data-role-view="manager" aria-pressed="true">Community Manager</button>
@@ -543,7 +544,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name" id="managerSampleName">Community Manager</span>
-                  <button class="manager-tip" id="managerSampleTip" type="button" data-manager-tip-name="">Tip Community Manager in XRP</button>
+                  <button class="manager-tip" id="managerSampleTip" type="button" data-manager-tip-name="" data-test-only hidden>Tip Community Manager in XRP</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:42 PM</span>
                 </div>
@@ -556,7 +557,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name" data-demo-name>Member One</span>
-                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="1">Great Chat</button>
+                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="1" data-test-only hidden>Great Chat</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:43 PM</span>
                 </div>
@@ -569,7 +570,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name" data-demo-name>Member Two</span>
-                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="2">Great Chat</button>
+                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="2" data-test-only hidden>Great Chat</button>
                   <span class="time">8:44 PM</span>
                 </div>
                 <div class="text">How did you decide to do it that way?</div>
@@ -581,7 +582,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name" data-demo-name>Member Three</span>
-                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="3">Great Chat</button>
+                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="3" data-test-only hidden>Great Chat</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:45 PM</span>
                 </div>
@@ -599,8 +600,8 @@
         </div>
       </section>
 
-      <div class="prototype-note">
-        <strong class="sans">Live-room Step 1B — Presence.</strong>
+      <div class="prototype-note" data-test-only hidden>
+        <strong class="sans">Test mode — Live-room Step 1B Presence.</strong>
         New chat messages use Supabase Realtime Broadcast for the selected community room, and the online count now comes from Supabase Presence. If Realtime is unavailable, messages fall back to this browser tab only. Private participant identity and recent-history continuity still come later. XRP-tip and Great Chat signing checkpoints remain unchanged; this page still cannot submit either XRPL transaction.
       </div>
     </div>
@@ -614,17 +615,17 @@
         <input id="xrpAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="XRP amount" aria-label="XRP tip amount" />
         <button class="primary" id="prepareXrpTip" type="button" disabled>Prepare XRP Tip</button>
       </div>
-      <div class="recognition-private-test">
+      <div class="recognition-private-test" data-test-only hidden>
         <label for="xrpTestSender">Private test sender</label>
         <input id="xrpTestSender" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste the member's r... address when ready" />
         <small>Testing bridge. This stands in for the member's private live-session / wallet identity, must match the Bifrost account used to sign, and is never saved.</small>
       </div>
       <p class="xrp-note" id="xrpTipStatus">The XRP destination is not manually entered. Wild Ledger resolves the current canonical Community Operating Wallet from XRPL.</p>
-      <div class="prepared-check" id="preparedXrpTipPanel">
+      <div class="prepared-check" id="preparedXrpTipPanel" data-test-only hidden>
         <strong>Prepared XRP Payment — not submitted</strong>
         <pre id="preparedXrpTipJson"></pre>
       </div>
-      <div class="signing-check" id="xrpSigningPanel">
+      <div class="signing-check" id="xrpSigningPanel" data-test-only hidden>
         <strong>Step 2 — member Bifrost signature only</strong>
         <div class="signing-status" id="xrpWalletStatus">Prepare the XRP tip before connecting Bifrost.</div>
         <div class="signing-actions">
@@ -654,18 +655,18 @@
         <button class="recognition-amount" type="button" data-recognition-amount="2">2 LEAP</button>
         <button class="recognition-amount" type="button" data-recognition-amount="3">3 LEAP</button>
       </div>
-      <div class="recognition-private-test">
+      <div class="recognition-private-test" data-test-only hidden>
         <label for="recognitionTestDestination">Private test destination</label>
         <input id="recognitionTestDestination" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste the member's r... address when ready" />
         <small>Prototype bridge only. The value stays in this browser tab, is not saved, and stands in for the future private live-session lookup.</small>
       </div>
-      <button class="primary recognition-wallet" id="prepareRecognition" type="button" disabled>Prepare Great Chat Check</button>
+      <button class="primary recognition-wallet" id="prepareRecognition" type="button" disabled data-test-only hidden>Prepare Great Chat Check</button>
       <p class="recognition-note" id="recognitionPrivateStatus">The member's XRPL address stays hidden in the Lounge. Wild Ledger targets this award by the participant's live session, not by the visible nickname.</p>
-      <div class="prepared-check" id="preparedCheckPanel">
+      <div class="prepared-check" id="preparedCheckPanel" data-test-only hidden>
         <strong>Prepared — not submitted</strong>
         <pre id="preparedCheckJson"></pre>
       </div>
-      <div class="signing-check" id="signingCheckPanel">
+      <div class="signing-check" id="signingCheckPanel" data-test-only hidden>
         <strong>Step 2B — Bifrost signature only</strong>
         <div class="signing-status" id="recognitionWalletStatus">Prepared Check is ready. Connect the current Community Operating Wallet when you want to test signing.</div>
         <div class="signing-actions">
@@ -745,6 +746,11 @@
     // never silently falls back to another community. Without an explicit URL
     // value, communityConfig.js may supply the community selected for this session.
     const chatParams = new URLSearchParams(window.location.search);
+    const TEST_MODE = chatParams.get("test") === "1";
+    document.body.dataset.testMode = TEST_MODE ? "on" : "off";
+    document.querySelectorAll("[data-test-only]").forEach(element => {
+      element.hidden = !TEST_MODE;
+    });
     const requestedCommunityToken = String(chatParams.get("community") || "").trim();
     const community = requestedCommunityToken
       ? (window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunityToken) || null)
@@ -936,7 +942,7 @@
       button.addEventListener("click", () => applyPrototypeRole(button.dataset.roleView));
     });
 
-    applyPrototypeRole(document.body.dataset.prototypeRole);
+    applyPrototypeRole(TEST_MODE ? document.body.dataset.prototypeRole : "member");
 
     entryForm.addEventListener("submit", (event) => {
       event.preventDefault();
