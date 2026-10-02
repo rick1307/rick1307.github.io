@@ -601,7 +601,7 @@
 
       <div class="prototype-note">
         <strong class="sans">Live-room Step 1A.</strong>
-        New chat messages are wired for Supabase Realtime Broadcast. Until the Supabase Project URL and publishable key are plugged in, messages fall back to this browser tab only. Presence, private participant identity, and recent-history continuity come later in Steps 1B and 1C. XRP-tip and Great Chat signing checkpoints remain unchanged; this page still cannot submit either XRPL transaction.
+        New chat messages use Supabase Realtime Broadcast for the selected community room. If Realtime is unavailable, messages fall back to this browser tab only. Presence, private participant identity, and recent-history continuity come later in Steps 1B and 1C. XRP-tip and Great Chat signing checkpoints remain unchanged; this page still cannot submit either XRPL transaction.
       </div>
     </div>
   </main>
@@ -761,10 +761,10 @@
     const NAMESPACE = String(community?.leapNamespace || "").trim();
     const GREAT_CHAT_MEMO = NAMESPACE ? `${NAMESPACE}/BADGE=GREAT-CHAT` : "";
 
-    // Live-room Step 1A. The project URL and publishable browser key plug in later.
-    // The publishable key is intended for client-side use. Never place a secret/service-role key here.
-    const SUPABASE_URL = String(runtimeConfig.supabaseUrl || "PASTE_SUPABASE_PROJECT_URL_HERE").trim();
-    const SUPABASE_PUBLISHABLE_KEY = String(runtimeConfig.supabasePublishableKey || "PASTE_SUPABASE_PUBLISHABLE_KEY_HERE").trim();
+    // Live-room Step 1A. Browser-safe Supabase connection for Realtime Broadcast.
+    // Runtime configuration may override these defaults. Never place a secret/service-role key here.
+    const SUPABASE_URL = String(runtimeConfig.supabaseUrl || "https://faenazefsogaoghuclis.supabase.co").trim();
+    const SUPABASE_PUBLISHABLE_KEY = String(runtimeConfig.supabasePublishableKey || "sb_publishable_8CRe36dcXHN_QV7dsVBMLg_xu6rw55M").trim();
     const COMMUNITY_BACKEND_ID = String(community?.backendId || "").trim().toUpperCase();
     const COMMUNITY_NAME = String(community?.communityName || "Community").trim();
     const MANAGER_NAME = String(community?.managerName || community?.operatorName || "Community Manager").trim();
