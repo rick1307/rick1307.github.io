@@ -183,6 +183,31 @@
       appearance:none;border:0;background:none;padding:0;color:var(--navy);
       font-weight:850;font-size:.87rem;text-align:left;
     }
+    .rank-status{
+      position:relative;display:inline-flex;align-items:center;min-width:0;
+    }
+    .rank-trigger{
+      cursor:help;border-radius:5px;line-height:1.2;
+    }
+    .rank-trigger:focus-visible{
+      outline:2px solid rgba(47,116,129,.48);outline-offset:3px;
+    }
+    .rank-popover{
+      position:absolute;z-index:31;left:0;top:calc(100% + 8px);
+      width:max-content;max-width:min(240px,70vw);padding:9px 11px;border-radius:10px;
+      background:#fffdf8;border:1px solid rgba(22,56,75,.16);
+      box-shadow:0 12px 28px rgba(26,37,44,.16);
+      color:var(--navy);text-align:left;font-size:.76rem;line-height:1.35;
+      opacity:0;visibility:hidden;transform:translateY(-3px);
+      transition:opacity .13s ease,transform .13s ease,visibility .13s ease;
+      pointer-events:none;
+    }
+    .message.me .rank-popover{left:auto;right:0}
+    .rank-status:hover .rank-popover,
+    .rank-status:focus-within .rank-popover{
+      opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;
+    }
+    .rank-popover strong{display:block;font-size:.79rem;white-space:nowrap}
     .manager-tip{
       appearance:none;border:1px solid rgba(47,116,129,.24);border-radius:999px;
       background:rgba(219,236,232,.62);color:var(--sea);padding:2px 7px;
@@ -245,11 +270,6 @@
     .message.me .bubble{text-align:right}
     .message.me .meta{justify-content:flex-end}
     .message.me .text{text-align:left;background:#f7ead9;border-radius:13px 4px 13px 13px}
-
-    .legend{
-      padding:8px 20px 13px;color:#748187;font-size:.74rem;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    }
 
     .composer{
       border-top:1px solid var(--line);padding:14px;
@@ -594,11 +614,16 @@
               </div>
             </div>
 
+            <!-- UI marker only: these demo ranks are fake presentation values.
+                 Real rank will later be reconstructed from ledger-derived community Earned LEAP. -->
             <div class="message" data-demo-participant="1">
               <div class="avatar" data-demo-avatar>1</div>
               <div class="bubble">
                 <div class="meta">
-                  <span class="name" data-demo-name>Member One</span>
+                  <span class="rank-status">
+                    <button class="name rank-trigger" type="button" data-demo-name data-demo-rank="Deckhand" aria-label="Member One — Deckhand">Member One</button>
+                    <span class="rank-popover" role="tooltip"><strong>Deckhand</strong></span>
+                  </span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="1" data-test-only hidden>Great Chat</button>
                   <span class="bolt-status" data-transfer-status="enabled">
                     <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
@@ -614,7 +639,10 @@
               <div class="avatar" data-demo-avatar>2</div>
               <div class="bubble">
                 <div class="meta">
-                  <span class="name" data-demo-name>Member Two</span>
+                  <span class="rank-status">
+                    <button class="name rank-trigger" type="button" data-demo-name data-demo-rank="Quartermaster" aria-label="Member Two — Quartermaster">Member Two</button>
+                    <span class="rank-popover" role="tooltip"><strong>Quartermaster</strong></span>
+                  </span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="2" data-test-only hidden>Great Chat</button>
                   <span class="bolt-status" data-transfer-status="disabled">
                     <button class="bolt-trigger" type="button" aria-label="Great Chats not enabled yet"><span class="bolt" aria-hidden="true">⚡</span></button>
@@ -630,7 +658,10 @@
               <div class="avatar" data-demo-avatar>3</div>
               <div class="bubble">
                 <div class="meta">
-                  <span class="name" data-demo-name>Member Three</span>
+                  <span class="rank-status">
+                    <button class="name rank-trigger" type="button" data-demo-name data-demo-rank="Master of the Leap" aria-label="Member Three — Master of the Leap">Member Three</button>
+                    <span class="rank-popover" role="tooltip"><strong>Master of the Leap</strong></span>
+                  </span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="3" data-test-only hidden>Great Chat</button>
                   <span class="bolt-status" data-transfer-status="enabled">
                     <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
@@ -642,8 +673,6 @@
               </div>
             </div>
           </div>
-
-          <div class="legend"><span class="bolt">⚡</span> Bright = Great Chats enabled · Dim = not enabled yet</div>
 
           <form class="composer" id="messageForm">
             <input id="messageInput" maxlength="280" autocomplete="off" placeholder="Say something..." aria-label="Message" />
@@ -924,7 +953,11 @@
         const name = row.querySelector("[data-demo-name]");
         const avatar = row.querySelector("[data-demo-avatar]");
         const greatChat = row.querySelector("[data-demo-great-chat]");
-        if (name) name.textContent = visibleName;
+        if (name) {
+          name.textContent = visibleName;
+          const demoRank = String(name.dataset.demoRank || "").trim();
+          if (demoRank) name.setAttribute("aria-label", `${visibleName} — ${demoRank}`);
+        }
         if (avatar) avatar.textContent = initialsFor(visibleName);
         if (greatChat) greatChat.dataset.greatChatSession = sessionId;
       });
