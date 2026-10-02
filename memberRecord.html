@@ -308,6 +308,33 @@
 
     .crew-state-message.show{display:block}
 
+    .crew-state-message.loading{
+      position:relative;
+      padding-left:42px;
+    }
+
+    .crew-state-message.loading::before{
+      content:"";
+      position:absolute;
+      left:15px;
+      top:50%;
+      width:15px;
+      height:15px;
+      margin-top:-8px;
+      border:2px solid rgba(255,255,255,.20);
+      border-top-color:var(--gold);
+      border-radius:50%;
+      animation:member-record-spin .8s linear infinite;
+    }
+
+    @keyframes member-record-spin{
+      to{transform:rotate(360deg)}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .crew-state-message.loading::before{animation:none}
+    }
+
     .crew-state-message strong{
       display:block;
       margin-bottom:3px;
@@ -3034,7 +3061,8 @@
         setTrustlineStatus(null, "checking");
         setStateMessage(
           "Reading your Member Record…",
-          "Checking the validated XRP Ledger."
+          "Checking the XRP Ledger.",
+          "loading"
         );
         setStatus("");
 
@@ -3182,32 +3210,23 @@
         - No arbitrary address lookup.
         - No localStorage fallback.
         - Only the active wallet handed off by index.html or join.html may load.
+
+        Paint rule:
+        - Render the Member Record shell immediately.
+        - Let XRPL work happen after the card is already visible.
       */
-      try {
-        communityAuthority = await resolveCommunityAuthority({ community, serverUrl: XRPL_WS });
-      } catch (error) {
-        console.warn("Community authority could not be fully resolved for Member Record:", error);
-        communityAuthority = null;
-      }
-
-      try {
-        communityRecognitionCatalog = await loadRecognitionCatalog({
-          community,
-          serverUrl: XRPL_WS,
-          issuer: LEAP_ISSUER,
-          currency: LEAP_CURRENCY,
-          includeIgnored: true
-        });
-      } catch (error) {
-        console.warn("Recognition definitions could not be fully resolved for Member Record:", error);
-        communityRecognitionCatalog = null;
-      }
-
       const rawActiveWallet = getRawActiveWallet();
       const activeWallet = getActiveWallet();
 
       if (activeWallet) {
-        loadCrewRecord(activeWallet);
+        resetRecord();
+        setTrustlineStatus(null, "checking");
+        setStateMessage(
+          "Reading your Member Record…",
+          "Checking the XRP Ledger.",
+          "loading"
+        );
+        setStatus("");
       } else {
         if (rawActiveWallet) {
           // A malformed active identity is stale identity state.
@@ -3230,7 +3249,44 @@
         setStatus("");
       }
 
+      // Everything above is synchronous. Reveal the fully styled card now,
+      // before any network or XRP Ledger request is awaited.
       document.documentElement.classList.remove("community-pending");
+
+      if (activeWallet) {
+        const [authorityResult, catalogResult] = await Promise.allSettled([
+          resolveCommunityAuthority({ community, serverUrl: XRPL_WS }),
+          loadRecognitionCatalog({
+            community,
+            serverUrl: XRPL_WS,
+            issuer: LEAP_ISSUER,
+            currency: LEAP_CURRENCY,
+            includeIgnored: true
+          })
+        ]);
+
+        if (authorityResult.status === "fulfilled") {
+          communityAuthority = authorityResult.value;
+        } else {
+          console.warn(
+            "Community authority could not be fully resolved for Member Record:",
+            authorityResult.reason
+          );
+          communityAuthority = null;
+        }
+
+        if (catalogResult.status === "fulfilled") {
+          communityRecognitionCatalog = catalogResult.value;
+        } else {
+          console.warn(
+            "Recognition definitions could not be fully resolved for Member Record:",
+            catalogResult.reason
+          );
+          communityRecognitionCatalog = null;
+        }
+
+        await loadCrewRecord(activeWallet);
+      }
     })();
   </script>
 </body>
