@@ -20,6 +20,7 @@
       --line:rgba(26,37,44,.18);
       --card:#fffaf0;
       --max:900px;
+      --community-surface-max:900px;
     }
 
     *{box-sizing:border-box}
@@ -550,10 +551,11 @@
       .xrp-entry .primary{width:100%}
     }
   </style>
+  <link rel="stylesheet" href="communitySurface.css">
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
 
-<body data-prototype-role="manager">
+<body class="wl-community-surface" data-prototype-role="manager">
   <nav>
     <div class="wrap nav-inner wl-nav-right">
       <a class="back-link wl-header-control" id="backLink" href="home.html">Back</a>
