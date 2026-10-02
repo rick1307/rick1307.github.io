@@ -199,8 +199,16 @@
             <span>Ledger as Authority</span>
             <small>Owner + Operator</small>
           </a>
+          <a class="toc-link" href="#human-recognition" data-audience="shared">
+            <span>Human Recognition &amp; Privacy</span>
+            <small>Owner + Operator</small>
+          </a>
           <a class="toc-link" href="#wallet-roles" data-audience="shared">
             <span>Wallet Roles &amp; Responsibilities</span>
+            <small>Owner + Operator</small>
+          </a>
+          <a class="toc-link" href="#recognition-operations" data-audience="shared">
+            <span>Recognition Operations</span>
             <small>Owner + Operator</small>
           </a>
           <a class="toc-link" href="#replenishment" data-audience="shared">
@@ -243,6 +251,48 @@
     </div>
   </section>
 
+  <section class="manual-section" id="human-recognition" data-audience="shared">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">Foundational Doctrine</span>
+          <h2>Human Recognition &amp; Privacy</h2>
+          <p class="section-summary">Wild Ledger should amplify human judgment, not replace it. The Operator remains the human center of recognition.</p>
+        </div>
+        <div class="audience-pill">Owner + Operator</div>
+      </div>
+
+      <div class="rule">The Operator recognizes. Wild Ledger distributes. XRPL remembers.</div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">Operating Principle</span>
+        <h3>Automate the scaffolding, not the humanity</h3>
+        <p>Wild Ledger is a recognition distribution engine, not an automated scoring system. The Operator decides whether a person did something worth recognizing. Wild Ledger should make that judgment easy to act on, distribute LEAP correctly, preserve the result, and reconstruct the history later.</p>
+        <div class="checklist">
+          <ul>
+            <li><strong>The Operator is the driver.</strong> The Operator initiates community recognition and decides what counts. Software may assist with workflow, consistency, validation, and recordkeeping, but it should not invent recognition on the Operator's behalf.</li>
+            <li><strong>Attention is part of participation.</strong> Members earn recognition by doing things the Operator chooses to recognize. The community may use comments, chat, direct interaction, in-person meetings, or any other channel the Operator chooses to notice that participation.</li>
+            <li><strong>Recognition is human; the record is durable.</strong> The judgment happens in the community. Once the Operator acts, Wild Ledger and XRPL provide the durable scaffolding around that judgment.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">Data Minimization</span>
+        <h3>Welcome. We want to know less about you.</h3>
+        <p>Wild Ledger does not need a rich personal profile in order to recognize participation. Ask for no more participant information than is needed to perform the immediate function or interpret LEAP history.</p>
+        <div class="checklist">
+          <ul>
+            <li><strong>Prefer ledger facts to personal profiles.</strong> If validated XRPL history already answers the question, do not ask the member to provide the same fact again.</li>
+            <li><strong>An XRPL address is enough for durable LEAP identity.</strong> Legal names, email addresses, phone numbers, demographic profiles, interests, and location histories are not prerequisites for ordinary LEAP participation.</li>
+            <li><strong>Keep temporary community identity temporary.</strong> A nickname or live-session identifier may be useful for chat or another immediate function, but it should not become a second authoritative member identity.</li>
+          </ul>
+        </div>
+        <div class="lesson"><strong>Business standard</strong><p>Privacy is not an extra feature layered on later. Knowing less is part of the operating model.</p></div>
+      </div>
+    </div>
+  </section>
+
   <section class="manual-section" id="wallet-roles" data-audience="shared">
     <div class="wrap">
       <div class="section-head">
@@ -254,10 +304,10 @@
         <div class="audience-pill">Owner + Operator</div>
       </div>
 
-      <div class="rule">Issuer defines LEAP. Distributor allocates LEAP. The Community Operating Wallet runs the community.</div>
+      <div class="rule">Issuer defines LEAP. Distributor allocates LEAP. Owner authority establishes system-level ownership and first community authority where permitted. The Community Operating Wallet runs the community.</div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">1.1 · The Three Wallet Roles</span>
+        <span class="lesson-kicker">1.1 · The Four Wallet Roles</span>
         <h3>Know which wallet is doing the job</h3>
         <p>The same XRPL network and even the same transaction type can be used for different purposes. Wild Ledger determines protocol meaning from the role of the signing account, the transaction, the direction of value, and the canonical memo or state statement.</p>
         <div class="wallet-grid">
@@ -269,12 +319,17 @@
           <article class="wallet-card">
             <div class="wallet-role">Allocation</div>
             <h4>Distributor</h4>
-            <p>The Distributor distributes community allocations and replenishments using allocation Checks. Its job is to put operating LEAP into the community side of the system. It does not create member recognition Checks.</p>
+            <p>The Distributor distributes community allocations and replenishments using allocation Checks. Its job is to put operating LEAP into the community side of the system. It does not decide or award member recognition.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Protocol Ownership</div>
+            <h4>Owner Wallet</h4>
+            <p>The Owner Wallet holds protocol-level Owner authority. It may establish the first Community Operating Wallet for a brand-new Community ID and may transfer Owner authority to a successor Owner Wallet. Once a community is established, the Owner Wallet does not take over that community's day-to-day authority.</p>
           </article>
           <article class="wallet-card">
             <div class="wallet-role">Community Operations</div>
             <h4>Community Operating Wallet</h4>
-            <p>The Operating Wallet is the community's on-ledger operating identity. It manages the community's operating LEAP, creates member recognition Checks, and signs canonical community protocol statements such as recognition lifecycle records.</p>
+            <p>The Operating Wallet is the community's on-ledger operating identity. It manages operating LEAP, delivers member recognition by Check or direct Payment, and signs canonical community protocol statements such as recognition lifecycle records.</p>
           </article>
         </div>
         <div class="lesson"><strong>People, accounts, and signer apps are different things</strong><p>The <strong>Operator</strong> is the person or business role running the community. The <strong>Community Operating Wallet</strong> is the XRPL account authorized to act for that community. Bifrost, Xaman, Tangem, or another compatible wallet app is only a signing tool that controls an XRPL account; changing signer apps does not change the community's protocol authority.</p></div>
@@ -287,7 +342,8 @@
         <div class="flow-line">Distributor → Allocation Check → Community operating side</div>
         <p>An <strong>allocation Check</strong> makes LEAP available to community operations; cashing the Check completes delivery. It belongs to the allocation and replenishment side of Wild Ledger.</p>
         <div class="flow-line">Community Operating Wallet → Recognition Check → Member</div>
-        <p>A <strong>recognition Check</strong> awards LEAP to a member for one canonical Badge, Event, or Challenge. The Operating Wallet creates that Check because recognition is a community operation.</p>
+        <p>A <strong>recognition Check</strong> offers LEAP to a member for one canonical Badge, Event, or Challenge. The Operating Wallet creates that Check because recognition is a community operation.</p>
+        <div class="lesson"><strong>Direct recognition is also valid</strong><p>When a member is already able to receive LEAP, the Community Operating Wallet may deliver recognition immediately by direct Payment. The business meaning is the same: the Operator recognized the member; the transaction is simply a different delivery path.</p></div>
         <div class="lesson"><strong>One mechanism, different protocol meaning</strong><p>Wild Ledger does not classify a transaction merely because it is a Check. It verifies who signed it, what asset it concerns, where it is going, and which protocol rules apply.</p></div>
         <div class="lesson"><strong>Allocation ownership follows the community namespace</strong><p>For an allocation such as <code>SFL-LEAP/ALLOCATION=500</code>, the memo says which community owns the allocation. The Check destination says where the Distributor delivered it. If the community later changes its Operating Wallet, the old allocation still belongs to that same community and remains part of its Tokenomics and audit history.</p></div>
       </div>
@@ -319,7 +375,101 @@
           </ul>
         </div>
         <div class="lesson"><strong>Existing-community first statement</strong><p>For a community that already existed before on-ledger authority state, the already-established Community Operating Wallet publishes one first canonical statement naming itself. That one-time step moves authority state onto XRPL. The Issuer and Distributor do not establish or control the Community Operating Wallet.</p></div>
-        <div class="warning"><strong>Brand-new community provisioning is still open.</strong> LEAP Protocol 1.0 does not yet define how a new community with no pre-existing Operating Wallet receives its first authority. Do not infer that authority from the Issuer or Distributor roles.</div>
+        <div class="lesson"><strong>Brand-new community provisioning</strong><p>For a previously unestablished Community ID, the current Owner Wallet publishes the first canonical <code>OPERATING-WALLET</code> value naming that community's first Operating Wallet. After that establishment, later Operating Wallet replacements are controlled by the currently authorized Community Operating Wallet, not by the Owner Wallet.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">1.5 · Owner Wallet State</span>
+        <h3>Owner authority can move, but it does not become community authority</h3>
+        <p>The current Owner Wallet may transfer Owner authority to a successor Owner Wallet. That replacement changes who holds Owner authority from that ledger position forward. It does not give the Owner Wallet continuing power to replace an already-established community's Operating Wallet.</p>
+        <div class="lesson"><strong>Keep the boundary clear</strong><p>The Owner Wallet can establish the first Operating Wallet for a brand-new Community ID. The community then governs its own Operating Wallet succession under the LEAP Protocol.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="manual-section" id="recognition-operations" data-audience="shared">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">Section 2 · Recognition Operations</span>
+          <h2>Recognition Operations</h2>
+          <p class="section-summary">Recognition is the human center of Wild Ledger. The Operator creates the opportunity, notices the participation, makes the judgment, and chooses when to recognize it.</p>
+        </div>
+        <div class="audience-pill">Owner + Operator</div>
+      </div>
+
+      <div class="rule">Show up. Do the thing. Make a difference.</div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.1 · The Three Recognition Types</span>
+        <h3>Use the category that matches the human story</h3>
+        <div class="wallet-grid">
+          <article class="wallet-card">
+            <div class="wallet-role">Event</div>
+            <h4>Show up.</h4>
+            <p>An Event says, <strong>“I was there.”</strong> It marks a specific real-world occurrence where the member and the community crossed paths. A member earns a particular Event once. When the occurrence is over, the Operator ends it.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Badge</div>
+            <h4>Do the thing.</h4>
+            <p>A Badge says, <strong>“I did that.”</strong> It recognizes a repeatable act, contribution, skill, role, shared moment, or other behavior the Operator values. The same Badge may be awarded to the same member more than once while it remains active.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Challenge</div>
+            <h4>Make a difference.</h4>
+            <p>A Challenge recognizes completion of a defined objective. It is useful when the community asks members to take on something meaningful — for example helping a cause, completing a project, or improving a place — and the Operator decides the objective was completed.</p>
+          </article>
+        </div>
+        <div class="lesson"><strong>Great Chat is the reference repeatable Badge</strong><p>Great Chat is available to every established LEAP community. The protocol supplies the Badge; the Operator supplies the judgment. There is no automatic engagement score. The Operator decides when a contribution deserves Great Chat and how much LEAP to award within the protocol rules.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.2 · Operator Judgment</span>
+        <h3>The Operator recognizes</h3>
+        <p>Nothing about ordinary recognition requires a machine to decide that a member earned it. The Operator may notice participation anywhere the community actually lives: an existing content channel, community chat, a comment thread, a direct interaction, or an in-person meeting.</p>
+        <div class="checklist">
+          <ul>
+            <li><strong>Do not automate worthiness.</strong> Software can organize opportunities and prepare the distribution, but the Operator decides whether the contribution counts.</li>
+            <li><strong>Do not force a single intake channel.</strong> A community should not need a formal claim form for every human interaction. The Operator can recognize what the Operator genuinely sees.</li>
+            <li><strong>LEAP is recognition, not an objective performance score.</strong> Award amounts express the Operator's recognition within the community; they should not be presented as a machine-generated measurement of a person's value.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.3 · Opportunity vs. History</span>
+        <h3>Public recognition asks “What can I do?” Member history answers “What have I done?”</h3>
+        <p>Keep opportunity and history separate. A public recognition surface should help people discover what they can participate in now. A member record should show what that member actually earned.</p>
+        <div class="lesson"><strong>Use recognition to pull people into participation</strong><p>The opportunity should be clear enough to create curiosity and action without trying to replace the creator, organization's existing content, or community channels. The story can live where the audience already is; Wild Ledger gives that participation structure and memory.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.4 · Create, End, Ignore</span>
+        <h3>Retire legitimate history. Quarantine mistakes.</h3>
+        <div class="checklist">
+          <ul>
+            <li><strong>CREATE establishes a legitimate community-defined recognition.</strong> Create it when the community genuinely intends to use that Badge, Event, or Challenge.</li>
+            <li><strong>END means retire it.</strong> Future use stops, but legitimate recognition already earned remains part of the member's history.</li>
+            <li><strong>IGNORE means quarantine it.</strong> Use IGNORE for an erroneous, test, invalid, or otherwise non-operational definition. It is removed from normal recognition presentation and history, but the underlying XRPL facts remain.</li>
+            <li><strong>IGNORE does not claw back LEAP.</strong> LEAP already delivered by otherwise valid recognition remains Earned LEAP and continues to count toward rank. The ignored recognition ID remains reserved.</li>
+          </ul>
+        </div>
+        <div class="warning"><strong>IGNORE is not a cleanup shortcut.</strong> Use it when the definition itself was a mistake. Use END when the recognition was legitimate and simply reached the end of its useful life.</div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.5 · The Participation Flywheel</span>
+        <h3>Recognition should strengthen the community that already exists</h3>
+        <p>Wild Ledger works best when it amplifies an existing creator, organization, or community rather than trying to replace its audience channels.</p>
+        <div class="flow-line">Story or content → Recognition opportunity → Community interaction → Operator recognition → LEAP distribution → Member history → More participation</div>
+        <div class="checklist">
+          <ul>
+            <li><strong>Let the main channel tell the story.</strong> Videos, posts, live streams, meetings, or other community content can explain the context and create interest.</li>
+            <li><strong>Let recognition create the invitation.</strong> The recognition surface shows that there are real things to show up for, do, and contribute to.</li>
+            <li><strong>Let community interaction create attention.</strong> Chat, comments, and real-world interaction give members ways to get the Operator's attention through genuine participation.</li>
+            <li><strong>Let the ledger preserve the result.</strong> After the Operator recognizes the member, the history becomes durable and can continue to tell that member's story later.</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -328,7 +478,7 @@
     <div class="wrap">
       <div class="section-head">
         <div>
-          <span class="section-number">Section 2 · Token Operations</span>
+          <span class="section-number">Section 3 · Token Operations</span>
           <h2>Replenishment Strategy</h2>
           <p class="section-summary">Wild Ledger replenishment is designed to support communities that put LEAP into circulation. This section explains what the algorithm measures, why broad circulation matters, and how to decide when a replenishment request makes sense.</p>
         </div>
@@ -338,7 +488,7 @@
       <div class="rule">Circulate first. Replenish second. Grow through participation.</div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">2.1 · Replenishment Cycles</span>
+        <span class="lesson-kicker">3.1 · Replenishment Cycles</span>
         <h3>Think in cycles, not calendar months</h3>
         <p>A replenishment is an <strong>economic event</strong>, not a monthly entitlement. Every completed replenishment closes one cycle and starts the next. The next calculation uses only activity that happens after that new starting line.</p>
         <div class="cycle-grid">
@@ -351,7 +501,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">2.2 · Replenishment Algorithm</span>
+        <span class="lesson-kicker">3.2 · Replenishment Algorithm</span>
         <h3>How the Wild Ledger algorithm works</h3>
         <p>The algorithm deliberately separates <strong>movement</strong> from <strong>healthy circulation</strong>. Moving LEAP out of the operating wallet matters, but concentrating it in one or a few wallets should not produce the same replenishment as broad community participation.</p>
         <div class="formula-grid">
@@ -390,7 +540,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">2.3 · Timing</span>
+        <span class="lesson-kicker">3.3 · Timing</span>
         <h3>Why waiting can improve the result</h3>
         <p>The Replenishment card turning green means a request is <strong>available</strong>. It does not mean the operator should immediately request it. Because a completed replenishment closes the current cycle, requesting too early can reduce what the cycle ultimately produces.</p>
         <div class="examples">
@@ -413,7 +563,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">2.4 · Decision Standard</span>
+        <span class="lesson-kicker">3.4 · Decision Standard</span>
         <h3>When should you request?</h3>
         <div class="checklist">
           <h4>Before requesting replenishment, ask:</h4>
@@ -432,7 +582,7 @@
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">2.5 · Quick Reference</span>
+        <span class="lesson-kicker">3.5 · Quick Reference</span>
         <h3>The operator playbook</h3>
         <div class="checklist">
           <ul>
@@ -454,7 +604,7 @@
 <footer>
   <div class="wrap footer-inner">
     <div>Wild Ledger · Operations Manual</div>
-    <div>Current replenishment model: 3% Growth Rate Provision</div>
+    <div>Current replenishment model: 3% Growth Rate Provision · Operations aligned to the current LEAP Protocol</div>
   </div>
 </footer>
 
