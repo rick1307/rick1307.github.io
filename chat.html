@@ -93,7 +93,7 @@
     .role-toggle[aria-pressed="true"]{
       background:var(--navy);border-color:var(--navy);color:white;box-shadow:0 5px 14px rgba(22,56,75,.14);
     }
-    body[data-prototype-role="member"] .recognize-btn[data-recognize-name]{display:none}
+    body[data-prototype-role="member"] .recognize-btn[data-great-chat-session]{display:none}
     body[data-prototype-role="manager"] .manager-tip{display:none}
 
     .panel{
@@ -530,7 +530,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name">SaltyDog</span>
-                  <button class="recognize-btn" type="button" data-recognize-name="SaltyDog">Recognize</button>
+                  <button class="recognize-btn" type="button" data-great-chat-session="sfl-live-saltydog">Great Chat</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:43 PM</span>
                 </div>
@@ -543,7 +543,7 @@
               <div class="bubble">
                 <div class="meta">
                   <span class="name">PanamaPete</span>
-                  <button class="recognize-btn" type="button" data-recognize-name="PanamaPete">Recognize</button>
+                  <button class="recognize-btn" type="button" data-great-chat-session="sfl-live-panamapete">Great Chat</button>
                   <span class="time">8:44 PM</span>
                 </div>
                 <div class="text">How deep is the water where you're anchored?</div>
@@ -551,11 +551,11 @@
             </div>
 
             <div class="message">
-              <div class="avatar">FF</div>
+              <div class="avatar">T</div>
               <div class="bubble">
                 <div class="meta">
-                  <span class="name">FrogFan</span>
-                  <button class="recognize-btn" type="button" data-recognize-name="FrogFan">Recognize</button>
+                  <span class="name">Taylor</span>
+                  <button class="recognize-btn" type="button" data-great-chat-session="sfl-live-taylor">Great Chat</button>
                   <span class="bolt" title="LEAP tips enabled">⚡</span>
                   <span class="time">8:45 PM</span>
                 </div>
@@ -606,7 +606,7 @@
         <button class="recognition-amount" type="button" data-recognition-amount="3">3 LEAP</button>
       </div>
       <button class="primary recognition-wallet" id="simulateRecognition" type="button" disabled>Continue to wallet</button>
-      <p class="recognition-note">The member's XRPL address stays hidden in the Lounge. In the live version, Wild Ledger would privately prepare the Check for this live participant session, then open the Community Manager's wallet for review and approval.</p>
+      <p class="recognition-note" id="recognitionPrivateStatus">The member's XRPL address stays hidden in the Lounge. Wild Ledger targets this award by the participant's live session, not by the visible nickname.</p>
       <div class="tip-actions">
         <button class="secondary" id="closeRecognition" type="button">Cancel</button>
       </div>
@@ -642,6 +642,7 @@
     let currentNickname = "";
     let currentXrpManagerName = "";
     let currentRecognitionName = "";
+    let currentRecognitionSessionId = "";
     let selectedRecognitionAmount = "";
 
     const entryView = document.getElementById("entryView");
@@ -657,6 +658,7 @@
     const xrpAmount = document.getElementById("xrpAmount");
     const recognitionScrim = document.getElementById("recognitionScrim");
     const recognitionName = document.getElementById("recognitionName");
+    const recognitionPrivateStatus = document.getElementById("recognitionPrivateStatus");
     const recognitionAmountButtons = Array.from(document.querySelectorAll("[data-recognition-amount]"));
     const simulateRecognition = document.getElementById("simulateRecognition");
     const recognitionCelebration = document.getElementById("recognitionCelebration");
@@ -783,8 +785,20 @@
       setTimeout(() => handleXrpTipCelebrated(prototypeEvent), 520);
     });
 
+    // Step 1 recognition plumbing: the public room carries only an opaque live-session ID.
+    // A real XRPL destination must NOT be embedded in chat.html or exposed in page data.
+    // Production will replace this prototype resolver with a private Worker/WebSocket lookup
+    // that maps the live-session ID to the member's XRPL destination only when needed.
+    function resolvePrivateRecognitionDestination(participantSessionId) {
+      if (!participantSessionId) return null;
+      return {
+        participantSessionId,
+        destinationStatus: "private-session-ready"
+      };
+    }
+
     document.querySelectorAll(".meta").forEach(meta => {
-      const recognizeButton = meta.querySelector(".recognize-btn[data-recognize-name]");
+      const recognizeButton = meta.querySelector(".recognize-btn[data-great-chat-session]");
       if (!recognizeButton) return;
       const hasLeapTransfersEnabled = Boolean(meta.querySelector(".bolt"));
       if (!hasLeapTransfersEnabled) {
@@ -794,12 +808,26 @@
       }
     });
 
-    document.querySelectorAll("[data-recognize-name]").forEach(button => {
+    document.querySelectorAll("[data-great-chat-session]").forEach(button => {
       button.addEventListener("click", () => {
         if (button.disabled) return;
-        currentRecognitionName = button.dataset.recognizeName || "Leaper";
+
+        const meta = button.closest(".meta");
+        const visibleName = meta?.querySelector(".name")?.textContent?.trim() || "Leaper";
+        const participantSessionId = button.dataset.greatChatSession || "";
+        const privateDestination = resolvePrivateRecognitionDestination(participantSessionId);
+        if (!privateDestination) {
+          toast.textContent = `Private Great Chat destination is unavailable for ${visibleName}.`;
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 1800);
+          return;
+        }
+
+        currentRecognitionName = visibleName;
+        currentRecognitionSessionId = privateDestination.participantSessionId;
         selectedRecognitionAmount = "";
         recognitionName.textContent = currentRecognitionName;
+        recognitionPrivateStatus.textContent = `${currentRecognitionName} is targeted by a private live-session ID. No XRPL address is stored or displayed in this page.`;
         recognitionAmountButtons.forEach(amountButton => amountButton.classList.remove("selected"));
         simulateRecognition.disabled = true;
         recognitionScrim.classList.add("open");
@@ -947,19 +975,29 @@
     }
 
     simulateRecognition.addEventListener("click", () => {
-      if (!selectedRecognitionAmount || !currentRecognitionName) return;
+      if (!selectedRecognitionAmount || !currentRecognitionName || !currentRecognitionSessionId) return;
+
+      const privateDestination = resolvePrivateRecognitionDestination(currentRecognitionSessionId);
+      if (!privateDestination) {
+        toast.textContent = `Private Great Chat destination is unavailable for ${currentRecognitionName}.`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1800);
+        return;
+      }
 
       const prototypeEvent = {
         type: "recognition-awarded",
         nickname: currentRecognitionName,
+        participantSessionId: privateDestination.participantSessionId,
         amount: Number(selectedRecognitionAmount),
         recognition: "Great Chat"
       };
 
       recognitionScrim.classList.remove("open");
 
-      // Prototype only: pretend the wallet was approved and the XRPL transaction
-      // validated. Production will replace this timer with the Worker's broadcast.
+      // Prototype only: the private recipient handoff has now been resolved by
+      // live-session ID. No XRPL address, Check, wallet signature, or ledger write
+      // occurs here yet. Step 2 will replace this timer with the real award pipeline.
       setTimeout(() => handleRecognitionAwarded(prototypeEvent), 700);
     });
   </script>
