@@ -190,10 +190,49 @@
       font-size:.66rem;font-weight:850;line-height:1.25;
     }
     .manager-tip:hover{border-color:var(--sea);background:rgba(219,236,232,.92)}
+    .bolt-status{
+      position:relative;display:inline-flex;align-items:center;
+    }
+    .bolt-trigger{
+      appearance:none;border:0;background:none;padding:0;margin:0;
+      display:inline-grid;place-items:center;cursor:help;line-height:1;
+      border-radius:5px;
+    }
+    .bolt-trigger:focus-visible{
+      outline:2px solid rgba(47,116,129,.48);outline-offset:3px;
+    }
     .bolt{
       color:#b37a00;font-size:.98rem;line-height:1;
       filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));
+      transition:opacity .15s ease,filter .15s ease;
     }
+    .bolt-status[data-transfer-status="disabled"] .bolt,
+    .bolt-status[data-transfer-status="pending"] .bolt{
+      opacity:.42;filter:grayscale(1) drop-shadow(0 1px 0 rgba(255,255,255,.8));
+    }
+    .bolt-popover{
+      position:absolute;z-index:30;left:0;top:calc(100% + 8px);
+      width:min(270px,72vw);padding:11px 12px;border-radius:11px;
+      background:#fffdf8;border:1px solid rgba(22,56,75,.16);
+      box-shadow:0 12px 28px rgba(26,37,44,.16);
+      color:var(--ink);text-align:left;font-size:.76rem;line-height:1.4;
+      opacity:0;visibility:hidden;transform:translateY(-3px);
+      transition:opacity .13s ease,transform .13s ease,visibility .13s ease;
+      pointer-events:none;
+    }
+    .message.me .bolt-popover{left:auto;right:0}
+    .bolt-status:hover .bolt-popover,
+    .bolt-status:focus-within .bolt-popover{
+      opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;
+    }
+    .bolt-popover strong{display:block;color:var(--navy);font-size:.79rem;margin-bottom:4px}
+    .bolt-popover p{margin:0}
+    .bolt-future-action{
+      width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px 10px;
+      background:rgba(22,56,75,.10);color:#68767d;font:inherit;font-weight:850;
+      cursor:not-allowed;
+    }
+    .bolt-construction{display:block;margin-top:4px;color:#8a9499;font-size:.66rem;text-align:center}
     .time{color:#879298;font-size:.7rem}
     .text{
       display:inline-block;padding:9px 12px;border-radius:4px 13px 13px 13px;
@@ -545,7 +584,10 @@
                 <div class="meta">
                   <span class="name" id="managerSampleName">Community Manager</span>
                   <button class="manager-tip" id="managerSampleTip" type="button" data-manager-tip-name="" data-test-only hidden>Tip Community Manager in XRP</button>
-                  <span class="bolt" title="LEAP tips enabled">⚡</span>
+                  <span class="bolt-status" data-transfer-status="enabled">
+                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Enabled</strong><p>This Leaper can receive LEAP directly.</p></span>
+                  </span>
                   <span class="time">8:42 PM</span>
                 </div>
                 <div class="text">Welcome aboard. Make yourselves comfortable.</div>
@@ -558,7 +600,10 @@
                 <div class="meta">
                   <span class="name" data-demo-name>Member One</span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="1" data-test-only hidden>Great Chat</button>
-                  <span class="bolt" title="LEAP tips enabled">⚡</span>
+                  <span class="bolt-status" data-transfer-status="enabled">
+                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Enabled</strong><p>This Leaper can receive LEAP directly.</p></span>
+                  </span>
                   <span class="time">8:43 PM</span>
                 </div>
                 <div class="text">That is a great update. Thanks for sharing it.</div>
@@ -571,6 +616,10 @@
                 <div class="meta">
                   <span class="name" data-demo-name>Member Two</span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="2" data-test-only hidden>Great Chat</button>
+                  <span class="bolt-status" data-transfer-status="disabled">
+                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers not enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Not Enabled</strong><p>This Leaper has not enabled direct LEAP transfers yet.</p></span>
+                  </span>
                   <span class="time">8:44 PM</span>
                 </div>
                 <div class="text">How did you decide to do it that way?</div>
@@ -583,7 +632,10 @@
                 <div class="meta">
                   <span class="name" data-demo-name>Member Three</span>
                   <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="3" data-test-only hidden>Great Chat</button>
-                  <span class="bolt" title="LEAP tips enabled">⚡</span>
+                  <span class="bolt-status" data-transfer-status="enabled">
+                    <button class="bolt-trigger" type="button" aria-label="LEAP transfers enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>LEAP Transfers Enabled</strong><p>This Leaper can receive LEAP directly.</p></span>
+                  </span>
                   <span class="time">8:45 PM</span>
                 </div>
                 <div class="text">This is exactly why I like being part of this community.</div>
@@ -591,7 +643,7 @@
             </div>
           </div>
 
-          <div class="legend"><span class="bolt">⚡</span> LEAP recognition enabled</div>
+          <div class="legend"><span class="bolt">⚡</span> Bright = LEAP transfers enabled · Dim = not enabled</div>
 
           <form class="composer" id="messageForm">
             <input id="messageInput" maxlength="280" autocomplete="off" placeholder="Say something..." aria-label="Message" />
@@ -998,6 +1050,66 @@
       return { nickname, text, senderId, messageId, sentAt };
     }
 
+    function createTransferStatusNode(status, { isMe = false } = {}) {
+      const wrapper = document.createElement("span");
+      wrapper.className = "bolt-status";
+      wrapper.dataset.transferStatus = status;
+
+      const trigger = document.createElement("button");
+      trigger.className = "bolt-trigger";
+      trigger.type = "button";
+
+      const bolt = document.createElement("span");
+      bolt.className = "bolt";
+      bolt.setAttribute("aria-hidden", "true");
+      bolt.textContent = "⚡";
+      trigger.appendChild(bolt);
+
+      const popover = document.createElement("span");
+      popover.className = "bolt-popover";
+      popover.setAttribute("role", "tooltip");
+
+      const title = document.createElement("strong");
+      const copy = document.createElement("p");
+
+      if (status === "enabled") {
+        trigger.setAttribute("aria-label", "LEAP transfers enabled");
+        title.textContent = "LEAP Transfers Enabled";
+        copy.textContent = isMe
+          ? "Your wallet can receive LEAP directly."
+          : "This Leaper can receive LEAP directly.";
+      } else if (status === "disabled") {
+        trigger.setAttribute("aria-label", "LEAP transfers not enabled");
+        title.textContent = "LEAP Transfers Not Enabled";
+        copy.textContent = isMe
+          ? "Your wallet has not enabled direct LEAP transfers yet."
+          : "This Leaper has not enabled direct LEAP transfers yet.";
+      } else {
+        trigger.setAttribute("aria-label", "LEAP transfer status not connected yet");
+        title.textContent = isMe ? "Your LEAP Transfer Status" : "LEAP Transfer Status";
+        copy.textContent = isMe
+          ? "Wild Ledger will check your wallet privately here once the wallet/session bridge is connected."
+          : "This live participant's transfer status is not connected to the room yet.";
+      }
+
+      popover.append(title, copy);
+
+      if (isMe && status !== "enabled") {
+        const futureButton = document.createElement("button");
+        futureButton.className = "bolt-future-action";
+        futureButton.type = "button";
+        futureButton.disabled = true;
+        futureButton.textContent = "Enable LEAP Transfers";
+        const construction = document.createElement("small");
+        construction.className = "bolt-construction";
+        construction.textContent = "Under construction";
+        popover.append(futureButton, construction);
+      }
+
+      wrapper.append(trigger, popover);
+      return wrapper;
+    }
+
     function renderChatMessage({ nickname, text, sentAt, isMe = false }) {
       const row = document.createElement("div");
       row.className = isMe ? "message me" : "message";
@@ -1019,6 +1131,7 @@
         <div class="bubble">
           <div class="meta">
             <span class="name"></span>
+            <span class="transfer-status-slot"></span>
             <span class="time"></span>
           </div>
           <div class="text"></div>
@@ -1026,6 +1139,12 @@
 
       row.querySelector(".avatar").textContent = initials;
       row.querySelector(".name").textContent = nickname;
+      const transferStatusSlot = row.querySelector(".transfer-status-slot");
+      if (isMe && transferStatusSlot) {
+        transferStatusSlot.replaceWith(createTransferStatusNode("pending", { isMe: true }));
+      } else if (transferStatusSlot) {
+        transferStatusSlot.remove();
+      }
       row.querySelector(".time").textContent = displayTime;
       row.querySelector(".text").textContent = text;
       messages.appendChild(row);
@@ -1548,7 +1667,7 @@
     document.querySelectorAll(".meta").forEach(meta => {
       const recognizeButton = meta.querySelector(".recognize-btn[data-great-chat-session]");
       if (!recognizeButton) return;
-      const hasLeapTransfersEnabled = Boolean(meta.querySelector(".bolt"));
+      const hasLeapTransfersEnabled = meta.querySelector('.bolt-status')?.dataset.transferStatus === "enabled";
       if (!hasLeapTransfersEnabled) {
         recognizeButton.disabled = true;
         recognizeButton.setAttribute("aria-disabled", "true");
