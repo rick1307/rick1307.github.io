@@ -417,7 +417,7 @@
           <article class="wallet-card">
             <div class="wallet-role">Challenge</div>
             <h4>Make a difference.</h4>
-            <p>A Challenge recognizes completion of a defined objective. It is useful when the community asks members to take on something meaningful — for example helping a cause, completing a project, or improving a place — and the Operator decides the objective was completed.</p>
+            <p>A Challenge recognizes completion of a defined objective. It is useful when the community asks members to take on something meaningful — for example helping a cause, completing a project, or improving a place — and the Operator decides the objective was completed. A member earns a particular Challenge ID once.</p>
           </article>
         </div>
         <div class="lesson"><strong>Great Chat is the reference repeatable Badge</strong><p>Great Chat is available to every established LEAP community. The protocol supplies the Badge; the Operator supplies the judgment. There is no automatic engagement score. The Operator decides when a contribution deserves Great Chat and how much LEAP to award within the protocol rules.</p></div>
@@ -455,14 +455,64 @@
             <li><strong>CREATE establishes a legitimate community-defined recognition.</strong> Create it when the community genuinely intends to use that Badge, Event, or Challenge.</li>
             <li><strong>END means retire it.</strong> Future use stops, but legitimate recognition already earned remains part of the member's history.</li>
             <li><strong>IGNORE means quarantine it.</strong> Use IGNORE for an erroneous, test, invalid, or otherwise non-operational definition. It is removed from normal recognition presentation and history, but the underlying XRPL facts remain.</li>
-            <li><strong>IGNORE does not claw back LEAP.</strong> LEAP already delivered by otherwise valid recognition remains Earned LEAP and continues to count toward rank. The ignored recognition ID remains reserved.</li>
+            <li><strong>IGNORE does not claw back LEAP.</strong> LEAP already delivered by otherwise valid recognition remains Earned LEAP and continues to count toward rank.</li>
+            <li><strong>END and IGNORE are final.</strong> There is no reopen, un-end, or un-ignore. Once a community-defined recognition ID has been established, that ID remains permanently reserved and is never reused, whether it is later ended or ignored.</li>
           </ul>
         </div>
         <div class="warning"><strong>IGNORE is not a cleanup shortcut.</strong> Use it when the definition itself was a mistake. Use END when the recognition was legitimate and simply reached the end of its useful life.</div>
       </div>
 
       <div class="lesson-block">
-        <span class="lesson-kicker">2.5 · The Participation Flywheel</span>
+        <span class="lesson-kicker">2.5 · When Recognition Counts</span>
+        <h3>Recognition counts when LEAP is actually delivered</h3>
+        <p>The Operator makes the judgment, but the ledger determines when the award becomes part of the member's Earned LEAP history. The timing depends on how the recognition is delivered.</p>
+        <div class="wallet-grid">
+          <article class="wallet-card">
+            <div class="wallet-role">Payment</div>
+            <h4>Earned when delivered.</h4>
+            <p>A protocol-valid recognition Payment counts when the Payment succeeds in validated XRPL history and actually delivers the LEAP to the member.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Check</div>
+            <h4>Earned when cashed.</h4>
+            <p><code>CheckCreate</code> is the recognition offer. It does not add Earned LEAP by itself. The recognition counts when the member successfully cashes the Check and the LEAP is actually delivered.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Award Rule</div>
+            <h4>One award. One reason.</h4>
+            <p>Each recognition award records exactly one Badge, Event, or Challenge reason. The award may deliver one or more LEAP, but the amount must be a positive whole number.</p>
+          </article>
+        </div>
+        <div class="lesson"><strong>Remember the repetition rule</strong><p>Badges may repeat. A member may earn the same Badge more than once. A particular Event ID counts once for that member, and a particular Challenge ID counts once for that member.</p></div>
+        <div class="rule">Payment = earned when delivered. Check = earned when cashed. One recognition award. One reason.</div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.6 · Recognition vs. Spread</span>
+        <h3>Two questions, one ledger</h3>
+        <p>Wild Ledger reads the same validated XRPL history through two different lenses. <strong>Recognition asks what a member earned.</strong> <strong>Spread Score asks how broadly the community spread LEAP.</strong> The same transaction can sometimes answer both questions, but the two records do not mean the same thing.</p>
+
+        <div class="wallet-grid">
+          <article class="wallet-card">
+            <div class="wallet-role">Member View</div>
+            <h4>What did this member earn?</h4>
+            <p>This belongs in the member record. Only protocol-valid recognition adds Earned LEAP and recognition history. That history can include Badges, Events, Challenges, Great Chat, and the Earned LEAP used to reconstruct rank.</p>
+          </article>
+          <article class="wallet-card">
+            <div class="wallet-role">Community View</div>
+            <h4>How far have we spread?</h4>
+            <p>This belongs in the community and Operator view. Spread Score measures qualifying outward LEAP distribution under Wild Ledger operating policy and helps determine when the community earns more operating inventory.</p>
+          </article>
+        </div>
+
+        <div class="lesson"><strong>One transaction can answer both questions</strong><p>If Alice receives 10 LEAP through a protocol-valid Great Chat recognition, Alice's member record gains 10 Earned LEAP. If Alice is also a qualifying outside wallet, that same outward distribution can contribute up to 10 points to the community's Spread Score.</p></div>
+        <div class="lesson"><strong>A LEAP transfer is not automatically recognition</strong><p>If Bob receives 10 LEAP in an ordinary transfer that does not satisfy the LEAP Protocol's recognition rules, the transfer may still contribute to Spread Score if Bob is a qualifying outside wallet. But Bob did not earn a Badge, Event, Challenge, Great Chat, Earned LEAP, or rank credit from that transfer.</p></div>
+        <div class="lesson"><strong>Spread Score is a Wild Ledger metric</strong><p>Spread Score is calculated from validated XRPL history, but it is not LEAP, a token, an award, a rank, or canonical LEAP Protocol state. It is Wild Ledger's operating measure of community reach.</p></div>
+        <div class="rule">Member side: What have I earned? Community side: How far have we spread?</div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">2.7 · The Participation Flywheel</span>
         <h3>Recognition should strengthen the community that already exists</h3>
         <p>Wild Ledger works best when it amplifies an existing creator, organization, or community rather than trying to replace its audience channels.</p>
         <div class="flow-line">Story or content → Recognition opportunity → Community interaction → Operator recognition → LEAP distribution → Member history → More participation</div>
@@ -501,13 +551,15 @@
           <p>Your community starts with 1,000 LEAP. You can give LEAP however you want. Each outside wallet can add up to 25 points to your Spread Score. Every 500 points earns your community another 1,000 LEAP. Giving one wallet more than 25 LEAP is fine. It just will not add more than 25 points. Sending LEAP back to yourself does not help.</p>
         </div>
 
+        <div class="lesson"><strong>Read the score as progress, not recognition</strong><p>A display such as <strong>Spread Score: 327 / 500</strong> means the community has 327 qualifying points toward its next 1,000 LEAP replenishment. It does not mean that any member earned 327 LEAP. Member recognition belongs in the member record; Spread Score belongs in the community's operating view.</p></div>
+
         <div class="lesson"><strong>The incentive is intentional</strong><p>Wild Ledger does not reward a community for simply holding LEAP. It rewards successful outward distribution. If a community spreads LEAP well, that community earns more operating inventory and has more LEAP available to keep participating and growing.</p></div>
       </div>
 
       <div class="lesson-block">
         <span class="lesson-kicker">3.2 · Spread Score</span>
         <h3>One wallet can help — but only up to 25</h3>
-        <p>Each qualifying recipient wallet contributes its <strong>net LEAP received</strong>, capped at <strong>25</strong>, to the community's lifetime Spread Score. This lets an Operator recognize the same person again without letting one wallet drive replenishment forever.</p>
+        <p>Each qualifying recipient wallet contributes its <strong>net LEAP received</strong>, capped at <strong>25</strong>, to the community's lifetime Spread Score. Spread Score is derived from validated XRPL history, but it is a Wild Ledger operating metric rather than LEAP Protocol state. This lets an Operator keep distributing LEAP to the same person without letting one wallet drive replenishment forever.</p>
 
         <div class="formula-grid">
           <article class="formula-card">
