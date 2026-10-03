@@ -382,7 +382,30 @@
         <span class="lesson-kicker">1.5 · Owner Wallet State</span>
         <h3>Owner authority can move, but it does not become community authority</h3>
         <p>The current Owner Wallet may transfer Owner authority to a successor Owner Wallet. That replacement changes who holds Owner authority from that ledger position forward. It does not give the Owner Wallet continuing power to replace an already-established community's Operating Wallet.</p>
-        <div class="lesson"><strong>Keep the boundary clear</strong><p>The Owner Wallet can establish the first Operating Wallet for a brand-new Community ID. The community then governs its own Operating Wallet succession under the LEAP Protocol.</p></div>
+        <div class="lesson"><strong>Keep the boundary clear</strong><p>The Owner Wallet can establish the first Operating Wallet for a brand-new Community ID. After establishment, only the currently authorized Community Operating Wallet controls ordinary succession to a new Operating Wallet. The Owner does not seize, recover, or replace that wallet authority.</p></div>
+      </div>
+
+      <div class="lesson-block">
+        <span class="lesson-kicker">1.6 · Community Responsibility &amp; Continuity</span>
+        <h3>Wild Ledger does not provide custody or wallet recovery</h3>
+        <p>Under the current operating model, creating and running a Wild Ledger community does not require a fee to Wild Ledger. That does not turn Wild Ledger into a custodian, wallet-recovery service, or guarantor of continued community operation. The Operator is responsible for maintaining access to the Community Operating Wallet and for naming a successor while that wallet can still sign.</p>
+
+        <div class="checklist">
+          <ul>
+            <li><strong>No key custody.</strong> Wild Ledger does not need, hold, or recover the private keys or signing credentials for a Community Operating Wallet.</li>
+            <li><strong>No recovery promise.</strong> If the Operator loses access to the current Operating Wallet before validly naming a successor, Wild Ledger does not promise to restore access, replace the wallet, or recreate that authority chain.</li>
+            <li><strong>No Owner takeover.</strong> Loss of access does not give the Owner Wallet authority to seize or replace an established community's Operating Wallet.</li>
+            <li><strong>Participation can end.</strong> Wild Ledger may stop presenting or supporting a community as active. An Operator does not receive a promise that a community will remain active, listed, supported, or recoverable indefinitely.</li>
+            <li><strong>History remains history.</strong> Ending active participation does not rewrite valid XRPL history. Recognition, Earned LEAP, allocations, and other protocol-valid facts that already occurred remain reconstructible from the ledger.</li>
+            <li><strong>Community IDs are not recycled.</strong> If an old community can no longer operate, another Operator may be provisioned under a different Community ID and namespace. The old namespace remains part of historical ledger record rather than being reassigned.</li>
+          </ul>
+        </div>
+
+        <div class="lesson"><strong>Free participation does not imply managed service</strong><p>Wild Ledger is designed to know less about Operators and members, not more. It does not require a conventional hosted-account relationship in order to establish community authority on XRPL, and it does not assume responsibility for an Operator's wallet access merely because the community uses Wild Ledger.</p></div>
+
+        <div class="warning"><strong>Protocol boundary.</strong> LEAP Protocol 0.20 does not yet define a canonical on-ledger Owner transaction that permanently deactivates an established community. Until the Protocol defines that rule, a Wild Ledger decision to stop listing, presenting, or supporting a community as active is an operating decision and must not be misrepresented as canonical LEAP Protocol state.</div>
+
+        <div class="rule">Wild Ledger does not recover communities and does not seize communities. An Operator is responsible for the wallet that carries the community's authority.</div>
       </div>
     </div>
   </section>
