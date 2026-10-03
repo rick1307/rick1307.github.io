@@ -81,11 +81,13 @@ export class WalletConnectXrplSigner {
     return this.client;
   }
 
-  async recoverApprovedSession() {
+  async recoverApprovedSession({ excludeTopics = new Set() } = {}) {
     const deadline = Date.now() + this.sessionRecoveryMs;
     while (Date.now() < deadline) {
       const sessions = this.client?.session?.getAll?.() || [];
       const recovered = sessions.find(session => {
+        const topic = String(session?.topic || "");
+        if (!topic || excludeTopics.has(topic)) return false;
         const namespace = session?.namespaces?.xrpl;
         return Array.isArray(namespace?.accounts) && namespace.accounts.length > 0;
       });
@@ -93,7 +95,7 @@ export class WalletConnectXrplSigner {
       await new Promise(resolve => setTimeout(resolve, 750));
     }
 
-    throw new Error("The wallet approved the connection, but the browser did not receive the WalletConnect session. Disconnect this site under the wallet's Connected Apps, then retry.");
+    throw new Error("The wallet approved the connection, but the browser did not receive the new WalletConnect session. Retry the connection from this page.");
   }
 
   resolveAccount(session) {
@@ -108,6 +110,15 @@ export class WalletConnectXrplSigner {
 
   async connect({ onUri = null } = {}) {
     await this.init();
+
+    // Remember every session that already existed before this connection attempt.
+    // Recovery is allowed to use only a NEW session created by this pairing, never
+    // an unrelated stale WalletConnect session left in the browser.
+    const existingTopics = new Set(
+      (this.client?.session?.getAll?.() || [])
+        .map(session => String(session?.topic || ""))
+        .filter(Boolean)
+    );
 
     const { uri, approval } = await this.client.connect({
       requiredNamespaces: {
@@ -124,7 +135,7 @@ export class WalletConnectXrplSigner {
 
     this.session = await Promise.race([
       approval(),
-      this.recoverApprovedSession()
+      this.recoverApprovedSession({ excludeTopics: existingTopics })
     ]);
 
     this.account = this.resolveAccount(this.session);
