@@ -354,7 +354,7 @@
         <p>Not every community action transfers LEAP. When the community needs to publish canonical state, the Operating Wallet can sign a successful validated no-op <code>AccountSet</code>. The transaction moves no LEAP; the public memo is the protocol statement.</p>
         <div class="checklist">
           <ul>
-            <li><strong>Recognition lifecycle.</strong> <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code> statements define the lifecycle of canonical Badges, Events, and Challenges.</li>
+            <li><strong>Community-defined recognition lifecycle.</strong> <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code> are no-op <code>AccountSet</code> lifecycle statements for community-defined Badges, Events, and Challenges. They manage whether a recognition opportunity exists and is available; they do not award recognition to a member or move LEAP.</li>
             <li><strong>Authority state.</strong> Single-valued protocol state can use the form <code>&lt;COMMUNITY&gt;-LEAP/AUTHORITY/&lt;KEY&gt;=&lt;VALUE&gt;</code>.</li>
             <li><strong>No private key leaves the wallet.</strong> Wild Ledger constructs and validates the transaction; the wallet app signs it; Wild Ledger submits the signed transaction and verifies the validated result.</li>
           </ul>
@@ -441,11 +441,15 @@
         <h3>Public recognition asks “What can I do?” Member history answers “What have I done?”</h3>
         <p>Keep opportunity and history separate. A public recognition surface should help people discover what they can participate in now. A member record should show what that member actually earned.</p>
         <div class="lesson"><strong>Use recognition to pull people into participation</strong><p>The opportunity should be clear enough to create curiosity and action without trying to replace the creator, organization's existing content, or community channels. The story can live where the audience already is; Wild Ledger gives that participation structure and memory.</p></div>
+        <div class="lesson"><strong>Lifecycle manages the menu. Recognition records what a member earned.</strong><p>These are two different XRPL jobs. A lifecycle statement says whether a community-defined Badge, Event, or Challenge exists as an opportunity. A member-recognition transaction says that a particular member actually earned one. Creating the opportunity does not recognize a member, and recognizing a member does not create the definition.</p></div>
       </div>
 
       <div class="lesson-block">
         <span class="lesson-kicker">2.4 · Create, End, Ignore</span>
-        <h3>Retire legitimate history. Quarantine mistakes.</h3>
+        <h3>Manage the life of a community-defined recognition opportunity</h3>
+        <p>Think of <code>CREATE</code>, <code>END</code>, and <code>IGNORE</code> as lifecycle flags for the community's recognition menu. They are successful validated no-op <code>AccountSet</code> transactions: the memo changes canonical lifecycle state, but the transaction does not transfer LEAP and does not say that any member earned the recognition.</p>
+        <div class="lesson"><strong>Example: a July developers meetup</strong><p>The community can publish <code>CREATE</code> for a recognition such as <code>DEVELOPERS-MEETUP-JULY</code>. That puts the opportunity on the board. If Alice attends and the Operator decides she earned it, the Operating Wallet later creates a separate recognition transaction for Alice. When the meetup is over, <code>END</code> stops future use of that recognition without erasing Alice's earned history.</p></div>
+        <div class="lesson"><strong>Great Chat shows the difference</strong><p><code>GREAT-CHAT</code> is already defined by the LEAP Protocol, so a community never lifecycle-<code>CREATE</code>s the Great Chat definition. The Operator still creates each individual Great Chat recognition transaction when a member earns it. The Protocol defines what Great Chat is; the Operator creates the member's recognition record.</p></div>
         <div class="checklist">
           <ul>
             <li><strong>CREATE establishes a legitimate community-defined recognition.</strong> Create it when the community genuinely intends to use that Badge, Event, or Challenge.</li>
