@@ -548,7 +548,7 @@
 
         <div class="lesson">
           <strong>The simple version</strong>
-          <p>Your community starts with 1,000 LEAP. You can give LEAP however you want. Each outside wallet can add up to 25 points to your Spread Score. Every 500 points earns your community another 1,000 LEAP. Giving one wallet more than 25 LEAP is fine. It just will not add more than 25 points. Sending LEAP back to yourself does not help.</p>
+          <p>Your community starts with 1,000 LEAP. You can give LEAP however you want. Each outside wallet can add up to 20 lifetime points to your Spread Score. Every 500 points earns your community another 1,000 LEAP. Giving one wallet more than 20 LEAP is fine. It just will not add more than 20 points. That wallet's 20-point cap never resets. Sending LEAP back to yourself does not help.</p>
         </div>
 
         <div class="lesson"><strong>Read the score as progress, not recognition</strong><p>A display such as <strong>Spread Score: 327 / 500</strong> means the community has 327 qualifying points toward its next 1,000 LEAP replenishment. It does not mean that any member earned 327 LEAP. Member recognition belongs in the member record; Spread Score belongs in the community's operating view.</p></div>
@@ -558,8 +558,8 @@
 
       <div class="lesson-block">
         <span class="lesson-kicker">3.2 · Spread Score</span>
-        <h3>One wallet can help — but only up to 25</h3>
-        <p>Each qualifying recipient wallet contributes its <strong>net LEAP received</strong>, capped at <strong>25</strong>, to the community's lifetime Spread Score. Spread Score is derived from validated XRPL history, but it is a Wild Ledger operating metric rather than LEAP Protocol state. This lets an Operator keep distributing LEAP to the same person without letting one wallet drive replenishment forever.</p>
+        <h3>One wallet can help — but only up to 20</h3>
+        <p>Each qualifying recipient wallet contributes its <strong>net LEAP received</strong>, capped at <strong>20</strong>, to the community's lifetime Spread Score. That 20-point lifetime cap never resets. Spread Score is derived from validated XRPL history, but it is a Wild Ledger operating metric rather than LEAP Protocol state. This lets an Operator keep distributing LEAP to the same person without letting one wallet drive replenishment forever.</p>
 
         <div class="formula-grid">
           <article class="formula-card">
@@ -569,8 +569,8 @@
           </article>
           <article class="formula-card">
             <div class="formula-name">2 · Wallet Credit</div>
-            <div class="formula">Cw = min(25, Nw)</div>
-            <p>A recipient wallet can contribute no more than <strong>25 points</strong> to Spread Score over its lifetime. The Operator may still distribute more LEAP to that wallet; the extra amount simply does not increase replenishment credit.</p>
+            <div class="formula">Cw = min(20, Nw)</div>
+            <p>A recipient wallet can contribute no more than <strong>20 points</strong> to Spread Score over its lifetime. Once that wallet reaches 20 points, it can never add another Spread Score point for that community. The Operator may still distribute more LEAP to that wallet; the extra amount simply does not increase replenishment credit.</p>
           </article>
           <article class="formula-card">
             <div class="formula-name">3 · Spread Score</div>
@@ -596,7 +596,7 @@
         <div class="checklist">
           <ul>
             <li><strong>Count successful, validated LEAP transfers</strong> from the community's authorized Operating Wallet history to qualifying external recipient wallets.</li>
-            <li><strong>Use the full authorized Operating Wallet history.</strong> Changing the community's Operating Wallet does not reset Spread Score.</li>
+            <li><strong>Use the full authorized Operating Wallet history.</strong> Changing the community's Operating Wallet does not reset Spread Score. The lifetime wallet credits do not reset either.</li>
             <li><strong>Do not count internal or controlled wallets.</strong> The Issuer, Distributor, Owner Wallet, the community's own Operating Wallets, and other wallets controlled by the Operator or community do not qualify as outside recipients.</li>
             <li><strong>Subtract LEAP that comes back.</strong> If a recipient sends LEAP back to the community's authorized Operating Wallet history, that return reduces the recipient wallet's net contribution.</li>
             <li><strong>No clawback of replenishment already delivered.</strong> If later returns reduce Spread Score below a prior threshold, Wild Ledger does not take back LEAP already replenished. The community must rebuild the score before another replenishment becomes available.</li>
@@ -611,19 +611,19 @@
         <div class="examples">
           <article class="example-card early">
             <h4>500 LEAP to one wallet</h4>
-            <p>The Operator may make that distribution, but one wallet can contribute only 25 points.</p>
-            <div class="math-line">Cw = min(25, 500) = 25<br>S = 25<br>E = 1000 × floor(25 ÷ 500) = 0</div>
+            <p>The Operator may make that distribution, but one wallet can contribute only 20 points.</p>
+            <div class="math-line">Cw = min(20, 500) = 20<br>S = 20<br>E = 1000 × floor(20 ÷ 500) = 0</div>
             <div class="result">0 LEAP earned</div>
           </article>
           <article class="example-card good">
-            <h4>25 LEAP to 20 wallets</h4>
-            <p>Twenty different qualifying wallets each reach the 25-point wallet cap.</p>
-            <div class="math-line">S = 20 × 25 = 500<br>E = 1000 × floor(500 ÷ 500) = 1000</div>
+            <h4>20 LEAP to 25 wallets</h4>
+            <p>Twenty-five different qualifying wallets each reach the 20-point wallet cap.</p>
+            <div class="math-line">S = 25 × 20 = 500<br>E = 1000 × floor(500 ÷ 500) = 1000</div>
             <div class="result">1,000 LEAP earned</div>
           </article>
         </div>
 
-        <div class="lesson"><strong>What happens next?</strong><p>Those same 20 wallets may continue receiving LEAP, but each has already contributed its full 25 points. To move Spread Score from 500 to 1,000, the community must create more qualifying wallet reach. Once Spread Score reaches 1,000, total replenishment earned becomes 2,000 LEAP. If 1,000 has already been delivered, another 1,000 becomes available.</p></div>
+        <div class="lesson"><strong>What happens next?</strong><p>Those same 25 wallets may continue receiving LEAP, but each has already contributed its full 20 lifetime points. To move Spread Score from 500 to 1,000, the community must create more qualifying wallet reach. The old wallets do not reset and cannot be reused for another 20 points. Once Spread Score reaches 1,000, total replenishment earned becomes 2,000 LEAP. If 1,000 has already been delivered, another 1,000 becomes available.</p></div>
       </div>
 
       <div class="lesson-block">
@@ -634,7 +634,7 @@
             <li><strong>Start with 1,000 LEAP.</strong></li>
             <li><strong>Use LEAP however your community needs.</strong></li>
             <li><strong>Spread LEAP outward if you want Wild Ledger to give the community more inventory.</strong></li>
-            <li><strong>Remember the 25-point lifetime cap per qualifying recipient wallet.</strong></li>
+            <li><strong>Remember the 20-point lifetime cap per qualifying recipient wallet. It never resets.</strong></li>
             <li><strong>Every 500 Spread Score points earns another 1,000 LEAP.</strong></li>
             <li><strong>Do not move LEAP through wallets you control just to increase the score.</strong></li>
           </ul>
