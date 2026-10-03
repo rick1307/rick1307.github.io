@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SFL Operating Wallet Bootstrap — Wild Ledger</title>
+<style>
+:root{
+  --bg:#f4f7fa;--card:#fff;--ink:#142235;--muted:#64748b;--line:#d8e0e8;
+  --navy:#183d61;--blue:#2d6ca8;--green:#13795b;--amber:#9a6700;--red:#b42318;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+main{max-width:760px;margin:auto;padding:24px 16px 60px}
+h1{font-size:clamp(1.9rem,6vw,3rem);line-height:1.05;margin:10px 0 12px}
+p{margin:8px 0}
+.kicker{font-size:.78rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--blue)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:16px 0;box-shadow:0 6px 22px rgba(20,34,53,.05)}
+.guard{border-left:6px solid var(--green)}
+.warn{border-left:6px solid var(--amber)}
+.addr,.memo,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;overflow-wrap:anywhere;word-break:break-word}
+.addr{font-size:1rem;font-weight:900;color:var(--navy);padding:12px;border-radius:10px;background:#eef5fb;margin-top:8px}
+.memo{font-size:.82rem;padding:12px;border-radius:10px;background:#f7f9fb;border:1px solid var(--line);margin-top:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:620px){.row{grid-template-columns:1fr}}
+.label{font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.status{font-weight:800;margin-top:6px}.wait{color:var(--amber)}.good{color:var(--green)}.bad{color:var(--red)}
+button{width:100%;border:0;border-radius:12px;padding:14px 16px;font-size:1rem;font-weight:900;cursor:pointer}
+button.primary{background:var(--navy);color:white}button.secondary{background:#e9f1f8;color:var(--navy)}
+button:disabled{opacity:.42;cursor:not-allowed}
+.steps{display:grid;gap:10px;margin-top:14px}
+.step{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}
+.num{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:var(--navy);color:white;font-weight:900}
+pre{white-space:pre-wrap;background:#0f1f2e;color:#e8f2fb;border-radius:12px;padding:14px;font-size:.76rem;max-height:290px;overflow:auto}
+.small{font-size:.82rem;color:var(--muted)}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+#qrWrap{display:none;text-align:center;margin-top:12px}#qrWrap.show{display:block}#qrImage{width:min(320px,85vw);height:auto;background:#fff;padding:10px;border-radius:12px;border:1px solid var(--line)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+</style>
+<script src="js/wildLedgerConfig.js"></script>
+</head>
+<body>
+<main>
+  <div class="kicker">Wild Ledger • One-time bootstrap</div>
+  <h1>Establish the SFL Community Operating Wallet</h1>
+  <p>This page has one job: publish SFL's first self-identifying Operating Wallet authority statement from the wallet that will actually hold that authority.</p>
+
+  <section class="card guard">
+    <div class="label">Expected SFL Community Operating Wallet</div>
+    <div class="addr" id="expectedAddress">rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q</div>
+    <p class="small">There is no manually entered destination address. The connected Bifrost account must equal this address exactly. The transaction Account and memo value are both generated from that same connected account.</p>
+  </section>
+
+  <section class="card warn">
+    <div class="label">Exact authority syntax</div>
+    <div class="memo" id="expectedMemo">SFL-LEAP/AUTHORITY/OPERATING-WALLET=rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q</div>
+    <p class="small">If the connected wallet does not match the expected address character-for-character, this page will not prepare or sign anything.</p>
+  </section>
+
+  <section class="card">
+    <div class="steps">
+      <div class="step"><div class="num">1</div><div><strong>Connect Bifrost</strong><div id="connectStatus" class="status wait">Not connected.</div></div></div>
+      <button id="connectButton" class="secondary" type="button">Connect Bifrost</button>
+      <div id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"><div class="small"><code id="qrUri"></code></div></div>
+      <div class="label" style="margin-top:8px">Connected signing wallet</div>
+      <div class="addr" id="connectedAddress">—</div>
+
+      <hr>
+      <div class="step"><div class="num">2</div><div><strong>Prepare the no-op AccountSet</strong><div id="prepareStatus" class="status wait">Waiting for the correct wallet.</div></div></div>
+      <button id="prepareButton" class="primary" type="button" disabled>Prepare AccountSet</button>
+      <div id="preparedPanel" hidden>
+        <div class="label" style="margin-top:12px">Prepared transaction</div>
+        <pre id="preparedJson"></pre>
+      </div>
+
+      <hr>
+      <div class="step"><div class="num">3</div><div><strong>Sign in Bifrost</strong><div id="signStatus" class="status wait">Not signed.</div></div></div>
+      <button id="signButton" class="primary" type="button" disabled>Sign AccountSet</button>
+
+      <hr>
+      <div class="step"><div class="num">4</div><div><strong>Submit and wait for XRPL validation</strong><div id="submitStatus" class="status wait">Nothing submitted.</div></div></div>
+      <button id="submitButton" class="primary" type="button" disabled>Submit to XRPL</button>
+    </div>
+  </section>
+
+  <section class="card" id="resultCard" hidden>
+    <div class="label">Validated bootstrap result</div>
+    <p><strong>Result:</strong> <span id="resultCode"></span></p>
+    <p><strong>Ledger:</strong> <span id="resultLedger"></span></p>
+    <p><strong>Transaction hash:</strong></p>
+    <div class="memo" id="resultHash"></div>
+    <p><strong>Canonical memo:</strong></p>
+    <div class="memo" id="resultMemo"></div>
+  </section>
+</main>
+
+<script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { prepareNoOpAccountSet, submitSignedTransaction, isClassicAddress } from "./js/xrplTransport.js";
+import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+
+const EXPECTED_ADDRESS = "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q";
+const NAMESPACE = "SFL-LEAP";
+const runtime = window.WILD_LEDGER_CONFIG || {};
+const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
+const FEE_CUSHION = Number(runtime.xrplFeeCushion || 1.2);
+const PROJECT_ID = String(runtime.walletConnectProjectId || "").trim();
+
+const connectButton = document.getElementById("connectButton");
+const prepareButton = document.getElementById("prepareButton");
+const signButton = document.getElementById("signButton");
+const submitButton = document.getElementById("submitButton");
+const connectStatus = document.getElementById("connectStatus");
+const prepareStatus = document.getElementById("prepareStatus");
+const signStatus = document.getElementById("signStatus");
+const submitStatus = document.getElementById("submitStatus");
+const connectedAddress = document.getElementById("connectedAddress");
+const qrWrap = document.getElementById("qrWrap");
+const qrImage = document.getElementById("qrImage");
+const qrUri = document.getElementById("qrUri");
+const preparedPanel = document.getElementById("preparedPanel");
+const preparedJson = document.getElementById("preparedJson");
+const resultCard = document.getElementById("resultCard");
+const resultCode = document.getElementById("resultCode");
+const resultLedger = document.getElementById("resultLedger");
+const resultHash = document.getElementById("resultHash");
+const resultMemo = document.getElementById("resultMemo");
+
+let signer = null;
+let connectedAccount = "";
+let preparedTx = null;
+let signedBlob = "";
+let busy = false;
+
+function memoFor(account) {
+  return `${NAMESPACE}/AUTHORITY/OPERATING-WALLET=${account}`;
+}
+
+function setStatus(el, text, tone="wait") {
+  el.textContent = text;
+  el.classList.remove("wait","good","bad");
+  el.classList.add(tone);
+}
+
+function exactWalletReady() {
+  return isClassicAddress(connectedAccount) && connectedAccount === EXPECTED_ADDRESS;
+}
+
+function resetAfterConnect() {
+  preparedTx = null;
+  signedBlob = "";
+  preparedPanel.hidden = true;
+  preparedJson.textContent = "";
+  resultCard.hidden = true;
+  setStatus(prepareStatus, exactWalletReady() ? "Correct wallet connected. Ready to prepare." : "Waiting for the correct wallet.", exactWalletReady() ? "good" : "wait");
+  setStatus(signStatus, "Not signed.", "wait");
+  setStatus(submitStatus, "Nothing submitted.", "wait");
+  updateButtons();
+}
+
+function updateButtons() {
+  connectButton.disabled = busy || !PROJECT_ID;
+  prepareButton.disabled = busy || !exactWalletReady() || !XRPL_SERVER;
+  signButton.disabled = busy || !preparedTx || !signer || !exactWalletReady();
+  submitButton.disabled = busy || !signedBlob || !exactWalletReady();
+}
+
+function assertExpectedAccount(account) {
+  if (!isClassicAddress(account)) throw new Error("Bifrost did not return a valid XRPL classic address.");
+  if (account !== EXPECTED_ADDRESS) {
+    throw new Error(`STOPPED: connected wallet ${account} does not equal the expected SFL wallet ${EXPECTED_ADDRESS}.`);
+  }
+}
+
+function assertPrepared(tx) {
+  if (!tx || tx.TransactionType !== "AccountSet") throw new Error("XRPL returned an unexpected transaction type.");
+  if (tx.Account !== EXPECTED_ADDRESS) throw new Error("Prepared Account changed unexpectedly.");
+  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+  if (memos.length !== 1) throw new Error("Prepared AccountSet does not contain exactly one memo.");
+  const hex = String(memos[0]?.Memo?.MemoData || "");
+  const text = hex ? new TextDecoder().decode(Uint8Array.from(hex.match(/.{1,2}/g).map(b => parseInt(b,16)))) : "";
+  if (text !== memoFor(EXPECTED_ADDRESS)) throw new Error("Prepared authority memo changed unexpectedly.");
+}
+
+connectButton.addEventListener("click", async () => {
+  busy = true; updateButtons();
+  try {
+    if (!PROJECT_ID) throw new Error("WalletConnect project ID is not configured.");
+    if (signer) { try { await signer.disconnect(); } catch (_) {} }
+    signer = new WalletConnectXrplSigner({
+      projectId: PROJECT_ID,
+      metadata: {
+        name: "Wild Ledger SFL Bootstrap",
+        description: "Establish the first SFL Community Operating Wallet authority statement",
+        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+        icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+      }
+    });
+    setStatus(connectStatus, "Initializing WalletConnect…", "wait");
+    const connection = await signer.connect({
+      onUri: async uri => {
+        qrImage.src = await QRCode.toDataURL(uri, { width: 520, margin: 2, errorCorrectionLevel: "M" });
+        qrUri.textContent = uri;
+        qrWrap.classList.add("show");
+        setStatus(connectStatus, "QR ready. Approve the connection in Bifrost.", "wait");
+      }
+    });
+    qrWrap.classList.remove("show");
+    qrUri.textContent = "";
+    connectedAccount = String(connection.account || "");
+    connectedAddress.textContent = connectedAccount || "—";
+    assertExpectedAccount(connectedAccount);
+    setStatus(connectStatus, "MATCH CONFIRMED — this is the expected SFL wallet.", "good");
+    resetAfterConnect();
+  } catch (error) {
+    connectedAccount = "";
+    connectedAddress.textContent = "—";
+    setStatus(connectStatus, error?.message || String(error), "bad");
+    resetAfterConnect();
+  } finally {
+    busy = false; updateButtons();
+  }
+});
+
+prepareButton.addEventListener("click", async () => {
+  busy = true; updateButtons(); signedBlob = "";
+  try {
+    assertExpectedAccount(connectedAccount);
+    const memoText = memoFor(connectedAccount);
+    setStatus(prepareStatus, "Asking XRPL to simulate and autofill the no-op AccountSet…", "wait");
+    const prepared = await prepareNoOpAccountSet({
+      serverUrl: XRPL_SERVER,
+      account: connectedAccount,
+      memoText,
+      feeCushion: FEE_CUSHION
+    });
+    assertPrepared(prepared.preparedTx);
+    preparedTx = prepared.preparedTx;
+    preparedJson.textContent = JSON.stringify(preparedTx, null, 2);
+    preparedPanel.hidden = false;
+    setStatus(prepareStatus, `Prepared safely. Account and memo both use ${EXPECTED_ADDRESS}.`, "good");
+    setStatus(signStatus, "Ready for Bifrost signature.", "wait");
+  } catch (error) {
+    preparedTx = null;
+    setStatus(prepareStatus, error?.message || String(error), "bad");
+  } finally {
+    busy = false; updateButtons();
+  }
+});
+
+signButton.addEventListener("click", async () => {
+  busy = true; updateButtons(); signedBlob = "";
+  try {
+    assertExpectedAccount(connectedAccount);
+    assertPrepared(preparedTx);
+    setStatus(signStatus, "Waiting for Bifrost approval…", "wait");
+    const result = await signer.signTransaction(preparedTx);
+    signedBlob = String(result.signedBlob || "");
+    if (!signedBlob) throw new Error("Bifrost did not return a signed transaction.");
+    setStatus(signStatus, "Signed blob received. Nothing has been submitted yet.", "good");
+    setStatus(submitStatus, "Ready to submit and wait for validation.", "wait");
+  } catch (error) {
+    signedBlob = "";
+    setStatus(signStatus, error?.message || String(error), "bad");
+  } finally {
+    busy = false; updateButtons();
+  }
+});
+
+submitButton.addEventListener("click", async () => {
+  busy = true; updateButtons();
+  try {
+    assertExpectedAccount(connectedAccount);
+    assertPrepared(preparedTx);
+    if (!signedBlob) throw new Error("No signed transaction is available.");
+    setStatus(submitStatus, "Submitting signed AccountSet to XRPL and waiting for validated result…", "wait");
+    const result = await submitSignedTransaction({
+      serverUrl: XRPL_SERVER,
+      signedBlob,
+      onSubmitted: ({ txHash }) => {
+        resultHash.textContent = txHash || "";
+        setStatus(submitStatus, "Accepted by XRPL. Waiting for ledger validation…", "wait");
+      }
+    });
+    if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated transaction returned ${result.finalResult}.`);
+    resultCode.textContent = result.finalResult;
+    resultLedger.textContent = String(result.ledgerIndex ?? "—");
+    resultHash.textContent = result.txHash || resultHash.textContent || "—";
+    resultMemo.textContent = memoFor(EXPECTED_ADDRESS);
+    resultCard.hidden = false;
+    setStatus(submitStatus, `VALIDATED tesSUCCESS — SFL bootstrap statement is on XRPL.`, "good");
+    submitButton.disabled = true;
+  } catch (error) {
+    setStatus(submitStatus, error?.message || String(error), "bad");
+  } finally {
+    busy = false; updateButtons();
+  }
+});
+
+if (!isClassicAddress(EXPECTED_ADDRESS)) {
+  setStatus(connectStatus, "The expected SFL wallet address embedded in this file is not a valid XRPL classic address. Do not use this page.", "bad");
+  connectButton.disabled = true;
+} else if (!PROJECT_ID) {
+  setStatus(connectStatus, "WalletConnect project ID is missing from wildLedgerConfig.js.", "bad");
+}
+updateButtons();
+</script>
+</body>
+</html>
