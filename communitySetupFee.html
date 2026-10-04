@@ -7,7 +7,7 @@
 <title>Community Setup Fee | Wild Ledger</title>
 <style>
 :root{--bg:#071f2c;--panel:#0b2f40;--line:rgba(255,255,255,.14);--text:#f5fbfa;--muted:rgba(236,249,247,.68);--green:#30d158;--gold:#f4bd58;--bad:#ff8978}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a);color:var(--text);font-family:Arial,sans-serif}.shell{width:min(100%,860px);margin:0 auto;padding:24px 14px 48px}.console{border:1px solid var(--line);border-radius:26px;background:rgba(10,45,58,.82);overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28)}header{padding:25px 22px;border-bottom:1px solid var(--line)}.back{display:inline-block;color:#b7f0df;text-decoration:none;font-size:.78rem;font-weight:800;margin-bottom:16px}.eyebrow{font-size:.68rem;text-transform:uppercase;letter-spacing:.11em;color:#a8d8ce;font-weight:900}h1{margin:7px 0 8px;font-size:clamp(2rem,7vw,3.4rem);line-height:.95}header p{margin:0;color:var(--muted);line-height:1.5}.body{display:grid;gap:14px;padding:14px}.card{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035);padding:18px}.card h2{margin:0 0 7px;font-size:1.05rem}.card p{margin:0;color:var(--muted);line-height:1.5;font-size:.86rem}.status{margin-top:13px;border-top:1px solid rgba(255,255,255,.09)}.row{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}.key{color:rgba(255,255,255,.55);font-weight:800}.value{overflow-wrap:anywhere}.good{color:#a7f3bd}.wait{color:#f3d79c}.bad{color:#ffc0b6}.choices{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.exact-fee{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:10px}.exact-fee input{min-height:44px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);color:white;padding:0 12px;font-size:.9rem;font-weight:800;outline:none}.exact-fee input:focus{border-color:var(--green);box-shadow:0 0 0 1px rgba(48,209,88,.18)}.selected-fee{margin-top:10px;font-size:.76rem;color:#bfe9df}.fee-choice{min-height:46px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);color:white;font-size:1rem;font-weight:900}.fee-choice.active{border-color:var(--green);background:rgba(48,209,88,.15);box-shadow:0 0 0 1px rgba(48,209,88,.18)}.buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{min-height:44px;border:0;border-radius:12px;padding:0 14px;font-weight:900;font-size:.8rem}button.primary{background:var(--green);color:#05210d}button.secondary{background:rgba(255,255,255,.09);color:white;border:1px solid rgba(255,255,255,.14)}button:disabled{opacity:.38;cursor:not-allowed}.notice{margin-top:12px;padding:12px 13px;border-radius:12px;background:rgba(244,189,88,.08);border:1px solid rgba(244,189,88,.22);font-size:.78rem;line-height:1.5;color:#f5dfb1}pre{white-space:pre-wrap;word-break:break-word;max-height:250px;overflow:auto;margin:12px 0 0;padding:12px;border-radius:12px;background:#04151d;color:#dff4ef;font-size:.68rem}footer{text-align:center;color:rgba(255,255,255,.42);font-size:.68rem;padding:0 20px 22px}@media(max-width:560px){.row{grid-template-columns:118px minmax(0,1fr)}.choices{grid-template-columns:repeat(5,1fr)}.fee-choice{padding:0}.exact-fee{grid-template-columns:1fr}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a);color:var(--text);font-family:Arial,sans-serif}.shell{width:min(100%,860px);margin:0 auto;padding:24px 14px 48px}.console{border:1px solid var(--line);border-radius:26px;background:rgba(10,45,58,.82);overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28)}header{padding:25px 22px;border-bottom:1px solid var(--line)}.back{display:inline-block;color:#b7f0df;text-decoration:none;font-size:.78rem;font-weight:800;margin-bottom:16px}.eyebrow{font-size:.68rem;text-transform:uppercase;letter-spacing:.11em;color:#a8d8ce;font-weight:900}h1{margin:7px 0 8px;font-size:clamp(2rem,7vw,3.4rem);line-height:.95}header p{margin:0;color:var(--muted);line-height:1.5}.body{display:grid;gap:14px;padding:14px}.card{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035);padding:18px}.card h2{margin:0 0 7px;font-size:1.05rem}.card p{margin:0;color:var(--muted);line-height:1.5;font-size:.86rem}.status{margin-top:13px;border-top:1px solid rgba(255,255,255,.09)}.row{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}.key{color:rgba(255,255,255,.55);font-weight:800}.value{overflow-wrap:anywhere}.good{color:#a7f3bd}.wait{color:#f3d79c}.bad{color:#ffc0b6}.choices{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.exact-fee{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:10px}.exact-fee input{min-height:44px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);color:white;padding:0 12px;font-size:.9rem;font-weight:800;outline:none}.exact-fee input:focus{border-color:var(--green);box-shadow:0 0 0 1px rgba(48,209,88,.18)}.selected-fee{margin-top:10px;font-size:.76rem;color:#bfe9df}.fee-choice{min-height:46px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);color:white;font-size:1rem;font-weight:900}.fee-choice.active{border-color:var(--green);background:rgba(48,209,88,.15);box-shadow:0 0 0 1px rgba(48,209,88,.18)}.buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{min-height:44px;border:0;border-radius:12px;padding:0 14px;font-weight:900;font-size:.8rem}button.primary{background:var(--green);color:#05210d}button.secondary{background:rgba(255,255,255,.09);color:white;border:1px solid rgba(255,255,255,.14)}button.next-action{background:var(--gold);border:1px solid #ffd98a;color:#08212d;box-shadow:0 0 0 3px rgba(244,189,88,.14),0 0 22px rgba(244,189,88,.30);opacity:1}button.complete-action{background:rgba(48,209,88,.16);border:1px solid rgba(167,243,189,.62);color:#a7f3bd;box-shadow:0 0 0 2px rgba(48,209,88,.08);opacity:1}button.complete-action:disabled{opacity:1}button:disabled{opacity:.38;cursor:not-allowed}.notice{margin-top:12px;padding:12px 13px;border-radius:12px;background:rgba(244,189,88,.08);border:1px solid rgba(244,189,88,.22);font-size:.78rem;line-height:1.5;color:#f5dfb1}pre{white-space:pre-wrap;word-break:break-word;max-height:250px;overflow:auto;margin:12px 0 0;padding:12px;border-radius:12px;background:#04151d;color:#dff4ef;font-size:.68rem}footer{text-align:center;color:rgba(255,255,255,.42);font-size:.68rem;padding:0 20px 22px}@media(max-width:560px){.row{grid-template-columns:118px minmax(0,1fr)}.choices{grid-template-columns:repeat(5,1fr)}.fee-choice{padding:0}.exact-fee{grid-template-columns:1fr}}
 </style>
 <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
@@ -48,7 +48,7 @@
 <button class="secondary" id="connectButton" type="button" disabled>Connect Owner Wallet</button>
 <button class="secondary" id="prepareButton" type="button" disabled>Prepare Transaction</button>
 <button class="secondary" id="signButton" type="button" disabled>Send for Signature</button>
-<button class="primary" id="submitButton" type="button" disabled>Submit to XRPL</button>
+<button class="secondary" id="submitButton" type="button" disabled>Submit to XRPL</button>
 </div>
 <div class="status">
 <div class="row"><div class="key">Connected wallet</div><div class="value wait" id="walletStatus">Not connected.</div></div>
@@ -106,6 +106,7 @@ const qrImage = $("qrImage");
 const uriText = $("uriText");
 
 let selectedDrops = String(DROPS_PER_XRP);
+let currentDrops = "";
 let ownerAccount = "";
 let signer = null;
 let prepared = null;
@@ -135,21 +136,69 @@ function paintSelection() {
   memoStatus.textContent = setupFeeMemo(selectedDrops);
 }
 
+function actionState(button, state, label) {
+  button.classList.remove("next-action", "complete-action");
+  if (state === "next") button.classList.add("next-action");
+  if (state === "complete") button.classList.add("complete-action");
+  if (label) button.textContent = label;
+}
+
+function sameAsCurrent() {
+  return Boolean(currentDrops) && selectedDrops === currentDrops;
+}
+
+function renderActionFlow() {
+  if (signer) {
+    connectButton.disabled = true;
+    actionState(connectButton, "complete", "✓ Owner Wallet Connected");
+  } else {
+    connectButton.disabled = !ownerAccount;
+    actionState(connectButton, ownerAccount ? "next" : "", "Connect Owner Wallet");
+  }
+
+  if (prepared) {
+    prepareButton.disabled = true;
+    actionState(prepareButton, "complete", "✓ Transaction Prepared");
+  } else if (signer && !sameAsCurrent()) {
+    prepareButton.disabled = false;
+    actionState(prepareButton, "next", "Prepare Transaction");
+  } else {
+    prepareButton.disabled = true;
+    actionState(prepareButton, "", "Prepare Transaction");
+  }
+
+  if (signedBlob) {
+    signButton.disabled = true;
+    actionState(signButton, "complete", "✓ Transaction Signed");
+  } else if (prepared) {
+    signButton.disabled = false;
+    actionState(signButton, "next", "Send for Signature");
+  } else {
+    signButton.disabled = true;
+    actionState(signButton, "", "Send for Signature");
+  }
+
+  if (submitLocked && signedBlob) {
+    submitButton.disabled = true;
+  } else if (signedBlob) {
+    submitButton.disabled = false;
+    actionState(submitButton, "next", "Submit to XRPL");
+  } else {
+    submitButton.disabled = true;
+    actionState(submitButton, "", "Submit to XRPL");
+  }
+}
+
 function resetTransaction() {
   prepared = null;
   signedBlob = "";
   submitLocked = false;
-  prepareButton.disabled = !signer;
-  prepareButton.textContent = "Prepare Transaction";
-  signButton.disabled = true;
-  signButton.textContent = "Send for Signature";
-  submitButton.disabled = true;
-  submitButton.textContent = "Submit to XRPL";
-  tone(preparedStatus, "wait", "Not prepared.");
+  tone(preparedStatus, "wait", sameAsCurrent() ? "Selected fee is already current." : "Not prepared.");
   tone(signatureStatus, "wait", "Not signed.");
   tone(submitStatus, "wait", "Not submitted.");
   preview.textContent = "No transaction prepared.";
   paintSelection();
+  renderActionFlow();
 }
 
 function chooseDrops(value, { mirrorInput = true } = {}) {
@@ -185,32 +234,41 @@ exactDrops.addEventListener("keydown", event => {
 
 exactDrops.value = selectedDrops;
 paintSelection();
+renderActionFlow();
 
-async function loadState() {
+async function loadState({ preserveSelection = false } = {}) {
   refreshButton.disabled = true;
-  connectButton.disabled = true;
   try {
     tone(ownerStatus, "wait", "Reading validated Owner history…");
     tone(feeStatus, "wait", "Reading setup-fee history…");
     const state = await readCommunitySetupFee({ serverUrl: SERVER, force: true });
     ownerAccount = state.ownerState.currentAccount;
     tone(ownerStatus, "good", ownerAccount);
-    connectButton.disabled = !ownerAccount;
 
     if (state.current) {
+      currentDrops = String(state.current.drops);
       tone(feeStatus, "good", `${state.current.xrp} XRP · ${formatDrops(state.current.drops)} drops`);
       feeLedger.textContent = `Ledger ${state.current.ledger}${state.current.hash ? ` · ${state.current.hash.slice(0, 12)}…` : ""}`;
-      selectedDrops = state.current.drops;
-      exactDrops.value = selectedDrops;
-      resetTransaction();
+      if (!preserveSelection) {
+        selectedDrops = currentDrops;
+        exactDrops.value = selectedDrops;
+        resetTransaction();
+      } else {
+        paintSelection();
+        renderActionFlow();
+      }
     } else {
+      currentDrops = "";
       tone(feeStatus, "wait", "Not established yet. Publish the first fee before public requests can be paid.");
       feeLedger.textContent = "—";
+      paintSelection();
+      renderActionFlow();
     }
   } catch (error) {
     tone(ownerStatus, "bad", error?.message || String(error));
     tone(feeStatus, "bad", "Unavailable.");
-    connectButton.disabled = true;
+    ownerAccount = "";
+    renderActionFlow();
   } finally {
     refreshButton.disabled = false;
   }
@@ -248,17 +306,17 @@ async function connect() {
       throw new Error(`Connected wallet is ${connected.account}, but current Owner is ${ownerAccount}.`);
     }
     tone(walletStatus, "good", `${connected.walletName} connected as current Owner.`);
-    prepareButton.disabled = false;
-    connectButton.textContent = "Owner Wallet Connected";
+    renderActionFlow();
   } catch (error) {
     signer = null;
     tone(walletStatus, "bad", error?.message || String(error));
-    connectButton.disabled = false;
+    renderActionFlow();
   }
 }
 
 async function prepare() {
   prepareButton.disabled = true;
+  actionState(prepareButton, "", "Preparing…");
   try {
     tone(preparedStatus, "wait", "Preparing against current XRPL state…");
     prepared = await prepareCommunitySetupFee({
@@ -270,27 +328,28 @@ async function prepare() {
     preview.textContent = JSON.stringify(prepared.preparedTx, null, 2);
     memoStatus.textContent = prepared.memoText;
     tone(preparedStatus, "good", `Prepared ${prepared.xrp} XRP (${formatDrops(prepared.drops)} drops) setup-fee statement.`);
-    prepareButton.textContent = "Prepared";
-    signButton.disabled = false;
+    renderActionFlow();
   } catch (error) {
     tone(preparedStatus, "bad", error?.message || String(error));
-    prepareButton.disabled = false;
+    prepared = null;
+    renderActionFlow();
   }
 }
 
 async function sign() {
   if (!prepared || !signer) return;
   signButton.disabled = true;
+  actionState(signButton, "", "Waiting for Signature…");
   try {
     tone(signatureStatus, "wait", "Approve the transaction in your wallet.");
     const signed = await signer.signTransaction(prepared.preparedTx);
     signedBlob = signed.signedBlob;
     tone(signatureStatus, "good", "Signed. Ready to submit.");
-    signButton.textContent = "Signed";
-    submitButton.disabled = false;
+    renderActionFlow();
   } catch (error) {
     tone(signatureStatus, "bad", error?.message || String(error));
-    signButton.disabled = false;
+    signedBlob = "";
+    renderActionFlow();
   }
 }
 
@@ -298,7 +357,7 @@ async function submit() {
   if (!signedBlob || submitLocked) return;
   submitLocked = true;
   submitButton.disabled = true;
-  submitButton.textContent = "Submitted — checking XRPL…";
+  actionState(submitButton, "", "Submitted — checking XRPL…");
   try {
     tone(submitStatus, "wait", "Submitting once, then checking validated XRPL history…");
     const out = await submitCommunitySetupFee({
@@ -312,14 +371,18 @@ async function submit() {
         details?.txHash ? `Submitted ${details.txHash.slice(0, 14)}… Checking validation…` : "Submitted. Checking validation…"
       )
     });
+    currentDrops = String(out.record.drops);
+    tone(feeStatus, "good", `${out.record.xrp} XRP · ${formatDrops(out.record.drops)} drops`);
+    feeLedger.textContent = `Ledger ${out.record.ledger}${out.record.hash ? ` · ${out.record.hash.slice(0, 12)}…` : ""}`;
     tone(submitStatus, "good", `Validated in ledger ${out.record.ledger}. Current setup fee is ${out.record.xrp} XRP (${formatDrops(out.record.drops)} drops).`);
-    await loadState();
+    actionState(submitButton, "complete", "✓ Fee Published");
+    submitButton.disabled = true;
+    submitLocked = true;
   } catch (error) {
     tone(submitStatus, "bad", error?.message || String(error));
     if (!error?.doNotResubmit) {
       submitLocked = false;
-      submitButton.disabled = false;
-      submitButton.textContent = "Submit to XRPL";
+      renderActionFlow();
     }
   }
 }
