@@ -280,6 +280,62 @@
     updateButtons();
   }
 
+  async function assertPreparedAuthorityCurrent(stage) {
+    if (!preparedTransaction?.Account) {
+      throw new Error("No prepared transaction is available for authority verification.");
+    }
+
+    const preparedAccount = String(preparedTransaction.Account || "");
+    clearCommunityAuthorityCache();
+    const latestAuthority = await resolveCommunityAuthority({
+      community,
+      serverUrl: xrplServer,
+      force: true
+    });
+
+    const latestRequiredSigner = String(
+      latestAuthority.initialStatementNeeded
+        ? (latestAuthority.legacyConfiguredAccount || latestAuthority.currentAccount || "")
+        : (latestAuthority.currentAccount || "")
+    );
+
+    if (!isClassicAddress(latestRequiredSigner)) {
+      clearPrepared();
+      throw new Error("This community does not currently have a resolvable Community Operating Wallet.");
+    }
+
+    authority = latestAuthority;
+    requiredSigner = latestRequiredSigner;
+    requiredSignerDisplay.textContent = requiredSigner;
+
+    if (authority.initialStatementNeeded) {
+      currentAccount.textContent = requiredSigner;
+      currentAccount.className = "value wait";
+      setStatus(authorityStatus, "First on-ledger OPERATING-WALLET statement has not been published.", "wait");
+    } else {
+      currentAccount.textContent = authority.currentAccount;
+      currentAccount.className = "value good";
+      setStatus(authorityStatus, `Canonical on XRPL. ${authority.transitions.length} prior wallet change${authority.transitions.length === 1 ? "" : "s"} resolved.`, "good");
+    }
+
+    if (connectedAccount) {
+      if (connectedAccount === requiredSigner) {
+        setStatus(connectionStatus, "Connected wallet is the required Operating Wallet.", "good");
+      } else {
+        setStatus(connectionStatus, `Connected account is not the required signer (${requiredSigner}).`, "bad");
+      }
+    }
+
+    if (preparedAccount !== requiredSigner) {
+      clearPrepared();
+      throw new Error(
+        `The Community Operating Wallet changed before ${stage}. Recheck validated XRPL history and prepare a new statement using ${requiredSigner}.`
+      );
+    }
+
+    return requiredSigner;
+  }
+
   newAccount.addEventListener("input", () => { clearPrepared(); refreshMemo(); updateButtons(); });
   refreshButton.addEventListener("click", () => { clearCommunityAuthorityCache(); resolveAuthority(true); });
   connectButton.addEventListener("click", connectSigner);
@@ -312,9 +368,14 @@
   });
 
   signButton.addEventListener("click", async () => {
-    if (!signer || !preparedTransaction || connectedAccount !== requiredSigner) return;
+    if (!signer || !preparedTransaction) return;
     busy = true; updateButtons();
     try {
+      setStatus(publicationStatus, "Rechecking Community Operating Wallet authority before signing…", "wait");
+      await assertPreparedAuthorityCurrent("signing");
+      if (connectedAccount !== requiredSigner) {
+        throw new Error(`Connected signer ${connectedAccount || "—"} is not the current Community Operating Wallet ${requiredSigner}.`);
+      }
       setStatus(publicationStatus, "Waiting for signer approval…", "wait");
       const result = await signer.signTransaction(preparedTransaction);
       signedBlob = result.signedBlob;
@@ -331,6 +392,8 @@
     if (!signedBlob) return;
     busy = true; updateButtons();
     try {
+      setStatus(publicationStatus, "Rechecking Community Operating Wallet authority before submission…", "wait");
+      await assertPreparedAuthorityCurrent("submission");
       setStatus(publicationStatus, "Submitting directly to XRPL and waiting for validated success…", "wait");
       const result = await submitSignedTransaction({ serverUrl: xrplServer, signedBlob });
       if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated transaction returned ${result.finalResult}.`);
