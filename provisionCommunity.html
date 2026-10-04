@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#031c29">
-  <title>Provision Community — Wild Ledger</title>
+  <title>Create a New Community — Wild Ledger</title>
   <style>
     :root{
       --deep:#031c29;--lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;
@@ -47,30 +47,30 @@
 <main class="shell">
   <section class="console">
     <header>
-      <a class="back wl-header-control" href="communities.html">← Communities</a>
+      <a class="back wl-header-control" href="addCommunity.html">← Add Community</a>
       <div class="eyebrow">Wild Ledger Owner</div>
-      <h1>Provision Community</h1>
-      <p class="intro">Create one permanent Community ID and establish its first Community Operating Wallet. Wild Ledger prepares and submits; Bifrost signs only.</p>
+      <h1>Create a New Community</h1>
+      <p class="intro">Move from top to bottom. Each step clears the next one. Wild Ledger generates the permanent Community ID, verifies the first Operating Wallet, prepares the canonical authority transaction, and confirms the result from validated XRPL history.</p>
     </header>
 
     <div class="body">
       <section class="card">
-        <h2>Canonical Owner Authority</h2>
+        <h2>Step 1 · Verify Wild Ledger Authority</h2>
         <div class="status">
           <div class="row"><div class="key">Initial Owner</div><div class="value" id="initialOwner">—</div></div>
           <div class="row"><div class="key">XRPL authority</div><div class="value wait" id="ownerStatus">Checking XRPL…</div></div>
           <div class="row"><div class="key">Current Owner</div><div class="value" id="currentOwner">—</div></div>
           <div class="row"><div class="key">Provisioned IDs</div><div class="value" id="provisionCount">—</div></div>
         </div>
-        <div class="notice"><strong>Automatic gate:</strong> this page stays locked until the initial <code>LEAP/AUTHORITY/OWNER-WALLET</code> statement exists in validated XRPL history. No manual switch is required later.</div>
+        <div class="notice"><strong>This step clears automatically.</strong> Wild Ledger reads validated XRPL history to determine the current Owner Wallet. New-community provisioning stays locked until canonical Owner authority is established.</div>
         <div class="buttons"><button class="secondary" id="refreshOwnerButton" type="button">Recheck XRPL</button></div>
       </section>
 
       <section class="card">
-        <h2>New Community</h2>
+        <h2>Step 2 · Create Community Identity</h2>
         <div class="grid">
           <div>
-            <label for="communityId">Generated Community ID</label>
+            <label for="communityId">Generated 3-character Community ID</label>
             <input id="communityId" readonly>
           </div>
           <div>
@@ -82,6 +82,7 @@
             <input id="operatingWallet" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="r...">
           </div>
         </div>
+        <div class="notice"><strong>Wild Ledger provisioning policy:</strong> new communities receive an automatically generated 3-character Community ID. The ID becomes permanent only when the authority transaction validates on XRPL.</div>
         <div class="buttons">
           <button class="secondary" id="newIdButton" type="button">Generate Another ID</button>
           <button class="primary" id="verifyWalletButton" type="button">Verify XRPL Address</button>
@@ -94,7 +95,7 @@
       </section>
 
       <section class="card">
-        <h2>Bifrost Signer</h2>
+        <h2>Step 3 · Connect the Owner Wallet</h2>
         <div class="grid">
           <div class="full">
             <label for="connectedAccount">Connected XRPL Account</label>
@@ -114,7 +115,7 @@
       </section>
 
       <section class="card">
-        <h2>Prepare + Sign</h2>
+        <h2>Step 4 · Prepare + Sign</h2>
         <div class="safety"><strong>Real protocol transaction.</strong> This is a no-op <code>AccountSet</code>. No LEAP moves and no XRPL account setting changes. The normal XRP transaction fee applies and the Community ID becomes permanently established when the transaction validates.</div>
         <div class="buttons">
           <button class="primary" id="prepareButton" type="button" disabled>Prepare Provisioning Transaction</button>
@@ -128,7 +129,7 @@
       </section>
 
       <section class="card">
-        <h2>Submit + Validate</h2>
+        <h2>Step 5 · Record + Confirm</h2>
         <div class="buttons"><button class="primary" id="submitButton" type="button" disabled>Submit Signed Transaction to XRPL</button></div>
         <div class="status" style="margin-top:12px">
           <div class="row"><div class="key">Submission</div><div class="value wait" id="submitStatus">Not submitted.</div></div>
@@ -137,10 +138,10 @@
           <div class="row"><div class="key">Canonical community</div><div class="value wait" id="canonicalStatus">Not established.</div></div>
         </div>
         <pre id="submitPreview">No XRPL submission yet.</pre>
-        <div class="notice success" id="successBox"><strong>Community provisioned.</strong> The Community ID and first Operating Wallet are now canonical XRPL history. Presentation/setup can be attached to this identity next.</div>
+        <div class="notice success" id="successBox"><strong>Community established on XRPL.</strong> The Community ID and first Operating Wallet are now canonical XRPL history. Community setup and presentation come next; they do not create the community.</div>
       </section>
     </div>
-    <footer>Wild Ledger community provisioning — Owner authority required.</footer>
+    <footer>Provisioning creates the community on XRPL. Setup creates its Wild Ledger experience.</footer>
   </section>
 </main>
 
@@ -162,8 +163,9 @@
   const SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
   const PROJECT_ID = String(config.walletConnectProjectId || "").trim();
   const FEE_CUSHION = Number(config.xrplFeeCushion || 1.2);
+  // New-community birth is one Owner-authorized XRPL act: the Community ID and first Operating Wallet become canonical together.
   const ID_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const ID_LENGTH = 4;
+  const ID_LENGTH = 3; // Wild Ledger provisioning policy; LEAP Protocol itself does not require a fixed length.
 
   const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
   const initialOwner = $("initialOwner");
