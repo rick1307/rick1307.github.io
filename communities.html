@@ -170,7 +170,7 @@
       communityVisibilityMemo,
       prepareCommunityVisibility,
       submitCommunityVisibility
-    } from "./js/communityVisibility.js?wl=20261004xrpl1";
+    } from "./js/communityVisibility.js?wl=20261004xrpl2";
 
     const directory = document.getElementById("communityDirectoryList");
     const state = document.getElementById("communityDirectoryState");
@@ -206,6 +206,7 @@
     let pendingHidden = false;
     let prepared = null;
     let signedBlob = "";
+    let submissionAttempted = false;
 
     function setModalStatus(text, tone = "") {
       modalStatus.classList.remove("good", "bad");
@@ -293,8 +294,10 @@
     function clearPrepared() {
       prepared = null;
       signedBlob = "";
+      submissionAttempted = false;
       signButton.disabled = true;
       submitButton.disabled = true;
+      submitButton.textContent = "Submit to XRPL";
       preview.textContent = "No transaction prepared.";
     }
 
@@ -304,7 +307,7 @@
       connectButton.disabled = !visibilityReady || !owner || !PROJECT_ID || Boolean(signerReady);
       prepareButton.disabled = !signerReady || !pendingCommunity;
       if (!prepared) signButton.disabled = true;
-      if (!signedBlob) submitButton.disabled = true;
+      submitButton.disabled = submissionAttempted || !signedBlob;
     }
 
     function openVisibilityDialog(community, nextHidden) {
@@ -417,7 +420,7 @@
         const result = await signer.signTransaction(prepared.preparedTx);
         signedBlob = String(result.signedBlob || "");
         if (!signedBlob) throw new Error("Bifrost did not return a signed transaction.");
-        setModalStatus("Signed transaction returned by Bifrost. It has not been submitted yet.", "good");
+        setModalStatus("Signed transaction returned by Bifrost. It has not been submitted yet. Press Submit once; after that Wild Ledger will handle confirmation.", "good");
         submitButton.disabled = false;
       } catch (error) {
         signedBlob = "";
@@ -432,37 +435,56 @@
     async function submitVisibility() {
       try {
         if (!prepared || !signedBlob || !pendingCommunity) throw new Error("Sign the visibility transaction first.");
+        if (submissionAttempted) throw new Error("This signed transaction has already been submitted or is being checked. Do not submit it again.");
+
+        // From this point forward the Submit button never becomes available for
+        // this signed blob again. Wild Ledger owns confirmation/recovery.
+        submissionAttempted = true;
         submitButton.disabled = true;
-        setModalStatus("Final Owner authority check…");
+        submitButton.textContent = "Checking XRPL…";
+        setModalStatus("Submitting this signed transaction once. After broadcast, Wild Ledger will keep checking XRPL; do not submit it again.");
+
         const published = await submitCommunityVisibility({
           serverUrl: SERVER,
           signedBlob,
           expectedOwner: prepared.ownerAccount,
           communityId: prepared.communityId,
           hidden: prepared.hidden,
-          onSubmitted: ({ txHash }) => setModalStatus(`Accepted by XRPL (${txHash}). Waiting for validation…`)
+          onSubmitted: ({ txHash }) => {
+            submitButton.textContent = "Submitted — checking XRPL…";
+            setModalStatus(`Accepted by XRPL (${txHash}). Waiting for validation and canonical visibility reconstruction…`);
+          }
         });
+
         visibilityState = published.visibilityState;
         visibilityReady = true;
         renderList();
         const ledger = published.result.ledgerIndex ?? "?";
         visibilityNote.classList.remove("error");
         visibilityNote.textContent = `${prepared.communityId} is now ${prepared.hidden ? "hidden from" : "visible on"} the public Wild Ledger page. Owner-signed XRPL state validated in ledger ${ledger}.`;
-        setModalStatus(`Validated in ledger ${ledger}. Wild Ledger reconstructed ${prepared.communityId} as ${prepared.hidden ? "HIDDEN" : "VISIBLE"}.`, "good");
+        setModalStatus(
+          `${published.recovered ? "Confirmed from validated XRPL history" : "Validated"} in ledger ${ledger}. Wild Ledger reconstructed ${prepared.communityId} as ${prepared.hidden ? "HIDDEN" : "VISIBLE"}.`,
+          "good"
+        );
         preview.textContent = JSON.stringify({
           hash: published.result.txHash,
           ledger: published.result.ledgerIndex,
           memo: published.record.memo,
-          state: published.record.state
+          state: published.record.state,
+          recovered: Boolean(published.recovered)
         }, null, 2);
         signedBlob = "";
         prepared = null;
         signButton.disabled = true;
         submitButton.disabled = true;
+        submitButton.textContent = "Confirmed on XRPL";
         modalOwner.textContent = currentOwner();
       } catch (error) {
         setModalStatus(error?.message || String(error), "bad");
-        if (signedBlob) submitButton.disabled = false;
+        // Never re-enable Submit after an attempt. If confirmation is uncertain,
+        // the safe next action is Close + refresh, not a second broadcast.
+        submitButton.disabled = true;
+        submitButton.textContent = error?.doNotResubmit ? "Do not resubmit" : "Submission stopped";
       } finally {
         refreshModalButtons();
       }
