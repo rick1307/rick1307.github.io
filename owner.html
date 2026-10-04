@@ -250,6 +250,30 @@
     margin-top: 18px;
   }
 
+  .setup-fee-shortcut {
+    min-height: 46px;
+    padding: 6px 14px 7px;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1;
+  }
+
+  .setup-fee-amount {
+    color: #e5fff8;
+    font-size: .82rem;
+    font-weight: 950;
+    letter-spacing: .02em;
+    text-transform: none;
+  }
+
+  .setup-fee-label {
+    color: #b7f0df;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
 
 
   .dashboard-group {
@@ -641,7 +665,10 @@
         <h1 id="owner-title">Owner Console</h1>
         <p class="intro">Central administration for Wild Ledger. Manage communities, platform settings, operations, and oversight from one place.</p>
         <div class="owner-shortcuts" aria-label="Owner tools">
-          <a class="professional-library-link wl-header-control" href="communitySetupFee.html" aria-label="Open Community Setup Fee" title="Open Community Setup Fee">Setup Fee</a>
+          <a class="professional-library-link wl-header-control setup-fee-shortcut" id="setupFeeShortcut" href="communitySetupFee.html" aria-label="Open Community Setup Fee" title="Open Community Setup Fee">
+            <span class="setup-fee-amount" id="setupFeeAmount">…</span>
+            <span class="setup-fee-label">Setup Fee</span>
+          </a>
         </div>
       </header>
 
@@ -785,6 +812,7 @@
   <script src="js/communityConfig.js"></script>
   <script type="module">
   import { resolveCommunityAuthority } from "./js/communityAuthority.js";
+  import { readCommunitySetupFee } from "./js/communitySetup.js";
 
   (() => {
     const FALLBACK_CONFIG = Object.freeze({
@@ -801,6 +829,38 @@
     const leapCurrency = String(config.leapCurrency || FALLBACK_CONFIG.leapCurrency || "").trim().toUpperCase();
     const distributorAccounts = new Set(Array.isArray(config.leapDistributors) ? config.leapDistributors : []);
     const xrplWebSocket = config.xrplWebSocket || FALLBACK_CONFIG.xrplWebSocket;
+
+    const setupFeeShortcut = document.getElementById("setupFeeShortcut");
+    const setupFeeAmount = document.getElementById("setupFeeAmount");
+
+    async function loadSetupFeeShortcut() {
+      if (!setupFeeAmount) return;
+      setupFeeAmount.textContent = "…";
+      try {
+        const state = await readCommunitySetupFee({ serverUrl: xrplWebSocket, force: true });
+        if (state?.current?.xrp) {
+          const label = `${state.current.xrp} XRP`;
+          setupFeeAmount.textContent = label;
+          if (setupFeeShortcut) {
+            setupFeeShortcut.setAttribute("aria-label", `Current setup fee ${label}. Open Community Setup Fee.`);
+            setupFeeShortcut.title = `Current setup fee: ${label}`;
+          }
+        } else {
+          setupFeeAmount.textContent = "Not Set";
+          if (setupFeeShortcut) {
+            setupFeeShortcut.setAttribute("aria-label", "Setup fee is not set. Open Community Setup Fee.");
+            setupFeeShortcut.title = "Setup fee is not set";
+          }
+        }
+      } catch (error) {
+        console.error("Wild Ledger setup fee status:", error);
+        setupFeeAmount.textContent = "—";
+        if (setupFeeShortcut) {
+          setupFeeShortcut.setAttribute("aria-label", "Setup fee unavailable. Open Community Setup Fee.");
+          setupFeeShortcut.title = "Setup fee unavailable";
+        }
+      }
+    }
 
     const communityRegistry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
     const communityRecords = Object.values(communityRegistry).filter(community => community?.leapNamespace);
@@ -1496,6 +1556,7 @@
       });
     }
 
+    loadSetupFeeShortcut();
     loadLeapDashboard();
     window.addEventListener("resize", fitAllMetricValues);
     window.addEventListener("orientationchange", () => setTimeout(fitAllMetricValues, 120));
