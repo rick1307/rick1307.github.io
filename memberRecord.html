@@ -429,7 +429,7 @@
 
     .record-grid{
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(2,minmax(0,1fr));
       gap:9px;
     }
 
@@ -475,27 +475,32 @@
     }
 
     .record-stat.community-totals{
+      grid-column:1 / -1;
       display:grid;
-      grid-template-rows:auto repeat(4,1fr);
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-rows:auto auto;
       gap:0;
-      padding:8px 10px;
+      padding:10px 12px 12px;
     }
 
     .recognition-summary-label{
-      margin:0 0 2px !important;
+      grid-column:1 / -1;
+      margin:0 0 6px !important;
     }
 
     .community-total-row{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) auto;
-      align-items:center;
-      gap:10px;
-      min-height:0;
-      padding:5px 0;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:4px;
+      min-width:0;
+      min-height:48px;
+      padding:7px 12px;
     }
 
     .community-total-row + .community-total-row{
-      border-top:1px solid rgba(255,255,255,.08);
+      border-left:1px solid rgba(255,255,255,.08);
     }
 
     .community-total-row span{
@@ -511,10 +516,10 @@
     .community-total-row strong{
       color:white;
       font-family:var(--community-display-font);
-      font-size:1.04rem;
+      font-size:1.12rem;
       font-weight:700;
       line-height:1;
-      text-align:right;
+      text-align:left;
     }
 
     .community-total-row.great-chat-total span,
@@ -1050,6 +1055,12 @@
         font-size:.66rem;
       }
       .record-grid{grid-template-columns:1fr 1fr}
+      .record-stat.community-totals{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-rows:auto auto auto;
+      }
+      .community-total-row:nth-of-type(3){border-left:0}
+      .community-total-row:nth-of-type(n+3){border-top:1px solid rgba(255,255,255,.08)}
       .pending-check-card{
         grid-template-columns:minmax(0,1fr) 100px;
         grid-template-areas:"main deadline";
@@ -1194,7 +1205,6 @@
         <div class="record-grid">
           <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong></div>
           <div class="record-stat"><b>Earned LEAP</b><strong id="recordEarned">—</strong><small id="recordEarnedNote" hidden></small></div>
-          <div class="record-stat"><b>Rank</b><strong id="recordRank">—</strong><small id="recordRankNote" hidden></small></div>
           <div class="record-stat community-totals" aria-label="Recognition totals">
             <b class="recognition-summary-label">Recognition</b>
             <div class="community-total-row great-chat-total"><span>Great Chats</span><strong id="recordGreatChats">—</strong></div>
@@ -1349,8 +1359,6 @@
       const leapEl = document.getElementById("recordLeap");
       const earnedEl = document.getElementById("recordEarned");
       const earnedNoteEl = document.getElementById("recordEarnedNote");
-      const rankEl = document.getElementById("recordRank");
-      const rankNoteEl = document.getElementById("recordRankNote");
       const greatChatsEl = document.getElementById("recordGreatChats");
       const badgesEl = document.getElementById("recordBadges");
       const challengesEl = document.getElementById("recordChallenges");
@@ -1969,8 +1977,6 @@
         leapEl.textContent = "—";
         earnedEl.textContent = "—";
         earnedNoteEl.textContent = `in ${communityName}`;
-        rankEl.textContent = "—";
-        rankNoteEl.textContent = `In ${communityName}`;
 
         progressLabel.textContent = "Rank progress";
         progressValue.textContent = "—";
@@ -2948,14 +2954,6 @@
 
         const earnedRank = rankFor(total);
 
-        if (total <= 0) {
-          rankEl.textContent = "Unranked";
-          rankNoteEl.textContent = `In ${communityName}`;
-        } else {
-          rankEl.textContent = earnedRank.name;
-          rankNoteEl.textContent = `In ${communityName}`;
-        }
-
         progressLabel.textContent = earnedRank.name;
 
         if (earnedRank.threshold === null) {
@@ -3112,10 +3110,8 @@
           ? String(balance)
           : String(Number(balance.toFixed(6)));
 
-        // Current wallet balance is a holdings fact only. Rank is rendered
-        // separately from reconstructed Earned LEAP history.
-        rankEl.textContent = "—";
-        rankNoteEl.textContent = `In ${communityName}`;
+        // Current wallet balance is a holdings fact only. Rank progress is
+        // rendered separately from reconstructed Earned LEAP history.
         progressLabel.textContent = "Rank progress";
         progressValue.textContent = "—";
         progressFill.style.width = "0%";
@@ -3210,8 +3206,6 @@
             greatChatsEl.textContent = "—";
             earnedEl.textContent = "—";
             earnedNoteEl.textContent = `in ${communityName}`;
-            rankEl.textContent = "Unavailable";
-            rankNoteEl.textContent = "Earned LEAP history unavailable";
             progressLabel.textContent = "Rank progress";
             progressValue.textContent = "—";
             progressFill.style.width = "0%";
