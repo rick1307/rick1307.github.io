@@ -315,6 +315,44 @@ export async function prepareCommunityVisibility({
   };
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function waitForExpectedVisibility({
+  serverUrl,
+  communityId,
+  hidden,
+  timeoutMs = 65000,
+  pollIntervalMs = 2200
+}) {
+  const deadline = Date.now() + Number(timeoutMs);
+  let lastError = null;
+
+  while (Date.now() < deadline) {
+    try {
+      CACHE.delete(serverUrl);
+      clearOwnerAuthorityCache();
+      const state = await readCommunityVisibility({ serverUrl, force: true });
+      const record = state.visibility.get(communityId) || null;
+      if (record && record.hidden === Boolean(hidden)) {
+        return { state, record };
+      }
+    } catch (error) {
+      lastError = error;
+    }
+    await sleep(Number(pollIntervalMs));
+  }
+
+  return { state: null, record: null, lastError };
+}
+
+function recoveryWorthySubmitError(error, acceptedSubmission) {
+  if (acceptedSubmission) return true;
+  const message = String(error?.message || error || "");
+  return /too busy|server busy|temporar|timeout|timed out|connection|closed|network|tefPAST_SEQ|past_seq/i.test(message);
+}
+
 export async function submitCommunityVisibility({
   serverUrl,
   signedBlob,
@@ -335,11 +373,79 @@ export async function submitCommunityVisibility({
     throw new Error("Owner authority changed after preparation. Prepare a new visibility transaction.");
   }
 
-  const result = await submitSignedTransaction({
-    serverUrl: server,
-    signedBlob,
-    onSubmitted
-  });
+  // If this exact state is already canonical, never send another transaction.
+  // This also makes a retry after an uncertain browser/server response harmless.
+  try {
+    const existing = await readCommunityVisibility({ serverUrl: server, force: true });
+    const existingRecord = existing.visibility.get(id) || null;
+    if (existingRecord && existingRecord.hidden === Boolean(hidden)) {
+      return {
+        result: {
+          txHash: existingRecord.hash || "",
+          ledgerIndex: existingRecord.ledger ?? null,
+          validated: true,
+          finalResult: "tesSUCCESS",
+          alreadyCanonical: true
+        },
+        visibilityState: existing,
+        record: existingRecord,
+        recovered: true,
+        alreadyCanonical: true
+      };
+    }
+  } catch (_) {
+    // A pre-submit history read is a safety check, not a reason to block a valid first attempt.
+  }
+
+  let acceptedSubmission = null;
+  let result = null;
+
+  try {
+    result = await submitSignedTransaction({
+      serverUrl: server,
+      signedBlob,
+      onSubmitted: details => {
+        acceptedSubmission = details || {};
+        if (typeof onSubmitted === "function") onSubmitted(details);
+      }
+    });
+  } catch (error) {
+    if (!recoveryWorthySubmitError(error, acceptedSubmission)) throw error;
+
+    // Once the signed transaction may have reached XRPL, do not ask the person
+    // to press Submit again. Confirm the intended state directly from validated
+    // Owner history instead. This safely handles transient "server busy" errors
+    // and tefPAST_SEQ responses from accidental resubmission of the same blob.
+    const recovered = await waitForExpectedVisibility({
+      serverUrl: server,
+      communityId: id,
+      hidden: Boolean(hidden)
+    });
+
+    if (recovered.record) {
+      return {
+        result: {
+          txHash: acceptedSubmission?.txHash || error?.txHash || recovered.record.hash || "",
+          ledgerIndex: recovered.record.ledger ?? null,
+          validated: true,
+          finalResult: "tesSUCCESS",
+          recoveredAfterSubmitError: true
+        },
+        visibilityState: recovered.state,
+        record: recovered.record,
+        recovered: true
+      };
+    }
+
+    const pending = new Error(
+      "XRPL may already have received this signed transaction, but Wild Ledger could not confirm the final visibility state yet. Do not submit it again. Close this window and refresh Communities so Wild Ledger can reread validated XRPL history."
+    );
+    pending.doNotResubmit = true;
+    pending.txHash = acceptedSubmission?.txHash || error?.txHash || "";
+    pending.cause = error;
+    throw pending;
+  }
+
   if (result.finalResult !== "tesSUCCESS") {
     throw new Error(`Validated visibility transaction returned ${result.finalResult}.`);
   }
@@ -349,7 +455,12 @@ export async function submitCommunityVisibility({
   const after = await readCommunityVisibility({ serverUrl: server, force: true });
   const record = after.visibility.get(id) || null;
   if (!record || record.hidden !== Boolean(hidden)) {
-    throw new Error("The transaction validated, but Wild Ledger did not reconstruct the expected visibility state.");
+    const pending = new Error(
+      "The transaction validated, but Wild Ledger has not reconstructed the expected visibility state yet. Do not submit it again. Close this window and refresh Communities."
+    );
+    pending.doNotResubmit = true;
+    pending.txHash = result.txHash || "";
+    throw pending;
   }
 
   return { result, visibilityState: after, record };
