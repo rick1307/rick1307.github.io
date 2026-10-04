@@ -324,7 +324,7 @@
           <article class="wallet-card">
             <div class="wallet-role">Protocol Ownership</div>
             <h4>Owner Wallet</h4>
-            <p>The Owner Wallet holds protocol-level Owner authority. It may establish the first Community Operating Wallet for a brand-new Community ID and may transfer Owner authority to a successor Owner Wallet. Once a community is established, the Owner Wallet does not take over that community's day-to-day authority.</p>
+            <p>The Owner Wallet holds protocol-level Owner authority. It may establish the first Community Operating Wallet for a brand-new Community ID, transfer Owner authority to a successor Owner Wallet, and publish separate Wild Ledger application state such as public visibility and the current community setup fee. Once a community is established, the Owner Wallet does not take over that community's day-to-day authority.</p>
           </article>
           <article class="wallet-card">
             <div class="wallet-role">Community Operations</div>
@@ -381,7 +381,7 @@
       <div class="lesson-block">
         <span class="lesson-kicker">1.5 · Owner Wallet State</span>
         <h3>Owner authority can move, but it does not become community authority</h3>
-        <p>The current Owner Wallet may transfer Owner authority to a successor Owner Wallet. That replacement changes who holds Owner authority from that ledger position forward. It does not give the Owner Wallet continuing power to replace an already-established community's Operating Wallet.</p>
+        <p>The current Owner Wallet may transfer Owner authority to a successor Owner Wallet. That replacement changes who holds Owner authority from that ledger position forward. The Owner Wallet may also publish separate Wild Ledger application state such as public visibility and the current community setup fee. Those application records do not give the Owner Wallet continuing power to replace an already-established community's Operating Wallet.</p>
         <div class="lesson"><strong>Keep the boundary clear</strong><p>The Owner Wallet can establish the first Operating Wallet for a brand-new Community ID. After establishment, only the currently authorized Community Operating Wallet controls ordinary succession to a new Operating Wallet. The Owner does not seize, recover, or replace that wallet authority.</p></div>
       </div>
 
@@ -403,7 +403,7 @@
 
         <div class="lesson"><strong>A setup fee does not create a managed account</strong><p>Wild Ledger is designed to know less about Operators and members, not more. A setup payment, if required, pays for Wild Ledger provisioning; it does not create protocol authority, key custody, wallet recovery rights, or a conventional hosted-account relationship.</p></div>
 
-        <div class="warning"><strong>Protocol boundary.</strong> LEAP Protocol 0.21 defines Owner-signed Wild Ledger public-visibility state, but <code>HIDDEN</code> is presentation state only. It does not deactivate, erase, suspend, or transfer an established community. A hidden community remains canonical XRPL history with the same Community ID and Operating Wallet authority.</div>
+        <div class="warning"><strong>Protocol boundary.</strong> LEAP Protocol 0.22 keeps community LEAP records separate from Wild Ledger application/business records. Wild Ledger handles the underlying application-record syntax so Operators do not need to know or construct it. A hidden community remains canonical XRPL history, and a paid setup request still does not create a community until the Owner provisions its first Operating Wallet.</div>
 
         <div class="rule">Wild Ledger does not recover communities and does not seize communities. An Operator is responsible for the wallet that carries the community's authority.</div>
       </div>
@@ -411,7 +411,7 @@
       <div class="lesson-block" id="community-visibility">
         <span class="lesson-kicker">1.7 · Public Visibility</span>
         <h3>Hidden changes the directory, not the community</h3>
-        <p>The current Owner Wallet may publish Wild Ledger application visibility for an already-established community using an Owner-signed validated no-op <code>AccountSet</code> memo: <code>WILD-LEDGER/VISIBILITY/&lt;COMMUNITY-ID&gt;=HIDDEN</code> or <code>...=VISIBLE</code>.</p>
+        <p>The current Owner Wallet may change whether an already-established community appears in Wild Ledger's public directory. Wild Ledger records that decision on XRPL and reconstructs the latest valid Owner state automatically. Operators do not need to know or construct the underlying application record.</p>
         <div class="checklist"><ul>
           <li><strong>No visibility statement means Visible.</strong> Wild Ledger shows the community publicly unless a later valid Owner statement says otherwise.</li>
           <li><strong>Latest valid state wins.</strong> Wild Ledger reconstructs visibility from validated Owner history and historical Owner authority.</li>
@@ -427,11 +427,28 @@
         <div class="checklist"><ul>
           <li><strong>Connect; do not type.</strong> The request flow obtains the account from the connected wallet so a mistyped or invented address cannot become the requested Operating Wallet.</li>
           <li><strong>Use the wallet you intend to keep.</strong> The Operator should connect an account they control and expect to retain because that account will carry community authority after provisioning.</li>
-          <li><strong>Setup payment comes from the same wallet.</strong> If Wild Ledger requires a setup fee, the XRP payment is made from that connected account. Payment is an operating/business condition only; it does not create the community.</li>
+          <li><strong>Setup payment comes from the same wallet.</strong> The native-XRP setup payment is made from that connected account to the current Owner Wallet. Wild Ledger records the payment as a community request on XRPL; the Operator does not need to construct the underlying ledger record.</li>
+          <li><strong>Payment is not provisioning.</strong> A valid setup payment satisfies the Wild Ledger business condition only. It does not reserve a Community ID, award LEAP, or create community authority.</li>
           <li><strong>Owner provisioning creates the community.</strong> Only the current Owner Wallet's valid provisioning transaction establishes the new Community ID and first Operating Wallet on XRPL.</li>
-          <li><strong>The same wallet is the return path.</strong> After provisioning, the Operator can return to Wild Ledger, connect that wallet, and Wild Ledger can discover which community it operates from validated XRPL history. A separate username, password, personal email address, or legal-name profile is not required for that authority relationship.</li>
+          <li><strong>The same wallet is the return path.</strong> After payment, Member Record can show that the request is waiting. After provisioning, the same wallet can be used to discover and enter the community. A separate username, password, personal email address, or legal-name profile is not required for that authority relationship.</li>
         </ul></div>
-        <div class="lesson"><strong>Privacy by design</strong><p>The business process should collect no more than it needs. The connected XRPL account and validated payment/provisioning history can carry the durable relationship without creating a conventional personal account database.</p></div>
+        <div class="lesson"><strong>What happens after payment</strong><p>After a valid request payment, the prospective Operator is done. Wild Ledger alerts the Owner for provisioning. Community setup is normally handled through the Owner workflow and is usually completed within 24 hours. The Operator can return through Member Record to see whether the request is still waiting or the community is ready.</p></div>
+        <div class="lesson"><strong>Privacy by design</strong><p>The business process should collect no more than it needs. The connected XRPL account and validated payment/provisioning history can carry the durable relationship without creating a conventional personal account database. Any email alert used by Wild Ledger is an operations notification, not the authoritative record of the request.</p></div>
+      </div>
+
+      <div class="lesson-block" id="community-setup-fee">
+        <span class="lesson-kicker">1.9 · Community Setup Fee &amp; Request Record</span>
+        <h3>The price can change; the ledger preserves which price applied</h3>
+        <p>The current Wild Ledger community setup fee is controlled by the current Owner Wallet and recorded by Wild Ledger on XRPL. Operator-facing screens show the amount in XRP; Wild Ledger handles the underlying ledger format.</p>
+        <div class="checklist"><ul>
+          <li><strong>The exact amount is preserved.</strong> Wild Ledger records the fee precisely in native-XRP drops while presenting a simple XRP amount to the person using the form.</li>
+          <li><strong>The current Owner controls the fee.</strong> Wild Ledger reconstructs the latest valid Owner-published setup fee from XRPL history.</li>
+          <li><strong>The request payment has one meaning.</strong> Wild Ledger records the native-XRP setup payment as a request to start a community. The person using the form does not need to know or build the ledger memo that carries that meaning.</li>
+          <li><strong>Historical price is honored.</strong> A request is judged against the valid Owner Wallet and setup fee that were in force immediately before that payment. A later price change does not invalidate or increase an earlier valid request.</li>
+          <li><strong>The request wallet matters.</strong> The sender of the valid request payment is the wallet Wild Ledger expects the Owner to provision as the first Community Operating Wallet.</li>
+          <li><strong>Business state stays separate from LEAP state.</strong> Setup-fee state and request payments do not create recognition, Earned LEAP, rank, or community authority.</li>
+        </ul></div>
+        <div class="lesson"><strong>Owner operating procedure</strong><p>Use the Owner Setup Fee control to publish or change the current fee; do not hand-build the underlying XRPL record. Before provisioning a new community, verify the applicant wallet's validated request payment against historical Owner authority and the setup fee in force at that payment's ledger position. Then provision the exact requesting wallet under a new Community ID.</p></div>
       </div>
     </div>
   </section>
