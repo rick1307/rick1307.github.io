@@ -366,9 +366,6 @@ try {
     onUpdate(update) {
       latestCommunities = update.communities;
       if (visibilityState) render(publicCommunities(latestCommunities, visibilityState));
-      if (update.stage === "owner") {
-        liveState.textContent = "Live Owner XRPL communities loaded · checking Owner-signed visibility…";
-      }
     }
   });
 
