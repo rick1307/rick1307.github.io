@@ -8,11 +8,9 @@
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:#080b0a}
 body{
+  height:100svh;
   min-height:100svh;
-  display:grid;
-  place-items:center;
-  overflow-x:hidden;
-  overflow-y:auto;
+  overflow:hidden;
   color:#f7f1df;
   font-family:Impact,Haettenschweiler,"Arial Narrow Bold",system-ui,sans-serif;
 }
@@ -35,9 +33,53 @@ body:after{
 .stage{
   position:relative;
   z-index:1;
-  width:min(980px,92vw);
+  width:100%;
+  height:100svh;
   text-align:center;
-  padding:44px 0;
+  --brand-h:390px;
+}
+.brand-header{
+  position:absolute;
+  z-index:5;
+  top:0;
+  left:50%;
+  width:min(980px,92vw);
+  transform:translateX(-50%);
+  padding:44px 0 38px;
+  pointer-events:none;
+}
+.community-scroll{
+  position:absolute;
+  z-index:2;
+  inset:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  scrollbar-width:none;
+  padding-top:var(--brand-h);
+  -webkit-mask-image:linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--brand-h) - 58px),
+    rgba(0,0,0,.22) calc(var(--brand-h) - 38px),
+    #000 var(--brand-h),
+    #000 100%
+  );
+  mask-image:linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--brand-h) - 58px),
+    rgba(0,0,0,.22) calc(var(--brand-h) - 38px),
+    #000 var(--brand-h),
+    #000 100%
+  );
+}
+.community-scroll::-webkit-scrollbar{display:none}
+.scroll-content{
+  width:min(980px,92vw);
+  margin:0 auto;
+  padding:0 0 max(44px,env(safe-area-inset-bottom));
 }
 .eyebrow{
   display:inline-block;
@@ -60,7 +102,7 @@ h1{
   transform:rotate(-1.5deg);
 }
 .tag{
-  margin:28px auto 38px;
+  margin:28px auto 0;
   max-width:680px;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:clamp(13px,2vw,17px);
@@ -243,12 +285,13 @@ h1{
   color:#827d70;
 }
 @media(max-width:650px){
-  .stage{width:min(90vw,500px)}
+  .brand-header,.scroll-content{width:min(90vw,500px)}
+  .brand-header{padding:36px 0 30px}
   h1{font-size:clamp(68px,23vw,120px)}
   .directory-shell{min-height:150px}
   .doors{grid-template-columns:1fr;gap:18px}
   .door{min-height:150px}
-  .tag{margin:24px auto 30px}
+  .tag{margin:24px auto 0}
 }
 @media(prefers-reduced-motion:reduce){
   body:before{animation:none}
@@ -259,31 +302,48 @@ h1{
 </head>
 <body>
 <main class="stage">
-  <div class="eyebrow">One LEAP · Many Communities</div>
-  <h1>Wild<br>Ledger</h1>
-  <div class="tag">Pick your community. Join the action.</div>
+  <header class="brand-header" id="brandHeader">
+    <div class="eyebrow">One LEAP · Many Communities</div>
+    <h1>Wild<br>Ledger</h1>
+    <div class="tag">Pick your community. Join the action.</div>
+  </header>
 
-  <div class="directory-shell" id="communityDirectory">
-    <div class="loading-spinner-wrap" id="communitySpinner" aria-hidden="true">
-      <div class="activity-spinner">
-        <span></span><span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span><span></span>
+  <div class="community-scroll" id="communityScroll">
+    <div class="scroll-content">
+      <div class="directory-shell" id="communityDirectory">
+        <div class="loading-spinner-wrap" id="communitySpinner" aria-hidden="true">
+          <div class="activity-spinner">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="doors" id="communityDoors" aria-live="polite"></div>
       </div>
+      <div class="live-state" id="communityLiveState">Reading validated XRPL community history…</div>
+
+      <a class="faq-link" href="leapFaq.html">LEAP FAQ</a>
+
+      <div class="footer">Powered by LEAP on the XRP Ledger</div>
+
+      <a class="start-link" href="startCommunity.html">Start a Community</a>
     </div>
-    <div class="doors" id="communityDoors" aria-live="polite"></div>
   </div>
-  <div class="live-state" id="communityLiveState">Reading validated XRPL community history…</div>
-
-  <a class="faq-link" href="leapFaq.html">LEAP FAQ</a>
-
-  <div class="footer">Powered by LEAP on the XRP Ledger</div>
-
-  <a class="start-link" href="startCommunity.html">Start a Community</a>
 </main>
 <script src="js/wildLedgerConfig.js"></script>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script type="module">
 import { readCommunityVisibility, communityIsHidden } from "./js/communityVisibility.js?wl=20261004xrpl1";
+
+const stage = document.querySelector(".stage");
+const brandHeader = document.getElementById("brandHeader");
+function syncBrandHeight() {
+  if (!stage || !brandHeader) return;
+  const height = Math.ceil(brandHeader.getBoundingClientRect().height);
+  stage.style.setProperty("--brand-h", `${height}px`);
+}
+syncBrandHeight();
+window.addEventListener("resize", syncBrandHeight, { passive:true });
+if (document.fonts?.ready) document.fonts.ready.then(syncBrandHeight).catch(() => {});
 
 const directory = document.getElementById("communityDirectory");
 const doors = document.getElementById("communityDoors");
