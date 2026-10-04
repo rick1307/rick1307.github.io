@@ -388,7 +388,7 @@
       <div class="lesson-block">
         <span class="lesson-kicker">1.6 · Community Responsibility &amp; Continuity</span>
         <h3>Wild Ledger does not provide custody or wallet recovery</h3>
-        <p>Under the current operating model, creating and running a Wild Ledger community does not require a fee to Wild Ledger. That does not turn Wild Ledger into a custodian, wallet-recovery service, or guarantor of continued community operation. The Operator is responsible for maintaining access to the Community Operating Wallet and for naming a successor while that wallet can still sign.</p>
+        <p>Creating and running a Wild Ledger community does not turn Wild Ledger into a custodian, wallet-recovery service, or guarantor of continued community operation. Wild Ledger may require a setup fee before provisioning a new community; that fee is a Wild Ledger business condition, not a LEAP Protocol act and not a source of community authority. The Operator is responsible for maintaining access to the Community Operating Wallet and for naming a successor while that wallet can still sign.</p>
 
         <div class="checklist">
           <ul>
@@ -401,11 +401,37 @@
           </ul>
         </div>
 
-        <div class="lesson"><strong>Free participation does not imply managed service</strong><p>Wild Ledger is designed to know less about Operators and members, not more. It does not require a conventional hosted-account relationship in order to establish community authority on XRPL, and it does not assume responsibility for an Operator's wallet access merely because the community uses Wild Ledger.</p></div>
+        <div class="lesson"><strong>A setup fee does not create a managed account</strong><p>Wild Ledger is designed to know less about Operators and members, not more. A setup payment, if required, pays for Wild Ledger provisioning; it does not create protocol authority, key custody, wallet recovery rights, or a conventional hosted-account relationship.</p></div>
 
-        <div class="warning"><strong>Protocol boundary.</strong> LEAP Protocol 0.20 does not yet define a canonical on-ledger Owner transaction that permanently deactivates an established community. Until the Protocol defines that rule, a Wild Ledger decision to stop listing, presenting, or supporting a community as active is an operating decision and must not be misrepresented as canonical LEAP Protocol state.</div>
+        <div class="warning"><strong>Protocol boundary.</strong> LEAP Protocol 0.21 defines Owner-signed Wild Ledger public-visibility state, but <code>HIDDEN</code> is presentation state only. It does not deactivate, erase, suspend, or transfer an established community. A hidden community remains canonical XRPL history with the same Community ID and Operating Wallet authority.</div>
 
         <div class="rule">Wild Ledger does not recover communities and does not seize communities. An Operator is responsible for the wallet that carries the community's authority.</div>
+      </div>
+
+      <div class="lesson-block" id="community-visibility">
+        <span class="lesson-kicker">1.7 · Public Visibility</span>
+        <h3>Hidden changes the directory, not the community</h3>
+        <p>The current Owner Wallet may publish Wild Ledger application visibility for an already-established community using an Owner-signed validated no-op <code>AccountSet</code> memo: <code>WILD-LEDGER/VISIBILITY/&lt;COMMUNITY-ID&gt;=HIDDEN</code> or <code>...=VISIBLE</code>.</p>
+        <div class="checklist"><ul>
+          <li><strong>No visibility statement means Visible.</strong> Wild Ledger shows the community publicly unless a later valid Owner statement says otherwise.</li>
+          <li><strong>Latest valid state wins.</strong> Wild Ledger reconstructs visibility from validated Owner history and historical Owner authority.</li>
+          <li><strong>Hidden is presentation only.</strong> It removes the community from Wild Ledger's public community selector. It does not change the Community ID, Operating Wallet authority, recognition history, allocations, Earned LEAP, or rank.</li>
+          <li><strong>The Owner still sees it.</strong> A hidden community remains in Owner operations because it still exists on XRPL.</li>
+        </ul></div>
+      </div>
+
+      <div class="lesson-block" id="community-onboarding">
+        <span class="lesson-kicker">1.8 · Starting a New Community</span>
+        <h3>The request wallet becomes the first Community Operating Wallet</h3>
+        <p>A prospective Operator does not type an XRPL address into a request form. The Operator connects the XRPL wallet they intend to use, Wild Ledger verifies that account on validated XRPL Mainnet, and that connected account becomes the requested first Community Operating Wallet.</p>
+        <div class="checklist"><ul>
+          <li><strong>Connect; do not type.</strong> The request flow obtains the account from the connected wallet so a mistyped or invented address cannot become the requested Operating Wallet.</li>
+          <li><strong>Use the wallet you intend to keep.</strong> The Operator should connect an account they control and expect to retain because that account will carry community authority after provisioning.</li>
+          <li><strong>Setup payment comes from the same wallet.</strong> If Wild Ledger requires a setup fee, the XRP payment is made from that connected account. Payment is an operating/business condition only; it does not create the community.</li>
+          <li><strong>Owner provisioning creates the community.</strong> Only the current Owner Wallet's valid provisioning transaction establishes the new Community ID and first Operating Wallet on XRPL.</li>
+          <li><strong>The same wallet is the return path.</strong> After provisioning, the Operator can return to Wild Ledger, connect that wallet, and Wild Ledger can discover which community it operates from validated XRPL history. A separate username, password, personal email address, or legal-name profile is not required for that authority relationship.</li>
+        </ul></div>
+        <div class="lesson"><strong>Privacy by design</strong><p>The business process should collect no more than it needs. The connected XRPL account and validated payment/provisioning history can carry the durable relationship without creating a conventional personal account database.</p></div>
       </div>
     </div>
   </section>
@@ -759,6 +785,7 @@
   const requestedRole = (params.get('role') || 'owner').trim().toLowerCase();
   const role = requestedRole === 'operator' || requestedRole === 'manager' ? 'operator' : 'owner';
   const community = (params.get('community') || '').trim().toUpperCase();
+  const from = (params.get('from') || '').trim().toLowerCase();
 
   document.documentElement.dataset.role = role;
 
@@ -781,11 +808,16 @@
   }
 
   if (backLink) {
-    backLink.textContent = '← View Community Library';
-    const returnParams = new URLSearchParams();
-    returnParams.set('role', role);
-    if (community) returnParams.set('community', community);
-    backLink.href = `../viewCommunityLibrary.html?${returnParams.toString()}`;
+    if (from === 'start-community') {
+      backLink.textContent = '← Start a Wild Ledger Community';
+      backLink.href = '../startCommunity.html';
+    } else {
+      backLink.textContent = '← View Community Library';
+      const returnParams = new URLSearchParams();
+      returnParams.set('role', role);
+      if (community) returnParams.set('community', community);
+      backLink.href = `../viewCommunityLibrary.html?${returnParams.toString()}`;
+    }
   }
 })();
 </script>
