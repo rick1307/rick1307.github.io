@@ -118,6 +118,20 @@ h1{
 }
 .frog{background:#7fffd4;transform:rotate(1deg)}
 .zach{background:#ff6a00;transform:rotate(-1.5deg)}
+.live-community{background:#f7f1df;transform:rotate(.4deg)}
+.door.pending{cursor:default;background:#d9d0ba;color:#0a0c0b;opacity:.78}
+.door.pending:hover,.door.pending:focus-visible{transform:rotate(.4deg);box-shadow:9px 10px 0 #000}
+.live-state{
+  margin:28px auto 0;
+  max-width:820px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#827d70;
+}
+.live-state.error{color:#ff8a66}
 .faq-link{
   display:inline-block;
   margin-top:34px;
@@ -166,21 +180,86 @@ h1{
   <h1>Wild<br>Ledger</h1>
   <div class="tag">Pick your community. Join the action.</div>
 
-  <div class="doors">
-    <a class="door frog" href="index.html?community=sfl">
-      <span class="small">Come aboard</span>
-      <span class="name">Sailing Frog's Leap</span>
-    </a>
-
-    <a class="door zach" href="index.html?community=zach">
-      <span class="small">Fire it up</span>
-      <span class="name">Zach's Hot Rods</span>
-    </a>
-  </div>
+  <div class="doors" id="communityDoors" aria-live="polite"></div>
+  <div class="live-state" id="communityLiveState">Reading validated XRPL community history…</div>
 
   <a class="faq-link" href="leapFaq.html">LEAP FAQ</a>
 
   <div class="footer">Powered by LEAP on the XRP Ledger</div>
 </main>
+<script src="js/wildLedgerConfig.js"></script>
+<script src="js/communityConfig.js" data-registry-only="true"></script>
+<script type="module">
+const doors = document.getElementById("communityDoors");
+const liveState = document.getElementById("communityLiveState");
+
+function cardTone(community) {
+  if (community.communityId === "SFL") return "frog";
+  if (community.communityId === "ZHR") return "zach";
+  return "live-community";
+}
+
+function cardEyebrow(community) {
+  if (!community.publicReady) return "Setup pending";
+  if (community.communityId === "SFL") return "Come aboard";
+  if (community.communityId === "ZHR") return "Fire it up";
+  return community.directoryStatus || "Community";
+}
+
+function communityDoor(community) {
+  const ready = Boolean(community.publicReady);
+  const card = document.createElement(ready ? "a" : "div");
+  card.className = `door ${cardTone(community)}${ready ? "" : " pending"}`;
+
+  if (ready) {
+    const configId = String(community.config?.id || community.communityId || "").trim();
+    card.href = `index.html?community=${encodeURIComponent(configId)}`;
+  } else {
+    card.setAttribute("aria-label", `${community.communityName || community.communityId} — setup pending`);
+  }
+
+  const small = document.createElement("span");
+  small.className = "small";
+  small.textContent = cardEyebrow(community);
+
+  const name = document.createElement("span");
+  name.className = "name";
+  name.textContent = community.communityName || community.communityId;
+
+  card.append(small, name);
+  return card;
+}
+
+function render(communities) {
+  doors.replaceChildren();
+  communities.forEach(community => doors.appendChild(communityDoor(community)));
+}
+
+try {
+  const { discoverWildLedgerCommunities } = await import("./js/communityDiscovery.js?wl=20261004b");
+  const result = await discoverWildLedgerCommunities({
+    force: true,
+    onUpdate(update) {
+      render(update.communities);
+      if (update.stage === "owner") {
+        liveState.textContent = "Live Owner XRPL communities loaded · checking legacy community authority…";
+      }
+    }
+  });
+
+  render(result.communities);
+  liveState.textContent = result.communities.length
+    ? `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`
+    : "No communities were found.";
+
+  if (result.warnings?.length) {
+    liveState.textContent += ` · ${result.warnings.join(" ")}`;
+  }
+} catch (error) {
+  doors.replaceChildren();
+  liveState.classList.add("error");
+  liveState.textContent = `Community list temporarily unavailable: ${error?.message || String(error)}`;
+}
+</script>
 </body>
 </html>
