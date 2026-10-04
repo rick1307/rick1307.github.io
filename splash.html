@@ -123,20 +123,19 @@ h1{
   gap:20px;
   max-width:820px;
   margin:auto;
-  opacity:0;
+  opacity:1;
   transform:translateY(8px);
   pointer-events:none;
-  transition:opacity .42s ease .10s,transform .42s cubic-bezier(.2,.8,.2,1) .10s;
+  transition:transform .72s cubic-bezier(.2,.8,.2,1);
 }
 .directory-shell.ready .doors{
-  opacity:1;
   transform:translateY(0);
   pointer-events:auto;
 }
 .community-scroll{
   opacity:0;
   pointer-events:none;
-  transition:opacity .34s ease;
+  transition:opacity .72s ease;
 }
 .stage.loaded .community-scroll,
 .stage.load-error .community-scroll{
@@ -152,7 +151,7 @@ h1{
   pointer-events:none;
   opacity:1;
   transform:scale(1);
-  transition:opacity .28s ease,transform .28s ease;
+  transition:opacity .58s ease,transform .58s ease;
 }
 .stage.loaded .loading-spinner-wrap,
 .stage.load-error .loading-spinner-wrap{
