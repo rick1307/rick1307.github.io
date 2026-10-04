@@ -2,7 +2,7 @@
   Wild Ledger Owner Authority resolver — proposed LEAP Protocol 1.0 authority model.
 
   Initial protocol anchor:
-    rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q
+    r4ZJA28EzaTa3g1GvMqQ37WjwTmgwkEHRb
 
   Canonical Owner authority state:
     LEAP/AUTHORITY/OWNER-WALLET=<XRPL-ADDRESS>
@@ -15,7 +15,7 @@
 
 import { DirectXRPLClient, isClassicAddress } from "./xrplTransport.js";
 
-export const PROTOCOL_INITIAL_OWNER_WALLET = "rfcDSPNx7ZtrPhs1bB7bzjcRdKVnRXCB9Q";
+export const PROTOCOL_INITIAL_OWNER_WALLET = "r4ZJA28EzaTa3g1GvMqQ37WjwTmgwkEHRb";
 export const OWNER_AUTHORITY_PREFIX = "LEAP/AUTHORITY/OWNER-WALLET=";
 
 const ACCOUNTSET_SPECIFIC_FIELDS = [
