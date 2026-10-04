@@ -4,42 +4,28 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="theme-color" content="#031c29" />
-  <title>Add Community — Wild Ledger</title>
+  <title>Add a Community — Wild Ledger</title>
   <style>
-    :root{
-      --deep:#031c29;--lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;
-      --coral:#ef735f;--ink:#f4fbfa;--muted:rgba(236,249,247,.68);
-      --panel:rgba(7,43,57,.74)
-    }
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(47,168,160,.26),transparent 31%),radial-gradient(circle at 88% 8%,rgba(239,115,95,.13),transparent 25%),radial-gradient(circle at 72% 82%,rgba(243,182,74,.12),transparent 28%),linear-gradient(145deg,#021720 0%,var(--deep) 42%,#062f3d 100%)}
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%)}
-    .shell{width:min(940px,100%);margin:0 auto;padding:28px 16px 48px}
-    .console{overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:28px;background:linear-gradient(155deg,rgba(8,56,70,.86),rgba(4,31,43,.84));box-shadow:0 28px 80px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-    header{padding:28px;border-bottom:1px solid rgba(255,255,255,.08)}
-    .back{display:block;width:max-content;margin:0 0 30px;color:#9fddff;text-decoration:none;font-weight:800;font-size:.78rem}
-    .eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
-    h1{margin:8px 0 0;font-size:clamp(2.15rem,8vw,4.15rem);line-height:.98;letter-spacing:-.05em}
-    .intro{max-width:760px;margin:16px 0 0;color:var(--muted);line-height:1.6}
-    .body{padding:22px;display:grid;gap:16px}
-    .route-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .route{display:flex;flex-direction:column;min-height:300px;padding:22px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),rgba(5,34,46,.42)}
-    .route.primary{border-color:rgba(134,215,201,.25)}
-    .route.legacy{border-color:rgba(243,182,74,.18)}
-    .kicker{font-size:.68rem;font-weight:900;letter-spacing:.10em;text-transform:uppercase;color:var(--sea-glass)}
-    .legacy .kicker{color:#f5d38f}
-    h2{margin:10px 0 8px;font-size:1.4rem;letter-spacing:-.02em}
-    p{margin:0;color:var(--muted);line-height:1.55}
-    .fact{margin-top:16px;padding:12px 13px;border-radius:13px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);font-size:.78rem;line-height:1.5;color:rgba(236,249,247,.74)}
-    .fact strong{color:var(--ink)}
-    .action{margin-top:auto;padding-top:22px}
-    .button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:13px 15px;border-radius:13px;text-decoration:none;font-size:.82rem;font-weight:900;border:1px solid rgba(134,215,201,.34);background:rgba(47,168,160,.16);color:#e8fffa}
-    .disabled{border:1px solid rgba(243,182,74,.18);background:rgba(243,182,74,.06);color:#f5d38f;cursor:default}
-    .status{display:inline-block;margin-top:10px;padding:5px 8px;border-radius:999px;background:rgba(243,182,74,.08);border:1px solid rgba(243,182,74,.16);color:#f5d38f;font-size:.63rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
-    .note{padding:17px 18px;border:1px dashed rgba(134,215,201,.2);border-radius:18px;color:rgba(236,249,247,.6);font-size:.82rem;line-height:1.55}
-    .note strong{color:var(--sea-glass)}
-    footer{padding:0 22px 24px;color:rgba(236,249,247,.42);font-size:.70rem;text-align:center}
-    @media(max-width:720px){.shell{padding:18px 10px 32px}.console{border-radius:22px}header{padding:24px 18px}.body{padding:14px}.route-grid{grid-template-columns:1fr}.route{min-height:0}}
+    :root{--deep:#031c29;--ocean:#063747;--lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;--coral:#ef735f;--ink:#f4fbfa;--muted:rgba(236,249,247,.68);--soft:rgba(236,249,247,.48)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(47,168,160,.27),transparent 31%),radial-gradient(circle at 88% 8%,rgba(239,115,95,.12),transparent 25%),radial-gradient(circle at 72% 82%,rgba(243,182,74,.11),transparent 28%),linear-gradient(145deg,#021720 0%,var(--deep) 42%,#062f3d 100%)}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.23;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.78),transparent 90%)}
+    .shell{width:min(980px,100%);margin:0 auto;padding:28px 16px 52px}.console{overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:30px;background:linear-gradient(155deg,rgba(8,56,70,.88),rgba(4,31,43,.86));box-shadow:0 30px 90px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    header{padding:30px 30px 28px;border-bottom:1px solid rgba(255,255,255,.08)}.back{display:block;width:max-content;margin:0 0 34px;color:#9fddff;text-decoration:none;font-weight:800;font-size:.78rem}.eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    h1{margin:9px 0 0;font-size:clamp(2.5rem,9vw,5rem);line-height:.94;letter-spacing:-.06em}.intro{max-width:760px;margin:18px 0 0;color:var(--muted);font-size:1.03rem;line-height:1.65}.intro strong{color:var(--ink)}
+    .hero-rule{display:flex;gap:10px;align-items:center;margin-top:22px;color:rgba(236,249,247,.58);font-size:.78rem;font-weight:800}.hero-rule:before{content:"";width:28px;height:2px;border-radius:99px;background:linear-gradient(90deg,var(--lagoon),var(--mango))}
+    .body{padding:24px;display:grid;gap:18px}.panel{border:1px solid rgba(255,255,255,.09);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),rgba(5,34,46,.44);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+    .start{padding:22px}.start-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:stretch}.start-copy{padding:4px 4px 4px 2px}.kicker{font-size:.67rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--sea-glass)}h2{margin:9px 0 9px;font-size:1.5rem;letter-spacing:-.025em}p{margin:0;color:var(--muted);line-height:1.58}
+    .birth-card{display:flex;flex-direction:column;justify-content:center;padding:18px;border-radius:17px;border:1px solid rgba(134,215,201,.18);background:rgba(47,168,160,.07)}.birth-label{font-size:.64rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--sea-glass)}.birth-title{margin-top:8px;font-size:1rem;font-weight:900}.birth-copy{margin-top:8px;color:rgba(236,249,247,.6);font-size:.78rem;line-height:1.5}
+    .journey{padding:22px}.journey-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}.journey-head h2{margin:0}.journey-note{max-width:390px;color:var(--soft);font-size:.76rem;line-height:1.45;text-align:right}
+    .steps{position:relative;display:grid;gap:10px}.steps:before{content:"";position:absolute;left:24px;top:28px;bottom:28px;width:1px;background:linear-gradient(var(--sea-glass),rgba(134,215,201,.08))}.step{position:relative;display:grid;grid-template-columns:50px minmax(0,1fr);gap:14px;padding:14px;border-radius:17px;border:1px solid rgba(255,255,255,.065);background:rgba(2,25,35,.35)}
+    .num{position:relative;z-index:1;display:grid;place-items:center;width:34px;height:34px;margin:2px auto 0;border-radius:50%;border:1px solid rgba(134,215,201,.32);background:#073847;color:#ddfaf3;font-weight:950;font-size:.77rem;box-shadow:0 0 0 5px rgba(4,31,43,.9)}.step-title{font-weight:900;letter-spacing:-.01em}.step-copy{margin-top:4px;color:rgba(236,249,247,.58);font-size:.79rem;line-height:1.5}
+    .who{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.chip{padding:5px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);font-size:.62rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.chip.you{background:rgba(243,182,74,.08);border-color:rgba(243,182,74,.18);color:#f6d99f}.chip.wl{background:rgba(47,168,160,.08);border-color:rgba(134,215,201,.16);color:#bdebe2}
+    .prep{padding:22px}.prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.prep-item{padding:14px;border-radius:15px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}.prep-item strong{display:block;font-size:.8rem}.prep-item span{display:block;margin-top:5px;color:rgba(236,249,247,.55);font-size:.74rem;line-height:1.45}
+    .cta{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;padding:22px;border-color:rgba(134,215,201,.22);background:linear-gradient(145deg,rgba(47,168,160,.10),rgba(243,182,74,.035)),rgba(5,34,46,.48)}.cta strong{display:block;font-size:1rem}.cta span{display:block;margin-top:5px;color:rgba(236,249,247,.58);font-size:.77rem;line-height:1.45}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-width:220px;padding:14px 17px;border:1px solid rgba(134,215,201,.38);border-radius:14px;background:linear-gradient(145deg,rgba(47,168,160,.24),rgba(47,168,160,.13));color:#edfffb;text-decoration:none;font-size:.82rem;font-weight:950;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 25px rgba(0,0,0,.12)}.button:hover,.button:focus-visible{background:linear-gradient(145deg,rgba(47,168,160,.34),rgba(47,168,160,.18));border-color:rgba(134,215,201,.58)}
+    .boundary{padding:0 24px 26px;color:rgba(236,249,247,.42);font-size:.7rem;line-height:1.55;text-align:center}.boundary strong{color:rgba(236,249,247,.64)}
+    @media(max-width:720px){.shell{padding:18px 10px 34px}.console{border-radius:23px}header{padding:24px 18px 22px}.body{padding:14px}.start-grid,.prep-grid,.cta{grid-template-columns:1fr}.journey-head{display:block}.journey-note{margin-top:8px;text-align:left}.button{width:100%;min-width:0}.steps:before{left:21px}.step{grid-template-columns:44px minmax(0,1fr)}}
   </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
@@ -50,39 +36,44 @@
         <a class="back wl-header-control" href="communities.html">← Communities</a>
         <div class="eyebrow">Wild Ledger Owner</div>
         <h1>Add a Community</h1>
-        <p class="intro">Choose the authority path that matches the community. Wild Ledger keeps the paths separate because the wallet allowed to establish authority is different in each case.</p>
+        <p class="intro"><strong>There is one normal path.</strong> Wild Ledger will generate the new community's permanent 3-character ID, verify its first Community Operating Wallet, and guide you through the Owner-authorized XRPL transaction that establishes both facts together.</p>
+        <div class="hero-rule">Nothing becomes canonical until XRPL validates the provisioning transaction.</div>
       </header>
-
       <div class="body">
-        <div class="route-grid">
-          <!-- NEW COMMUNITY: Owner-signed birth. One validated statement establishes both the permanent Community ID and the first Community Operating Wallet. -->
-          <section class="route primary">
-            <div class="kicker">Normal path</div>
-            <h2>Create a New Community</h2>
-            <p>Use this when the community has never existed in Wild Ledger. Wild Ledger generates a new 3-character Community ID and the current Wild Ledger Owner Wallet establishes its first Community Operating Wallet on XRPL.</p>
-            <div class="fact"><strong>Who signs?</strong> The current canonical Wild Ledger Owner Wallet.</div>
-            <div class="fact"><strong>What becomes canonical?</strong> The new Community ID and its first Operating Wallet become canonical together when the XRPL transaction validates.</div>
-            <div class="action"><a class="button" href="provisionCommunity.html"><span>Create New Community</span><span>→</span></a></div>
-          </section>
-
-          <!-- EXISTING / LEGACY COMMUNITY: this is NOT the old Owner-signed newCommunityOperatingWalletHelper flow. The correct future route must have the existing community Operating Wallet establish itself under the one-time legacy rule. -->
-          <section class="route legacy">
-            <div class="kicker">Legacy path</div>
-            <h2>Establish an Existing Community</h2>
-            <p>Use this only for a community that existed before Wild Ledger's current on-ledger authority system and therefore needs its one-time authority establishment.</p>
-            <div class="fact"><strong>Who signs?</strong> The community's existing Operating Wallet establishes itself. The Wild Ledger Owner does not create this legacy authority statement.</div>
-            <div class="fact"><strong>Why isn't this wired yet?</strong> The older helper in the current code is an Owner-signed new-community tool, so it is not the correct implementation for this legacy case.</div>
-            <div class="action">
-              <div class="button disabled" aria-disabled="true"><span>Legacy Authority Path</span><span>Not wired yet</span></div>
-              <span class="status">Scaffold in place</span>
+        <section class="panel start">
+          <div class="start-grid">
+            <div class="start-copy">
+              <div class="kicker">New community provisioning</div>
+              <h2>One guided process from start to finish</h2>
+              <p>You do not build the authority memo by hand. You do not choose a Community ID format. You provide the first Operating Wallet and approve the Owner transaction; Wild Ledger handles the protocol details and checks each lock before moving forward.</p>
             </div>
-          </section>
-        </div>
-
-        <div class="note"><strong>Operating Wallet changes are handled somewhere else.</strong> Once a community has canonical authority, a later Operating Wallet change belongs inside that community. The currently authorized Community Operating Wallet names its successor.</div>
+            <div class="birth-card">
+              <div class="birth-label">Canonical birth event</div>
+              <div class="birth-title">Community ID + first Operating Wallet</div>
+              <div class="birth-copy">Those two facts become canonical together in one validated Owner-signed authority statement.</div>
+            </div>
+          </div>
+        </section>
+        <section class="panel journey" aria-labelledby="journeyTitle">
+          <div class="journey-head"><div><div class="kicker">What happens next</div><h2 id="journeyTitle">You move through five locks</h2></div><div class="journey-note">Each step opens the next. If a prerequisite is not satisfied, Wild Ledger keeps the following action locked.</div></div>
+          <div class="steps">
+            <article class="step"><div class="num">1</div><div><div class="step-title">Wild Ledger confirms Owner authority</div><div class="step-copy">The page reads validated XRPL history and determines the current Wild Ledger Owner Wallet. This normally clears automatically.</div><div class="who"><span class="chip wl">Wild Ledger does this</span></div></div></article>
+            <article class="step"><div class="num">2</div><div><div class="step-title">A new Community ID is generated</div><div class="step-copy">Wild Ledger creates an unused 3-character ID and its matching <code>-LEAP</code> namespace. You paste the XRPL address that will become the community's first Operating Wallet and press Verify.</div><div class="who"><span class="chip wl">ID generated automatically</span><span class="chip you">You provide the wallet</span></div></div></article>
+            <article class="step"><div class="num">3</div><div><div class="step-title">Connect the current Owner Wallet</div><div class="step-copy">Press Connect Bifrost and approve the WalletConnect pairing. Wild Ledger verifies that the connected XRPL account is the Owner Wallet it just reconstructed from XRPL.</div><div class="who"><span class="chip you">You connect Bifrost</span><span class="chip wl">Wild Ledger checks the signer</span></div></div></article>
+            <article class="step"><div class="num">4</div><div><div class="step-title">Prepare, review, and sign</div><div class="step-copy">Press Prepare Provisioning Transaction. Wild Ledger builds the exact no-op AccountSet and shows it to you. Then press Send to Bifrost for Signature and approve it in Bifrost.</div><div class="who"><span class="chip wl">Wild Ledger builds the transaction</span><span class="chip you">You approve the signature</span></div></div></article>
+            <article class="step"><div class="num">5</div><div><div class="step-title">Record it on XRPL and confirm it</div><div class="step-copy">Press Submit Signed Transaction to XRPL. Wild Ledger waits for validation and then reads XRPL again. Only after that confirmation does the community exist canonically.</div><div class="who"><span class="chip you">You submit when ready</span><span class="chip wl">Wild Ledger validates the result</span></div></div></article>
+          </div>
+        </section>
+        <section class="panel prep">
+          <div class="kicker">Before you begin</div><h2>Have these two things ready</h2>
+          <div class="prep-grid">
+            <div class="prep-item"><strong>The first Community Operating Wallet address</strong><span>An existing, funded XRPL classic address beginning with <code>r</code>. Wild Ledger will verify that the account exists.</span></div>
+            <div class="prep-item"><strong>Bifrost with the current Owner Wallet available</strong><span>The provisioning transaction must be signed by the canonical Wild Ledger Owner Wallet. The normal XRP network fee applies; no LEAP is transferred.</span></div>
+          </div>
+        </section>
+        <section class="panel cta"><div><strong>Ready to create the next Wild Ledger community?</strong><span>The next screen is the actual provisioning workflow. It will keep later actions locked until the earlier checks are complete.</span></div><a class="button" href="provisionCommunity.html"><span>Begin Provisioning</span><span>→</span></a></section>
       </div>
-
-      <footer>Application access chooses the workflow. XRPL authority determines who may perform the canonical act.</footer>
+      <div class="boundary"><strong>Provisioning creates canonical identity and authority.</strong> Friendly name, appearance, terminology, and other community setup come afterward and do not create the community.</div>
     </section>
   </main>
 </body>
