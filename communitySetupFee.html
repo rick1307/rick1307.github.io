@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071f2c">
+<title>Community Setup Fee | Wild Ledger</title>
+<style>
+:root{--bg:#071f2c;--panel:#0b2f40;--line:rgba(255,255,255,.14);--text:#f5fbfa;--muted:rgba(236,249,247,.68);--green:#30d158;--gold:#f4bd58;--bad:#ff8978}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a);color:var(--text);font-family:Arial,sans-serif}.shell{width:min(100%,860px);margin:0 auto;padding:24px 14px 48px}.console{border:1px solid var(--line);border-radius:26px;background:rgba(10,45,58,.82);overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28)}header{padding:25px 22px;border-bottom:1px solid var(--line)}.back{display:inline-block;color:#b7f0df;text-decoration:none;font-size:.78rem;font-weight:800;margin-bottom:16px}.eyebrow{font-size:.68rem;text-transform:uppercase;letter-spacing:.11em;color:#a8d8ce;font-weight:900}h1{margin:7px 0 8px;font-size:clamp(2rem,7vw,3.4rem);line-height:.95}header p{margin:0;color:var(--muted);line-height:1.5}.body{display:grid;gap:14px;padding:14px}.card{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035);padding:18px}.card h2{margin:0 0 7px;font-size:1.05rem}.card p{margin:0;color:var(--muted);line-height:1.5;font-size:.86rem}.status{margin-top:13px;border-top:1px solid rgba(255,255,255,.09)}.row{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:.78rem}.key{color:rgba(255,255,255,.55);font-weight:800}.value{overflow-wrap:anywhere}.good{color:#a7f3bd}.wait{color:#f3d79c}.bad{color:#ffc0b6}.choices{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.exact-fee{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:10px}.exact-fee input{min-height:44px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);color:white;padding:0 12px;font-size:.9rem;font-weight:800;outline:none}.exact-fee input:focus{border-color:var(--green);box-shadow:0 0 0 1px rgba(48,209,88,.18)}.selected-fee{margin-top:10px;font-size:.76rem;color:#bfe9df}.fee-choice{min-height:46px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.05);color:white;font-size:1rem;font-weight:900}.fee-choice.active{border-color:var(--green);background:rgba(48,209,88,.15);box-shadow:0 0 0 1px rgba(48,209,88,.18)}.buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}button{min-height:44px;border:0;border-radius:12px;padding:0 14px;font-weight:900;font-size:.8rem}button.primary{background:var(--green);color:#05210d}button.secondary{background:rgba(255,255,255,.09);color:white;border:1px solid rgba(255,255,255,.14)}button:disabled{opacity:.38;cursor:not-allowed}.notice{margin-top:12px;padding:12px 13px;border-radius:12px;background:rgba(244,189,88,.08);border:1px solid rgba(244,189,88,.22);font-size:.78rem;line-height:1.5;color:#f5dfb1}pre{white-space:pre-wrap;word-break:break-word;max-height:250px;overflow:auto;margin:12px 0 0;padding:12px;border-radius:12px;background:#04151d;color:#dff4ef;font-size:.68rem}footer{text-align:center;color:rgba(255,255,255,.42);font-size:.68rem;padding:0 20px 22px}@media(max-width:560px){.row{grid-template-columns:118px minmax(0,1fr)}.choices{grid-template-columns:repeat(5,1fr)}.fee-choice{padding:0}.exact-fee{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="wildLedgerControls.css">
+</head>
+<body>
+<main class="shell"><section class="console">
+<header>
+<a class="back wl-header-control" href="owner.html">← Owner Console</a>
+<div class="eyebrow">Wild Ledger Owner</div>
+<h1>Community Setup Fee</h1>
+<p>Set the XRP fee required to submit a new-community request. The fee is Owner-signed application state on XRPL. Historical prices remain part of the ledger record.</p>
+</header>
+<div class="body">
+<section class="card">
+<h2>1 · Read current fee from XRPL</h2>
+<p>Wild Ledger accepts only historically valid statements from the canonical Owner Wallet.</p>
+<div class="status">
+<div class="row"><div class="key">Current Owner</div><div class="value wait" id="ownerStatus">Checking XRPL…</div></div>
+<div class="row"><div class="key">Current setup fee</div><div class="value wait" id="feeStatus">Checking XRPL…</div></div>
+<div class="row"><div class="key">Last changed</div><div class="value" id="feeLedger">—</div></div>
+</div>
+<div class="buttons"><button class="secondary" id="refreshButton" type="button">Recheck XRPL</button></div>
+</section>
+<section class="card">
+<h2>2 · Choose the new fee</h2>
+<p>The ledger rule is simple: the setup fee is any positive whole number of drops. The 1–10 XRP buttons are easy presets only; they are not a Wild Ledger limit.</p>
+<div class="choices" id="feeChoices"></div>
+<div class="exact-fee">
+<input id="exactDrops" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Exact setup fee in drops" placeholder="Exact drops — example: 500000">
+<button class="secondary" id="useDropsButton" type="button">Use Exact Drops</button>
+</div>
+<div class="selected-fee" id="selectedFee">Selected: 1 XRP · 1,000,000 drops</div>
+<div class="notice"><strong>Historical-price rule:</strong> a request is judged against the setup fee that was in force when its payment validated. Changing the fee later does not change an earlier valid request.</div>
+</section>
+<section class="card">
+<h2>3 · Sign the Owner statement</h2>
+<p>The selected fee becomes current only after the Owner-signed no-op AccountSet validates on XRPL.</p>
+<div class="buttons">
+<button class="secondary" id="connectButton" type="button" disabled>Connect Owner Wallet</button>
+<button class="secondary" id="prepareButton" type="button" disabled>Prepare Transaction</button>
+<button class="secondary" id="signButton" type="button" disabled>Send for Signature</button>
+<button class="primary" id="submitButton" type="button" disabled>Submit to XRPL</button>
+</div>
+<div class="status">
+<div class="row"><div class="key">Connected wallet</div><div class="value wait" id="walletStatus">Not connected.</div></div>
+<div class="row"><div class="key">Memo</div><div class="value" id="memoStatus">—</div></div>
+<div class="row"><div class="key">Prepared</div><div class="value wait" id="preparedStatus">Not prepared.</div></div>
+<div class="row"><div class="key">Signature</div><div class="value wait" id="signatureStatus">Not signed.</div></div>
+<div class="row"><div class="key">XRPL</div><div class="value wait" id="submitStatus">Not submitted.</div></div>
+</div>
+<pre id="preview">No transaction prepared.</pre>
+<div id="qrWrap" style="display:none;margin-top:12px;text-align:center"><img id="qrImage" alt="WalletConnect QR code" style="width:min(100%,320px);border-radius:12px;background:white;padding:8px"></div>
+<div id="uriText" style="margin-top:8px;font-size:.62rem;word-break:break-all;color:rgba(255,255,255,.45)"></div>
+</section>
+</div>
+<footer>Wild Ledger application state · XRPL is the record</footer>
+</section></main>
+<script src="js/wildLedgerConfig.js"></script>
+<script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+import {
+  DROPS_PER_XRP,
+  dropsToXrpString,
+  normalizeSetupFeeDrops,
+  readCommunitySetupFee,
+  setupFeeMemo,
+  prepareCommunitySetupFee,
+  submitCommunitySetupFee
+} from "./js/communitySetup.js";
+
+const config = window.WILD_LEDGER_CONFIG || {};
+const SERVER = config.xrplWebSocket || "wss://s1.ripple.com/";
+const PROJECT_ID = String(config.walletConnectProjectId || "").trim();
+const FEE_CUSHION = Number(config.xrplFeeCushion || 1.2);
+const $ = id => document.getElementById(id);
+const ownerStatus = $("ownerStatus");
+const feeStatus = $("feeStatus");
+const feeLedger = $("feeLedger");
+const refreshButton = $("refreshButton");
+const feeChoices = $("feeChoices");
+const exactDrops = $("exactDrops");
+const useDropsButton = $("useDropsButton");
+const selectedFee = $("selectedFee");
+const connectButton = $("connectButton");
+const prepareButton = $("prepareButton");
+const signButton = $("signButton");
+const submitButton = $("submitButton");
+const walletStatus = $("walletStatus");
+const memoStatus = $("memoStatus");
+const preparedStatus = $("preparedStatus");
+const signatureStatus = $("signatureStatus");
+const submitStatus = $("submitStatus");
+const preview = $("preview");
+const qrWrap = $("qrWrap");
+const qrImage = $("qrImage");
+const uriText = $("uriText");
+
+let selectedDrops = String(DROPS_PER_XRP);
+let ownerAccount = "";
+let signer = null;
+let prepared = null;
+let signedBlob = "";
+let submitLocked = false;
+
+function tone(el, kind, text) {
+  el.className = `value ${kind || ""}`;
+  el.textContent = text;
+}
+
+function formatDrops(drops) {
+  return Number(drops) <= Number.MAX_SAFE_INTEGER
+    ? Number(drops).toLocaleString("en-US")
+    : String(drops);
+}
+
+function selectedXrp() {
+  return dropsToXrpString(selectedDrops);
+}
+
+function paintSelection() {
+  [...feeChoices.children].forEach(button => {
+    button.classList.toggle("active", button.dataset.drops === selectedDrops);
+  });
+  selectedFee.textContent = `Selected: ${selectedXrp()} XRP · ${formatDrops(selectedDrops)} drops`;
+  memoStatus.textContent = setupFeeMemo(selectedDrops);
+}
+
+function resetTransaction() {
+  prepared = null;
+  signedBlob = "";
+  submitLocked = false;
+  prepareButton.disabled = !signer;
+  prepareButton.textContent = "Prepare Transaction";
+  signButton.disabled = true;
+  signButton.textContent = "Send for Signature";
+  submitButton.disabled = true;
+  submitButton.textContent = "Submit to XRPL";
+  tone(preparedStatus, "wait", "Not prepared.");
+  tone(signatureStatus, "wait", "Not signed.");
+  tone(submitStatus, "wait", "Not submitted.");
+  preview.textContent = "No transaction prepared.";
+  paintSelection();
+}
+
+function chooseDrops(value, { mirrorInput = true } = {}) {
+  selectedDrops = normalizeSetupFeeDrops(value);
+  if (mirrorInput) exactDrops.value = selectedDrops;
+  resetTransaction();
+}
+
+for (let xrp = 1; xrp <= 10; xrp += 1) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "fee-choice";
+  button.textContent = String(xrp);
+  button.dataset.drops = String(xrp * DROPS_PER_XRP);
+  button.title = `${xrp} XRP preset`;
+  button.addEventListener("click", () => chooseDrops(button.dataset.drops));
+  feeChoices.appendChild(button);
+}
+
+useDropsButton.addEventListener("click", () => {
+  try {
+    chooseDrops(exactDrops.value, { mirrorInput: true });
+  } catch (error) {
+    tone(preparedStatus, "bad", error?.message || String(error));
+  }
+});
+
+exactDrops.addEventListener("keydown", event => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  useDropsButton.click();
+});
+
+exactDrops.value = selectedDrops;
+paintSelection();
+
+async function loadState() {
+  refreshButton.disabled = true;
+  connectButton.disabled = true;
+  try {
+    tone(ownerStatus, "wait", "Reading validated Owner history…");
+    tone(feeStatus, "wait", "Reading setup-fee history…");
+    const state = await readCommunitySetupFee({ serverUrl: SERVER, force: true });
+    ownerAccount = state.ownerState.currentAccount;
+    tone(ownerStatus, "good", ownerAccount);
+    connectButton.disabled = !ownerAccount;
+
+    if (state.current) {
+      tone(feeStatus, "good", `${state.current.xrp} XRP · ${formatDrops(state.current.drops)} drops`);
+      feeLedger.textContent = `Ledger ${state.current.ledger}${state.current.hash ? ` · ${state.current.hash.slice(0, 12)}…` : ""}`;
+      selectedDrops = state.current.drops;
+      exactDrops.value = selectedDrops;
+      resetTransaction();
+    } else {
+      tone(feeStatus, "wait", "Not established yet. Publish the first fee before public requests can be paid.");
+      feeLedger.textContent = "—";
+    }
+  } catch (error) {
+    tone(ownerStatus, "bad", error?.message || String(error));
+    tone(feeStatus, "bad", "Unavailable.");
+    connectButton.disabled = true;
+  } finally {
+    refreshButton.disabled = false;
+  }
+}
+
+async function connect() {
+  if (!PROJECT_ID) {
+    tone(walletStatus, "bad", "Wallet connection is not configured.");
+    return;
+  }
+  connectButton.disabled = true;
+  try {
+    signer = new WalletConnectXrplSigner({
+      projectId: PROJECT_ID,
+      metadata: {
+        name: "Wild Ledger Setup Fee",
+        description: "Owner-signed Wild Ledger community setup fee",
+        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+        icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+      }
+    });
+    const connected = await signer.connect({
+      onUri: async uri => {
+        qrImage.src = await QRCode.toDataURL(uri, { width: 560, margin: 2, errorCorrectionLevel: "M" });
+        qrWrap.style.display = "block";
+        uriText.textContent = uri;
+        tone(walletStatus, "wait", "Approve this connection in your Owner wallet.");
+      }
+    });
+    qrWrap.style.display = "none";
+    uriText.textContent = "";
+    if (connected.account !== ownerAccount) {
+      await signer.disconnect();
+      signer = null;
+      throw new Error(`Connected wallet is ${connected.account}, but current Owner is ${ownerAccount}.`);
+    }
+    tone(walletStatus, "good", `${connected.walletName} connected as current Owner.`);
+    prepareButton.disabled = false;
+    connectButton.textContent = "Owner Wallet Connected";
+  } catch (error) {
+    signer = null;
+    tone(walletStatus, "bad", error?.message || String(error));
+    connectButton.disabled = false;
+  }
+}
+
+async function prepare() {
+  prepareButton.disabled = true;
+  try {
+    tone(preparedStatus, "wait", "Preparing against current XRPL state…");
+    prepared = await prepareCommunitySetupFee({
+      serverUrl: SERVER,
+      drops: selectedDrops,
+      feeCushion: FEE_CUSHION
+    });
+    if (prepared.ownerAccount !== ownerAccount) ownerAccount = prepared.ownerAccount;
+    preview.textContent = JSON.stringify(prepared.preparedTx, null, 2);
+    memoStatus.textContent = prepared.memoText;
+    tone(preparedStatus, "good", `Prepared ${prepared.xrp} XRP (${formatDrops(prepared.drops)} drops) setup-fee statement.`);
+    prepareButton.textContent = "Prepared";
+    signButton.disabled = false;
+  } catch (error) {
+    tone(preparedStatus, "bad", error?.message || String(error));
+    prepareButton.disabled = false;
+  }
+}
+
+async function sign() {
+  if (!prepared || !signer) return;
+  signButton.disabled = true;
+  try {
+    tone(signatureStatus, "wait", "Approve the transaction in your wallet.");
+    const signed = await signer.signTransaction(prepared.preparedTx);
+    signedBlob = signed.signedBlob;
+    tone(signatureStatus, "good", "Signed. Ready to submit.");
+    signButton.textContent = "Signed";
+    submitButton.disabled = false;
+  } catch (error) {
+    tone(signatureStatus, "bad", error?.message || String(error));
+    signButton.disabled = false;
+  }
+}
+
+async function submit() {
+  if (!signedBlob || submitLocked) return;
+  submitLocked = true;
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitted — checking XRPL…";
+  try {
+    tone(submitStatus, "wait", "Submitting once, then checking validated XRPL history…");
+    const out = await submitCommunitySetupFee({
+      serverUrl: SERVER,
+      signedBlob,
+      expectedOwner: prepared.ownerAccount,
+      drops: prepared.drops,
+      onSubmitted: details => tone(
+        submitStatus,
+        "wait",
+        details?.txHash ? `Submitted ${details.txHash.slice(0, 14)}… Checking validation…` : "Submitted. Checking validation…"
+      )
+    });
+    tone(submitStatus, "good", `Validated in ledger ${out.record.ledger}. Current setup fee is ${out.record.xrp} XRP (${formatDrops(out.record.drops)} drops).`);
+    await loadState();
+  } catch (error) {
+    tone(submitStatus, "bad", error?.message || String(error));
+    if (!error?.doNotResubmit) {
+      submitLocked = false;
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit to XRPL";
+    }
+  }
+}
+
+refreshButton.addEventListener("click", loadState);
+connectButton.addEventListener("click", connect);
+prepareButton.addEventListener("click", prepare);
+signButton.addEventListener("click", sign);
+submitButton.addEventListener("click", submit);
+loadState();
+</script>
+</body></html>
