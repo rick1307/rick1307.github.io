@@ -512,7 +512,7 @@
     <div class="library-heading" aria-label="Library section">
       <div class="library-title">Library</div>
     </div>
-    <p>The operating shelf for Wild Ledger. Formal doctrine lives in the Operations Manual and LEAP Protocol. Working material stays below until it is ready to be absorbed into one of those documents.</p>
+    <p id="libraryIntro">The operating shelf for Wild Ledger. Formal doctrine lives in the Operations Manual and LEAP Protocol. Working material stays below until it is ready to be absorbed into one of those documents.</p>
     <div class="role-line" id="roleLine">Owner View</div>
   </div>
   <div class="menu primary-docs">
@@ -523,28 +523,30 @@
     </a>
   </div>
 
-  <div class="section-label">LEAP Protocol</div>
-  <div class="section-note">The canonical protocol, the design bridge for extending it, and the owner-only view of what may come next.</div>
-  <div class="protocol-wrap">
-    <div class="protocol-grid">
-      <a class="protocol-card canonical" id="leapProtocolLink" href="documentation/leapProtocol.html">
-        <span class="protocol-status">What Is</span>
-        <span class="protocol-title">LEAP Protocol</span>
-        <span class="protocol-copy">The current authoritative standard: LEAP identity, authority, namespace, memo grammar, ledger records, validity, and protocol rules.</span>
-        <span class="protocol-file">documentation/leapProtocol.html</span>
-      </a>
-      <a class="protocol-card" id="protocolExtensibilityLink" data-audience="owner" href="documentation/protocolExtensibility.html">
-        <span class="protocol-status">How It Can Evolve</span>
-        <span class="protocol-title">Protocol Extensibility</span>
-        <span class="protocol-copy">The bridge between the canonical protocol and future versions: how block space, versioning, and compact rules preserve room to grow.</span>
-        <span class="protocol-file">documentation/protocolExtensibility.html</span>
-      </a>
-      <a class="protocol-card" id="protocolSnapshotExtensionLink" data-audience="owner" href="documentation/protocolSnapshotExtension.html">
-        <span class="protocol-status">What Could Be Next</span>
-        <span class="protocol-title">Protocol Snapshot Extension</span>
-        <span class="protocol-copy">A notional protocol extension showing how periodic community state could be recorded without changing what is currently authoritative.</span>
-        <span class="protocol-file">documentation/protocolSnapshotExtension.html</span>
-      </a>
+  <div id="protocolShelf" data-audience="owner">
+    <div class="section-label">LEAP Protocol</div>
+    <div class="section-note">The canonical protocol, the design bridge for extending it, and the owner-only view of what may come next.</div>
+    <div class="protocol-wrap">
+      <div class="protocol-grid">
+        <a class="protocol-card canonical" id="leapProtocolLink" href="documentation/leapProtocol.html">
+          <span class="protocol-status">What Is</span>
+          <span class="protocol-title">LEAP Protocol</span>
+          <span class="protocol-copy">The current authoritative standard: LEAP identity, authority, namespace, memo grammar, ledger records, validity, and protocol rules.</span>
+          <span class="protocol-file">documentation/leapProtocol.html</span>
+        </a>
+        <a class="protocol-card" id="protocolExtensibilityLink" href="documentation/protocolExtensibility.html">
+          <span class="protocol-status">How It Can Evolve</span>
+          <span class="protocol-title">Protocol Extensibility</span>
+          <span class="protocol-copy">The bridge between the canonical protocol and future versions: how block space, versioning, and compact rules preserve room to grow.</span>
+          <span class="protocol-file">documentation/protocolExtensibility.html</span>
+        </a>
+        <a class="protocol-card" id="protocolSnapshotExtensionLink" href="documentation/protocolSnapshotExtension.html">
+          <span class="protocol-status">What Could Be Next</span>
+          <span class="protocol-title">Protocol Snapshot Extension</span>
+          <span class="protocol-copy">A notional protocol extension showing how periodic community state could be recorded without changing what is currently authoritative.</span>
+          <span class="protocol-file">documentation/protocolSnapshotExtension.html</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -571,6 +573,11 @@
         <span class="link-title">Community Chat / Lounge</span>
         <span class="link-subtitle">Architecture and design principles for community rooms, Member Record access, temporary aliases, presence, recognition, and XRP tipping.</span>
         <span class="link-file">documentation/chatDocumentation.html</span>
+      </a>
+      <a href="documentation/accessArchitecture.html">
+        <span class="link-title">Access Architecture</span>
+        <span class="link-subtitle">Working architecture for Owner, Operator, and demo access: workspace routing, session boundaries, future authentication, and the separation between application access and XRPL authority.</span>
+        <span class="link-file">documentation/accessArchitecture.html</span>
       </a>
       <a href="documentation/marketing.html">
         <span class="link-title">Marketing</span>
@@ -630,7 +637,11 @@
   document.documentElement.dataset.role = role;
 
   const roleLine = document.getElementById('roleLine');
+  const libraryIntro = document.getElementById('libraryIntro');
   if (roleLine) roleLine.textContent = role === 'operator' ? 'Community Operator View' : 'Owner View';
+  if (libraryIntro && role === 'operator') {
+    libraryIntro.textContent = 'Your operating handbook for running this Wild Ledger community. Use the Operations Manual for wallets, recognition, distribution, replenishment, and community procedures.';
+  }
 
   document.querySelectorAll('[data-audience]').forEach((node) => {
     const audience = (node.dataset.audience || 'shared').toLowerCase();
