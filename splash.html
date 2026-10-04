@@ -126,26 +126,36 @@ h1{
   opacity:0;
   transform:translateY(8px);
   pointer-events:none;
-  transition:opacity .42s ease .12s,transform .42s cubic-bezier(.2,.8,.2,1) .12s;
+  transition:opacity .42s ease .10s,transform .42s cubic-bezier(.2,.8,.2,1) .10s;
 }
 .directory-shell.ready .doors{
   opacity:1;
   transform:translateY(0);
   pointer-events:auto;
 }
+.community-scroll{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .34s ease;
+}
+.stage.loaded .community-scroll,
+.stage.load-error .community-scroll{
+  opacity:1;
+  pointer-events:auto;
+}
 .loading-spinner-wrap{
-  position:absolute;
+  position:fixed;
   inset:0;
-  z-index:3;
+  z-index:4;
   display:grid;
   place-items:center;
   pointer-events:none;
   opacity:1;
   transform:scale(1);
-  transition:opacity .20s ease,transform .20s ease;
+  transition:opacity .28s ease,transform .28s ease;
 }
-.directory-shell.ready .loading-spinner-wrap,
-.directory-shell.error .loading-spinner-wrap{
+.stage.loaded .loading-spinner-wrap,
+.stage.load-error .loading-spinner-wrap{
   opacity:0;
   transform:scale(.94);
 }
@@ -308,15 +318,16 @@ h1{
     <div class="tag">Pick your community. Join the action.</div>
   </header>
 
+  <div class="loading-spinner-wrap" id="communitySpinner" aria-hidden="true">
+    <div class="activity-spinner">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
   <div class="community-scroll" id="communityScroll">
     <div class="scroll-content">
       <div class="directory-shell" id="communityDirectory">
-        <div class="loading-spinner-wrap" id="communitySpinner" aria-hidden="true">
-          <div class="activity-spinner">
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-            <span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
-        </div>
         <div class="doors" id="communityDoors" aria-live="polite"></div>
       </div>
       <div class="live-state" id="communityLiveState">Reading validated XRPL community history…</div>
@@ -394,15 +405,19 @@ function render(communities) {
 }
 
 function revealDirectory() {
-  // Give the browser one clean paint with the cards hidden, then cross-fade them in.
+  // Let the browser finish layout while the results remain invisible, then cross-fade.
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => directory.classList.add("ready"));
+    requestAnimationFrame(() => {
+      directory.classList.add("ready");
+      stage.classList.add("loaded");
+    });
   });
 }
 
 function failDirectory() {
   directory.classList.remove("ready");
   directory.classList.add("error");
+  stage.classList.add("load-error");
 }
 
 function publicCommunities(communities, visibilityState) {
