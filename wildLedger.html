@@ -88,8 +88,6 @@
 <p style="color:var(--muted);font-size:17px;margin:0">Tell me what you want to call it. I’ll build the first one with you.</p>
 </div>
 </section></main><footer>Wild Ledger · Powered by LEAP</footer></div><script src="js/wildLedgerConfig.js"></script><script src="js/communityConfig.js" data-registry-only="true"></script><script type="module">
-import { discoverWildLedgerCommunities } from "./js/communityDiscovery.js";
-
 const list = document.getElementById("communityList");
 const state = document.getElementById("communityListState");
 
@@ -120,13 +118,37 @@ function communityCard(community) {
   return card;
 }
 
-try {
-  const result = await discoverWildLedgerCommunities({ force: true });
+function renderList(communities) {
   list.replaceChildren();
-  state.textContent = result.communities.length
-    ? `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`
-    : "No communities were found.";
-  result.communities.forEach(community => list.appendChild(communityCard(community)));
+  communities.forEach(community => list.appendChild(communityCard(community)));
+}
+
+try {
+  state.textContent = "Loading live Wild Ledger communities…";
+  const { discoverWildLedgerCommunities } = await import("./js/communityDiscovery.js?wl=20261004b");
+  state.textContent = "Reading validated Owner XRPL history…";
+
+  const result = await discoverWildLedgerCommunities({
+    force: true,
+    onUpdate(update) {
+      renderList(update.communities);
+      if (update.stage === "owner") {
+        state.textContent = `Live Owner XRPL communities loaded · checking legacy community authority…`;
+      } else if (update.stage.endsWith(":reading")) {
+        const id = update.stage.split(":")[1] || "legacy";
+        state.textContent = `Live Owner XRPL communities loaded · checking ${id} authority…`;
+      }
+    }
+  });
+
+  renderList(result.communities);
+  if (!result.communities.length) {
+    state.textContent = "No communities were found.";
+  } else if (result.warnings?.length) {
+    state.textContent = `Live community list · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"} · ${result.warnings.join(" ")}`;
+  } else {
+    state.textContent = `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`;
+  }
 } catch (error) {
   list.replaceChildren();
   state.classList.add("error");

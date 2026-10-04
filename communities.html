@@ -115,8 +115,6 @@
   <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
   <script type="module">
-    import { discoverWildLedgerCommunities } from "./js/communityDiscovery.js";
-
     const directory = document.getElementById("communityDirectoryList");
     const state = document.getElementById("communityDirectoryState");
 
@@ -147,7 +145,6 @@
       const copy = document.createElement("p");
       copy.className = "community-copy";
       copy.textContent = community.directoryDescription || "Wild Ledger community.";
-
       details.append(name, meta, copy);
 
       let action;
@@ -166,15 +163,38 @@
       directory.appendChild(article);
     }
 
-    try {
-      const result = await discoverWildLedgerCommunities({ force: true });
+    function renderList(communities) {
       directory.replaceChildren();
+      communities.forEach(renderCommunity);
+    }
 
+    try {
+      state.textContent = "Loading Wild Ledger community discovery…";
+      const { discoverWildLedgerCommunities } = await import("./js/communityDiscovery.js?wl=20261004b");
+      state.textContent = "Reading validated Owner XRPL history…";
+
+      const result = await discoverWildLedgerCommunities({
+        force: true,
+        onUpdate(update) {
+          renderList(update.communities);
+          if (update.stage === "owner") {
+            state.textContent = `Owner XRPL history read · ${update.communities.length} ${update.communities.length === 1 ? "community" : "communities"} found · checking legacy community authority…`;
+          } else if (update.stage.endsWith(":reading")) {
+            const id = update.stage.split(":")[1] || "legacy";
+            state.textContent = `Owner XRPL history read · checking ${id} authority on XRPL…`;
+          } else if (update.stage.endsWith(":complete")) {
+            state.textContent = `XRPL community history updated · ${update.communities.length} ${update.communities.length === 1 ? "community" : "communities"} found`;
+          }
+        }
+      });
+
+      renderList(result.communities);
       if (!result.communities.length) {
         state.textContent = "No communities were found.";
+      } else if (result.warnings?.length) {
+        state.textContent = `Live community list · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"} · ${result.warnings.join(" ")}`;
       } else {
         state.textContent = `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`;
-        result.communities.forEach(renderCommunity);
       }
     } catch (error) {
       directory.replaceChildren();
