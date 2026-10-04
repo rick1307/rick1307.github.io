@@ -74,6 +74,9 @@
       border:1px solid rgba(143,210,255,.18);background:rgba(77,167,235,.08);color:#a9dcff;
       text-decoration:none;font-size:.74rem;font-weight:900;white-space:nowrap;
     }
+    .open.pending{cursor:default;color:rgba(236,249,247,.46);border-color:rgba(255,255,255,.09);background:rgba(255,255,255,.035)}
+    .directory-state{margin:10px 2px 0;color:rgba(236,249,247,.58);font-size:.82rem;line-height:1.5}
+    .directory-state.error{color:#ffb2a7}
     .future{
       margin:2px 22px 24px;padding:16px 18px;border:1px dashed rgba(134,215,201,.2);border-radius:18px;
       color:rgba(236,249,247,.58);font-size:.82rem;line-height:1.5;
@@ -92,7 +95,7 @@
       <header>
         <div class="header-controls">
           <a class="back wl-header-control" href="owner.html">← Owner Console</a>
-          <a class="create-community" href="addCommunity.html" aria-label="Add community" title="Add community">+</a>
+          <a class="create-community" href="provisionCommunity.html" aria-label="Provision new community" title="Provision new community">+</a>
         </div>
         <div class="title-row">
           <h1>Communities</h1>
@@ -102,70 +105,82 @@
 
       <section class="directory" aria-label="Wild Ledger community directory">
         <div class="section-title">Community Directory</div>
+        <div id="communityDirectoryState" class="directory-state">Reading validated XRPL community history…</div>
         <div id="communityDirectoryList"></div>
       </section>
 
-      <div class="future"><strong>Add a community:</strong> select an existing community to manage it, or use the + button to begin the guided provisioning process for a new community.</div>
+      <div class="future"><strong>Community provisioning:</strong> select an existing community to manage it, or use the + button to provision a new Community ID and its first Operating Wallet on XRPL.</div>
     </section>
   </main>
+  <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js" data-registry-only="true"></script>
-  <script>
-    (() => {
-      const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
-      const directory = document.getElementById("communityDirectoryList");
-      if (!directory) return;
+  <script type="module">
+    import { discoverWildLedgerCommunities } from "./js/communityDiscovery.js";
 
-      const communities = Object.values(registry);
-      if (!communities.length) {
-        const empty = document.createElement("p");
-        empty.className = "community-copy";
-        empty.textContent = "No communities are registered yet.";
-        directory.appendChild(empty);
-        return;
+    const directory = document.getElementById("communityDirectoryList");
+    const state = document.getElementById("communityDirectoryState");
+
+    function addChip(meta, text, reference = false) {
+      if (!text) return;
+      const chip = document.createElement("span");
+      chip.className = `chip${reference ? " reference" : ""}`;
+      chip.textContent = text;
+      meta.appendChild(chip);
+    }
+
+    function renderCommunity(community) {
+      const reference = Boolean(community.reference);
+      const article = document.createElement("article");
+      article.className = `community${reference ? " reference-community" : ""}`;
+
+      const details = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "community-name";
+      name.textContent = community.communityName || community.communityId;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      addChip(meta, community.communityId, reference);
+      addChip(meta, community.directoryStatus, reference);
+      if (community.canonical) addChip(meta, "XRPL Live");
+
+      const copy = document.createElement("p");
+      copy.className = "community-copy";
+      copy.textContent = community.directoryDescription || "Wild Ledger community.";
+
+      details.append(name, meta, copy);
+
+      let action;
+      if (community.configured) {
+        action = document.createElement("a");
+        action.className = "open";
+        action.href = `viewCommunity.html?community=${encodeURIComponent(community.communityId)}&role=owner`;
+        action.textContent = "Open Community →";
+      } else {
+        action = document.createElement("span");
+        action.className = "open pending";
+        action.textContent = "Setup pending";
       }
 
-      communities.forEach((community) => {
-        const backendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(community.id || "").toUpperCase();
-        const reference = community.directoryTone === "reference";
+      article.append(details, action);
+      directory.appendChild(article);
+    }
 
-        const article = document.createElement("article");
-        article.className = `community${reference ? " reference-community" : ""}`;
+    try {
+      const result = await discoverWildLedgerCommunities({ force: true });
+      directory.replaceChildren();
 
-        const details = document.createElement("div");
-        const name = document.createElement("div");
-        name.className = "community-name";
-        name.textContent = community.communityName || "Community";
-
-        const meta = document.createElement("div");
-        meta.className = "meta";
-
-        const idChip = document.createElement("span");
-        idChip.className = `chip${reference ? " reference" : ""}`;
-        idChip.textContent = backendId;
-        meta.appendChild(idChip);
-
-        if (community.directoryStatus) {
-          const statusChip = document.createElement("span");
-          statusChip.className = `chip${reference ? " reference" : ""}`;
-          statusChip.textContent = community.directoryStatus;
-          meta.appendChild(statusChip);
-        }
-
-        const copy = document.createElement("p");
-        copy.className = "community-copy";
-        copy.textContent = community.directoryDescription || "Wild Ledger community.";
-
-        details.append(name, meta, copy);
-
-        const open = document.createElement("a");
-        open.className = "open";
-        open.href = `viewCommunity.html?community=${encodeURIComponent(backendId)}&role=owner`;
-        open.textContent = "Open Community →";
-
-        article.append(details, open);
-        directory.appendChild(article);
-      });
-    })();
+      if (!result.communities.length) {
+        state.textContent = "No communities were found.";
+      } else {
+        state.textContent = `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`;
+        result.communities.forEach(renderCommunity);
+      }
+    } catch (error) {
+      directory.replaceChildren();
+      state.classList.add("error");
+      state.textContent = `Community discovery failed: ${error?.message || String(error)}`;
+    }
   </script>
 </body>
 </html>

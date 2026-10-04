@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Wild Ledger</title><style>
-:root{--ink:#17202a;--muted:#667085;--paper:#f6f2e9;--card:#fff;--line:#d8d2c7;--accent:#243b35;--gold:#b68a52}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 20% 0%,rgba(182,138,82,.14),transparent 34rem),var(--paper)}.wrap{max-width:980px;margin:auto;padding:28px 20px 64px}header{display:flex;justify-content:flex-end;align-items:center;padding:8px 0 44px}.brand{font-weight:850;letter-spacing:.04em;font-size:20px}.leap{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}.hero{padding:44px 0 54px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:750;font-size:12px;color:var(--gold);margin-bottom:14px}h1{font-size:clamp(46px,9vw,86px);line-height:.94;margin:0 0 22px;letter-spacing:-.055em}.hero p{font-size:clamp(19px,3vw,25px);color:#475467;margin:0}.section-title{margin:30px 0 18px;font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.community{display:block;text-decoration:none;color:inherit;background:rgba(255,255,255,.76);border:1px solid var(--line);border-radius:18px;margin:14px 0;padding:24px;box-shadow:0 8px 28px rgba(23,32,42,.045)}.community-top{display:flex;justify-content:space-between;align-items:center;gap:18px}.community h2{margin:0;font-size:clamp(23px,4vw,31px)}.arrow{font-size:28px;color:var(--gold)}.bar{height:7px;border-radius:20px;margin:18px 0 14px;background:linear-gradient(90deg,var(--accent),var(--gold))}.community p{margin:0;color:var(--muted);line-height:1.55}.system{margin-top:50px;padding:30px;border-radius:20px;background:var(--accent);color:#fff}.system h2{margin:0 0 12px;font-size:27px}.system p{margin:0;color:#e3e8e5;line-height:1.6}.pillrow{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.pill{border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:8px 13px;font-size:14px}footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}@media(max-width:560px){.wrap{padding:22px 16px 48px}.hero{padding:32px 0 40px}.community{padding:20px}.system{padding:23px}}
+:root{--ink:#17202a;--muted:#667085;--paper:#f6f2e9;--card:#fff;--line:#d8d2c7;--accent:#243b35;--gold:#b68a52}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 20% 0%,rgba(182,138,82,.14),transparent 34rem),var(--paper)}.wrap{max-width:980px;margin:auto;padding:28px 20px 64px}header{display:flex;justify-content:flex-end;align-items:center;padding:8px 0 44px}.brand{font-weight:850;letter-spacing:.04em;font-size:20px}.leap{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}.hero{padding:44px 0 54px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:750;font-size:12px;color:var(--gold);margin-bottom:14px}h1{font-size:clamp(46px,9vw,86px);line-height:.94;margin:0 0 22px;letter-spacing:-.055em}.hero p{font-size:clamp(19px,3vw,25px);color:#475467;margin:0}.section-title{margin:30px 0 18px;font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.community{display:block;text-decoration:none;color:inherit;background:rgba(255,255,255,.76);border:1px solid var(--line);border-radius:18px;margin:14px 0;padding:24px;box-shadow:0 8px 28px rgba(23,32,42,.045)}.community-top{display:flex;justify-content:space-between;align-items:center;gap:18px}.community h2{margin:0;font-size:clamp(23px,4vw,31px)}.arrow{font-size:28px;color:var(--gold)}.bar{height:7px;border-radius:20px;margin:18px 0 14px;background:linear-gradient(90deg,var(--accent),var(--gold))}.community p{margin:0;color:var(--muted);line-height:1.55}.system{margin-top:50px;padding:30px;border-radius:20px;background:var(--accent);color:#fff}.system h2{margin:0 0 12px;font-size:27px}.system p{margin:0;color:#e3e8e5;line-height:1.6}.pillrow{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.pill{border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:8px 13px;font-size:14px}footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}.community.pending{cursor:default}.community.pending .arrow{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}.community-list-state{margin:8px 0 14px;color:var(--muted);font-size:14px}.community-list-state.error{color:#9f2f24}@media(max-width:560px){.wrap{padding:22px 16px 48px}.hero{padding:32px 0 40px}.community{padding:20px}.system{padding:23px}}
 
 .manager-button{display:inline-block;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:rgba(255,255,255,.78);padding:8px 13px;border-radius:999px;font-size:13px;font-weight:750;white-space:nowrap}
 .manager-button:hover{background:#fff}
 </style>  <link rel="stylesheet" href="../wildLedgerControls.css">
 </head><body><div class="wrap"><header><a class="manager-button wl-header-control" href="../viewCommunityLibrary.html">View Community Library</a></header><main><section class="hero"><div class="eyebrow">A community layer on the XRP Ledger</div><h1>Wild Ledger</h1><p>Communities powered by LEAP.</p></section><div class="section-title">Communities</div>
-<a class="community" href="https://sailingfrogsleap.com"><div class="community-top"><h2>Sailing Frog's Leap</h2><span class="arrow">→</span></div><div class="bar"></div><p>An active LEAP community. Its own identity, members and achievements — recorded on the XRP Ledger.</p></a>
-<a class="community" href="#"><div class="community-top"><h2>Warriors XRP</h2><span class="arrow">→</span></div><div class="bar"></div><p>A second community, powered by the same LEAP system and shaped around its own people and identity.</p></a>
+<div id="communityListState" class="community-list-state">Reading validated XRPL community history…</div>
+<div id="communityList"></div>
 <section class="system"><h2>One system. Different communities.</h2><p>Each community can have its own skin, its own members and its own achievements while sharing the LEAP architecture underneath.</p><div class="pillrow"><span class="pill">Badges</span><span class="pill">Events</span><span class="pill">Challenges</span></div></section>
 <section style="margin-top:50px">
 <div class="eyebrow">The offer</div>
@@ -87,4 +87,49 @@
 <h2 style="font-size:30px;margin:0 0 10px">Want your own LEAP community?</h2>
 <p style="color:var(--muted);font-size:17px;margin:0">Tell me what you want to call it. I’ll build the first one with you.</p>
 </div>
-</section></main><footer>Wild Ledger · Powered by LEAP</footer></div></body></html>
+</section></main><footer>Wild Ledger · Powered by LEAP</footer></div><script src="js/wildLedgerConfig.js"></script><script src="js/communityConfig.js" data-registry-only="true"></script><script type="module">
+import { discoverWildLedgerCommunities } from "./js/communityDiscovery.js";
+
+const list = document.getElementById("communityList");
+const state = document.getElementById("communityListState");
+
+function communityCard(community) {
+  const ready = Boolean(community.publicReady);
+  const card = document.createElement(ready ? "a" : "div");
+  card.className = `community${ready ? "" : " pending"}`;
+  if (ready) card.href = `index.html?community=${encodeURIComponent(community.communityId)}`;
+
+  const top = document.createElement("div");
+  top.className = "community-top";
+
+  const name = document.createElement("h2");
+  name.textContent = community.communityName || community.communityId;
+
+  const arrow = document.createElement("span");
+  arrow.className = "arrow";
+  arrow.textContent = ready ? "→" : "Setup pending";
+  top.append(name, arrow);
+
+  const bar = document.createElement("div");
+  bar.className = "bar";
+
+  const copy = document.createElement("p");
+  copy.textContent = community.directoryDescription || "Wild Ledger community.";
+
+  card.append(top, bar, copy);
+  return card;
+}
+
+try {
+  const result = await discoverWildLedgerCommunities({ force: true });
+  list.replaceChildren();
+  state.textContent = result.communities.length
+    ? `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`
+    : "No communities were found.";
+  result.communities.forEach(community => list.appendChild(communityCard(community)));
+} catch (error) {
+  list.replaceChildren();
+  state.classList.add("error");
+  state.textContent = `Community list temporarily unavailable: ${error?.message || String(error)}`;
+}
+</script></body></html>
