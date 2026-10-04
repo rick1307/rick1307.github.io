@@ -135,34 +135,18 @@ h1{
 .live-state.error{color:#ff8a66}
 
 .start-link{
-  display:block;
-  width:min(520px,100%);
-  margin:24px auto 0;
-  padding:16px 20px;
-  color:#07110e;
-  text-decoration:none;
-  background:#7fffd4;
-  border:3px solid #0a0c0b;
-  border-radius:5px 20px 6px 18px;
-  box-shadow:7px 8px 0 #000;
-  font-size:clamp(20px,3.4vw,30px);
-  line-height:1;
-  letter-spacing:-.02em;
-  text-transform:uppercase;
-  transition:transform .16s ease,box-shadow .16s ease;
-}
-.start-link small{
-  display:block;
-  margin-bottom:7px;
+  display:inline-block;
+  margin:18px auto 0;
+  color:#69aefc;
+  text-decoration:underline;
+  text-underline-offset:3px;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:10px;
-  line-height:1.2;
-  letter-spacing:.16em;
-  text-transform:uppercase;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.06em;
 }
 .start-link:hover,.start-link:focus-visible{
-  transform:translate(-2px,-3px) rotate(-.5deg);
-  box-shadow:10px 11px 0 #000;
+  color:#9bc9ff;
 }
 
 .faq-link{
@@ -216,11 +200,11 @@ h1{
   <div class="doors" id="communityDoors" aria-live="polite"></div>
   <div class="live-state" id="communityLiveState">Reading validated XRPL community history…</div>
 
-  <a class="start-link" href="startCommunity.html"><small>Operate your own</small>Start a Wild Ledger Community</a>
-
   <a class="faq-link" href="leapFaq.html">LEAP FAQ</a>
 
   <div class="footer">Powered by LEAP on the XRP Ledger</div>
+
+  <a class="start-link" href="startCommunity.html">Start a Community</a>
 </main>
 <script src="js/wildLedgerConfig.js"></script>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
