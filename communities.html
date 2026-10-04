@@ -298,6 +298,7 @@
       signButton.disabled = true;
       submitButton.disabled = true;
       submitButton.textContent = "Submit to XRPL";
+      prepareButton.textContent = "Prepare Transaction";
       preview.textContent = "No transaction prepared.";
     }
 
@@ -305,7 +306,7 @@
       const owner = currentOwner();
       const signerReady = Boolean(signerAccount && owner && signerAccount === owner);
       connectButton.disabled = !visibilityReady || !owner || !PROJECT_ID || Boolean(signerReady);
-      prepareButton.disabled = !signerReady || !pendingCommunity;
+      prepareButton.disabled = !signerReady || !pendingCommunity || Boolean(prepared);
       if (!prepared) signButton.disabled = true;
       submitButton.disabled = submissionAttempted || !signedBlob;
     }
@@ -400,6 +401,7 @@
         }
         signedBlob = "";
         preview.textContent = JSON.stringify(prepared.preparedTx, null, 2);
+        prepareButton.textContent = "Prepared";
         setModalStatus(`Prepared successfully. Network fee: ${prepared.preparedTx.Fee} drops. Nothing has been signed or submitted yet.`, "good");
         signButton.disabled = false;
       } catch (error) {
