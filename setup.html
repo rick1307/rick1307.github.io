@@ -692,19 +692,45 @@
           </div>
         </section>
 
-        <section class="section-card">
+        <section class="section-card" id="imagesSection">
           <div class="section-head">
             <div>
               <h2>Images</h2>
-              <p>Photographic community assets should normally be JPG. Transparent graphics such as the LEAP logo stay PNG.</p>
+              <p>Choose the image for each community slot. Wild Ledger creates the repository filename from the slot and Community ID. Each image must be 250 KB or smaller.</p>
             </div>
           </div>
+          <div class="notice"><strong>Shared LEAP logo:</strong> the LEAP coin is system artwork and is not changed here. Setup validates and names community images, but does not upload image bytes to the server yet.</div>
           <div class="grid-2">
-            <div class="field"><label for="bannerDesktop">Desktop banner</label><input id="bannerDesktop" data-path="bannerDesktop" placeholder="images/zachBannerDesktop.jpg"></div>
-            <div class="field"><label for="bannerMobile">Mobile banner</label><input id="bannerMobile" data-path="bannerMobile" placeholder="images/zachBannerMobile.jpg"><div class="hint">Current mobile banner standard: 1200 × 480 JPG.</div></div>
-            <div class="field"><label for="profileImage">Profile image</label><input id="profileImage" data-path="profileImage" placeholder="images/zachProfileImage.jpg"></div>
-            <div class="field"><label for="heroImage">Hero image</label><input id="heroImage" data-path="heroImage" placeholder="images/zachHeroImage.jpg"></div>
-            <div class="field full"><label for="eventHeroImage">Event hero image</label><input id="eventHeroImage" data-path="eventHeroImage" placeholder="images/zachEventHero.jpg"></div>
+            <div class="field">
+              <label for="bannerDesktopFile">Desktop banner</label>
+              <input id="bannerDesktopFile" type="file" accept=".jpg,.jpeg,.png" data-image-slot="bannerDesktop">
+              <input id="bannerDesktop" class="image-path" data-path="bannerDesktop" readonly aria-label="Desktop banner repository path">
+              <div class="hint">Wide landscape. Maximum 250 KB.</div>
+            </div>
+            <div class="field">
+              <label for="bannerMobileFile">Mobile banner</label>
+              <input id="bannerMobileFile" type="file" accept=".jpg,.jpeg,.png" data-image-slot="bannerMobile">
+              <input id="bannerMobile" class="image-path" data-path="bannerMobile" readonly aria-label="Mobile banner repository path">
+              <div class="hint">Wide mobile landscape. Maximum 250 KB.</div>
+            </div>
+            <div class="field">
+              <label for="profileImageFile">Profile image</label>
+              <input id="profileImageFile" type="file" accept=".jpg,.jpeg,.png" data-image-slot="profileImage">
+              <input id="profileImage" class="image-path" data-path="profileImage" readonly aria-label="Profile image repository path">
+              <div class="hint">Square or portrait. Maximum 250 KB.</div>
+            </div>
+            <div class="field">
+              <label for="heroImageFile">Hero image</label>
+              <input id="heroImageFile" type="file" accept=".jpg,.jpeg,.png" data-image-slot="heroImage">
+              <input id="heroImage" class="image-path" data-path="heroImage" readonly aria-label="Hero image repository path">
+              <div class="hint">Feature image. Maximum 250 KB.</div>
+            </div>
+            <div class="field full">
+              <label for="eventHeroImageFile">Event hero image</label>
+              <input id="eventHeroImageFile" type="file" accept=".jpg,.jpeg,.png" data-image-slot="eventHeroImage">
+              <input id="eventHeroImage" class="image-path" data-path="eventHeroImage" readonly aria-label="Event hero image repository path">
+              <div class="hint">Event feature image. Maximum 250 KB.</div>
+            </div>
           </div>
         </section>
 
@@ -894,11 +920,11 @@
         joinLabel: "Join →",
         heading: "Welcome",
         intro: "",
-        bannerDesktop: "images/bannerDesktop.jpg",
-        bannerMobile: "images/bannerMobile.jpg",
-        profileImage: "images/profileImage.jpg",
-        heroImage: "images/heroImage.jpg",
-        eventHeroImage: "images/eventHero.jpg",
+        bannerDesktop: "",
+        bannerMobile: "",
+        profileImage: "",
+        heroImage: "",
+        eventHeroImage: "",
         experienceLine: "Show up. Participate. Build a history.",
         experienceSteps: ["Show up", "Participate", "Build a history"],
         walletStorageKey: "",
@@ -955,6 +981,59 @@
           status.textContent = "This browser could not save the draft.";
           status.className = "status error";
         }
+      }
+
+      const MAX_COMMUNITY_IMAGE_BYTES = 250 * 1024;
+
+      function canonicalCommunityIdForImages() {
+        const namespace = String(document.getElementById("leapNamespace")?.value || current.leapNamespace || "")
+          .trim()
+          .toUpperCase();
+        const fromNamespace = namespace.endsWith("-LEAP") ? namespace.slice(0, -5) : namespace;
+        return fromNamespace.replace(/[^A-Z0-9-]/g, "");
+      }
+
+      function canonicalImageExtension(file) {
+        const type = String(file?.type || "").toLowerCase();
+        const name = String(file?.name || "").toLowerCase();
+        if (type === "image/png" || name.endsWith(".png")) return "png";
+        if (type === "image/jpeg" || name.endsWith(".jpg") || name.endsWith(".jpeg")) return "jpg";
+        return "";
+      }
+
+      function handleCommunityImageSelection(input) {
+        const file = input.files?.[0];
+        if (!file) return;
+        const slot = input.dataset.imageSlot;
+        const communityId = canonicalCommunityIdForImages();
+        const extension = canonicalImageExtension(file);
+
+        if (!communityId) {
+          input.value = "";
+          status.textContent = "Enter the LEAP namespace first so Wild Ledger can derive the Community ID for the image filename.";
+          status.className = "status error";
+          return;
+        }
+        if (!extension) {
+          input.value = "";
+          status.textContent = "Community images must be JPG or PNG.";
+          status.className = "status error";
+          return;
+        }
+        if (file.size > MAX_COMMUNITY_IMAGE_BYTES) {
+          input.value = "";
+          status.textContent = `${file.name} is larger than 250 KB. Choose a smaller image.`;
+          status.className = "status error";
+          return;
+        }
+
+        const path = `images/${slot}-${communityId}.${extension}`;
+        const pathInput = document.querySelector(`[data-path='${slot}']`);
+        if (pathInput) pathInput.value = path;
+        current[slot] = path;
+        status.textContent = `Image accepted. Save it in the repository as ${path.split("/").pop()}.`;
+        status.className = "status ok";
+        updateOutputAndPreview();
       }
 
       function setSimpleFields() {
@@ -1254,7 +1333,14 @@
         updateOutputAndPreview();
       });
 
-      form.addEventListener("change", updateOutputAndPreview);
+      form.addEventListener("change", (event) => {
+        const target = event.target;
+        if (target.matches("[data-image-slot]")) {
+          handleCommunityImageSelection(target);
+          return;
+        }
+        updateOutputAndPreview();
+      });
 
       document.getElementById("saveDraftButton").addEventListener("click", saveDraft);
 
