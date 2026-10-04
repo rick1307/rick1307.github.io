@@ -1052,7 +1052,7 @@
   <nav>
     <div class="wrap nav-inner wl-nav-right">
       <div class="nav-links wl-nav-right">
-        <a class="wl-header-control" href="splash.html">Wild Ledger</a>
+        <a class="wl-header-control" id="wildLedgerLink" href="splash.html" hidden>Wild Ledger</a>
       </div>
     </div>
   </nav>
@@ -1241,6 +1241,15 @@
     (() => {
       const community = window.WILD_LEDGER_COMMUNITY;
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
+
+      const wildLedgerLink = document.getElementById("wildLedgerLink");
+      if (wildLedgerLink) {
+        try {
+          wildLedgerLink.hidden = !sessionStorage.getItem("wildLedgerRole");
+        } catch (_) {
+          wildLedgerLink.hidden = true;
+        }
+      }
 
       if (!community || !communityId) {
         throw new Error("Community configuration failed to load.");
