@@ -190,8 +190,12 @@ h1{
 <script src="js/wildLedgerConfig.js"></script>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script type="module">
+import { readCommunityVisibility, communityIsHidden } from "./js/communityVisibility.js?wl=20261004xrpl1";
+
 const doors = document.getElementById("communityDoors");
 const liveState = document.getElementById("communityLiveState");
+const config = window.WILD_LEDGER_CONFIG || {};
+const SERVER = String(config.xrplWebSocket || "wss://s1.ripple.com/").trim();
 
 function cardTone(community) {
   if (community.communityId === "SFL") return "frog";
@@ -235,30 +239,59 @@ function render(communities) {
   communities.forEach(community => doors.appendChild(communityDoor(community)));
 }
 
+function publicCommunities(communities, visibilityState) {
+  return communities.filter(community => !communityIsHidden(visibilityState, community.communityId));
+}
+
 try {
   const { discoverWildLedgerCommunities } = await import("./js/communityDiscovery.js?wl=20261004b");
+  let latestCommunities = [];
+  let visibilityState = null;
+
+  const visibilityPromise = readCommunityVisibility({ serverUrl: SERVER, force: true })
+    .then(result => {
+      visibilityState = result;
+      if (latestCommunities.length) render(publicCommunities(latestCommunities, visibilityState));
+      return result;
+    });
+
   const result = await discoverWildLedgerCommunities({
     force: true,
     onUpdate(update) {
-      render(update.communities);
+      latestCommunities = update.communities;
+      if (visibilityState) render(publicCommunities(latestCommunities, visibilityState));
       if (update.stage === "owner") {
-        liveState.textContent = "Live Owner XRPL communities loaded · checking legacy community authority…";
+        liveState.textContent = "Live Owner XRPL communities loaded · checking Owner-signed visibility…";
       }
     }
   });
 
-  render(result.communities);
-  liveState.textContent = result.communities.length
-    ? `Live from validated XRPL history · ${result.communities.length} ${result.communities.length === 1 ? "community" : "communities"}`
-    : "No communities were found.";
+  latestCommunities = result.communities;
+  try {
+    visibilityState = await visibilityPromise;
+  } catch (visibilityError) {
+    doors.replaceChildren();
+    liveState.classList.add("error");
+    liveState.textContent = "Community directory temporarily unavailable while XRPL visibility history is being read.";
+    console.error("Wild Ledger visibility read failed", visibilityError);
+    throw new Error("VISIBILITY_UNAVAILABLE");
+  }
+
+  const shown = publicCommunities(result.communities, visibilityState);
+  render(shown);
+  liveState.textContent = shown.length
+    ? `Live from validated XRPL history · ${shown.length} ${shown.length === 1 ? "community" : "communities"}`
+    : "No communities are currently shown.";
 
   if (result.warnings?.length) {
     liveState.textContent += ` · ${result.warnings.join(" ")}`;
   }
 } catch (error) {
-  doors.replaceChildren();
-  liveState.classList.add("error");
-  liveState.textContent = `Community list temporarily unavailable: ${error?.message || String(error)}`;
+  if (error?.message !== "VISIBILITY_UNAVAILABLE") {
+    doors.replaceChildren();
+    liveState.classList.add("error");
+    liveState.textContent = `Community list temporarily unavailable: ${error?.message || String(error)}`;
+  }
 }
 </script>
 </body>
