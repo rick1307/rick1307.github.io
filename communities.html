@@ -82,10 +82,10 @@
     .community-actions{display:flex;flex-direction:column;align-items:flex-end;gap:10px;min-width:176px}
     .visibility-control{display:flex;align-items:center;justify-content:flex-end;gap:9px;color:rgba(236,249,247,.64);font-size:.72rem;font-weight:800}
     .visibility-label{white-space:nowrap}
-    .visibility-switch{position:relative;width:44px;height:26px;padding:0;border:1px solid rgba(134,215,201,.26);border-radius:999px;background:rgba(134,215,201,.10);cursor:pointer;transition:.16s ease}
-    .visibility-switch:before{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#dffbf4;box-shadow:0 2px 8px rgba(0,0,0,.28);transition:.16s ease}
-    .visibility-switch[aria-checked="true"]{background:rgba(239,115,95,.34);border-color:rgba(239,115,95,.52)}
-    .visibility-switch[aria-checked="true"]:before{transform:translateX(18px);background:#ffe1dc}
+    .visibility-switch{position:relative;width:44px;height:26px;padding:0;border:1px solid rgba(239,115,95,.38);border-radius:999px;background:rgba(239,115,95,.16);cursor:pointer;transition:.16s ease}
+    .visibility-switch:before{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#ffe1dc;box-shadow:0 2px 8px rgba(0,0,0,.28);transition:.16s ease}
+    .visibility-switch[aria-checked="true"]{background:rgba(47,168,160,.30);border-color:rgba(134,215,201,.52)}
+    .visibility-switch[aria-checked="true"]:before{transform:translateX(18px);background:#dffbf4}
     .visibility-switch:disabled{cursor:not-allowed;opacity:.42}
     .visibility-note{margin:0 2px;color:rgba(236,249,247,.48);font-size:.74rem;line-height:1.45}
     .visibility-note.error{color:#ffb2a7}
@@ -273,8 +273,8 @@
       toggle.type = "button";
       toggle.className = "visibility-switch";
       toggle.setAttribute("role", "switch");
-      toggle.setAttribute("aria-checked", hidden ? "true" : "false");
-      toggle.setAttribute("aria-label", `${hidden ? "Show" : "Hide"} ${community.communityName || community.communityId} on the public Wild Ledger page`);
+      toggle.setAttribute("aria-checked", hidden ? "false" : "true");
+      toggle.setAttribute("aria-label", `Public visibility for ${community.communityName || community.communityId}`);
       toggle.disabled = !visibilityReady;
       toggle.addEventListener("click", () => openVisibilityDialog(community, !hidden));
       control.append(label, toggle);
