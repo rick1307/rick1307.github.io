@@ -1132,22 +1132,25 @@
 
     /* Wild Ledger community tape: deliberately uses the visual grammar of a
        stock ticker while carrying community-service data, not market data. */
+    .leap-journey-banner{
+      position:relative;
+      z-index:2;
+    }
+
     .wallet-community-ribbon{
+      position:relative;
+      z-index:1;
       max-height:0;
       overflow:hidden;
-      opacity:0;
-      transform:translateY(-8px);
       background:#071012;
       border-top:0 solid #b58a32;
       border-bottom:0 solid #b58a32;
       box-shadow:0 8px 22px rgba(0,0,0,.12);
-      transition:max-height .46s ease,opacity .34s ease,transform .46s ease,border-width .46s ease;
+      transition:max-height .72s cubic-bezier(.2,.8,.2,1),border-width .72s cubic-bezier(.2,.8,.2,1);
     }
 
     .wallet-community-ribbon.is-visible{
       max-height:44px;
-      opacity:1;
-      transform:translateY(0);
       border-top-width:1px;
       border-bottom-width:1px;
     }
@@ -1158,6 +1161,13 @@
       display:flex;
       align-items:stretch;
       padding:0;
+      transform:translateY(-100%);
+      transition:transform .72s cubic-bezier(.2,.8,.2,1);
+      will-change:transform;
+    }
+
+    .wallet-community-ribbon.is-visible .wallet-community-ribbon-inner{
+      transform:translateY(0);
     }
 
     .wallet-community-ribbon-label{
@@ -1270,6 +1280,7 @@
 
     @media (prefers-reduced-motion:reduce){
       .wallet-community-ribbon{transition:none}
+      .wallet-community-ribbon-inner{transition:none;transform:none}
       .wallet-community-ribbon-track{
         overflow-x:auto;
         scrollbar-width:none;
