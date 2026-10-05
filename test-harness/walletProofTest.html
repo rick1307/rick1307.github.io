@@ -170,6 +170,14 @@
     .kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 11px;margin-top:10px;font-size:.75rem}.kv b{color:rgba(236,249,247,.48)}
     .mono{white-space:pre-wrap;word-break:break-word;background:#02151e;color:#dffbf5;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px;margin-top:8px;max-height:280px;overflow:auto;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
     .fine{font-size:.72rem;color:rgba(236,249,247,.46);line-height:1.52;margin:6px 2px 0}
+    .overall-result{margin:14px 0 10px;padding:16px;border:1px solid rgba(130,227,159,.62);border-radius:18px;background:linear-gradient(135deg,rgba(19,102,65,.46),rgba(16,80,57,.30));box-shadow:0 0 0 1px rgba(130,227,159,.12) inset;display:grid;grid-template-columns:52px 1fr;gap:13px;align-items:center}
+    .overall-result[hidden]{display:none!important}
+    .overall-result-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(130,227,159,.74);background:rgba(130,227,159,.12);color:#dfffe7;font-size:1.85rem;font-weight:950}
+    .overall-result-label{display:block;color:#bdf7ce;font-size:.66rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase;margin-bottom:3px}
+    .overall-result strong{display:block;color:#f3fff6;font-size:1.15rem}
+    .overall-result p{margin:4px 0 0;color:#c7ddd8;font-size:.84rem;line-height:1.45}
+    .harness-about{margin-top:12px}
+    .harness-about .safety,.harness-about .run-meter,.harness-about .progress,.harness-about .next-panel{margin-top:12px}
     footer{padding:18px 24px 22px;text-align:center;color:rgba(236,249,247,.36);font-size:.63rem;font-weight:900;letter-spacing:.10em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.055)}
     [hidden]{display:none!important}
 
@@ -195,36 +203,17 @@
       <div class="eyebrow">Test Harness · Conversational by Design</div>
       <h1>Wallet Proof Test</h1>
       <p class="intro"><strong>Question this harness answers:</strong> does the connected wallet really control the XRPL account it claims?</p>
-      <div class="safety"><strong>How to read this page:</strong> yellow means not done, the spinning ring means working, a green check means passed, and a red X means stop and use the diagnostic report. No XRPL transaction is submitted.</div>
-      <div class="run-meter" id="runMeter"><div><strong id="runHeadline">Run the four checks from top to bottom.</strong><span id="runDetail">If all four become green checks, wallet proof is good.</span></div><span class="run-count" id="runCount">0 / 4 PASSED</span></div>
-      <div class="progress" aria-label="Wallet proof test steps">
-        <div class="progress-item is-active" id="progress1"><span class="progress-num">Step 1</span><span class="progress-label">Connect</span><span class="progress-state" id="progress1State">NEXT</span></div>
-        <div class="progress-item is-locked" id="progress2"><span class="progress-num">Step 2</span><span class="progress-label">Challenge</span><span class="progress-state" id="progress2State">LOCKED</span></div>
-        <div class="progress-item is-locked" id="progress3"><span class="progress-num">Step 3</span><span class="progress-label">Prove control</span><span class="progress-state" id="progress3State">LOCKED</span></div>
-        <div class="progress-item is-locked" id="progress4"><span class="progress-num">Step 4</span><span class="progress-label">Reject replay</span><span class="progress-state" id="progress4State">LOCKED</span></div>
-      </div>
     </header>
 
     <div class="body">
-      <div class="next-panel" id="nextPanel" aria-live="polite">
-        <div class="next-panel-label" id="nextPanelLabel">Your next action</div>
-        <div class="next-panel-text" id="nextPanelText">Step 1 — Connect the wallet</div>
-        <div class="next-panel-detail" id="nextPanelDetail">Use the big green wallet button in Step 1.</div>
-      </div>
-
-      <details class="purpose">
-        <summary>When do I use this harness?</summary>
-        <div class="purpose-body"><strong>Use it when wallet ownership itself is the thing you need to isolate.</strong> It does not identify a community, create an Operator session, change authority, or write to XRPL. A clean pass means the connected account produced a valid one-time cryptographic proof and Wild Ledger rejected reuse of that proof.</div>
-      </details>
-
       <details class="step-folder is-active" id="step1Folder" open>
         <summary data-step-summary="1"><span class="step-number">1</span><span><span class="step-kicker">Wallet connection</span><h2>Connect the wallet</h2></span><span class="state-icon pending" id="step1Icon">•</span><span class="step-state" id="step1State">NEXT</span><span class="caret">›</span></summary>
         <div class="folder-body">
           <p class="action-line">Connect Bifrost and approve the wallet connection.</p>
-          <p class="action-sub">No address typing. Wild Ledger reads the XRPL account directly from the wallet.</p>
           <div id="walletActionShell"><div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div><div id="wallet-kit-button"></div></div>
           <div class="human-status" id="step1Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for a wallet connection.</span></div></div>
           <div class="failure-panel" id="step1Failure" hidden><h3>✕ Step 1 failed</h3><p id="step1Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="1">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">No address typing. Wild Ledger reads the XRPL account directly from the wallet.</div></details>
           <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">A connected wallet exposes the XRPL public account that Wild Ledger will later ask to prove. The user never types or pastes the ledger address.</div></details>
           <details class="detail-card"><summary>Technical details</summary><div class="detail-body"><div class="kv"><b>Wallet</b><span id="connectedWallet">—</span><b>XRPL address</b><span id="connectedAddress">—</span></div></div></details>
         </div>
@@ -234,10 +223,10 @@
         <summary data-step-summary="2"><span class="step-number">2</span><span><span class="step-kicker">Fresh one-time proof</span><h2>Generate the challenge</h2></span><span class="state-icon locked" id="step2Icon">•</span><span class="step-state" id="step2State">LOCKED</span><span class="caret">›</span></summary>
         <div class="folder-body">
           <p class="action-line">Create a fresh one-time challenge for this wallet to sign.</p>
-          <p class="action-sub">Wild Ledger makes the challenge automatically. You do not enter anything.</p>
           <div class="button-row"><button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button></div>
           <div class="human-status" id="step2Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for Step 1.</span></div></div>
           <div class="failure-panel" id="step2Failure" hidden><h3>✕ Step 2 failed</h3><p id="step2Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="2">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">Wild Ledger makes the challenge automatically. You do not enter anything.</div></details>
           <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">The proof request is fresh, random, short-lived, and specific to this browser session. That prevents a stored old proof from standing in for current wallet control.</div></details>
           <details class="detail-card"><summary>Technical details</summary><div class="detail-body"><div id="challengeArea" hidden><div class="kv"><b>Nonce</b><span id="nonceText">—</span><b>Expires</b><span id="expiresText">—</span></div><div style="margin-top:10px;font-weight:850">Exact message the wallet will sign</div><pre class="mono" id="challengeText"></pre></div><div id="challengeEmpty">No challenge has been generated yet.</div></div></details>
         </div>
@@ -247,10 +236,10 @@
         <summary data-step-summary="3"><span class="step-number">3</span><span><span class="step-kicker">Cryptographic proof</span><h2>Prove wallet control</h2></span><span class="state-icon locked" id="step3Icon">•</span><span class="step-state" id="step3State">LOCKED</span><span class="caret">›</span></summary>
         <div class="folder-body">
           <p class="action-line">Ask Bifrost to sign the challenge, then approve the signing request.</p>
-          <p class="action-sub">Bifrost may show a transaction-shaped signing screen. This harness never submits it to XRPL.</p>
           <div class="button-row"><button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button></div>
           <div class="human-status" id="step3Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for Steps 1 and 2.</span></div></div>
           <div class="failure-panel" id="step3Failure" hidden><h3>✕ Step 3 failed</h3><p id="step3Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="3">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">Bifrost may show a transaction-shaped signing screen. This harness never submits it to XRPL.</div></details>
           <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">Wild Ledger checks that the signed account matches the connected account, the public key belongs to that account, the digital signature is valid, and the signed message exactly matches the one-time challenge.</div></details>
           <details class="detail-card"><summary>Verification details and raw proof</summary><div class="detail-body"><div class="kv"><b>Signed by</b><span id="proofAccount">—</span><b>Signature</b><span id="signatureCheck">—</span><b>Message</b><span id="messageCheck">—</span><b>Nonce</b><span id="nonceCheck">—</span><b>Ledger submit</b><span>Not performed</span></div><details class="detail-card" style="margin-top:10px"><summary>Raw returned proof data</summary><div class="detail-body"><pre class="mono" id="rawProof">No proof returned yet.</pre></div></details></div></details>
         </div>
@@ -260,12 +249,37 @@
         <summary data-step-summary="4"><span class="step-number">4</span><span><span class="step-kicker">Anti-replay check</span><h2>Reject the same proof twice</h2></span><span class="state-icon locked" id="step4Icon">•</span><span class="step-state" id="step4State">LOCKED</span><span class="caret">›</span></summary>
         <div class="folder-body">
           <p class="action-line">Try the exact same proof again and confirm Wild Ledger rejects it.</p>
-          <p class="action-sub">The correct result is rejection: a valid one-time proof must work only once.</p>
           <div class="button-row"><button id="replayButton" class="primary-action" type="button" disabled>Test Same Proof Again</button></div>
           <div class="human-status" id="step4Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for a successful wallet proof.</span></div></div>
           <div class="failure-panel" id="step4Failure" hidden><h3>✕ Step 4 failed</h3><p id="step4Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="4">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">The correct result is rejection: a valid one-time proof must work only once.</div></details>
           <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">Wild Ledger records the nonce after a successful proof and rejects the exact same signed proof if someone tries to reuse it.</div></details>
           <details class="detail-card"><summary>Technical details</summary><div class="detail-body" id="replayTechnical">No replay test has been run yet.</div></details>
+        </div>
+      </details>
+
+      <div class="overall-result" id="overallResult" hidden aria-live="polite">
+        <span class="overall-result-icon" aria-hidden="true">✓</span>
+        <div><span class="overall-result-label">TEST COMPLETE</span><strong>Wallet proof passed</strong><p>Four green checks. The connected wallet proved control, and the same one-time proof could not be reused.</p></div>
+      </div>
+
+      <details class="purpose harness-about">
+        <summary>About this test</summary>
+        <div class="purpose-body">
+          <p><strong>When do I use this harness?</strong> Use it when wallet control itself is the thing you need to isolate. It does not identify a community, create an Operator session, change authority, or write to XRPL.</p>
+          <div class="safety"><strong>How to read the status:</strong> yellow means not done, the spinning ring means working, a green check means passed, and a red X means stop and use the diagnostic report. No XRPL transaction is submitted.</div>
+          <div class="run-meter" id="runMeter"><div><strong id="runHeadline">Run the four checks from top to bottom.</strong><span id="runDetail">If all four become green checks, wallet proof is good.</span></div><span class="run-count" id="runCount">0 / 4 PASSED</span></div>
+          <div class="progress" aria-label="Wallet proof test steps">
+            <div class="progress-item is-active" id="progress1"><span class="progress-num">Step 1</span><span class="progress-label">Connect</span><span class="progress-state" id="progress1State">NEXT</span></div>
+            <div class="progress-item is-locked" id="progress2"><span class="progress-num">Step 2</span><span class="progress-label">Challenge</span><span class="progress-state" id="progress2State">LOCKED</span></div>
+            <div class="progress-item is-locked" id="progress3"><span class="progress-num">Step 3</span><span class="progress-label">Prove control</span><span class="progress-state" id="progress3State">LOCKED</span></div>
+            <div class="progress-item is-locked" id="progress4"><span class="progress-num">Step 4</span><span class="progress-label">Reject replay</span><span class="progress-state" id="progress4State">LOCKED</span></div>
+          </div>
+          <div class="next-panel" id="nextPanel" aria-live="polite">
+            <div class="next-panel-label" id="nextPanelLabel">Your next action</div>
+            <div class="next-panel-text" id="nextPanelText">Step 1 — Connect the wallet</div>
+            <div class="next-panel-detail" id="nextPanelDetail">Use the wallet button in Step 1.</div>
+          </div>
         </div>
       </details>
 
@@ -304,6 +318,7 @@
   const nextPanelText = document.getElementById("nextPanelText");
   const nextPanelDetail = document.getElementById("nextPanelDetail");
   const runMeter = document.getElementById("runMeter");
+  const overallResult = document.getElementById("overallResult");
   const runHeadline = document.getElementById("runHeadline");
   const runDetail = document.getElementById("runDetail");
   const runCount = document.getElementById("runCount");
@@ -419,6 +434,7 @@
     const challengeReady = !!currentChallenge && Date.now() <= currentChallenge.expiresAt && !usedNonces.has(currentChallenge.nonce);
     const proofDone = !!lastVerifiedAccount && lastVerifiedAccount === address;
     const complete = proofDone && replayPassed;
+    if (overallResult) overallResult.hidden = !complete;
 
     generateButton.disabled = !address || proofDone || !!busyStep;
     signButton.disabled = !address || !challengeReady || proofDone || !!busyStep;
