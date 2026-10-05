@@ -21,10 +21,11 @@ import {
   loadRecognitionCatalog,
   recognitionAvailabilityFromCatalog
 } from "./recognitionCatalog.js";
+import { readCommunityRequestStatus } from "./communitySetup.js";
 
 export const WILD_LEDGER_ACTIVE_WALLET_KEY = "wildLedger.activeWallet";
 export const WILD_LEDGER_COMMUNITY_RECORD_KEY = "wildLedger.communityRecord";
-export const WILD_LEDGER_COMMUNITY_RECORD_VERSION = 1;
+export const WILD_LEDGER_COMMUNITY_RECORD_VERSION = 2;
 
 const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
 const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
@@ -560,6 +561,49 @@ function summarizeCommunityRelationship({
   };
 }
 
+function compactOperatorJourney(status) {
+  const state = String(status?.state || "NONE").toUpperCase();
+  const request = status?.request
+    ? {
+        ledger: Number(status.request.ledger) || null,
+        hash: String(status.request.hash || ""),
+        feeXrp: String(status.request.feeXrp || "")
+      }
+    : null;
+  const community = status?.community
+    ? {
+        communityId: String(status.community.communityId || "").trim().toUpperCase(),
+        namespace: String(status.community.namespace || ""),
+        operatingWallet: String(status.community.operatingWallet || ""),
+        firstOperatingWallet: String(status.community.firstOperatingWallet || ""),
+        ledger: Number(status.community.ledger) || null,
+        hash: String(status.community.hash || "")
+      }
+    : null;
+  const transferredCommunity = status?.transferredCommunity
+    ? {
+        communityId: String(status.transferredCommunity.communityId || "").trim().toUpperCase(),
+        namespace: String(status.transferredCommunity.namespace || ""),
+        firstOperatingWallet: String(status.transferredCommunity.firstOperatingWallet || ""),
+        ledger: Number(status.transferredCommunity.ledger) || null,
+        hash: String(status.transferredCommunity.hash || "")
+      }
+    : null;
+
+  return {
+    state,
+    request,
+    community,
+    transferredCommunity,
+    currentCommunityCount: Array.isArray(status?.currentlyOperatedCommunities)
+      ? status.currentlyOperatedCommunities.length
+      : 0,
+    initialCommunityCount: Array.isArray(status?.initialProvisionedCommunities)
+      ? status.initialProvisionedCommunities.length
+      : 0
+  };
+}
+
 export async function buildWildLedgerCommunityRecord({
   wallet,
   force = false,
@@ -601,6 +645,20 @@ export async function buildWildLedgerCommunityRecord({
 
   const warnings = [...(Array.isArray(discovery?.warnings) ? discovery.warnings : [])];
   if (walletData.linesError) warnings.push(`LEAP balance: ${walletData.linesError}`);
+
+  let operatorJourney = { state: "UNKNOWN", request: null, community: null, transferredCommunity: null, currentCommunityCount: 0, initialCommunityCount: 0 };
+  try {
+    publish("reading-community-request");
+    operatorJourney = compactOperatorJourney(
+      await readCommunityRequestStatus({
+        serverUrl,
+        account: target,
+        force
+      })
+    );
+  } catch (error) {
+    warnings.push(`Community request status: ${error?.message || String(error)}`);
+  }
 
   const cashedCheckAmounts = buildCashedCheckAmounts(walletData.entries, issuer, currency);
   const relationships = [];
@@ -673,6 +731,7 @@ export async function buildWildLedgerCommunityRecord({
     builtAt: new Date().toISOString(),
     leapBalance: walletData.leapBalance,
     isWildLedgerOwner: String(ownerState?.currentAccount || "") === target,
+    operatorJourney,
     communities: relationships,
     warnings
   };
