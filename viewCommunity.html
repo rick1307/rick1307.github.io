@@ -251,11 +251,58 @@
   const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
   const defaultCommunity = Object.values(registry)[0] || null;
   const defaultBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(defaultCommunity) || "";
-  const requestedCommunity = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || defaultBackendId;
-  const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
-  const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+
+  function readOperatorSession() {
+    try {
+      const session = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
+      if (!session || typeof session !== "object") return null;
+      if (Number(session.version) !== 1) return null;
+      if (String(session.role || "").trim().toLowerCase() !== "operator") return null;
+      const communityId = String(session.communityId || "").trim().toUpperCase();
+      const verifiedWallet = String(session.verifiedWallet || "").trim();
+      const source = String(session.source || "").trim();
+      if (!communityId || !/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(verifiedWallet)) return null;
+      if (source !== "wallet-proof + validated-xrpl-authority") return null;
+      return { ...session, communityId, verifiedWallet, role: "operator" };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function clearOperatorSession() {
+    sessionStorage.removeItem("wildLedgerRole");
+    sessionStorage.removeItem("wildLedgerCommunity");
+    sessionStorage.removeItem("wildLedgerOperatorWallet");
+    sessionStorage.removeItem("wildLedgerOperatorSession");
+  }
+
+  const operatorSession = readOperatorSession();
+  const urlRole = String(params.get("role") || "").trim().toLowerCase();
+  const storedRole = String(sessionStorage.getItem("wildLedgerRole") || "").trim().toLowerCase();
+  const operatorRequested = urlRole === "operator" || urlRole === "manager" || storedRole === "operator";
+
+  // Operator access is session-led. A typed role/community URL never creates Operator context.
+  if (operatorRequested && !operatorSession) {
+    clearOperatorSession();
+    window.location.replace("getWild.html?operatorSession=required");
+    return;
+  }
+
+  const role = operatorSession ? "operator" : "owner";
+  const requestedCommunity = operatorSession
+    ? operatorSession.communityId
+    : (params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || defaultBackendId);
   const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunity) || null;
-  const requestedId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedCommunity || "").trim().toUpperCase();
+  const requestedId = operatorSession
+    ? operatorSession.communityId
+    : (window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedCommunity || "").trim().toUpperCase());
+
+  if (operatorSession) {
+    // Synchronize old downstream keys, but the verified Operator session remains authoritative here.
+    sessionStorage.setItem("wildLedgerRole", "operator");
+    sessionStorage.setItem("wildLedgerCommunity", operatorSession.communityId);
+    sessionStorage.setItem("wildLedgerOperatorWallet", operatorSession.verifiedWallet);
+  }
 
   const viewCommunityTitle = document.getElementById("view-community-title");
   const ownerCommunitiesBack = document.getElementById("ownerCommunitiesBack");
@@ -274,12 +321,10 @@
     operatorLogout.remove();
   } else if (operatorLogout) {
     operatorLogout.addEventListener("click", () => {
-      sessionStorage.removeItem("wildLedgerRole");
-      sessionStorage.removeItem("wildLedgerCommunity");
+      clearOperatorSession();
       window.location.href = "getWild.html";
     });
   }
-
 
   if (communityTokenomicsLink) {
     communityTokenomicsLink.href = `viewCommunityTokenomics.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
@@ -301,13 +346,9 @@
     communityEditLink.href = `setup.html?mode=edit&community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
-  if (community) {
-    viewCommunityTitle.textContent = community.communityName;
-    document.title = `${community.communityName} | Wild Ledger`;
-  } else {
-    viewCommunityTitle.textContent = "Community";
-    document.title = "Community | Wild Ledger";
-  }
+  const displayName = community?.communityName || operatorSession?.communityName || requestedId || "Community";
+  viewCommunityTitle.textContent = displayName;
+  document.title = `${displayName} | Wild Ledger`;
 })();
 </script>
 </body>
