@@ -1273,6 +1273,7 @@
   <script type="module">
     import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
     import { loadRecognitionCatalog, recognitionAvailabilityFromCatalog } from "./js/recognitionCatalog.js";
+    import { ensureWildLedgerCommunityRecord } from "./js/walletCommunityRecord.js";
     (async () => {
       const community = window.WILD_LEDGER_COMMUNITY;
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
@@ -3197,6 +3198,18 @@
           }
 
           saveWallet(account);
+
+          // Step 2: build the wallet's cross-community Wild Ledger record once
+          // in the background. This never blocks the current Member Record.
+          // Once complete, the compact public-ledger summary is reused from
+          // sessionStorage for the rest of this browser tab/session.
+          void ensureWildLedgerCommunityRecord({ wallet: account }).catch(error => {
+            console.warn(
+              "Wild Ledger cross-community record could not be built in the background:",
+              error
+            );
+          });
+
           saveLeapSession(account, safeBalance);
 
           if (checksResult.status === "fulfilled") {
