@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-role="owner">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="theme-color" content="#06202e"/>
+<title>TestHub | Wild Ledger</title>
+<style>
+  :root{
+    --bg:#06202e;--deep:#071d2a;--panel:rgba(10,45,58,.72);--panel2:rgba(5,34,46,.58);
+    --line:rgba(121,213,194,.18);--line2:rgba(121,213,194,.34);--text:#f5fbfa;
+    --muted:rgba(236,249,247,.72);--mint:#79d5c2;--mint2:#b7f0df;--teal:#29b8b1;
+    --gold:#f4bd58;--coral:#ef765d;--good:#82e2b6;--warn:#ffd789;
+    --shadow:0 28px 78px rgba(0,16,24,.38);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;color:var(--text);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:
+      radial-gradient(circle at 12% 14%,rgba(41,184,177,.34) 0,rgba(41,184,177,.12) 22%,transparent 44%),
+      radial-gradient(circle at 87% 15%,rgba(244,189,88,.24) 0,rgba(244,189,88,.07) 21%,transparent 42%),
+      radial-gradient(circle at 88% 86%,rgba(239,118,93,.24) 0,rgba(239,118,93,.07) 23%,transparent 46%),
+      linear-gradient(145deg,#06202e 0%,#0a3444 48%,#071d2a 100%);
+    padding:24px 14px 48px;
+  }
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 78%);-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 78%)}
+  .shell{position:relative;z-index:1;width:min(100%,900px);margin:0 auto}
+  .hero,.section{border:1px solid rgba(219,248,244,.14);background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  .hero{position:relative;overflow:hidden;border-radius:30px;padding:28px;margin-bottom:16px}
+  .hero:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--teal),var(--mint),var(--gold),var(--coral))}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}
+  .back{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 13px;border:1px solid rgba(121,213,194,.30);border-radius:999px;color:var(--mint2);background:rgba(121,213,194,.09);text-decoration:none;font-size:.72rem;font-weight:900;letter-spacing:.045em;text-transform:uppercase}
+  .back:hover,.back:focus-visible{color:#e5fff8;border-color:rgba(121,213,194,.54);background:rgba(121,213,194,.15);outline:none}
+  .tag{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mint2)}
+  h1{margin:0;font-size:clamp(2.4rem,8vw,5rem);line-height:.93;letter-spacing:-.06em;font-weight:950}
+  .lede{margin:16px 0 0;max-width:720px;color:var(--muted);font-size:1rem;line-height:1.58}
+  .rule{margin-top:20px;padding:14px 16px;border:1px solid rgba(121,213,194,.22);border-radius:16px;background:rgba(121,213,194,.08);color:#e8fffa;font-weight:800;line-height:1.45}
+  .section{border-radius:26px;padding:22px;margin-top:16px}
+  .section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:14px}
+  .section-kicker{font-size:.72rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--mint2)}
+  h2{margin:4px 0 0;font-size:1.4rem;letter-spacing:-.025em}
+  .section-copy{margin:0;color:var(--muted);font-size:.88rem;line-height:1.5;max-width:460px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .card{position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:20px;padding:18px;background:linear-gradient(150deg,rgba(121,213,194,.07),rgba(255,255,255,.012)),var(--panel2);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+  .card:hover{border-color:var(--line2)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .chip{display:inline-flex;align-items:center;min-height:25px;padding:0 9px;border-radius:999px;font-size:.66rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border:1px solid rgba(121,213,194,.22);color:var(--mint2);background:rgba(121,213,194,.07)}
+  .chip.write{color:#ffe8ae;border-color:rgba(244,189,88,.28);background:rgba(244,189,88,.08)}
+  .chip.one{color:#ffd9d1;border-color:rgba(239,118,93,.30);background:rgba(239,118,93,.08)}
+  .card h3{margin:0 0 8px;font-size:1.23rem;line-height:1.08;letter-spacing:-.025em}
+  .purpose{margin:0 0 14px;color:var(--muted);font-size:.9rem;line-height:1.5}
+  .facts{display:grid;gap:10px;margin-top:auto}
+  .fact{padding-top:10px;border-top:1px solid rgba(121,213,194,.10);font-size:.82rem;line-height:1.48;color:rgba(236,249,247,.82)}
+  .fact b{display:block;margin-bottom:3px;color:var(--mint2);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase}
+  .open{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;min-height:48px;padding:0 15px;border-radius:14px;text-decoration:none;color:#06202e;background:linear-gradient(180deg,#a8eadb,#79d5c2);font-weight:950;box-shadow:0 10px 22px rgba(0,0,0,.14)}
+  .open:hover,.open:focus-visible{transform:translateY(-1px);outline:none}
+  .file{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.66rem;font-weight:800;opacity:.72;overflow-wrap:anywhere;text-align:right}
+  .caution{margin-top:14px;padding:13px 14px;border-radius:14px;border:1px solid rgba(244,189,88,.24);background:rgba(244,189,88,.07);color:#ffe7af;font-size:.82rem;line-height:1.5}
+  footer{padding:20px 6px 0;text-align:center;color:rgba(236,249,247,.48);font-size:.76rem}
+  [hidden]{display:none!important}
+  @media(max-width:700px){.hero{padding:22px 18px}.section{padding:18px 16px}.top{margin-bottom:24px}.grid{grid-template-columns:1fr}.section-head{display:block}.section-copy{margin-top:7px}.file{font-size:.62rem}}
+</style>
+<link rel="stylesheet" href="wildLedgerControls.css">
+<link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+<main class="shell">
+  <section class="hero">
+    <div class="top">
+      <a class="back wl-header-control" id="backLink" href="viewCommunityLibrary.html">← Library</a>
+      <div class="tag">Owner Tools</div>
+    </div>
+    <h1>TestHub</h1>
+    <p class="lede">Wild Ledger's manual service bay. When an automated path is confusing, broken, or still under construction, open the smallest harness that isolates the exact job you want to test.</p>
+    <div class="rule">Harness rule: follow the highlighted next action. If a harness writes to XRPL, it must say so before the submit step.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div><div class="section-kicker">Safe diagnostics</div><h2>No ledger write</h2></div>
+      <p class="section-copy">These tools read XRPL history, connect wallets, verify signatures, or create browser session state. They do not submit a transaction.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <div class="chips"><span class="chip">No XRPL write</span><span class="chip">Wallet proof</span></div>
+        <h3>Wallet Proof Test</h3>
+        <p class="purpose">The smallest possible wallet-control test. It proves that the connected XRPL wallet can sign the exact one-time Wild Ledger challenge.</p>
+        <div class="facts">
+          <div class="fact"><b>Use it when</b>Bifrost or wallet proof is the suspected problem, before you involve community authority or Operator routing.</div>
+          <div class="fact"><b>Successful finish</b>Wallet control verified; signature valid; challenge matches; nothing submitted to XRPL.</div>
+        </div>
+        <a class="open" href="walletProofTest.html"><span>Open Harness →</span><span class="file">walletProofTest.html</span></a>
+      </article>
+
+      <article class="card">
+        <div class="chips"><span class="chip">No XRPL write</span><span class="chip">Authority read</span></div>
+        <h3>Operator Authority Test</h3>
+        <p class="purpose">Proves wallet control and then asks validated XRPL history which Wild Ledger community that exact wallet currently operates.</p>
+        <div class="facts">
+          <div class="fact"><b>Use it when</b>The wallet connects and signs, but you need to verify that Wild Ledger is resolving the correct current Community Operating Wallet authority.</div>
+          <div class="fact"><b>Successful finish</b>One current community is identified from validated XRPL authority history.</div>
+        </div>
+        <a class="open" href="operatorAuthorityTest.html"><span>Open Harness →</span><span class="file">operatorAuthorityTest.html</span></a>
+      </article>
+
+      <article class="card">
+        <div class="chips"><span class="chip">No XRPL write</span><span class="chip">Session + handoff</span></div>
+        <h3>Operator Session Test</h3>
+        <p class="purpose">The full Operator entrance test: connect, prove wallet control, identify current authority, establish the browser Operator session, then hand off into the verified community.</p>
+        <div class="facts">
+          <div class="fact"><b>Use it when</b>You want to debug the real Operator sign-in path end to end, especially session creation or the final View Community handoff.</div>
+          <div class="fact"><b>Successful finish</b>The verified wallet becomes an Operator session and opens the community identified from XRPL, without a typed Community ID.</div>
+        </div>
+        <a class="open" href="test-harness/operatorSessionTest.html"><span>Open Harness →</span><span class="file">test-harness/operatorSessionTest.html</span></a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div><div class="section-kicker">Operational harnesses</div><h2>Real XRPL write</h2></div>
+      <p class="section-copy">These tools can publish canonical authority or provisioning records. Use them deliberately: the final submit step creates permanent ledger history and charges the normal XRP transaction fee.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <div class="chips"><span class="chip write">Writes XRPL</span><span class="chip">Provisioning</span></div>
+        <h3>Direct Community Provisioning</h3>
+        <p class="purpose">A direct test-only path for creating a new canonical Wild Ledger community without going through the request and setup-fee workflow.</p>
+        <div class="facts">
+          <div class="fact"><b>Use it when</b>You need to provision a community directly, or isolate community birth from the larger onboarding/payment automation.</div>
+          <div class="fact"><b>Successful finish</b>The Owner-signed AccountSet validates and Wild Ledger reconstructs the new canonical community from XRPL history.</div>
+        </div>
+        <div class="caution">The final submit button is real. This harness creates canonical community history on XRPL.</div>
+        <a class="open" href="communityProvisioningHarness.html"><span>Open Harness →</span><span class="file">communityProvisioningHarness.html</span></a>
+      </article>
+
+      <article class="card">
+        <div class="chips"><span class="chip write">Writes XRPL</span><span class="chip">Operating wallet</span></div>
+        <h3>New Community Operating Wallet</h3>
+        <p class="purpose">Publishes the first canonical <code>OPERATING-WALLET</code> authority statement for a brand-new community, signed by the current Wild Ledger Owner Wallet.</p>
+        <div class="facts">
+          <div class="fact"><b>Use it when</b>A new community exists conceptually and you need to establish its first Community Operating Wallet directly and verify every step.</div>
+          <div class="fact"><b>Successful finish</b>The Owner-signed no-op AccountSet validates with the canonical community operating-wallet memo.</div>
+        </div>
+        <div class="caution">The final submit button is real. Check the Community ID and Operating Wallet before signing.</div>
+        <a class="open" href="newCommunityOperatingWalletHelper.html"><span>Open Harness →</span><span class="file">newCommunityOperatingWalletHelper.html</span></a>
+      </article>
+
+      <article class="card">
+        <div class="chips"><span class="chip write">Writes XRPL</span><span class="chip one">One-time authority</span></div>
+        <h3>Owner Wallet Statement</h3>
+        <p class="purpose">Publishes Wild Ledger's canonical initial <code>OWNER-WALLET</code> statement using the Owner Wallet itself as signer and named authority.</p>
+        <div class="facts">
+          <div class="fact"><b>Use it when</b>You are establishing or verifying the one-time initial Wild Ledger Owner Wallet authority and the harness confirms that the canonical statement does not already exist.</div>
+          <div class="fact"><b>Successful finish</b>The AccountSet validates and the canonical OWNER-WALLET statement is found on a fresh XRPL reread.</div>
+        </div>
+        <div class="caution">This is not a routine debugging button. Do not publish a second establishment statement after the canonical Owner Wallet statement already exists.</div>
+        <a class="open" href="xrplOwnerWalletStatementHarness.html"><span>Open Harness →</span><span class="file">xrplOwnerWalletStatementHarness.html</span></a>
+      </article>
+    </div>
+  </section>
+
+  <footer>TestHub · Manual Wild Ledger diagnostics and controlled protocol tools</footer>
+</main>
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const role = (params.get('role') || 'owner').trim().toLowerCase();
+  const community = (params.get('community') || '').trim().toUpperCase();
+  const from = (params.get('from') || '').trim().toLowerCase();
+  const back = new URLSearchParams();
+  back.set('role', role === 'operator' || role === 'manager' ? 'operator' : 'owner');
+  if (community) back.set('community', community);
+  if (from === 'owner') back.set('from', 'owner');
+  const backLink = document.getElementById('backLink');
+  if (backLink) backLink.href = `viewCommunityLibrary.html?${back.toString()}`;
+})();
+</script>
+</body>
+</html>

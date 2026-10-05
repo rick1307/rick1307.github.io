@@ -601,6 +601,18 @@
       </a>
     </div>
   </div>
+
+  <div id="testHubShelf" data-audience="owner">
+    <div class="section-label">Diagnostics / Manual Tools</div>
+    <div class="section-note">A direct door into the Wild Ledger test harnesses. Use TestHub when you want to isolate one part of the system and run it by hand.</div>
+    <div class="menu">
+      <a id="testHubLink" href="testHub.html">
+        <span class="link-title">TestHub</span>
+        <span class="link-subtitle">The manual service bay: every current Wild Ledger harness, what it tests, when to use it, and whether it writes to XRPL.</span>
+        <span class="link-file">testHub.html</span>
+      </a>
+    </div>
+  </div>
 </div>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script>
@@ -659,6 +671,7 @@
   const leapProtocolLink = document.getElementById('leapProtocolLink');
   const protocolExtensibilityLink = document.getElementById('protocolExtensibilityLink');
   const protocolSnapshotExtensionLink = document.getElementById('protocolSnapshotExtensionLink');
+  const testHubLink = document.getElementById('testHubLink');
 
   if (backLink) {
     if (ownerEntry) {
@@ -673,6 +686,7 @@
   if (leapProtocolLink) leapProtocolLink.href = `documentation/leapProtocol.html?${qs}`;
   if (protocolExtensibilityLink) protocolExtensibilityLink.href = `documentation/protocolExtensibility.html?${qs}`;
   if (protocolSnapshotExtensionLink) protocolSnapshotExtensionLink.href = `documentation/protocolSnapshotExtension.html?${qs}`;
+  if (testHubLink) testHubLink.href = `testHub.html?${qs}`;
 })();
 </script>
 </body>
