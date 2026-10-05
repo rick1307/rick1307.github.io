@@ -137,12 +137,12 @@
       </div>
     </section>
 
-    <p class="fine">Practice harness only. It does not check S9U authority and it does not publish community settings. Those come later, after the wallet-proof process is familiar.</p>
+    <p class="fine">Practice harness only. Verifier v2 uses the current ripple-keypairs browser implementation. It does not check S9U authority and it does not publish community settings. Those come later, after the wallet-proof process is familiar.</p>
   </main>
 
   <script type="module">
     import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
-    import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@1.3.1?bundle";
+    import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@3.1.0?bundle";
 
     const cfg = window.WILD_LEDGER_CONFIG || {};
     const projectId = String(cfg.walletConnectProjectId || "").trim();
@@ -321,14 +321,32 @@
       if (!account || !publicKey || !signature) throw new Error("The signed proof is missing Account, SigningPubKey, or TxnSignature.");
       if (account !== expectedAccount) throw new Error("The signed proof came from a different XRPL account than the connected wallet.");
 
-      const derived = deriveAddress(publicKey);
+      let derived;
+      try {
+        derived = deriveAddress(publicKey);
+      } catch (error) {
+        throw new Error(`Public-key address check failed: ${error?.message || String(error)}`);
+      }
       if (derived !== account) throw new Error("The public key in the proof does not belong to the signed XRPL account.");
 
       const unsigned = JSON.parse(JSON.stringify(signedTx));
       delete unsigned.TxnSignature;
       delete unsigned.hash;
-      const signingData = encodeForSigning(unsigned);
-      if (!verify(signingData, signature, publicKey)) throw new Error("The digital signature is not valid.");
+
+      let signingData;
+      try {
+        signingData = encodeForSigning(unsigned);
+      } catch (error) {
+        throw new Error(`XRPL signing-data encoding failed: ${error?.message || String(error)}`);
+      }
+
+      let signatureIsValid;
+      try {
+        signatureIsValid = verify(signingData, signature, publicKey);
+      } catch (error) {
+        throw new Error(`Digital-signature check failed: ${error?.message || String(error)}`);
+      }
+      if (!signatureIsValid) throw new Error("The digital signature is not valid.");
 
       const signedMessage = extractMemoText(signedTx);
       if (signedMessage !== challenge.message) throw new Error("The signed message does not match this one-time challenge.");
