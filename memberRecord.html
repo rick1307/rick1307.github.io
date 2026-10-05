@@ -1777,7 +1777,18 @@
             key: "operator-journey",
             type: "action",
             title: `${communityName} is ready.`,
-            body: `${communityId || "Your community"} has been established on the XRP Ledger. Community setup is your next step.`
+            body: `${communityId || "Your community"} has been established on the XRP Ledger. Community setup is your next step.`,
+            buttonLabel: "Finish Community Setup",
+            onClick: () => {
+              if (!communityId) return;
+              try { sessionStorage.setItem("wildLedgerRole", "operator"); } catch (_) {}
+              const query = new URLSearchParams({
+                community: communityId,
+                role: "operator",
+                mode: "provisioned"
+              });
+              window.location.href = `setup.html?${query.toString()}`;
+            }
           });
         }
       }

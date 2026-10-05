@@ -866,7 +866,50 @@
       const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
       const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
       const requestedMode = (params.get("mode") || "edit").trim().toLowerCase();
-      const mode = role === "operator" ? "edit" : (requestedMode === "new" ? "new" : "edit");
+      const mode = requestedMode === "provisioned"
+        ? "provisioned"
+        : (role === "operator" ? "edit" : (requestedMode === "new" ? "new" : "edit"));
+      const ACTIVE_WALLET_KEY = "wildLedger.activeWallet";
+      const COMMUNITY_RECORD_KEY = "wildLedger.communityRecord";
+
+      function sessionValue(key) {
+        try { return sessionStorage.getItem(key) || ""; } catch (_) { return ""; }
+      }
+
+      function readSessionJson(key) {
+        const raw = sessionValue(key);
+        if (!raw) return null;
+        try { return JSON.parse(raw); } catch (_) { return null; }
+      }
+
+      function provisionedSetupContext(requestedCommunity) {
+        if (mode !== "provisioned") return null;
+
+        const activeWallet = String(sessionValue(ACTIVE_WALLET_KEY) || "").trim();
+        const record = readSessionJson(COMMUNITY_RECORD_KEY);
+        const journey = record?.operatorJourney || null;
+        const community = journey?.community || null;
+        const communityId = String(community?.communityId || "").trim().toUpperCase();
+        const requestedId = String(requestedCommunity || "").trim().toUpperCase();
+        const recordWallet = String(record?.wallet || "").trim();
+        const operatingWallet = String(community?.operatingWallet || "").trim();
+        const firstOperatingWallet = String(community?.firstOperatingWallet || operatingWallet || "").trim();
+        const namespace = String(community?.namespace || (communityId ? `${communityId}-LEAP` : "")).trim().toUpperCase();
+
+        if (role !== "operator") return null;
+        if (!activeWallet || !record || recordWallet !== activeWallet) return null;
+        if (String(journey?.state || "").toUpperCase() !== "SETUP_REQUIRED") return null;
+        if (!communityId || !requestedId || communityId !== requestedId) return null;
+        if (!operatingWallet || operatingWallet !== activeWallet) return null;
+
+        return {
+          communityId,
+          namespace,
+          activeWallet,
+          operatingWallet,
+          firstOperatingWallet: firstOperatingWallet || operatingWallet
+        };
+      }
 
       function resolveCommunityId(value) {
         return window.WILD_LEDGER_RESOLVE_COMMUNITY_ID?.(value) || "";
@@ -1125,6 +1168,41 @@
         applyWorkspacePresentation();
       }
 
+      function loadProvisionedCommunity(context, preferDraft = true) {
+        const communityId = String(context?.communityId || "").trim().toUpperCase();
+        const appId = communityId.toLowerCase();
+        const base = blankCommunity();
+        base.id = appId;
+        base.backendId = communityId;
+        base.aliases = [communityId, appId];
+        base.operatingWallet = String(context?.firstOperatingWallet || context?.operatingWallet || "").trim();
+        base.communityName = communityId;
+        base.leapNamespace = String(context?.namespace || `${communityId}-LEAP`).trim().toUpperCase();
+        base.walletStorageKey = `${appId}.xrpl.wallet`;
+        base.activeWalletKey = `${appId}.xrpl.activeWallet`;
+
+        currentSourceId = appId;
+        const saved = preferDraft ? readSavedDraft(appId) : null;
+        current = { ...base, ...(saved || {}) };
+
+        // Canonical / system-derived fields are reasserted after any browser draft.
+        current.id = appId;
+        current.backendId = communityId;
+        current.aliases = [communityId, appId];
+        current.operatingWallet = base.operatingWallet;
+        current.leapNamespace = base.leapNamespace;
+        current.walletStorageKey = base.walletStorageKey;
+        current.activeWalletKey = base.activeWalletKey;
+
+        ensureShape();
+        renderAll();
+        status.textContent = saved
+          ? `Loaded saved ${communityId} setup draft. Canonical community identity remains locked.`
+          : `${communityId} is established on XRPL. Complete the human-facing community settings below.`;
+        status.className = saved ? "status ok" : "status";
+        applyWorkspacePresentation();
+      }
+
       function ensureShape() {
         current.experienceSteps = Array.isArray(current.experienceSteps) ? current.experienceSteps.slice(0,3) : [];
         while (current.experienceSteps.length < 3) current.experienceSteps.push("");
@@ -1204,17 +1282,23 @@
         setLocked(activeWalletKeyInput, !ownerCreating);
 
         if (identityPermissionTag) {
-          identityPermissionTag.textContent = ownerCreating ? "Owner sets at creation" : "Locked setup fields";
+          identityPermissionTag.textContent = mode === "provisioned"
+            ? "Established at provisioning"
+            : (ownerCreating ? "Owner sets at creation" : "Locked setup fields");
         }
         if (idHint) {
-          idHint.textContent = ownerCreating
-            ? "Lowercase internal application key used for URLs and browser storage. It is not the canonical LEAP Protocol Community ID, and it locks after creation in this interface."
-            : "Lowercase internal application key used for URLs and browser storage. Not the canonical LEAP Protocol Community ID. Locked in this interface.";
+          idHint.textContent = mode === "provisioned"
+            ? "Derived from the provisioned Community ID and locked for this community."
+            : (ownerCreating
+                ? "Lowercase internal application key used for URLs and browser storage. It is not the canonical LEAP Protocol Community ID, and it locks after creation in this interface."
+                : "Lowercase internal application key used for URLs and browser storage. Not the canonical LEAP Protocol Community ID. Locked in this interface.");
         }
         if (namespaceHint) {
-          namespaceHint.textContent = ownerCreating
-            ? "Permanent protocol namespace for this community. It locks after creation."
-            : "Permanent LEAP protocol namespace. Locked after community creation.";
+          namespaceHint.textContent = mode === "provisioned"
+            ? "Canonical LEAP namespace established for this provisioned community. Locked in this interface."
+            : (ownerCreating
+                ? "Permanent protocol namespace for this community. It locks after creation."
+                : "Permanent LEAP protocol namespace. Locked after community creation.");
         }
 
         // Operators do not need the browser-storage plumbing or raw registry JSON.
@@ -1288,7 +1372,9 @@
         document.title = "Community Setup — Wild Ledger";
         if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
 
-        const sourceCommunity = configId ? communities[configId] : null;
+        const sourceCommunity = mode === "provisioned"
+          ? current
+          : (configId ? communities[configId] : null);
         refreshOperatingWalletAuthority(sourceCommunity);
         if (manageOperatingAccountLink && configId) {
           const backendId = backendCommunityId(configId);
@@ -1305,6 +1391,17 @@
           if (manageOperatingAccountLink) manageOperatingAccountLink.hidden = true;
           if (operatingWalletDisplay) operatingWalletDisplay.textContent = "Not established yet.";
           if (operatingWalletState) operatingWalletState.textContent = "This is a new community draft; no XRPL Operating Wallet exists yet.";
+          applyFieldPermissions();
+          return;
+        }
+
+        if (mode === "provisioned") {
+          if (workspaceTitle) workspaceTitle.textContent = `Finish ${backendCommunityId(current)} Setup`;
+          if (setupBackLink) {
+            setupBackLink.textContent = "← Member Record";
+            setupBackLink.href = "memberRecord.html";
+          }
+          if (manageOperatingAccountLink) manageOperatingAccountLink.hidden = true;
           applyFieldPermissions();
           return;
         }
@@ -1384,12 +1481,31 @@
         sessionStorage.getItem("wildLedgerCommunity") ||
         window.WILD_LEDGER_COMMUNITY_ID ||
         "";
-      const resolvedRequestedId = resolveCommunityId(requestedCommunity);
-      const initialId = mode === "new"
-        ? "__new__"
-        : (resolvedRequestedId || Object.keys(communities)[0] || "__new__");
 
-      loadCommunity(initialId);
+      if (mode === "provisioned") {
+        const context = provisionedSetupContext(params.get("community") || "");
+        if (!context) {
+          loadCommunity("__new__", false);
+          form.querySelectorAll("input, select, textarea, button").forEach(element => {
+            element.disabled = true;
+          });
+          status.textContent = "Wild Ledger could not verify a provisioned community for the active wallet. Return to Member Record and reopen setup from the action card.";
+          status.className = "status error";
+          if (workspaceTitle) workspaceTitle.textContent = "Community Setup";
+          if (setupBackLink) {
+            setupBackLink.textContent = "← Member Record";
+            setupBackLink.href = "memberRecord.html";
+          }
+        } else {
+          loadProvisionedCommunity(context);
+        }
+      } else {
+        const resolvedRequestedId = resolveCommunityId(requestedCommunity);
+        const initialId = mode === "new"
+          ? "__new__"
+          : (resolvedRequestedId || Object.keys(communities)[0] || "__new__");
+        loadCommunity(initialId);
+      }
     })();
   </script>
 </body>
