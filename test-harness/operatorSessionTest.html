@@ -254,7 +254,17 @@
       </div>
     </section>
 
-    <p class="fine">Practice harness only. Steps 1–4 prove wallet control and resolve current Community Operating Wallet authority from validated XRPL history. Step 5 writes the current Wild Ledger browser session keys from that verified result. This is the current static-site scaffold, not the future server-side production authorization boundary. It does not route the Operator, publish community settings, or submit anything to XRPL.</p>
+    <section class="card step-card is-locked" id="step6Card">
+      <div class="step"><span class="step-number">6</span><h2>Enter the verified community</h2><span class="step-state" id="step6State">LOCKED</span></div>
+      <p>This final handoff opens the real Wild Ledger community page with no Community ID or role in the URL. The page must take Operator context from the verified browser session you just created.</p>
+      <div class="action-callout">NEXT BUTTON ↓</div>
+      <div class="button-row">
+        <button id="openCommunityButton" class="primary-action" type="button" disabled>Open Verified Community</button>
+      </div>
+      <div class="status" id="handoffStatus">Create the Operator session first.</div>
+    </section>
+
+    <p class="fine">Practice harness only. Steps 1–4 prove wallet control and resolve current Community Operating Wallet authority from validated XRPL history. Step 5 writes the current Wild Ledger browser session keys from that verified result. Step 6 hands that verified browser session to the real community page without putting role or Community ID in the URL. This is the current static-site scaffold, not the future server-side production authorization boundary. It does not publish community settings or submit anything to XRPL.</p>
   </main>
 
   <script type="module">
@@ -309,12 +319,14 @@
     const sessionSource = document.getElementById("sessionSource");
     const sessionEstablished = document.getElementById("sessionEstablished");
     const sessionRaw = document.getElementById("sessionRaw");
+    const openCommunityButton = document.getElementById("openCommunityButton");
+    const handoffStatus = document.getElementById("handoffStatus");
     const nextPanelText = document.getElementById("nextPanelText");
     const nextPanelDetail = document.getElementById("nextPanelDetail");
     const walletButtonLoading = document.getElementById("walletButtonLoading");
     const walletButtonHost = document.getElementById("wallet-kit-button");
-    const stepCards = [1,2,3,4,5].map(n => document.getElementById(`step${n}Card`));
-    const stepStates = [1,2,3,4,5].map(n => document.getElementById(`step${n}State`));
+    const stepCards = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Card`));
+    const stepStates = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}State`));
 
     let currentChallenge = null;
     let lastSignedResult = null;
@@ -360,10 +372,11 @@
       signButton.disabled = !address || !challengeReady || proofDone || !!busyStep;
       identifyButton.disabled = !proofDone || !!lastAuthorityResult || !!busyStep;
       createSessionButton.disabled = !candidateReady || sessionDone || !!busyStep;
+      openCommunityButton.disabled = !sessionDone || !!busyStep;
 
       if (!address) {
         setStepState(1, "active");
-        [2,3,4,5].forEach(n => setStepState(n, "locked"));
+        [2,3,4,5,6].forEach(n => setStepState(n, "locked"));
         nextPanelText.textContent = "Step 1 — Connect Bifrost";
         nextPanelDetail.textContent = "Tap the highlighted wallet button in Step 1. Nothing else is ready yet.";
         return;
@@ -378,6 +391,7 @@
         if (!lastAuthorityResult) {
           setStepState(4, "active");
           setStepState(5, "locked");
+          setStepState(6, "locked");
           nextPanelText.textContent = busyStep === 4 ? "Step 4 — Reading XRPL authority…" : "Step 4 — Identify My Community";
           nextPanelDetail.textContent = busyStep === 4
             ? "Please wait while validated XRPL authority history is checked."
@@ -388,6 +402,7 @@
         setStepState(4, "done");
         if (authorityMatches.length !== 1 || !candidateReady) {
           setStepState(5, "locked");
+          setStepState(6, "locked");
           nextPanelText.textContent = authorityMatches.length > 1 ? "STOP — Community chooser required" : "STOP — No Operator authority found";
           nextPanelDetail.textContent = authorityMatches.length > 1
             ? "This wallet controls more than one community, so this harness will not guess."
@@ -397,6 +412,7 @@
 
         if (!sessionDone) {
           setStepState(5, "active");
+          setStepState(6, "locked");
           nextPanelText.textContent = busyStep === 5 ? "Step 5 — Rechecking authority…" : "Step 5 — Create Operator Session";
           nextPanelDetail.textContent = busyStep === 5
             ? "Please wait while authority is rechecked before the browser session is written."
@@ -405,14 +421,16 @@
         }
 
         setStepState(5, "done");
-        nextPanelText.textContent = "TEST COMPLETE";
-        nextPanelDetail.textContent = `Operator session established for ${sessionCandidate.communityId}.`;
+        setStepState(6, "active");
+        nextPanelText.textContent = "Step 6 — Open Verified Community";
+        nextPanelDetail.textContent = `Session established for ${sessionCandidate.communityId}. Tap the highlighted button to test the real-page handoff.`;
+        setStatus(handoffStatus, `Ready. NEXT: open ${sessionCandidate.communityId} from the verified Operator session.`, "wait");
         return;
       }
 
       if (!challengeReady) {
         setStepState(2, "active");
-        [3,4,5].forEach(n => setStepState(n, "locked"));
+        [3,4,5,6].forEach(n => setStepState(n, "locked"));
         nextPanelText.textContent = "Step 2 — Generate Challenge";
         nextPanelDetail.textContent = "Bifrost is connected. Tap the highlighted Generate Challenge button.";
         return;
@@ -420,7 +438,7 @@
 
       setStepState(2, "done");
       setStepState(3, "active");
-      [4,5].forEach(n => setStepState(n, "locked"));
+      [4,5,6].forEach(n => setStepState(n, "locked"));
       nextPanelText.textContent = busyStep === 3 ? "Step 3 — Waiting for Bifrost…" : "Step 3 — Prove Wallet Control";
       nextPanelDetail.textContent = busyStep === 3
         ? "Review the signing request in Bifrost and approve it if it matches this test."
@@ -989,7 +1007,7 @@
         wildLedgerOperatorWallet: sessionStorage.getItem("wildLedgerOperatorWallet"),
         wildLedgerOperatorSession: JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null")
       }, null, 2);
-      setStatus(sessionStatus, `Good. The browser Operator session is now bound to ${session.communityId} from verified wallet authority. TEST COMPLETE.`, "good");
+      setStatus(sessionStatus, `Good. The browser Operator session is now bound to ${session.communityId} from verified wallet authority. NEXT: Open Verified Community.`, "good");
       updateGuidance();
     }
 
@@ -1003,6 +1021,7 @@
       setStatus(sessionStatus, sessionCandidate
         ? `Test session cleared. Authority for ${sessionCandidate.communityId} is still verified; NEXT: Create Operator Session again.`
         : "Test session cleared. Identify exactly one community first.", "wait");
+      setStatus(handoffStatus, "Create the Operator session first.", "wait");
       updateGuidance();
     }
 
@@ -1230,6 +1249,20 @@
         busyStep = 0;
         updateGuidance();
       }
+    });
+
+    openCommunityButton.addEventListener("click", () => {
+      let stored = null;
+      try {
+        stored = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
+      } catch (_) {}
+      if (!stored?.communityId || !stored?.verifiedWallet || stored?.role !== "operator" || stored?.source !== "wallet-proof + validated-xrpl-authority") {
+        setStatus(handoffStatus, "The verified Operator session is missing or incomplete. Create it again before continuing.", "bad");
+        updateGuidance();
+        return;
+      }
+      setStatus(handoffStatus, `Opening ${stored.communityId} with session-only Operator context…`, "good");
+      window.location.href = "../viewCommunity.html";
     });
 
     clearSessionButton.addEventListener("click", clearStoredOperatorSession);
