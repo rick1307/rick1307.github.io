@@ -307,6 +307,65 @@
 
     .record-wallet{display:none}
 
+    .member-attention{
+      display:none;
+      margin:0 0 14px;
+      gap:10px;
+    }
+
+    .member-attention.show{display:grid}
+
+    .member-attention-group{display:none}
+    .member-attention-group.show{display:block}
+
+    .member-attention-heading{
+      margin:0 0 6px;
+      color:rgba(255,255,255,.46);
+      font-size:.58rem;
+      font-weight:900;
+      letter-spacing:.14em;
+      line-height:1.2;
+      text-transform:uppercase;
+    }
+
+    .member-attention-stack{
+      display:grid;
+      gap:8px;
+    }
+
+    .member-attention-card{
+      padding:12px 13px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.045);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      color:rgba(255,255,255,.76);
+      font-size:.75rem;
+      line-height:1.48;
+    }
+
+    .member-attention-card.notice{
+      border-color:rgba(160,222,173,.24);
+      background:rgba(160,222,173,.05);
+    }
+
+    .member-attention-card.action-required{
+      border-color:rgba(240,199,107,.34);
+      background:rgba(240,199,107,.075);
+    }
+
+    .member-attention-card strong{
+      display:block;
+      margin-bottom:3px;
+      color:#fff;
+      font-size:.84rem;
+      line-height:1.3;
+    }
+
+    .member-attention-card .crew-state-action{
+      margin-top:10px;
+    }
+
     .crew-state-message{
       display:none;
       margin:0 0 14px;
@@ -1382,7 +1441,16 @@
           </a>
         </div>
 
-        <div class="crew-state-message" id="operatorJourneyMilestone" role="status" aria-live="polite"></div>
+        <div class="member-attention" id="memberAttention" aria-live="polite">
+          <section class="member-attention-group" id="memberNoticeGroup" aria-label="Member Record notices">
+            <div class="member-attention-heading">Notices</div>
+            <div class="member-attention-stack" id="memberNoticeStack"></div>
+          </section>
+          <section class="member-attention-group" id="memberActionGroup" aria-label="Member Record actions">
+            <div class="member-attention-heading">Actions</div>
+            <div class="member-attention-stack" id="memberActionStack"></div>
+          </section>
+        </div>
         <div class="crew-state-message" id="crewStateMessage" role="status" aria-live="polite"></div>
         <div class="record-wallet" id="recordWallet" hidden></div>
 
@@ -1567,7 +1635,11 @@
       const XRPL_WS = wildLedger.xrplWebSocket;
 
       const status = document.getElementById("crewRecordStatus");
-      const operatorJourneyMilestone = document.getElementById("operatorJourneyMilestone");
+      const memberAttention = document.getElementById("memberAttention");
+      const memberNoticeGroup = document.getElementById("memberNoticeGroup");
+      const memberNoticeStack = document.getElementById("memberNoticeStack");
+      const memberActionGroup = document.getElementById("memberActionGroup");
+      const memberActionStack = document.getElementById("memberActionStack");
       const crewStateMessage = document.getElementById("crewStateMessage");
       const leaperLoungeEntry = document.getElementById("leaperLoungeEntry");
       const trustlineStatus = document.getElementById("trustlineStatus");
@@ -1622,25 +1694,78 @@
         return parts;
       }
 
-      function renderOperatorJourneyMilestone(record) {
-        if (!operatorJourneyMilestone) return;
+      function syncMemberAttention() {
+        if (!memberAttention) return;
 
-        operatorJourneyMilestone.className = "crew-state-message";
-        operatorJourneyMilestone.replaceChildren();
+        const hasNotices = Boolean(memberNoticeStack?.children.length);
+        const hasActions = Boolean(memberActionStack?.children.length);
+
+        memberNoticeGroup?.classList.toggle("show", hasNotices);
+        memberActionGroup?.classList.toggle("show", hasActions);
+        memberAttention.classList.toggle("show", hasNotices || hasActions);
+      }
+
+      function findAttentionCard(key) {
+        if (!memberAttention || !key) return null;
+        return [...memberAttention.querySelectorAll("[data-attention-key]")].find(
+          card => card.dataset.attentionKey === key
+        ) || null;
+      }
+
+      function removeAttentionCard(key) {
+        findAttentionCard(key)?.remove();
+        syncMemberAttention();
+      }
+
+      function setAttentionCard({ key, type = "notice", title = "", body = "", buttonLabel = "", onClick = null }) {
+        if (!key || !memberNoticeStack || !memberActionStack) return;
+
+        removeAttentionCard(key);
+
+        const isAction = type === "action";
+        const card = document.createElement("div");
+        card.className = `member-attention-card ${isAction ? "action-required" : "notice"}`;
+        card.dataset.attentionKey = key;
+
+        if (title) {
+          const heading = document.createElement("strong");
+          heading.textContent = title;
+          card.appendChild(heading);
+        }
+
+        if (body) {
+          const copy = document.createElement("span");
+          copy.textContent = body;
+          card.appendChild(copy);
+        }
+
+        if (buttonLabel && typeof onClick === "function") {
+          const button = document.createElement("button");
+          button.className = "crew-state-action";
+          button.type = "button";
+          button.textContent = buttonLabel;
+          button.addEventListener("click", onClick);
+          card.appendChild(button);
+        }
+
+        (isAction ? memberActionStack : memberNoticeStack).appendChild(card);
+        syncMemberAttention();
+      }
+
+      function renderOperatorJourneyMilestone(record) {
+        removeAttentionCard("operator-journey");
 
         const journey = record?.operatorJourney || null;
         const journeyState = String(journey?.state || "").toUpperCase();
         if (!journey || !journeyState) return;
 
         if (journeyState === "WAITING") {
-          const title = document.createElement("strong");
-          title.textContent = "Community request received.";
-
-          const copy = document.createElement("span");
-          copy.textContent = "Your request is being processed. No action is required right now. Community setup is usually completed within 24 hours.";
-
-          operatorJourneyMilestone.append(title, copy);
-          operatorJourneyMilestone.classList.add("show", "success");
+          setAttentionCard({
+            key: "operator-journey",
+            type: "notice",
+            title: "Community request received.",
+            body: "Your request is being processed. No action is required right now. Community setup is usually completed within 24 hours."
+          });
           return;
         }
 
@@ -1648,14 +1773,12 @@
           const communityId = String(journey?.community?.communityId || "").trim().toUpperCase();
           const communityName = String(journey?.community?.communityName || communityId || "Your community").trim();
 
-          const title = document.createElement("strong");
-          title.textContent = `${communityName} is ready.`;
-
-          const copy = document.createElement("span");
-          copy.textContent = `${communityId || "Your community"} has been established on the XRP Ledger. Community setup is your next step.`;
-
-          operatorJourneyMilestone.append(title, copy);
-          operatorJourneyMilestone.classList.add("show", "action");
+          setAttentionCard({
+            key: "operator-journey",
+            type: "action",
+            title: `${communityName} is ready.`,
+            body: `${communityId || "Your community"} has been established on the XRP Ledger. Community setup is your next step.`
+          });
         }
       }
 
@@ -1836,10 +1959,35 @@
       function setStateMessage(title = "", body = "", kind = "", showTransferAction = false, showJoinAction = false) {
         if (!crewStateMessage) return;
 
-        crewStateMessage.textContent = "";
+        removeAttentionCard("leap-transfers");
+        removeAttentionCard("join-community");
+
+        if (showTransferAction) {
+          setAttentionCard({
+            key: "leap-transfers",
+            type: "action",
+            title: "Enable LEAP Transfers",
+            body: "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
+            buttonLabel: "Enable LEAP Transfers",
+            onClick: prepareLeapTrustline
+          });
+        }
+
+        if (showJoinAction) {
+          setAttentionCard({
+            key: "join-community",
+            type: "action",
+            title: `Join ${communityName}`,
+            body: `Open the Join flow to establish this wallet in the ${communityName} membership system.`,
+            buttonLabel: "Go to Join",
+            onClick: () => { window.location.href = "join.html"; }
+          });
+        }
+
+        crewStateMessage.replaceChildren();
         crewStateMessage.className = "crew-state-message";
 
-        if (!title && !body && !showTransferAction && !showJoinAction) {
+        if (!title && !body) {
           crewStateMessage.hidden = true;
           return;
         }
@@ -1856,28 +2004,6 @@
           const copy = document.createElement("span");
           copy.textContent = body;
           crewStateMessage.appendChild(copy);
-        }
-
-        if (showTransferAction) {
-          const button = document.createElement("button");
-          button.className = "crew-state-action";
-          button.type = "button";
-          button.textContent = "Enable LEAP Transfers";
-          button.title = "Enable direct LEAP transfers for this wallet.";
-          button.addEventListener("click", prepareLeapTrustline);
-          crewStateMessage.appendChild(button);
-        }
-
-        if (showJoinAction) {
-          const button = document.createElement("button");
-          button.className = "crew-state-action";
-          button.type = "button";
-          button.textContent = "Go to Join";
-          button.title = "Go to the Join page.";
-          button.addEventListener("click", () => {
-            window.location.href = "join.html";
-          });
-          crewStateMessage.appendChild(button);
         }
 
         crewStateMessage.hidden = false;
@@ -3526,12 +3652,7 @@
           saveWallet(account);
 
           if (transfersDisabled) {
-            setStateMessage(
-              "",
-              "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
-              "warn",
-              true
-            );
+            setStateMessage("", "", "", true);
           } else {
             setStateMessage();
           }
@@ -3560,13 +3681,7 @@
           clearIdentityState({ forgetWallet:true });
           resetRecord();
           setTrustlineStatus(null, "unavailable");
-          setStateMessage(
-            `You have not joined the ${communityName} membership system.`,
-            "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
-            "warn",
-            false,
-            true
-          );
+          setStateMessage("", "", "", false, true);
           setStatus("");
           return;
         }
@@ -3615,12 +3730,7 @@
               transfersDisabled
             );
           } else if (Number(leapLine?.limit) === 0) {
-            setStateMessage(
-              "",
-              "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
-              "warn",
-              true
-            );
+            setStateMessage("", "", "", true);
           } else {
             setStateMessage();
           }
@@ -3770,13 +3880,7 @@
             "warn"
           );
         } else {
-          setStateMessage(
-            `You have not joined the ${communityName} membership system.`,
-            "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
-            "warn",
-            false,
-            true
-          );
+          setStateMessage("", "", "", false, true);
         }
         setStatus("");
       }
