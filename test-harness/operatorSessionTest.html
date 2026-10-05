@@ -7,122 +7,125 @@
   <title>Operator Session Test — Wild Ledger</title>
   <style>
     :root{
-      --bg:#e8eee9;
-      --card:#fbf8ef;
-      --ink:#17313a;
-      --deep:#0b2d36;
-      --sea:#2f7481;
-      --gold:#d7ae62;
-      --line:rgba(15,52,64,.18);
-      --muted:#60757a;
-      --ok:#226b4e;
-      --bad:#9b3e32;
-      --warn:#8b641e;
-      --shadow:0 18px 55px rgba(11,45,54,.13);
+      --deep:#031c29;--deep2:#062f3d;--panel:rgba(7,43,57,.76);--card:rgba(5,34,46,.58);
+      --lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;--coral:#ef735f;
+      --ink:#f4fbfa;--muted:rgba(236,249,247,.68);--line:rgba(255,255,255,.09);
+      --good:#9fe0b0;--bad:#ffb7aa;--wait:#f5d38f;--blue:#9fddff;
     }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
     body{
-      margin:0;
-      font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--ink);
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       background:
-        radial-gradient(circle at 10% -10%,rgba(215,174,98,.18),transparent 30%),
-        linear-gradient(180deg,#edf1ec,#d6e3df);
-      min-height:100vh;
+        radial-gradient(circle at 12% 10%,rgba(47,168,160,.26),transparent 31%),
+        radial-gradient(circle at 88% 8%,rgba(239,115,95,.13),transparent 25%),
+        radial-gradient(circle at 72% 82%,rgba(243,182,74,.12),transparent 28%),
+        linear-gradient(145deg,#021720 0%,var(--deep) 42%,var(--deep2) 100%);
     }
-    .shell{width:min(780px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}
-    .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-    .brand{font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem;color:var(--deep)}
-    .badge{font-size:.72rem;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.55)}
-    .hero,.card{background:rgba(251,248,239,.92);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px}
-    .hero{padding:24px;margin-bottom:16px}
-    h1{margin:0 0 8px;font-size:clamp(1.8rem,7vw,2.65rem);line-height:1.02;color:var(--deep)}
-    .lede{margin:0;color:var(--muted);font-size:1rem;line-height:1.55}
-    .hard-stop{margin-top:18px;border:1px solid rgba(34,107,78,.25);background:rgba(34,107,78,.08);border-radius:16px;padding:14px 15px;font-weight:750;line-height:1.45;color:#1e5b43}
-    .card{padding:20px;margin-top:14px}
-    .step{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-    .step-number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--deep);color:white;font-weight:900;font-size:.82rem}
-    h2{font-size:1.15rem;margin:0;color:var(--deep)}
-    p{line-height:1.55}
-    button{appearance:none;border:0;border-radius:14px;padding:13px 16px;font:inherit;font-weight:850;cursor:pointer;background:var(--deep);color:white;min-height:48px}
-    button.secondary{background:transparent;color:var(--deep);border:1px solid var(--line)}
-    button:disabled{opacity:.42;cursor:not-allowed}
-    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-    .status{margin-top:13px;padding:12px 13px;border-radius:14px;background:rgba(23,49,58,.055);border:1px solid var(--line);line-height:1.45;word-break:break-word}
-    .status.good{background:rgba(34,107,78,.09);border-color:rgba(34,107,78,.25);color:var(--ok)}
-    .status.bad{background:rgba(155,62,50,.08);border-color:rgba(155,62,50,.22);color:var(--bad)}
-    .status.wait{background:rgba(139,100,30,.08);border-color:rgba(139,100,30,.20);color:var(--warn)}
-    .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:var(--muted);margin-bottom:7px}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.79rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#102f37;color:#eaf5f1;border-radius:14px;padding:14px;margin-top:9px;max-height:270px;overflow:auto}
-    .kv{display:grid;grid-template-columns:125px 1fr;gap:7px 12px;margin-top:12px;font-size:.9rem}
-    .kv b{color:var(--muted)}
-    .result-big{font-size:1.25rem;font-weight:950;margin-top:10px}
-    .result-big.good{color:var(--ok)}
-    .result-big.bad{color:var(--bad)}
-    details{margin-top:14px}
-    summary{cursor:pointer;font-weight:800;color:var(--deep)}
-    .fine{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:16px}
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;
+      background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+      background-size:36px 36px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%);
+      -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%);
+    }
+    .shell{width:min(930px,100%);margin:0 auto;padding:28px 16px 52px;position:relative;z-index:1}
+    .console{
+      overflow:visible;border:1px solid var(--line);border-radius:30px;
+      background:linear-gradient(155deg,rgba(8,56,70,.90),rgba(4,31,43,.88));
+      box-shadow:0 30px 90px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    }
+    .console::before{content:"";display:block;height:4px;border-radius:30px 30px 0 0;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
+    header{padding:30px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .back{display:block;width:max-content;margin:0 0 28px;color:var(--blue);text-decoration:none;font-weight:800;font-size:.78rem}
+    .eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+    h1{margin:8px 0 0;font-size:clamp(2.35rem,8vw,4.6rem);line-height:.96;letter-spacing:-.055em}
+    .intro{max-width:790px;margin:16px 0 0;color:var(--muted);line-height:1.62}
+    .safety{margin-top:16px;padding:13px 14px;border-radius:14px;border:1px solid rgba(134,215,201,.16);background:rgba(47,168,160,.07);color:rgba(236,249,247,.78);font-size:.78rem;line-height:1.52}
+    .safety strong{color:#dffbf5}
 
-    /* Guided harness: there should never be any doubt about what to do next. */
+    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:24px}
+    .progress-item{position:relative;padding:9px 8px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(1,21,30,.28);text-align:center;transition:.18s ease}
+    .progress-num{display:block;color:var(--sea-glass);font-size:.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+    .progress-label{display:block;margin-top:3px;color:rgba(236,249,247,.57);font-size:.61rem;font-weight:800;line-height:1.25}
+    .progress-state{display:block;margin-top:5px;font-size:.56rem;font-weight:950;letter-spacing:.09em;text-transform:uppercase;color:rgba(236,249,247,.34)}
+    .progress-item.is-active{border-color:rgba(243,182,74,.60);background:rgba(243,182,74,.11);box-shadow:0 0 0 2px rgba(243,182,74,.045)}
+    .progress-item.is-active .progress-num,.progress-item.is-active .progress-state{color:#ffe6ad}
+    .progress-item.is-done{border-color:rgba(159,224,176,.42);background:rgba(159,224,176,.10)}
+    .progress-item.is-done .progress-num,.progress-item.is-done .progress-state{color:#dfffe7}
+    .progress-item.is-locked{opacity:.58}
+
+    .body{padding:22px;display:grid;gap:16px}
     .next-panel{
-      position:sticky;
-      top:calc(env(safe-area-inset-top, 0px) + 8px);
-      z-index:20;
-      margin:0 0 16px;
-      padding:14px 16px;
-      border:2px solid var(--gold);
-      border-radius:18px;
-      background:#fffaf0;
-      box-shadow:0 12px 32px rgba(11,45,54,.16);
+      position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:30;
+      margin:0;padding:15px 16px;border:2px solid rgba(243,182,74,.68);border-radius:17px;
+      background:linear-gradient(145deg,rgba(93,66,13,.96),rgba(53,42,17,.96));
+      box-shadow:0 14px 36px rgba(0,0,0,.28),0 0 0 3px rgba(243,182,74,.05);
     }
-    .next-panel-label{font-size:.72rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)}
-    .next-panel-text{margin-top:3px;font-size:1.12rem;font-weight:950;line-height:1.28;color:var(--deep)}
-    .next-panel-detail{margin-top:3px;font-size:.86rem;line-height:1.4;color:var(--muted)}
+    .next-panel-label{font-size:.67rem;font-weight:950;letter-spacing:.13em;text-transform:uppercase;color:#ffd986}
+    .next-panel-text{margin-top:4px;font-size:1.15rem;font-weight:950;line-height:1.25;color:#fff3cf}
+    .next-panel-detail{margin-top:4px;font-size:.80rem;line-height:1.48;color:rgba(255,243,207,.76)}
 
-    .step-card{position:relative;transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease}
-    .step-card.is-active{border:3px solid var(--gold);box-shadow:0 18px 50px rgba(139,100,30,.18)}
-    .step-card.is-done{border:2px solid rgba(34,107,78,.42)}
-    .step-card.is-locked{opacity:.62}
-    .step-state{margin-left:auto;border-radius:999px;padding:6px 9px;font-size:.68rem;font-weight:950;letter-spacing:.07em;text-transform:uppercase;background:rgba(23,49,58,.08);color:var(--muted)}
-    .step-card.is-active .step-state{background:var(--gold);color:#2e260f}
-    .step-card.is-done .step-state{background:rgba(34,107,78,.12);color:var(--ok)}
-    .step-card.is-locked .step-state{background:rgba(23,49,58,.07);color:var(--muted)}
-
-    .action-callout{display:none;margin:14px 0 8px;font-size:.72rem;font-weight:950;letter-spacing:.09em;text-transform:uppercase;color:var(--warn)}
-    .step-card.is-active .action-callout{display:block}
-    .primary-action{width:100%;font-size:1.03rem;min-height:56px}
-    .step-card.is-active .primary-action:not(:disabled){
-      outline:4px solid rgba(215,174,98,.32);
-      box-shadow:0 8px 22px rgba(11,45,54,.18);
+    .card{
+      position:relative;padding:22px;border:1px solid var(--line);border-radius:22px;
+      background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),var(--card);
+      transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease,transform .18s ease;
     }
-    .primary-action:not(:disabled)::after{content:"  →"}
+    .step-card.is-active{border:2px solid rgba(243,182,74,.72);box-shadow:0 0 0 3px rgba(243,182,74,.055),0 18px 44px rgba(0,0,0,.22);transform:translateY(-1px)}
+    .step-card.is-done{border-color:rgba(159,224,176,.38)}
+    .step-card.is-locked{opacity:.52}
+    .step-head{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:start;margin-bottom:15px}
+    .step-number{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;border:1px solid rgba(134,215,201,.28);background:rgba(47,168,160,.10);color:#e5fff9;font-size:.82rem;font-weight:950}
+    .step-kicker{color:var(--sea-glass);font-size:.64rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    h2{margin:4px 0 0;font-size:1.2rem;letter-spacing:-.02em}
+    .step-summary{margin:7px 0 0;color:rgba(236,249,247,.60);font-size:.80rem;line-height:1.50}
+    .step-state{align-self:start;border-radius:999px;padding:6px 9px;font-size:.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.055);color:rgba(236,249,247,.47)}
+    .step-card.is-active .step-state{background:rgba(243,182,74,.16);border:1px solid rgba(243,182,74,.42);color:#ffe7ae}
+    .step-card.is-done .step-state{background:rgba(159,224,176,.13);border:1px solid rgba(159,224,176,.34);color:#eaffef}
 
-    #walletActionShell{margin-top:12px;border-radius:16px}
-    #step1Card.is-active #walletActionShell{padding:10px;border:3px solid var(--gold);background:rgba(215,174,98,.08)}
+    .instruction{margin:0 0 15px;padding:13px 14px;border-radius:15px;border:1px solid rgba(243,182,74,.18);background:rgba(243,182,74,.06)}
+    .instruction strong{display:block;color:#f7deb0;font-size:.76rem}
+    .instruction span{display:block;margin-top:4px;color:rgba(247,222,176,.78);font-size:.76rem;line-height:1.5}
+    .step-card.is-locked .instruction{border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.025)}
+    .step-card.is-locked .instruction strong,.step-card.is-locked .instruction span{color:rgba(236,249,247,.43)}
+
+    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    button{appearance:none;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-size:.82rem;font-weight:900;cursor:pointer;min-height:46px}
+    button.secondary{color:#b9e5ff;background:rgba(77,167,235,.08)}
+    button:disabled{opacity:.34;cursor:not-allowed}
+    .primary-action{width:100%;min-height:56px;background:rgba(47,168,160,.18);border-color:rgba(134,215,201,.34);color:#effffa;font-size:1rem}
+    .step-card.is-active .primary-action:not(:disabled){background:linear-gradient(180deg,rgba(47,168,160,.32),rgba(47,168,160,.21));border:2px solid rgba(134,215,201,.78);box-shadow:0 0 0 4px rgba(47,168,160,.09),0 11px 26px rgba(0,0,0,.22)}
+    .step-card.is-active .primary-action:not(:disabled)::before{content:"NEXT · ";color:#d7fff7}
+    .step-card.is-active .primary-action:not(:disabled)::after{content:"  →"}
+
+    #walletActionShell{margin-top:10px;border-radius:16px}
+    #step1Card.is-active #walletActionShell{padding:10px;border:2px solid rgba(134,215,201,.72);background:rgba(47,168,160,.065);box-shadow:0 0 0 4px rgba(47,168,160,.07)}
     #wallet-kit-button{min-height:58px}
     #wallet-kit-button:empty{display:none}
-    #wallet-kit-button button,
-    #wallet-kit-button [role="button"]{
-      width:100%!important;
-      min-height:58px!important;
-      border-radius:14px!important;
-      font-size:1.03rem!important;
-      font-weight:900!important;
-    }
-    #step1Card.is-active #wallet-kit-button button,
-    #step1Card.is-active #wallet-kit-button [role="button"]{
-      outline:4px solid rgba(215,174,98,.32)!important;
-      box-shadow:0 8px 22px rgba(11,45,54,.18)!important;
-    }
-    .wallet-loading{padding:14px 15px;border:2px dashed rgba(139,100,30,.35);border-radius:14px;color:var(--warn);font-weight:850;text-align:center}
-    .wallet-loading.bad{border-color:rgba(155,62,50,.35);color:var(--bad);background:rgba(155,62,50,.05)}
+    #wallet-kit-button button,#wallet-kit-button [role="button"]{width:100%!important;min-height:58px!important;border-radius:12px!important;font-size:1rem!important;font-weight:900!important}
+    #step1Card.is-active #wallet-kit-button button,#step1Card.is-active #wallet-kit-button [role="button"]{outline:3px solid rgba(134,215,201,.18)!important;box-shadow:0 10px 24px rgba(0,0,0,.22)!important}
+    .wallet-loading{padding:14px 15px;border:1px dashed rgba(243,182,74,.38);border-radius:12px;color:var(--wait);font-weight:850;text-align:center}
+    .wallet-loading.bad{border-color:rgba(255,183,170,.38);color:var(--bad);background:rgba(255,183,170,.05)}
 
+    .status{margin-top:13px;padding:12px 13px;border-radius:13px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.07);line-height:1.45;word-break:break-word;color:rgba(236,249,247,.76);font-size:.80rem}
+    .status.good{background:rgba(159,224,176,.075);border-color:rgba(159,224,176,.24);color:var(--good)}
+    .status.bad{background:rgba(255,183,170,.065);border-color:rgba(255,183,170,.22);color:var(--bad)}
+    .status.wait{background:rgba(243,182,74,.065);border-color:rgba(243,182,74,.18);color:var(--wait)}
+    .label{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;font-weight:900;color:rgba(236,249,247,.50);margin-bottom:7px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.74rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:rgba(0,11,18,.48);color:#cae9e5;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:9px;max-height:270px;overflow:auto}
+    .kv{display:grid;grid-template-columns:150px 1fr;gap:8px 12px;margin-top:12px;font-size:.80rem}
+    .kv b{color:rgba(236,249,247,.48);font-weight:800}
+    .kv span{overflow-wrap:anywhere}
+    .result-big{font-size:1.18rem;font-weight:950;margin-top:12px}.result-big.good{color:var(--good)}.result-big.bad{color:var(--bad)}
+    details{margin-top:14px} summary{cursor:pointer;font-weight:850;color:#b9e5ff}
+    .fine{margin:0;padding:0 4px 2px;color:rgba(236,249,247,.46);font-size:.72rem;line-height:1.5}
+    footer{padding:0 22px 26px;color:rgba(236,249,247,.38);font-size:.68rem;text-align:center}
     [hidden]{display:none!important}
-    @media(max-width:600px){
-      .shell{width:min(100% - 20px,780px);padding-top:16px}
-      .hero,.card{border-radius:20px;padding:17px}
-      .kv{grid-template-columns:1fr;gap:2px}
-      .button-row button{width:100%}
+    @media(max-width:760px){
+      .shell{padding:18px 10px 34px}.console{border-radius:22px}header{padding:24px 18px}.body{padding:14px;gap:12px}
+      .progress{grid-template-columns:repeat(2,1fr)}.progress-item{text-align:left;padding:8px 10px}.progress-num,.progress-label,.progress-state{display:inline}.progress-label{margin-left:4px}.progress-state{float:right;margin-top:1px}
+      .step-head{grid-template-columns:42px minmax(0,1fr) auto;gap:10px}.step-number{width:38px;height:38px;border-radius:12px}.step-state{padding:5px 7px;font-size:.56rem}
+      .kv{grid-template-columns:1fr;gap:2px}.button-row button{width:100%}.next-panel{top:calc(env(safe-area-inset-top,0px) + 6px)}
     }
   </style>
   <script src="../js/wildLedgerConfig.js"></script>
@@ -130,142 +133,85 @@
   <script src="https://cdn.jsdelivr.net/npm/@xrpl-wallet-kit/browser@0.1.18/dist/xrpl-wallet-kit.iife.min.js"></script>
 </head>
 <body>
-  <main class="shell">
-    <div class="topline">
-      <div class="brand">Wild Ledger</div>
-      <div class="badge">Learning Harness</div>
+<main class="shell">
+  <section class="console">
+    <header>
+      <a class="back" href="../communities.html">← Owner Communities</a>
+      <div class="eyebrow">Wild Ledger · Test Harness</div>
+      <h1>Operator Session + Handoff</h1>
+      <p class="intro">Prove control of the connected XRPL wallet, identify the community that wallet currently operates from validated ledger history, establish the browser Operator session, then hand that verified session to the real community page.</p>
+      <div class="safety"><strong>Safe test:</strong> this harness does not submit an XRPL transaction and does not change protocol authority. It only asks the wallet to sign a one-time proof message, reads validated XRPL history, and writes temporary browser session state.</div>
+      <div class="progress" aria-label="Operator session test steps">
+        <div class="progress-item is-active" id="progress1"><span class="progress-num">Step 1</span><span class="progress-label">Connect wallet</span><span class="progress-state" id="progress1State">NEXT</span></div>
+        <div class="progress-item is-locked" id="progress2"><span class="progress-num">Step 2</span><span class="progress-label">Challenge</span><span class="progress-state" id="progress2State">LOCKED</span></div>
+        <div class="progress-item is-locked" id="progress3"><span class="progress-num">Step 3</span><span class="progress-label">Prove control</span><span class="progress-state" id="progress3State">LOCKED</span></div>
+        <div class="progress-item is-locked" id="progress4"><span class="progress-num">Step 4</span><span class="progress-label">Find authority</span><span class="progress-state" id="progress4State">LOCKED</span></div>
+        <div class="progress-item is-locked" id="progress5"><span class="progress-num">Step 5</span><span class="progress-label">Create session</span><span class="progress-state" id="progress5State">LOCKED</span></div>
+        <div class="progress-item is-locked" id="progress6"><span class="progress-num">Step 6</span><span class="progress-label">Open community</span><span class="progress-state" id="progress6State">LOCKED</span></div>
+      </div>
+    </header>
+
+    <div class="body">
+      <div class="next-panel" id="nextPanel" aria-live="polite">
+        <div class="next-panel-label">Your next action</div>
+        <div class="next-panel-text" id="nextPanelText">Step 1 — Connect Bifrost</div>
+        <div class="next-panel-detail" id="nextPanelDetail">Tap the highlighted wallet button below. Everything else stays locked until this is complete.</div>
+      </div>
+
+      <section class="card step-card is-active" id="step1Card">
+        <div class="step-head"><span class="step-number">1</span><div><div class="step-kicker">Wallet connection</div><h2>Connect Bifrost</h2><p class="step-summary">Wild Ledger needs the XRPL account directly from your wallet. No address is typed or pasted.</p></div><span class="step-state" id="step1State">NEXT</span></div>
+        <div class="instruction"><strong>Your action: tap the wallet button below, choose Bifrost, and approve the connection.</strong><span>When the connection is complete, this card turns green and Step 2 becomes the only highlighted next action.</span></div>
+        <div id="walletActionShell">
+          <div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div>
+          <div id="wallet-kit-button"></div>
+        </div>
+        <div class="status wait" id="connectionStatus">Waiting for Bifrost connection.</div>
+        <div class="kv" id="connectionDetails" hidden><b>Wallet</b><span id="connectedWallet">—</span><b>XRPL address</b><span id="connectedAddress">—</span></div>
+      </section>
+
+      <section class="card step-card is-locked" id="step2Card">
+        <div class="step-head"><span class="step-number">2</span><div><div class="step-kicker">Fresh one-time proof</div><h2>Generate the challenge</h2><p class="step-summary">Wild Ledger creates a random, short-lived message for this browser session. You do not type anything.</p></div><span class="step-state" id="step2State">LOCKED</span></div>
+        <div class="instruction"><strong>Your action: tap Generate Challenge.</strong><span>The challenge expires after five minutes and can be accepted only once.</span></div>
+        <div class="button-row"><button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button></div>
+        <div id="challengeArea" hidden><div class="label" style="margin-top:16px">Exact message Bifrost will sign</div><pre class="mono" id="challengeText"></pre><div class="kv"><b>Nonce</b><span id="nonceText">—</span><b>Expires</b><span id="expiresText">—</span></div></div>
+      </section>
+
+      <section class="card step-card is-locked" id="step3Card">
+        <div class="step-head"><span class="step-number">3</span><div><div class="step-kicker">Wallet-control proof</div><h2>Prove control in Bifrost</h2><p class="step-summary">Bifrost signs the exact one-time challenge. Wild Ledger verifies the signature locally and submits nothing to XRPL.</p></div><span class="step-state" id="step3State">LOCKED</span></div>
+        <div class="instruction"><strong>Your action: tap Prove Wallet Control, then approve the signing request in Bifrost.</strong><span>Bifrost may show a transaction-shaped signing screen. It is only the signature envelope; this harness never submits it.</span></div>
+        <div class="button-row"><button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button><button id="replayButton" class="secondary" type="button" disabled>Test Same Proof Again</button></div>
+        <div class="status" id="proofStatus">Waiting for Steps 1 and 2.</div>
+        <div id="proofResult" hidden><div class="result-big" id="resultBig"></div><div class="kv"><b>Signed by</b><span id="proofAccount">—</span><b>Signature</b><span id="signatureCheck">—</span><b>Message</b><span id="messageCheck">—</span><b>Nonce</b><span id="nonceCheck">—</span><b>Ledger submit</b><span>Not performed</span></div><details><summary>Show returned proof data</summary><pre class="mono" id="rawProof"></pre></details></div>
+      </section>
+
+      <section class="card step-card is-locked" id="step4Card">
+        <div class="step-head"><span class="step-number">4</span><div><div class="step-kicker">Validated XRPL authority</div><h2>Identify the community</h2><p class="step-summary">Wild Ledger reads validated authority history and checks whether this verified wallet is the current Community Operating Wallet.</p></div><span class="step-state" id="step4State">LOCKED</span></div>
+        <div class="instruction"><strong>Your action: tap Identify My Community.</strong><span>No Community ID is entered. Wild Ledger discovers the community from the verified wallet and ledger history.</span></div>
+        <div class="button-row"><button id="identifyButton" class="primary-action" type="button" disabled>Identify My Community</button></div>
+        <div class="status" id="authorityStatus">Waiting for verified wallet control.</div>
+        <div id="authorityResult" hidden><div class="result-big" id="authorityBig"></div><div class="kv"><b>Verified wallet</b><span id="authorityWallet">—</span><b>Community</b><span id="authorityCommunity">—</span><b>Namespace</b><span id="authorityNamespace">—</span><b>Current authority</b><span id="authorityCurrent">—</span><b>Source</b><span id="authoritySource">—</span></div><details id="authorityDetails" hidden><summary>Show authority details</summary><pre class="mono" id="authorityRaw"></pre></details></div>
+      </section>
+
+      <section class="card step-card is-locked" id="step5Card">
+        <div class="step-head"><span class="step-number">5</span><div><div class="step-kicker">Verified browser context</div><h2>Create the Operator session</h2><p class="step-summary">Wild Ledger rechecks current authority, then writes the Operator browser session from the verified wallet result.</p></div><span class="step-state" id="step5State">LOCKED</span></div>
+        <div class="instruction"><strong>Your action: tap Create Operator Session.</strong><span>The session is built from fresh XRPL authority. It is not granted from a typed Community ID or a URL parameter.</span></div>
+        <div class="button-row"><button id="createSessionButton" class="primary-action" type="button" disabled>Create Operator Session</button><button id="clearSessionButton" class="secondary" type="button">Clear Test Session</button></div>
+        <div class="status" id="sessionStatus">Waiting for exactly one community authority match.</div>
+        <div id="sessionResult" hidden><div class="result-big" id="sessionBig"></div><div class="kv"><b>Role</b><span id="sessionRole">—</span><b>Community</b><span id="sessionCommunity">—</span><b>Verified wallet</b><span id="sessionWallet">—</span><b>Source</b><span id="sessionSource">—</span><b>Established</b><span id="sessionEstablished">—</span></div><details><summary>Show browser session values</summary><pre class="mono" id="sessionRaw"></pre></details></div>
+      </section>
+
+      <section class="card step-card is-locked" id="step6Card">
+        <div class="step-head"><span class="step-number">6</span><div><div class="step-kicker">Real-page handoff</div><h2>Open the verified community</h2><p class="step-summary">This tests the real handoff. The community page receives no Community ID and no role in its URL; it must use the verified Operator session.</p></div><span class="step-state" id="step6State">LOCKED</span></div>
+        <div class="instruction"><strong>Your action: tap Open Verified Community.</strong><span>Pass condition: the correct community opens in Operator mode, with Log Out visible and Owner-only navigation absent.</span></div>
+        <div class="button-row"><button id="openCommunityButton" class="primary-action" type="button" disabled>Open Verified Community</button></div>
+        <div class="status" id="handoffStatus">Waiting for the Operator session.</div>
+      </section>
+
+      <p class="fine">Test harness only. Steps 1–4 prove wallet control and resolve current Community Operating Wallet authority from validated XRPL history. Step 5 writes the browser Operator session from that verified result. Step 6 hands that session to the real community page without putting role or Community ID in the URL.</p>
     </div>
-
-    <section class="hero">
-      <h1>Operator Session Test</h1>
-      <p class="lede">Prove wallet control, identify current community authority from validated XRPL history, then establish the browser Operator session from that verified result.</p>
-      <div class="hard-stop">No XRPL transaction is submitted by this page. The final step writes only browser session state for this test. It does not create or change protocol authority.</div>
-    </section>
-
-    <div class="next-panel" id="nextPanel" aria-live="polite">
-      <div class="next-panel-label">Next action</div>
-      <div class="next-panel-text" id="nextPanelText">Connect Bifrost</div>
-      <div class="next-panel-detail" id="nextPanelDetail">Step 1 is highlighted below.</div>
-    </div>
-
-    <section class="card step-card is-active" id="step1Card">
-      <div class="step"><span class="step-number">1</span><h2>Connect Bifrost</h2><span class="step-state" id="step1State">NEXT</span></div>
-      <p>Use the wallet button below. In the wallet chooser, choose Bifrost and approve the connection.</p>
-      <div id="walletActionShell">
-        <div class="action-callout">NEXT BUTTON ↓</div>
-        <div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div>
-        <div id="wallet-kit-button"></div>
-      </div>
-      <div class="status wait" id="connectionStatus">No wallet connected yet.</div>
-      <div class="kv" id="connectionDetails" hidden>
-        <b>Wallet</b><span id="connectedWallet">—</span>
-        <b>XRPL address</b><span id="connectedAddress">—</span>
-      </div>
-    </section>
-
-    <section class="card step-card is-locked" id="step2Card">
-      <div class="step"><span class="step-number">2</span><h2>Make a one-time challenge</h2><span class="step-state" id="step2State">LOCKED</span></div>
-      <p>Wild Ledger makes a new random code. You do not type it.</p>
-      <div class="action-callout">NEXT BUTTON ↓</div>
-      <div class="button-row">
-        <button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button>
-      </div>
-      <div id="challengeArea" hidden>
-        <div class="label" style="margin-top:16px">Exact message Bifrost will sign</div>
-        <pre class="mono" id="challengeText"></pre>
-        <div class="kv">
-          <b>Nonce</b><span id="nonceText">—</span>
-          <b>Expires</b><span id="expiresText">—</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="card step-card is-locked" id="step3Card">
-      <div class="step"><span class="step-number">3</span><h2>Ask Bifrost for the proof</h2><span class="step-state" id="step3State">LOCKED</span></div>
-      <p>Bifrost may show a transaction-shaped signing screen. That is the compatibility envelope used to create the signature. Wild Ledger does not submit it.</p>
-      <div class="action-callout">NEXT BUTTON ↓</div>
-      <div class="button-row">
-        <button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button>
-        <button id="replayButton" class="secondary" type="button" disabled>Test Same Proof Again</button>
-      </div>
-      <div class="status" id="proofStatus">Generate a challenge after Bifrost is connected.</div>
-      <div id="proofResult" hidden>
-        <div class="result-big" id="resultBig"></div>
-        <div class="kv">
-          <b>Signed by</b><span id="proofAccount">—</span>
-          <b>Signature</b><span id="signatureCheck">—</span>
-          <b>Message</b><span id="messageCheck">—</span>
-          <b>Nonce</b><span id="nonceCheck">—</span>
-          <b>Ledger submit</b><span>Not performed</span>
-        </div>
-        <details>
-          <summary>Show returned proof data</summary>
-          <pre class="mono" id="rawProof"></pre>
-        </details>
-      </div>
-    </section>
-
-    <section class="card step-card is-locked" id="step4Card">
-      <div class="step"><span class="step-number">4</span><h2>Identify community authority</h2><span class="step-state" id="step4State">LOCKED</span></div>
-      <p>After wallet control is verified, Wild Ledger reads validated XRPL authority history and checks whether this exact address is the current Community Operating Wallet for any community.</p>
-      <div class="action-callout">NEXT BUTTON ↓</div>
-      <div class="button-row">
-        <button id="identifyButton" class="primary-action" type="button" disabled>Identify My Community</button>
-      </div>
-      <div class="status" id="authorityStatus">Verify wallet control first.</div>
-      <div id="authorityResult" hidden>
-        <div class="result-big" id="authorityBig"></div>
-        <div class="kv">
-          <b>Verified wallet</b><span id="authorityWallet">—</span>
-          <b>Community</b><span id="authorityCommunity">—</span>
-          <b>Namespace</b><span id="authorityNamespace">—</span>
-          <b>Current authority</b><span id="authorityCurrent">—</span>
-          <b>Source</b><span id="authoritySource">—</span>
-        </div>
-        <details id="authorityDetails" hidden>
-          <summary>Show authority details</summary>
-          <pre class="mono" id="authorityRaw"></pre>
-        </details>
-      </div>
-    </section>
-
-    <section class="card step-card is-locked" id="step5Card">
-      <div class="step"><span class="step-number">5</span><h2>Establish Operator session</h2><span class="step-state" id="step5State">LOCKED</span></div>
-      <p>This step is enabled only after one current community authority match is found. Before writing the session, Wild Ledger rechecks validated XRPL history so the session is created from fresh authority, not a typed Community ID or URL value.</p>
-      <div class="action-callout">NEXT BUTTON ↓</div>
-      <div class="button-row">
-        <button id="createSessionButton" class="primary-action" type="button" disabled>Create Operator Session</button>
-        <button id="clearSessionButton" class="secondary" type="button">Clear Test Session</button>
-      </div>
-      <div class="status" id="sessionStatus">Identify exactly one community first.</div>
-      <div id="sessionResult" hidden>
-        <div class="result-big" id="sessionBig"></div>
-        <div class="kv">
-          <b>Role</b><span id="sessionRole">—</span>
-          <b>Community</b><span id="sessionCommunity">—</span>
-          <b>Verified wallet</b><span id="sessionWallet">—</span>
-          <b>Source</b><span id="sessionSource">—</span>
-          <b>Established</b><span id="sessionEstablished">—</span>
-        </div>
-        <details>
-          <summary>Show browser session values</summary>
-          <pre class="mono" id="sessionRaw"></pre>
-        </details>
-      </div>
-    </section>
-
-    <section class="card step-card is-locked" id="step6Card">
-      <div class="step"><span class="step-number">6</span><h2>Enter the verified community</h2><span class="step-state" id="step6State">LOCKED</span></div>
-      <p>This final handoff opens the real Wild Ledger community page with no Community ID or role in the URL. The page must take Operator context from the verified browser session you just created.</p>
-      <div class="action-callout">NEXT BUTTON ↓</div>
-      <div class="button-row">
-        <button id="openCommunityButton" class="primary-action" type="button" disabled>Open Verified Community</button>
-      </div>
-      <div class="status" id="handoffStatus">Create the Operator session first.</div>
-    </section>
-
-    <p class="fine">Practice harness only. Steps 1–4 prove wallet control and resolve current Community Operating Wallet authority from validated XRPL history. Step 5 writes the current Wild Ledger browser session keys from that verified result. Step 6 hands that verified browser session to the real community page without putting role or Community ID in the URL. This is the current static-site scaffold, not the future server-side production authorization boundary. It does not publish community settings or submit anything to XRPL.</p>
-  </main>
+    <footer>WILD LEDGER · OPERATOR SESSION TEST HARNESS · HUMANS TAP. WALLETS SIGN. LEDGERS CARRY.</footer>
+  </section>
+</main>
 
   <script type="module">
     import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
@@ -327,6 +273,8 @@
     const walletButtonHost = document.getElementById("wallet-kit-button");
     const stepCards = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Card`));
     const stepStates = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}State`));
+    const progressItems = [1,2,3,4,5,6].map(n => document.getElementById(`progress${n}`));
+    const progressStates = [1,2,3,4,5,6].map(n => document.getElementById(`progress${n}State`));
 
     let currentChallenge = null;
     let lastSignedResult = null;
@@ -344,11 +292,21 @@
     function setStepState(stepNumber, state) {
       const card = stepCards[stepNumber - 1];
       const badge = stepStates[stepNumber - 1];
+      const progress = progressItems[stepNumber - 1];
+      const progressBadge = progressStates[stepNumber - 1];
       if (!card || !badge) return;
       card.classList.remove("is-active", "is-done", "is-locked");
-      if (state === "active") { card.classList.add("is-active"); badge.textContent = "NEXT"; }
-      else if (state === "done") { card.classList.add("is-done"); badge.textContent = "DONE"; }
-      else { card.classList.add("is-locked"); badge.textContent = "LOCKED"; }
+      progress?.classList.remove("is-active", "is-done", "is-locked");
+      if (state === "active") {
+        card.classList.add("is-active"); badge.textContent = "NEXT";
+        progress?.classList.add("is-active"); if (progressBadge) progressBadge.textContent = "NEXT";
+      } else if (state === "done") {
+        card.classList.add("is-done"); badge.textContent = "DONE";
+        progress?.classList.add("is-done"); if (progressBadge) progressBadge.textContent = "DONE";
+      } else {
+        card.classList.add("is-locked"); badge.textContent = "LOCKED";
+        progress?.classList.add("is-locked"); if (progressBadge) progressBadge.textContent = "LOCKED";
+      }
     }
 
     function storedSessionMatchesCurrentWallet() {
