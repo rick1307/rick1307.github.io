@@ -1130,114 +1130,168 @@
     }
 
 
-    /* Wild Ledger cross-community ribbon: revealed only after the session
-       record has been reconstructed or recovered from sessionStorage. */
+    /* Wild Ledger community tape: deliberately uses the visual grammar of a
+       stock ticker while carrying community-service data, not market data. */
     .wallet-community-ribbon{
       max-height:0;
       overflow:hidden;
       opacity:0;
       transform:translateY(-8px);
-      background:color-mix(in srgb,var(--paper) 94%,white 6%);
-      border-bottom:0 solid var(--line);
+      background:#071012;
+      border-top:0 solid #b58a32;
+      border-bottom:0 solid #b58a32;
+      box-shadow:0 8px 22px rgba(0,0,0,.12);
       transition:max-height .46s ease,opacity .34s ease,transform .46s ease,border-width .46s ease;
     }
 
     .wallet-community-ribbon.is-visible{
-      max-height:96px;
+      max-height:44px;
       opacity:1;
       transform:translateY(0);
+      border-top-width:1px;
       border-bottom-width:1px;
     }
 
     .wallet-community-ribbon-inner{
+      width:100%;
+      min-height:42px;
       display:flex;
-      align-items:center;
-      gap:14px;
-      min-height:48px;
-      padding-top:7px;
-      padding-bottom:7px;
+      align-items:stretch;
+      padding:0;
     }
 
     .wallet-community-ribbon-label{
+      position:relative;
+      z-index:2;
       flex:0 0 auto;
-      color:var(--muted);
-      font-family:var(--community-ui-font);
-      font-size:.68rem;
+      display:flex;
+      align-items:center;
+      padding:0 12px 0 14px;
+      border-right:1px solid rgba(218,178,87,.48);
+      background:#0d1a1d;
+      color:#dfb957;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:.62rem;
       font-weight:900;
-      letter-spacing:.09em;
-      line-height:1.2;
+      letter-spacing:.12em;
+      line-height:1;
       text-transform:uppercase;
       white-space:nowrap;
+      box-shadow:8px 0 18px rgba(0,0,0,.24);
     }
 
     .wallet-community-ribbon-track{
+      position:relative;
+      flex:1 1 auto;
+      min-width:0;
+      overflow:hidden;
       display:flex;
       align-items:center;
-      gap:9px;
-      min-width:0;
-      overflow-x:auto;
-      overscroll-behavior-x:contain;
-      scrollbar-width:none;
-      -webkit-overflow-scrolling:touch;
-      padding:2px 2px;
     }
 
-    .wallet-community-ribbon-track::-webkit-scrollbar{display:none}
+    .wallet-community-ticker-rail{
+      --ticker-duration:32s;
+      width:max-content;
+      display:flex;
+      align-items:center;
+      will-change:transform;
+      animation:walletCommunityTicker var(--ticker-duration) linear infinite;
+    }
+
+    .wallet-community-ticker-loop,
+    .wallet-community-ticker-unit{
+      display:flex;
+      flex:0 0 auto;
+      align-items:center;
+    }
 
     .wallet-community-link{
       flex:0 0 auto;
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      min-height:30px;
-      padding:6px 10px;
-      border:1px solid color-mix(in srgb,var(--sea) 28%,transparent);
-      border-radius:999px;
-      background:color-mix(in srgb,var(--sea) 7%,white 93%);
-      color:var(--sea);
-      font-family:var(--community-ui-font);
-      font-size:.76rem;
+      gap:8px;
+      min-height:40px;
+      padding:0 18px;
+      color:#f5f1df;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:.72rem;
       font-weight:800;
-      line-height:1.2;
+      letter-spacing:.035em;
+      line-height:1;
       text-decoration:none;
+      text-transform:uppercase;
       white-space:nowrap;
+      touch-action:manipulation;
+    }
+
+    .wallet-community-link span:nth-of-type(even){
+      color:#e0b955;
     }
 
     .wallet-community-link:hover,
     .wallet-community-link:focus-visible{
-      border-color:color-mix(in srgb,var(--sea) 55%,transparent);
-      background:color-mix(in srgb,var(--sea) 12%,white 88%);
+      color:#ffffff;
+      background:rgba(255,255,255,.07);
       text-decoration:none;
+      outline:none;
     }
 
     .wallet-community-link[aria-current="page"]{
-      border-color:color-mix(in srgb,var(--gold) 58%,var(--sea) 42%);
-      background:color-mix(in srgb,var(--gold) 14%,white 86%);
-      color:var(--deep);
+      color:#ffffff;
+    }
+
+    .wallet-community-link[aria-current="page"]::before{
+      content:"●";
+      color:#e0b955;
+      font-size:.55rem;
+      margin-right:1px;
     }
 
     .wallet-community-separator{
-      color:color-mix(in srgb,var(--muted) 65%,transparent);
-      font-weight:700;
+      flex:0 0 auto;
+      color:#9e7d34;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:.62rem;
+      line-height:1;
+    }
+
+    .wallet-community-ribbon-track:hover .wallet-community-ticker-rail,
+    .wallet-community-ribbon-track:focus-within .wallet-community-ticker-rail{
+      animation-play-state:paused;
+    }
+
+    @keyframes walletCommunityTicker{
+      from{transform:translate3d(0,0,0)}
+      to{transform:translate3d(-50%,0,0)}
     }
 
     @media (max-width:700px){
-      .wallet-community-ribbon.is-visible{max-height:118px}
-      .wallet-community-ribbon-inner{
-        align-items:flex-start;
-        flex-direction:column;
-        gap:4px;
-        min-height:56px;
-        padding-top:7px;
-        padding-bottom:8px;
+      .wallet-community-ribbon.is-visible{max-height:44px}
+      .wallet-community-ribbon-inner{min-height:42px}
+      .wallet-community-ribbon-label{
+        padding-left:10px;
+        padding-right:9px;
+        font-size:.56rem;
+        letter-spacing:.09em;
       }
-      .wallet-community-ribbon-track{width:100%}
-      .wallet-community-ribbon-label{padding-left:2px}
-      .wallet-community-link{font-size:.72rem;padding:6px 9px}
+      .wallet-community-link{
+        min-height:40px;
+        padding-left:14px;
+        padding-right:14px;
+        font-size:.68rem;
+      }
     }
 
     @media (prefers-reduced-motion:reduce){
       .wallet-community-ribbon{transition:none}
+      .wallet-community-ribbon-track{
+        overflow-x:auto;
+        scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+      }
+      .wallet-community-ribbon-track::-webkit-scrollbar{display:none}
+      .wallet-community-ticker-rail{animation:none;transform:none}
+      .wallet-community-ticker-loop + .wallet-community-ticker-loop{display:none}
     }
 
 
@@ -1553,42 +1607,63 @@
           return String(a?.communityName || "").localeCompare(String(b?.communityName || ""));
         });
 
-        const fragment = document.createDocumentFragment();
+        function buildTickerUnit() {
+          const unit = document.createElement("div");
+          unit.className = "wallet-community-ticker-unit";
 
-        relationships.forEach((relationship, index) => {
-          const key = String(relationship?.communityKey || relationship?.communityId || "").trim().toLowerCase();
-          if (!key) return;
+          relationships.forEach((relationship) => {
+            const key = String(relationship?.communityKey || relationship?.communityId || "").trim().toLowerCase();
+            if (!key) return;
 
-          if (index > 0) {
+            const link = document.createElement("a");
+            link.className = "wallet-community-link";
+            link.href = `index.html?community=${encodeURIComponent(key)}`;
+            if (key === String(communityId).toLowerCase()) link.setAttribute("aria-current", "page");
+
+            const labelParts = relationshipRibbonLabel(relationship);
+            labelParts.forEach((part, partIndex) => {
+              if (partIndex > 0) {
+                const dot = document.createElement("span");
+                dot.setAttribute("aria-hidden", "true");
+                dot.textContent = "•";
+                link.appendChild(dot);
+              }
+              const span = document.createElement("span");
+              span.textContent = part;
+              link.appendChild(span);
+            });
+
+            unit.appendChild(link);
+
             const separator = document.createElement("span");
             separator.className = "wallet-community-separator";
             separator.setAttribute("aria-hidden", "true");
-            separator.textContent = "•";
-            fragment.appendChild(separator);
-          }
-
-          const link = document.createElement("a");
-          link.className = "wallet-community-link";
-          link.href = `index.html?community=${encodeURIComponent(key)}`;
-          if (key === String(communityId).toLowerCase()) link.setAttribute("aria-current", "page");
-
-          const labelParts = relationshipRibbonLabel(relationship);
-          labelParts.forEach((part, partIndex) => {
-            if (partIndex > 0) {
-              const dot = document.createElement("span");
-              dot.setAttribute("aria-hidden", "true");
-              dot.textContent = "·";
-              link.appendChild(dot);
-            }
-            const span = document.createElement("span");
-            span.textContent = part;
-            link.appendChild(span);
+            separator.textContent = "◆";
+            unit.appendChild(separator);
           });
 
-          fragment.appendChild(link);
-        });
+          return unit;
+        }
 
-        walletCommunityRibbonTrack.replaceChildren(fragment);
+        // Build two identical loops so the tape can translate by exactly one
+        // loop width and wrap without a visible jump. With only one or two
+        // communities we repeat the unit inside each loop so the tape still
+        // reads like a real continuous market ticker.
+        const repeatsPerLoop = relationships.length === 1 ? 5 : relationships.length === 2 ? 3 : 2;
+        const rail = document.createElement("div");
+        rail.className = "wallet-community-ticker-rail";
+        rail.style.setProperty("--ticker-duration", `${Math.max(30, relationships.length * 7)}s`);
+
+        for (let loopIndex = 0; loopIndex < 2; loopIndex += 1) {
+          const loop = document.createElement("div");
+          loop.className = "wallet-community-ticker-loop";
+          for (let repeatIndex = 0; repeatIndex < repeatsPerLoop; repeatIndex += 1) {
+            loop.appendChild(buildTickerUnit());
+          }
+          rail.appendChild(loop);
+        }
+
+        walletCommunityRibbonTrack.replaceChildren(rail);
 
         // Let the Member Record paint first, then reveal the wallet's broader
         // Wild Ledger identity as a smooth secondary layer beneath the banner.
