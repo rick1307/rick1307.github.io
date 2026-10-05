@@ -100,6 +100,15 @@
       color:var(--deep);
     }
 
+    /* Global Member Record mode: the wallet-level shell lives outside any one
+       community. Community-specific history remains available when a
+       ?community=... parameter is present. */
+    body[data-member-record-mode="global"] .leap-journey-banner{display:none;}
+    body[data-member-record-mode="global"] .community-only{display:none !important;}
+    body[data-member-record-mode="global"] .record-grid{grid-template-columns:1fr;}
+    body[data-member-record-mode="global"] .global-balance-stat{grid-column:1 / -1;}
+    body[data-member-record-mode="global"] .lounge-header-action{display:none !important;}
+
     *{box-sizing:border-box}
     html.community-pending body{visibility:hidden}
 
@@ -1377,9 +1386,9 @@
         <div class="record-wallet" id="recordWallet" hidden></div>
 
         <div class="record-grid">
-          <div class="record-stat"><b>Current LEAP</b><strong id="recordLeap">—</strong></div>
-          <div class="record-stat"><b>Earned LEAP</b><strong id="recordEarned">—</strong><small id="recordEarnedNote" hidden></small></div>
-          <div class="record-stat community-totals" aria-label="Recognition totals">
+          <div class="record-stat global-balance-stat"><b id="recordLeapLabel">Current LEAP</b><strong id="recordLeap">—</strong></div>
+          <div class="record-stat community-only"><b>Earned LEAP</b><strong id="recordEarned">—</strong><small id="recordEarnedNote" hidden></small></div>
+          <div class="record-stat community-totals community-only" aria-label="Recognition totals">
             <b class="recognition-summary-label">Recognition</b>
             <div class="community-total-row great-chat-total"><span>Great Chats</span><strong id="recordGreatChats">—</strong></div>
             <div class="community-total-row"><span>Badges</span><strong id="recordBadges">—</strong></div>
@@ -1388,7 +1397,7 @@
           </div>
         </div>
 
-        <div class="rank-progress">
+        <div class="rank-progress community-only">
           <div class="rank-progress-copy">
             <span id="progressLabel">Rank progress</span>
             <strong id="progressValue">—</strong>
@@ -1402,7 +1411,7 @@
 
         <p class="crew-status" id="crewRecordStatus" role="status" aria-live="polite"></p>
 
-        <section class="pending-checks" id="pendingChecks" aria-live="polite">
+        <section class="pending-checks community-only" id="pendingChecks" aria-live="polite">
           <div class="pending-checks-head">
             <div class="pending-checks-title">
               <b id="pendingChecksTitle">LEAP Waiting for You</b>
@@ -1418,7 +1427,7 @@
           <div class="pending-check-list" id="pendingCheckList"></div>
         </section>
 
-        <div class="crew-logbook" id="crewLogbook">
+        <div class="crew-logbook community-only" id="crewLogbook">
           <div class="logbook-head">
             <b>Your Logbook</b>
             <span>Your LEAP history</span>
@@ -1452,6 +1461,10 @@
       getCachedWildLedgerCommunityRecord
     } from "./js/walletCommunityRecord.js";
     (async () => {
+      const memberRecordParams = new URLSearchParams(window.location.search);
+      const requestedCommunity = String(memberRecordParams.get("community") || "").trim();
+      const isGlobalMemberRecord = !requestedCommunity;
+
       const community = window.WILD_LEDGER_COMMUNITY;
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
 
@@ -1470,34 +1483,53 @@
         pageOverlay:"--page-overlay", navBackground:"--nav-background",
         headerBackground:"--header-background", darkFeatureBackground:"--dark-feature-background"
       };
-      for (const [key, cssVar] of Object.entries(themeVars)) {
-        if (theme[key]) rootStyle.setProperty(cssVar, theme[key]);
+      if (!isGlobalMemberRecord) {
+        for (const [key, cssVar] of Object.entries(themeVars)) {
+          if (theme[key]) rootStyle.setProperty(cssVar, theme[key]);
+        }
+        document.body.dataset.communityTheme = communityId;
+        document.body.dataset.communityLayout = community.layout || "classic";
       }
-      document.body.dataset.communityTheme = communityId;
-      document.body.dataset.communityLayout = community.layout || "classic";
-      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-      if (themeColorMeta && theme.themeColor) themeColorMeta.content = theme.themeColor;
+      document.body.dataset.memberRecordMode = isGlobalMemberRecord ? "global" : "community";
 
-      document.title = `Member Record — ${communityName}`;
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (!isGlobalMemberRecord && themeColorMeta && theme.themeColor) themeColorMeta.content = theme.themeColor;
+
+      document.title = isGlobalMemberRecord
+        ? "Member Record — Wild Ledger"
+        : `Member Record — ${communityName}`;
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
-        metaDescription.content = `See your ${communityName} member record and validated LEAP history.`;
+        metaDescription.content = isGlobalMemberRecord
+          ? "See this wallet's Wild Ledger record and community relationships."
+          : `See your ${communityName} member record and validated LEAP history.`;
       }
       const communityNameLabel = document.getElementById("communityNameLabel");
       if (communityNameLabel) communityNameLabel.textContent = communityName;
       const memberRecordTitle = document.getElementById("memberRecordTitle");
       if (memberRecordTitle) memberRecordTitle.textContent = "Member Record";
       const memberRecordConsole = document.getElementById("memberRecordConsole");
-      if (memberRecordConsole) memberRecordConsole.setAttribute("aria-label", `${communityName} Member Record`);
+      if (memberRecordConsole) {
+        memberRecordConsole.setAttribute(
+          "aria-label",
+          isGlobalMemberRecord ? "Wild Ledger Member Record" : `${communityName} Member Record`
+        );
+      }
+      const recordLeapLabel = document.getElementById("recordLeapLabel");
+      if (recordLeapLabel && isGlobalMemberRecord) recordLeapLabel.textContent = "LEAP Balance";
+
       const communityHomeBrand = document.getElementById("communityHomeBrand");
       const communityHomeLink = document.getElementById("communityHomeLink");
-      if (communityHomeBrand) communityHomeBrand.href = communityHomeHref;
-      if (communityHomeLink) communityHomeLink.href = communityHomeHref;
+      const homeHref = isGlobalMemberRecord ? "splash.html" : communityHomeHref;
+      if (communityHomeBrand) communityHomeBrand.href = homeHref;
+      if (communityHomeLink) communityHomeLink.href = homeHref;
 
       const bannerDesktop = document.getElementById("communityBannerDesktop");
-      if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
       const bannerMobile = document.getElementById("communityBannerMobile");
-      if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+      if (!isGlobalMemberRecord) {
+        if (bannerDesktop && community.bannerDesktop) bannerDesktop.src = community.bannerDesktop;
+        if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
+      }
 
       const wildLedger = window.WILD_LEDGER_CONFIG;
       if (!wildLedger) {
@@ -1521,11 +1553,15 @@
       const SFL_DISMISSED_EXPIRED_CHECKS_KEY = `${communityId}.leap.dismissedExpiredChecks`;
       const PENDING_CHECK_VISIBLE_MS = 7 * 24 * 60 * 60 * 1000;
 
-      // Remove any address-bearing values left by older versions that used localStorage.
-      try {
-        localStorage.removeItem(SFL_WALLET_STORAGE_KEY);
-        localStorage.removeItem(SFL_LEAP_SESSION_KEY);
-      } catch (_) {}
+      // Remove any address-bearing values left by older community-specific
+      // versions that used localStorage. Global mode does not impersonate the
+      // fallback community selected by communityConfig.js.
+      if (!isGlobalMemberRecord) {
+        try {
+          localStorage.removeItem(SFL_WALLET_STORAGE_KEY);
+          localStorage.removeItem(SFL_LEAP_SESSION_KEY);
+        } catch (_) {}
+      }
 
       const XRPL_WS = wildLedger.xrplWebSocket;
 
@@ -1598,9 +1634,11 @@
         }
 
         relationships.sort((a, b) => {
-          const aCurrent = String(a?.communityKey || a?.communityId || "").toLowerCase() === String(communityId).toLowerCase();
-          const bCurrent = String(b?.communityKey || b?.communityId || "").toLowerCase() === String(communityId).toLowerCase();
-          if (aCurrent !== bCurrent) return aCurrent ? -1 : 1;
+          if (!isGlobalMemberRecord) {
+            const aCurrent = String(a?.communityKey || a?.communityId || "").toLowerCase() === String(communityId).toLowerCase();
+            const bCurrent = String(b?.communityKey || b?.communityId || "").toLowerCase() === String(communityId).toLowerCase();
+            if (aCurrent !== bCurrent) return aCurrent ? -1 : 1;
+          }
           return String(a?.communityName || "").localeCompare(String(b?.communityName || ""));
         });
 
@@ -1614,7 +1652,7 @@
 
             const item = document.createElement("span");
             item.className = `wallet-community-item ${relationshipIndex % 2 === 0 ? "tone-a" : "tone-b"}`;
-            if (key === String(communityId).toLowerCase()) item.classList.add("is-current");
+            if (!isGlobalMemberRecord && key === String(communityId).toLowerCase()) item.classList.add("is-current");
 
             const labelParts = relationshipRibbonLabel(relationship);
             labelParts.forEach((part, partIndex) => {
@@ -1668,12 +1706,14 @@
         });
       }
 
-      renderProgressRankScale();
+      if (!isGlobalMemberRecord) renderProgressRankScale();
       renderWildLedgerCommunityRibbon(getCachedWildLedgerCommunityRecord());
 
       function getRawActiveWallet() {
         try {
-          return sessionStorage.getItem(SFL_ACTIVE_WALLET_KEY) || "";
+          return sessionStorage.getItem(
+            isGlobalMemberRecord ? WILD_LEDGER_ACTIVE_WALLET_KEY : SFL_ACTIVE_WALLET_KEY
+          ) || "";
         } catch (_) {
           return "";
         }
@@ -1687,13 +1727,15 @@
       function saveWallet(account) {
         if (!classicAddressPattern.test(account)) return;
 
-        try {
-          sessionStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
-        } catch (_) {}
+        if (!isGlobalMemberRecord) {
+          try {
+            sessionStorage.setItem(SFL_WALLET_STORAGE_KEY, account);
+          } catch (_) {}
 
-        try {
-          sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
-        } catch (_) {}
+          try {
+            sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
+          } catch (_) {}
+        }
 
         // Wild Ledger-wide session identity. This is intentionally session-only:
         // it lets future cross-community features know which public XRPL wallet
@@ -3409,6 +3451,69 @@
         progressFill.style.width = "0%";
       }
 
+      async function loadGlobalMemberRecord(account) {
+        if (!classicAddressPattern.test(account)) {
+          resetRecord();
+          setTrustlineStatus(null, "unavailable");
+          setStateMessage(
+            "No active Wild Ledger wallet.",
+            "Open a Member Record from a community first so Wild Ledger knows which public XRPL wallet this browser session is viewing.",
+            "warn"
+          );
+          setStatus("");
+          return;
+        }
+
+        resetRecord();
+        setTrustlineStatus(null, "checking");
+        setStateMessage(
+          "Reading your Wild Ledger record…",
+          "Checking the XRP Ledger while the rest of the page stays available.",
+          "loading"
+        );
+        setStatus("");
+
+        try {
+          const lines = await queryAccountLines(account);
+          const leapLine = lines.find(isLeapLine);
+          const balance = leapLine ? Number(leapLine.balance) : 0;
+          const safeBalance = Number.isFinite(balance) ? balance : 0;
+          const transfersDisabled = !leapLine || Number(leapLine.limit) === 0;
+
+          renderRecord(account, safeBalance);
+          setTrustlineStatus(leapLine);
+          saveWallet(account);
+
+          if (transfersDisabled) {
+            setStateMessage(
+              "",
+              "Enable LEAP transfers so LEAP already in the wild can come straight to this wallet from other LEAP holders.",
+              "warn",
+              true
+            );
+          } else {
+            setStateMessage();
+          }
+
+          void ensureWildLedgerCommunityRecord({ wallet: account })
+            .then(record => renderWildLedgerCommunityRibbon(record))
+            .catch(error => {
+              console.warn(
+                "Wild Ledger cross-community record could not be built in the background:",
+                error
+              );
+            });
+        } catch (error) {
+          console.error(error);
+          setTrustlineStatus(null, "unavailable");
+          setStateMessage(
+            "Wild Ledger record is temporarily unavailable.",
+            "The XRP Ledger could not be read right now. Your session wallet has not been changed.",
+            "warn"
+          );
+        }
+      }
+
       async function loadCrewRecord(account) {
         if (!classicAddressPattern.test(account)) {
           clearIdentityState({ forgetWallet:true });
@@ -3600,30 +3705,38 @@
         resetRecord();
         setTrustlineStatus(null, "checking");
         setStateMessage(
-          "Reading your Member Record…",
+          isGlobalMemberRecord ? "Reading your Wild Ledger record…" : "Reading your Member Record…",
           "Checking the XRP Ledger.",
           "loading"
         );
         setStatus("");
       } else {
-        if (rawActiveWallet) {
-          // A malformed active identity is stale identity state.
+        if (rawActiveWallet && !isGlobalMemberRecord) {
+          // A malformed community-specific active identity is stale identity state.
           clearIdentityState({ forgetWallet:true });
-        } else {
-          // Direct/manual page load: no active identity. Do not touch the
+        } else if (!isGlobalMemberRecord) {
+          // Direct/manual community page load: no active identity. Do not touch the
           // remembered wallet; index.html may still use it for returning crew.
           clearLeapSession();
         }
 
         resetRecord();
         setTrustlineStatus(null, "unavailable");
-        setStateMessage(
-          `You have not joined the ${communityName} membership system.`,
-          "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
-          "warn",
-          false,
-          true
-        );
+        if (isGlobalMemberRecord) {
+          setStateMessage(
+            "No active Wild Ledger wallet in this session.",
+            "Open your Member Record from a community first. Wild Ledger will then carry that public XRPL wallet through this browser session.",
+            "warn"
+          );
+        } else {
+          setStateMessage(
+            `You have not joined the ${communityName} membership system.`,
+            "Once you have joined, you can return to this page by pasting your XRPL address into the Member Record text box on the LEAP Homepage.",
+            "warn",
+            false,
+            true
+          );
+        }
         setStatus("");
       }
 
@@ -3632,38 +3745,42 @@
       document.documentElement.classList.remove("community-pending");
 
       if (activeWallet) {
-        const [authorityResult, catalogResult] = await Promise.allSettled([
-          resolveCommunityAuthority({ community, serverUrl: XRPL_WS }),
-          loadRecognitionCatalog({
-            community,
-            serverUrl: XRPL_WS,
-            issuer: LEAP_ISSUER,
-            currency: LEAP_CURRENCY,
-            includeIgnored: true
-          })
-        ]);
-
-        if (authorityResult.status === "fulfilled") {
-          communityAuthority = authorityResult.value;
+        if (isGlobalMemberRecord) {
+          await loadGlobalMemberRecord(activeWallet);
         } else {
-          console.warn(
-            "Community authority could not be fully resolved for Member Record:",
-            authorityResult.reason
-          );
-          communityAuthority = null;
-        }
+          const [authorityResult, catalogResult] = await Promise.allSettled([
+            resolveCommunityAuthority({ community, serverUrl: XRPL_WS }),
+            loadRecognitionCatalog({
+              community,
+              serverUrl: XRPL_WS,
+              issuer: LEAP_ISSUER,
+              currency: LEAP_CURRENCY,
+              includeIgnored: true
+            })
+          ]);
 
-        if (catalogResult.status === "fulfilled") {
-          communityRecognitionCatalog = catalogResult.value;
-        } else {
-          console.warn(
-            "Recognition definitions could not be fully resolved for Member Record:",
-            catalogResult.reason
-          );
-          communityRecognitionCatalog = null;
-        }
+          if (authorityResult.status === "fulfilled") {
+            communityAuthority = authorityResult.value;
+          } else {
+            console.warn(
+              "Community authority could not be fully resolved for Member Record:",
+              authorityResult.reason
+            );
+            communityAuthority = null;
+          }
 
-        await loadCrewRecord(activeWallet);
+          if (catalogResult.status === "fulfilled") {
+            communityRecognitionCatalog = catalogResult.value;
+          } else {
+            console.warn(
+              "Recognition definitions could not be fully resolved for Member Record:",
+              catalogResult.reason
+            );
+            communityRecognitionCatalog = null;
+          }
+
+          await loadCrewRecord(activeWallet);
+        }
       }
     })();
   </script>
