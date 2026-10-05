@@ -1338,6 +1338,7 @@
 
       const SFL_WALLET_STORAGE_KEY = community.walletStorageKey || `${communityId}.xrpl.wallet`;
       const SFL_ACTIVE_WALLET_KEY = community.activeWalletKey || `${communityId}.xrpl.activeWallet`;
+      const WILD_LEDGER_ACTIVE_WALLET_KEY = "wildLedger.activeWallet";
       const SFL_LEAP_SESSION_KEY = `${communityId}.leap.session`;
       const SFL_DISMISSED_EXPIRED_CHECKS_KEY = `${communityId}.leap.dismissedExpiredChecks`;
       const PENDING_CHECK_VISIBLE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -1409,6 +1410,14 @@
 
         try {
           sessionStorage.setItem(SFL_ACTIVE_WALLET_KEY, account);
+        } catch (_) {}
+
+        // Wild Ledger-wide session identity. This is intentionally session-only:
+        // it lets future cross-community features know which public XRPL wallet
+        // this browser session is currently viewing without creating a database
+        // or changing any community-specific wallet behavior.
+        try {
+          sessionStorage.setItem(WILD_LEDGER_ACTIVE_WALLET_KEY, account);
         } catch (_) {}
       }
 
