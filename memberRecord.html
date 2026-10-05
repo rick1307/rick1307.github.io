@@ -1382,6 +1382,7 @@
           </a>
         </div>
 
+        <div class="crew-state-message" id="operatorJourneyMilestone" role="status" aria-live="polite"></div>
         <div class="crew-state-message" id="crewStateMessage" role="status" aria-live="polite"></div>
         <div class="record-wallet" id="recordWallet" hidden></div>
 
@@ -1566,6 +1567,7 @@
       const XRPL_WS = wildLedger.xrplWebSocket;
 
       const status = document.getElementById("crewRecordStatus");
+      const operatorJourneyMilestone = document.getElementById("operatorJourneyMilestone");
       const crewStateMessage = document.getElementById("crewStateMessage");
       const leaperLoungeEntry = document.getElementById("leaperLoungeEntry");
       const trustlineStatus = document.getElementById("trustlineStatus");
@@ -1618,6 +1620,25 @@
 
         if (relationship?.currentOperator) parts.push("Operator");
         return parts;
+      }
+
+      function renderOperatorJourneyMilestone(record) {
+        if (!operatorJourneyMilestone) return;
+
+        operatorJourneyMilestone.className = "crew-state-message";
+        operatorJourneyMilestone.replaceChildren();
+
+        const journey = record?.operatorJourney || null;
+        if (!journey || String(journey.state || "").toUpperCase() !== "WAITING") return;
+
+        const title = document.createElement("strong");
+        title.textContent = "Community request received.";
+
+        const copy = document.createElement("span");
+        copy.textContent = "Your request is being processed. No action is required right now. Community setup is usually completed within 24 hours.";
+
+        operatorJourneyMilestone.append(title, copy);
+        operatorJourneyMilestone.classList.add("show", "success");
       }
 
       function renderWildLedgerCommunityRibbon(record) {
@@ -1707,7 +1728,9 @@
       }
 
       if (!isGlobalMemberRecord) renderProgressRankScale();
-      renderWildLedgerCommunityRibbon(getCachedWildLedgerCommunityRecord());
+      const cachedWildLedgerRecord = getCachedWildLedgerCommunityRecord();
+      renderOperatorJourneyMilestone(cachedWildLedgerRecord);
+      renderWildLedgerCommunityRibbon(cachedWildLedgerRecord);
 
       function getRawActiveWallet() {
         try {
@@ -3496,7 +3519,7 @@
           }
 
           void ensureWildLedgerCommunityRecord({ wallet: account })
-            .then(record => renderWildLedgerCommunityRibbon(record))
+            .then(record => { renderOperatorJourneyMilestone(record); renderWildLedgerCommunityRibbon(record); })
             .catch(error => {
               console.warn(
                 "Wild Ledger cross-community record could not be built in the background:",
@@ -3591,7 +3614,7 @@
           // Once complete, the compact public-ledger summary is reused from
           // sessionStorage for the rest of this browser tab/session.
           void ensureWildLedgerCommunityRecord({ wallet: account })
-            .then(record => renderWildLedgerCommunityRibbon(record))
+            .then(record => { renderOperatorJourneyMilestone(record); renderWildLedgerCommunityRibbon(record); })
             .catch(error => {
               console.warn(
                 "Wild Ledger cross-community record could not be built in the background:",
