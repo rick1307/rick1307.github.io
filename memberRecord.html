@@ -1130,6 +1130,117 @@
     }
 
 
+    /* Wild Ledger cross-community ribbon: revealed only after the session
+       record has been reconstructed or recovered from sessionStorage. */
+    .wallet-community-ribbon{
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      transform:translateY(-8px);
+      background:color-mix(in srgb,var(--paper) 94%,white 6%);
+      border-bottom:0 solid var(--line);
+      transition:max-height .46s ease,opacity .34s ease,transform .46s ease,border-width .46s ease;
+    }
+
+    .wallet-community-ribbon.is-visible{
+      max-height:96px;
+      opacity:1;
+      transform:translateY(0);
+      border-bottom-width:1px;
+    }
+
+    .wallet-community-ribbon-inner{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-height:48px;
+      padding-top:7px;
+      padding-bottom:7px;
+    }
+
+    .wallet-community-ribbon-label{
+      flex:0 0 auto;
+      color:var(--muted);
+      font-family:var(--community-ui-font);
+      font-size:.68rem;
+      font-weight:900;
+      letter-spacing:.09em;
+      line-height:1.2;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .wallet-community-ribbon-track{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      min-width:0;
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+      padding:2px 2px;
+    }
+
+    .wallet-community-ribbon-track::-webkit-scrollbar{display:none}
+
+    .wallet-community-link{
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:30px;
+      padding:6px 10px;
+      border:1px solid color-mix(in srgb,var(--sea) 28%,transparent);
+      border-radius:999px;
+      background:color-mix(in srgb,var(--sea) 7%,white 93%);
+      color:var(--sea);
+      font-family:var(--community-ui-font);
+      font-size:.76rem;
+      font-weight:800;
+      line-height:1.2;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    .wallet-community-link:hover,
+    .wallet-community-link:focus-visible{
+      border-color:color-mix(in srgb,var(--sea) 55%,transparent);
+      background:color-mix(in srgb,var(--sea) 12%,white 88%);
+      text-decoration:none;
+    }
+
+    .wallet-community-link[aria-current="page"]{
+      border-color:color-mix(in srgb,var(--gold) 58%,var(--sea) 42%);
+      background:color-mix(in srgb,var(--gold) 14%,white 86%);
+      color:var(--deep);
+    }
+
+    .wallet-community-separator{
+      color:color-mix(in srgb,var(--muted) 65%,transparent);
+      font-weight:700;
+    }
+
+    @media (max-width:700px){
+      .wallet-community-ribbon.is-visible{max-height:118px}
+      .wallet-community-ribbon-inner{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+        min-height:56px;
+        padding-top:7px;
+        padding-bottom:8px;
+      }
+      .wallet-community-ribbon-track{width:100%}
+      .wallet-community-ribbon-label{padding-left:2px}
+      .wallet-community-link{font-size:.72rem;padding:6px 9px}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .wallet-community-ribbon{transition:none}
+    }
+
+
     /* LEAP journey banner: desktop + mobile companion artwork */
     .leap-journey-banner{
       width:100%;
@@ -1174,6 +1285,18 @@
         alt="The LEAP journey: Website — Front Door; LEAP — Passport; XRPL — Logbook; Discord — Community Club.">
     </picture>
   </div>
+
+
+  <section
+    class="wallet-community-ribbon"
+    id="walletCommunityRibbon"
+    aria-label="Your Wild Ledger communities"
+    aria-live="polite">
+    <div class="wrap wallet-community-ribbon-inner">
+      <span class="wallet-community-ribbon-label">Your Communities</span>
+      <div class="wallet-community-ribbon-track" id="walletCommunityRibbonTrack"></div>
+    </div>
+  </section>
 
 
   <header>
@@ -1273,7 +1396,10 @@
   <script type="module">
     import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
     import { loadRecognitionCatalog, recognitionAvailabilityFromCatalog } from "./js/recognitionCatalog.js";
-    import { ensureWildLedgerCommunityRecord } from "./js/walletCommunityRecord.js";
+    import {
+      ensureWildLedgerCommunityRecord,
+      getCachedWildLedgerCommunityRecord
+    } from "./js/walletCommunityRecord.js";
     (async () => {
       const community = window.WILD_LEDGER_COMMUNITY;
       const communityId = window.WILD_LEDGER_COMMUNITY_ID || (community && community.id);
@@ -1387,7 +1513,92 @@
       let currentLogbookRecords = [];
       let currentPendingLeapChecks = [];
 
+      const walletCommunityRibbon = document.getElementById("walletCommunityRibbon");
+      const walletCommunityRibbonTrack = document.getElementById("walletCommunityRibbonTrack");
+
+      function formatWholeLeap(value) {
+        const number = Number(value);
+        return Number.isFinite(number) ? Math.max(0, Math.trunc(number)).toLocaleString() : "0";
+      }
+
+      function relationshipRibbonLabel(relationship) {
+        const parts = [String(relationship?.communityName || relationship?.communityId || "Community")];
+
+        if (relationship?.member) {
+          parts.push(`${formatWholeLeap(relationship.earnedLeap)} LEAP`);
+          if (relationship?.rank) parts.push(String(relationship.rank));
+        }
+
+        if (relationship?.currentOperator) parts.push("Operator");
+        return parts;
+      }
+
+      function renderWildLedgerCommunityRibbon(record) {
+        if (!walletCommunityRibbon || !walletCommunityRibbonTrack) return;
+
+        const relationships = Array.isArray(record?.communities)
+          ? record.communities.filter(item => item?.member || item?.currentOperator)
+          : [];
+
+        if (!relationships.length) {
+          walletCommunityRibbon.classList.remove("is-visible");
+          walletCommunityRibbonTrack.replaceChildren();
+          return;
+        }
+
+        relationships.sort((a, b) => {
+          const aCurrent = String(a?.communityKey || a?.communityId || "").toLowerCase() === String(communityId).toLowerCase();
+          const bCurrent = String(b?.communityKey || b?.communityId || "").toLowerCase() === String(communityId).toLowerCase();
+          if (aCurrent !== bCurrent) return aCurrent ? -1 : 1;
+          return String(a?.communityName || "").localeCompare(String(b?.communityName || ""));
+        });
+
+        const fragment = document.createDocumentFragment();
+
+        relationships.forEach((relationship, index) => {
+          const key = String(relationship?.communityKey || relationship?.communityId || "").trim().toLowerCase();
+          if (!key) return;
+
+          if (index > 0) {
+            const separator = document.createElement("span");
+            separator.className = "wallet-community-separator";
+            separator.setAttribute("aria-hidden", "true");
+            separator.textContent = "•";
+            fragment.appendChild(separator);
+          }
+
+          const link = document.createElement("a");
+          link.className = "wallet-community-link";
+          link.href = `index.html?community=${encodeURIComponent(key)}`;
+          if (key === String(communityId).toLowerCase()) link.setAttribute("aria-current", "page");
+
+          const labelParts = relationshipRibbonLabel(relationship);
+          labelParts.forEach((part, partIndex) => {
+            if (partIndex > 0) {
+              const dot = document.createElement("span");
+              dot.setAttribute("aria-hidden", "true");
+              dot.textContent = "·";
+              link.appendChild(dot);
+            }
+            const span = document.createElement("span");
+            span.textContent = part;
+            link.appendChild(span);
+          });
+
+          fragment.appendChild(link);
+        });
+
+        walletCommunityRibbonTrack.replaceChildren(fragment);
+
+        // Let the Member Record paint first, then reveal the wallet's broader
+        // Wild Ledger identity as a smooth secondary layer beneath the banner.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => walletCommunityRibbon.classList.add("is-visible"));
+        });
+      }
+
       renderProgressRankScale();
+      renderWildLedgerCommunityRibbon(getCachedWildLedgerCommunityRecord());
 
       function getRawActiveWallet() {
         try {
@@ -3203,12 +3414,14 @@
           // in the background. This never blocks the current Member Record.
           // Once complete, the compact public-ledger summary is reused from
           // sessionStorage for the rest of this browser tab/session.
-          void ensureWildLedgerCommunityRecord({ wallet: account }).catch(error => {
-            console.warn(
-              "Wild Ledger cross-community record could not be built in the background:",
-              error
-            );
-          });
+          void ensureWildLedgerCommunityRecord({ wallet: account })
+            .then(record => renderWildLedgerCommunityRibbon(record))
+            .catch(error => {
+              console.warn(
+                "Wild Ledger cross-community record could not be built in the background:",
+                error
+              );
+            });
 
           saveLeapSession(account, safeBalance);
 
