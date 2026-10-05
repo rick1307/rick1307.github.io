@@ -25,7 +25,7 @@ import { readCommunityRequestStatus } from "./communitySetup.js";
 
 export const WILD_LEDGER_ACTIVE_WALLET_KEY = "wildLedger.activeWallet";
 export const WILD_LEDGER_COMMUNITY_RECORD_KEY = "wildLedger.communityRecord";
-export const WILD_LEDGER_COMMUNITY_RECORD_VERSION = 2;
+export const WILD_LEDGER_COMMUNITY_RECORD_VERSION = 3;
 
 const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
 const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
@@ -721,6 +721,29 @@ export async function buildWildLedgerCommunityRecord({
     // service-history uses, while the future ticker can choose active roles only.
     if (relationship.member || relationship.currentOperator || relationship.historicalOperator) {
       relationships.push(relationship);
+    }
+  }
+
+  // Translate the raw request/provisioning state into the Operator journey
+  // milestone Wild Ledger can present. XRPL still supplies the underlying facts.
+  if (String(operatorJourney?.state || "").toUpperCase() === "READY") {
+    const journeyCommunityId = String(operatorJourney?.community?.communityId || "").trim().toUpperCase();
+    const relationship = relationships.find(item =>
+      String(item?.communityId || "").trim().toUpperCase() === journeyCommunityId
+      && item?.currentOperator
+    );
+
+    if (relationship) {
+      operatorJourney = {
+        ...operatorJourney,
+        state: relationship.setupRequired ? "SETUP_REQUIRED" : (relationship.configured ? "OPERATIONAL" : "READY"),
+        community: {
+          ...(operatorJourney.community || {}),
+          communityName: String(relationship.communityName || journeyCommunityId || "Community"),
+          configured: Boolean(relationship.configured),
+          setupRequired: Boolean(relationship.setupRequired)
+        }
+      };
     }
   }
 
