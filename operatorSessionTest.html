@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b2d36">
+  <title>Operator Session Test — Wild Ledger</title>
+  <style>
+    :root{
+      --bg:#e8eee9;
+      --card:#fbf8ef;
+      --ink:#17313a;
+      --deep:#0b2d36;
+      --sea:#2f7481;
+      --gold:#d7ae62;
+      --line:rgba(15,52,64,.18);
+      --muted:#60757a;
+      --ok:#226b4e;
+      --bad:#9b3e32;
+      --warn:#8b641e;
+      --shadow:0 18px 55px rgba(11,45,54,.13);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 10% -10%,rgba(215,174,98,.18),transparent 30%),
+        linear-gradient(180deg,#edf1ec,#d6e3df);
+      min-height:100vh;
+    }
+    .shell{width:min(780px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+    .brand{font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem;color:var(--deep)}
+    .badge{font-size:.72rem;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.55)}
+    .hero,.card{background:rgba(251,248,239,.92);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px}
+    .hero{padding:24px;margin-bottom:16px}
+    h1{margin:0 0 8px;font-size:clamp(1.8rem,7vw,2.65rem);line-height:1.02;color:var(--deep)}
+    .lede{margin:0;color:var(--muted);font-size:1rem;line-height:1.55}
+    .hard-stop{margin-top:18px;border:1px solid rgba(34,107,78,.25);background:rgba(34,107,78,.08);border-radius:16px;padding:14px 15px;font-weight:750;line-height:1.45;color:#1e5b43}
+    .card{padding:20px;margin-top:14px}
+    .step{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .step-number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--deep);color:white;font-weight:900;font-size:.82rem}
+    h2{font-size:1.15rem;margin:0;color:var(--deep)}
+    p{line-height:1.55}
+    button{appearance:none;border:0;border-radius:14px;padding:13px 16px;font:inherit;font-weight:850;cursor:pointer;background:var(--deep);color:white;min-height:48px}
+    button.secondary{background:transparent;color:var(--deep);border:1px solid var(--line)}
+    button:disabled{opacity:.42;cursor:not-allowed}
+    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    .status{margin-top:13px;padding:12px 13px;border-radius:14px;background:rgba(23,49,58,.055);border:1px solid var(--line);line-height:1.45;word-break:break-word}
+    .status.good{background:rgba(34,107,78,.09);border-color:rgba(34,107,78,.25);color:var(--ok)}
+    .status.bad{background:rgba(155,62,50,.08);border-color:rgba(155,62,50,.22);color:var(--bad)}
+    .status.wait{background:rgba(139,100,30,.08);border-color:rgba(139,100,30,.20);color:var(--warn)}
+    .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:var(--muted);margin-bottom:7px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.79rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#102f37;color:#eaf5f1;border-radius:14px;padding:14px;margin-top:9px;max-height:270px;overflow:auto}
+    .kv{display:grid;grid-template-columns:125px 1fr;gap:7px 12px;margin-top:12px;font-size:.9rem}
+    .kv b{color:var(--muted)}
+    .result-big{font-size:1.25rem;font-weight:950;margin-top:10px}
+    .result-big.good{color:var(--ok)}
+    .result-big.bad{color:var(--bad)}
+    details{margin-top:14px}
+    summary{cursor:pointer;font-weight:800;color:var(--deep)}
+    .fine{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:16px}
+    [hidden]{display:none!important}
+    @media(max-width:600px){
+      .shell{width:min(100% - 20px,780px);padding-top:16px}
+      .hero,.card{border-radius:20px;padding:17px}
+      .kv{grid-template-columns:1fr;gap:2px}
+      .button-row button{width:100%}
+    }
+  </style>
+  <script src="../js/wildLedgerConfig.js"></script>
+  <script src="../js/communityConfig.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xrpl-wallet-kit/browser@0.1.18/dist/xrpl-wallet-kit.iife.min.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <div class="topline">
+      <div class="brand">Wild Ledger</div>
+      <div class="badge">Learning Harness</div>
+    </div>
+
+    <section class="hero">
+      <h1>Operator Session Test</h1>
+      <p class="lede">Prove wallet control, identify current community authority from validated XRPL history, then establish the browser Operator session from that verified result.</p>
+      <div class="hard-stop">No XRPL transaction is submitted by this page. The final step writes only browser session state for this test. It does not create or change protocol authority.</div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span class="step-number">1</span><h2>Connect Bifrost</h2></div>
+      <p>Use the wallet button below. In the wallet chooser, choose Bifrost and approve the connection.</p>
+      <div id="wallet-kit-button"></div>
+      <div class="status wait" id="connectionStatus">No wallet connected yet.</div>
+      <div class="kv" id="connectionDetails" hidden>
+        <b>Wallet</b><span id="connectedWallet">—</span>
+        <b>XRPL address</b><span id="connectedAddress">—</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span class="step-number">2</span><h2>Make a one-time challenge</h2></div>
+      <p>Wild Ledger makes a new random code. You do not type it.</p>
+      <div class="button-row">
+        <button id="generateButton" type="button">Generate Challenge</button>
+      </div>
+      <div id="challengeArea" hidden>
+        <div class="label" style="margin-top:16px">Exact message Bifrost will sign</div>
+        <pre class="mono" id="challengeText"></pre>
+        <div class="kv">
+          <b>Nonce</b><span id="nonceText">—</span>
+          <b>Expires</b><span id="expiresText">—</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span class="step-number">3</span><h2>Ask Bifrost for the proof</h2></div>
+      <p>Bifrost may show a transaction-shaped signing screen. That is the compatibility envelope used to create the signature. Wild Ledger does not submit it.</p>
+      <div class="button-row">
+        <button id="signButton" type="button" disabled>Prove Wallet Control</button>
+        <button id="replayButton" class="secondary" type="button" disabled>Test Same Proof Again</button>
+      </div>
+      <div class="status" id="proofStatus">Generate a challenge after Bifrost is connected.</div>
+      <div id="proofResult" hidden>
+        <div class="result-big" id="resultBig"></div>
+        <div class="kv">
+          <b>Signed by</b><span id="proofAccount">—</span>
+          <b>Signature</b><span id="signatureCheck">—</span>
+          <b>Message</b><span id="messageCheck">—</span>
+          <b>Nonce</b><span id="nonceCheck">—</span>
+          <b>Ledger submit</b><span>Not performed</span>
+        </div>
+        <details>
+          <summary>Show returned proof data</summary>
+          <pre class="mono" id="rawProof"></pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span class="step-number">4</span><h2>Identify community authority</h2></div>
+      <p>After wallet control is verified, Wild Ledger reads validated XRPL authority history and checks whether this exact address is the current Community Operating Wallet for any community.</p>
+      <div class="button-row">
+        <button id="identifyButton" type="button" disabled>Identify My Community</button>
+      </div>
+      <div class="status" id="authorityStatus">Verify wallet control first.</div>
+      <div id="authorityResult" hidden>
+        <div class="result-big" id="authorityBig"></div>
+        <div class="kv">
+          <b>Verified wallet</b><span id="authorityWallet">—</span>
+          <b>Community</b><span id="authorityCommunity">—</span>
+          <b>Namespace</b><span id="authorityNamespace">—</span>
+          <b>Current authority</b><span id="authorityCurrent">—</span>
+          <b>Source</b><span id="authoritySource">—</span>
+        </div>
+        <details id="authorityDetails" hidden>
+          <summary>Show authority details</summary>
+          <pre class="mono" id="authorityRaw"></pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span class="step-number">5</span><h2>Establish Operator session</h2></div>
+      <p>This step is enabled only after one current community authority match is found. Before writing the session, Wild Ledger rechecks validated XRPL history so the session is created from fresh authority, not a typed Community ID or URL value.</p>
+      <div class="button-row">
+        <button id="createSessionButton" type="button" disabled>Create Operator Session</button>
+        <button id="clearSessionButton" class="secondary" type="button">Clear Test Session</button>
+      </div>
+      <div class="status" id="sessionStatus">Identify exactly one community first.</div>
+      <div id="sessionResult" hidden>
+        <div class="result-big" id="sessionBig"></div>
+        <div class="kv">
+          <b>Role</b><span id="sessionRole">—</span>
+          <b>Community</b><span id="sessionCommunity">—</span>
+          <b>Verified wallet</b><span id="sessionWallet">—</span>
+          <b>Source</b><span id="sessionSource">—</span>
+          <b>Established</b><span id="sessionEstablished">—</span>
+        </div>
+        <details>
+          <summary>Show browser session values</summary>
+          <pre class="mono" id="sessionRaw"></pre>
+        </details>
+      </div>
+    </section>
+
+    <p class="fine">Practice harness only. Steps 1–4 prove wallet control and resolve current Community Operating Wallet authority from validated XRPL history. Step 5 writes the current Wild Ledger browser session keys from that verified result. This is the current static-site scaffold, not the future server-side production authorization boundary. It does not route the Operator, publish community settings, or submit anything to XRPL.</p>
+  </main>
+
+  <script type="module">
+    import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
+    import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@3.1.0?bundle";
+    import { DirectXRPLClient, isClassicAddress } from "../js/xrplTransport.js?wl=20261005-operator-session";
+    import { resolveOwnerAuthority } from "../js/ownerAuthority.js?wl=20261005-operator-session";
+    import { resolveCommunityAuthority, isCanonicalNoOpAccountSet, operatingWalletMemo } from "../js/communityAuthority.js?wl=20261005-operator-session";
+
+    const cfg = window.WILD_LEDGER_CONFIG || {};
+    const projectId = String(cfg.walletConnectProjectId || "").trim();
+    const proofDestination = String(cfg.leapIssuer || "").trim();
+
+    const connectionStatus = document.getElementById("connectionStatus");
+    const connectionDetails = document.getElementById("connectionDetails");
+    const connectedWallet = document.getElementById("connectedWallet");
+    const connectedAddress = document.getElementById("connectedAddress");
+    const generateButton = document.getElementById("generateButton");
+    const signButton = document.getElementById("signButton");
+    const replayButton = document.getElementById("replayButton");
+    const challengeArea = document.getElementById("challengeArea");
+    const challengeTextEl = document.getElementById("challengeText");
+    const nonceText = document.getElementById("nonceText");
+    const expiresText = document.getElementById("expiresText");
+    const proofStatus = document.getElementById("proofStatus");
+    const proofResult = document.getElementById("proofResult");
+    const resultBig = document.getElementById("resultBig");
+    const proofAccount = document.getElementById("proofAccount");
+    const signatureCheck = document.getElementById("signatureCheck");
+    const messageCheck = document.getElementById("messageCheck");
+    const nonceCheck = document.getElementById("nonceCheck");
+    const rawProof = document.getElementById("rawProof");
+    const identifyButton = document.getElementById("identifyButton");
+    const authorityStatus = document.getElementById("authorityStatus");
+    const authorityResult = document.getElementById("authorityResult");
+    const authorityBig = document.getElementById("authorityBig");
+    const authorityWallet = document.getElementById("authorityWallet");
+    const authorityCommunity = document.getElementById("authorityCommunity");
+    const authorityNamespace = document.getElementById("authorityNamespace");
+    const authorityCurrent = document.getElementById("authorityCurrent");
+    const authoritySource = document.getElementById("authoritySource");
+    const authorityDetails = document.getElementById("authorityDetails");
+    const authorityRaw = document.getElementById("authorityRaw");
+    const createSessionButton = document.getElementById("createSessionButton");
+    const clearSessionButton = document.getElementById("clearSessionButton");
+    const sessionStatus = document.getElementById("sessionStatus");
+    const sessionResult = document.getElementById("sessionResult");
+    const sessionBig = document.getElementById("sessionBig");
+    const sessionRole = document.getElementById("sessionRole");
+    const sessionCommunity = document.getElementById("sessionCommunity");
+    const sessionWallet = document.getElementById("sessionWallet");
+    const sessionSource = document.getElementById("sessionSource");
+    const sessionEstablished = document.getElementById("sessionEstablished");
+    const sessionRaw = document.getElementById("sessionRaw");
+
+    let currentChallenge = null;
+    let lastSignedResult = null;
+    let lastVerifiedAccount = "";
+    let lastAuthorityResult = null;
+    let sessionCandidate = null;
+    const usedNonces = new Set();
+
+    function setStatus(element, message, tone = "") {
+      element.textContent = message;
+      element.className = `status${tone ? ` ${tone}` : ""}`;
+    }
+
+    function randomNonce() {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+    }
+
+    function makeChallenge() {
+      const issued = new Date();
+      const expires = new Date(issued.getTime() + 5 * 60 * 1000);
+      const nonce = randomNonce();
+      const origin = location.origin && location.origin !== "null" ? location.origin : "local-test";
+      const message = [
+        "Wild Ledger Wallet Proof",
+        "Purpose: prove wallet control",
+        `Nonce: ${nonce}`,
+        `Issued: ${issued.toISOString()}`,
+        `Expires: ${expires.toISOString()}`,
+        `Site: ${origin}`
+      ].join("\n");
+      return { nonce, issuedAt: issued.getTime(), expiresAt: expires.getTime(), message };
+    }
+
+    function getSession() {
+      try {
+        return kit?.getSession?.() || kit?.manager?.getSession?.() || null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function sessionAddress(session) {
+      return String(
+        session?.account?.address ||
+        session?.accountAddress ||
+        session?.address ||
+        session?.accounts?.[0]?.address ||
+        ""
+      ).trim();
+    }
+
+    function sessionWalletName(session) {
+      return String(
+        session?.wallet?.name ||
+        session?.adapter?.name ||
+        session?.walletName ||
+        session?.adapterId ||
+        "Connected wallet"
+      );
+    }
+
+    function refreshConnection() {
+      const session = getSession();
+      const address = sessionAddress(session);
+      if (!address) {
+        setStatus(connectionStatus, "No wallet connected yet.", "wait");
+        connectionDetails.hidden = true;
+        signButton.disabled = true;
+        return;
+      }
+
+      connectedWallet.textContent = sessionWalletName(session);
+      connectedAddress.textContent = address;
+      connectionDetails.hidden = false;
+      if (lastVerifiedAccount && lastVerifiedAccount !== address) {
+        lastVerifiedAccount = "";
+        clearAuthorityResult("The connected wallet changed. Prove wallet control again.");
+      }
+      setStatus(connectionStatus, "Wallet connected. You can make a one-time challenge.", "good");
+      signButton.disabled = !currentChallenge;
+    }
+
+    function hexToUtf8(hex) {
+      const clean = String(hex || "").replace(/[^A-Fa-f0-9]/g, "");
+      if (!clean || clean.length % 2) return "";
+      const bytes = new Uint8Array(clean.length / 2);
+      for (let i = 0; i < bytes.length; i += 1) bytes[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+      try { return new TextDecoder().decode(bytes); } catch (_) { return ""; }
+    }
+
+    function isHex(value) {
+      return typeof value === "string" && value.length > 80 && /^[A-Fa-f0-9]+$/.test(value);
+    }
+
+    function walk(value, visitor, seen = new Set()) {
+      if (value == null) return null;
+      if (typeof value === "object") {
+        if (seen.has(value)) return null;
+        seen.add(value);
+      }
+      const hit = visitor(value);
+      if (hit) return hit;
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          const found = walk(item, visitor, seen);
+          if (found) return found;
+        }
+      } else if (value && typeof value === "object") {
+        for (const item of Object.values(value)) {
+          const found = walk(item, visitor, seen);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function findSignedTransaction(result) {
+      const objectHit = walk(result, value => {
+        if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+        if (value.TransactionType && value.Account && (value.TxnSignature || value.Signers)) return value;
+        return null;
+      });
+      if (objectHit) return JSON.parse(JSON.stringify(objectHit));
+
+      const blob = walk(result, value => {
+        if (!isHex(value)) return null;
+        try {
+          const tx = decode(value);
+          if (tx?.TransactionType && tx?.Account && (tx?.TxnSignature || tx?.Signers)) return { blob:value, tx };
+        } catch (_) {}
+        return null;
+      });
+      return blob?.tx ? JSON.parse(JSON.stringify(blob.tx)) : null;
+    }
+
+    function extractMemoText(tx) {
+      const memo = Array.isArray(tx?.Memos) ? tx.Memos[0]?.Memo : null;
+      return hexToUtf8(memo?.MemoData || "");
+    }
+
+    function verifySignedProof(result, challenge, { allowUsedNonce = false } = {}) {
+      if (!challenge) throw new Error("There is no active challenge.");
+      if (Date.now() > challenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
+      if (!allowUsedNonce && usedNonces.has(challenge.nonce)) throw new Error("This nonce was already used. Generate a new challenge.");
+
+      const session = getSession();
+      const expectedAccount = sessionAddress(session);
+      if (!expectedAccount) throw new Error("The wallet session is no longer connected.");
+
+      const signedTx = findSignedTransaction(result);
+      if (!signedTx) throw new Error("The wallet returned a proof, but this test page could not locate the signed XRPL proof envelope.");
+      if (Array.isArray(signedTx.Signers) && signedTx.Signers.length) throw new Error("This first test expects a normal single-sign wallet proof.");
+
+      const account = String(signedTx.Account || "");
+      const publicKey = String(signedTx.SigningPubKey || "");
+      const signature = String(signedTx.TxnSignature || "");
+      if (!account || !publicKey || !signature) throw new Error("The signed proof is missing Account, SigningPubKey, or TxnSignature.");
+      if (account !== expectedAccount) throw new Error("The signed proof came from a different XRPL account than the connected wallet.");
+
+      let derived;
+      try {
+        derived = deriveAddress(publicKey);
+      } catch (error) {
+        throw new Error(`Public-key address check failed: ${error?.message || String(error)}`);
+      }
+      if (derived !== account) throw new Error("The public key in the proof does not belong to the signed XRPL account.");
+
+      const unsigned = JSON.parse(JSON.stringify(signedTx));
+      delete unsigned.TxnSignature;
+      delete unsigned.hash;
+
+      let signingData;
+      try {
+        signingData = encodeForSigning(unsigned);
+      } catch (error) {
+        throw new Error(`XRPL signing-data encoding failed: ${error?.message || String(error)}`);
+      }
+
+      let signatureIsValid;
+      try {
+        signatureIsValid = verify(signingData, signature, publicKey);
+      } catch (error) {
+        throw new Error(`Digital-signature check failed: ${error?.message || String(error)}`);
+      }
+      if (!signatureIsValid) throw new Error("The digital signature is not valid.");
+
+      const signedMessage = extractMemoText(signedTx);
+      if (signedMessage !== challenge.message) throw new Error("The signed message does not match this one-time challenge.");
+
+      return { account, publicKey, signature, signedMessage, signedTx };
+    }
+
+    function normalizeTx(entry) {
+      return entry?.tx_json || entry?.tx || entry?.transaction || entry || {};
+    }
+
+    function transactionSucceeded(entry) {
+      if (entry?.validated === false) return false;
+      const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+      const result = meta?.TransactionResult ?? meta?.transaction_result;
+      return !result || result === "tesSUCCESS";
+    }
+
+    function ledgerIndex(entry, tx = normalizeTx(entry)) {
+      const value = entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.ledgerIndex ?? tx?.inLedger;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function transactionIndex(entry) {
+      const meta = entry?.meta || entry?.metaData || entry?.metadata || {};
+      const value = entry?.tx_index ?? entry?.transaction_index ?? meta?.TransactionIndex ?? meta?.transaction_index;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function transactionHash(entry, tx = normalizeTx(entry)) {
+      return String(entry?.hash || entry?.tx_hash || tx?.hash || "");
+    }
+
+    function orderFromEntry(entry, tx = normalizeTx(entry)) {
+      const ledger = ledgerIndex(entry, tx);
+      if (!Number.isFinite(ledger)) return null;
+      return { ledger, txIndex: transactionIndex(entry) };
+    }
+
+    function compareOrder(a, b) {
+      if (a.ledger !== b.ledger) return a.ledger - b.ledger;
+      const ai = Number.isFinite(a.txIndex) ? a.txIndex : -1;
+      const bi = Number.isFinite(b.txIndex) ? b.txIndex : -1;
+      return ai - bi;
+    }
+
+    function isAfter(a, b) {
+      return compareOrder(a, b) > 0;
+    }
+
+    function decodedMemoTexts(tx) {
+      const texts = [];
+      for (const wrapper of Array.isArray(tx?.Memos) ? tx.Memos : []) {
+        const memo = wrapper?.Memo || {};
+        for (const field of [memo.MemoData, memo.MemoType, memo.MemoFormat]) {
+          if (field === undefined || field === null || field === "") continue;
+          const decoded = hexToUtf8(field).trim();
+          if (decoded) texts.push(decoded);
+        }
+      }
+      return texts;
+    }
+
+    function authorityStatementFromEntry(entry, namespace) {
+      const tx = normalizeTx(entry);
+      if (!transactionSucceeded(entry) || !isCanonicalNoOpAccountSet(tx) || !isClassicAddress(tx.Account)) return null;
+
+      const texts = decodedMemoTexts(tx);
+      if (texts.length !== 1) return null;
+
+      const prefix = `${namespace}/AUTHORITY/OPERATING-WALLET=`;
+      const text = texts[0];
+      if (!text.startsWith(prefix)) return null;
+
+      const value = text.slice(prefix.length);
+      if (!isClassicAddress(value)) return null;
+      if (text !== operatingWalletMemo(namespace, value)) return null;
+
+      const order = orderFromEntry(entry, tx);
+      if (!order) return null;
+
+      return {
+        account: String(tx.Account),
+        value,
+        ledger: order.ledger,
+        txIndex: order.txIndex,
+        hash: transactionHash(entry, tx),
+        memo: text
+      };
+    }
+
+    async function readAccountHistory(client, account) {
+      let marker;
+      const rows = [];
+      do {
+        const fields = {
+          account,
+          ledger_index_min: -1,
+          ledger_index_max: -1,
+          binary: false,
+          forward: true,
+          limit: 400
+        };
+        if (marker !== undefined) fields.marker = marker;
+        const response = await client.request("account_tx", fields, 30000);
+        const result = response.result || {};
+        rows.push(...(Array.isArray(result.transactions) ? result.transactions : []));
+        marker = result.marker;
+      } while (marker !== undefined && marker !== null);
+      return rows;
+    }
+
+    function sortStatements(statements) {
+      const sorted = [...statements].sort((a, b) => compareOrder(a, b));
+      for (let i = 1; i < sorted.length; i += 1) {
+        const prior = sorted[i - 1];
+        const current = sorted[i];
+        if (prior.ledger === current.ledger && (!Number.isFinite(prior.txIndex) || !Number.isFinite(current.txIndex))) {
+          throw new Error(`Authority resolution needs XRPL transaction ordering for ledger ${current.ledger}, but TransactionIndex was unavailable.`);
+        }
+      }
+      return sorted;
+    }
+
+    async function resolveProvisionedCommunityAuthority(client, provision, maxTransitions = 50) {
+      const communityId = String(provision?.communityId || "").trim().toUpperCase();
+      const namespace = String(provision?.namespace || `${communityId}-LEAP`).trim();
+      const firstWallet = String(provision?.operatingWallet || "").trim();
+      if (!communityId || !namespace || !isClassicAddress(firstWallet)) {
+        throw new Error("Owner provisioning record is incomplete.");
+      }
+
+      let currentAccount = firstWallet;
+      let activeFromExclusive = {
+        ledger: Number(provision.ledger),
+        txIndex: Number.isFinite(Number(provision.txIndex)) ? Number(provision.txIndex) : null
+      };
+      if (!Number.isFinite(activeFromExclusive.ledger)) throw new Error(`${communityId} provisioning ledger is unavailable.`);
+
+      const accounts = [currentAccount];
+      const transitions = [];
+      const statements = [];
+      const statementCache = new Map();
+      const seen = new Set([currentAccount]);
+      let transitionCount = 0;
+
+      async function statementsFor(account) {
+        if (statementCache.has(account)) return statementCache.get(account);
+        const rows = await readAccountHistory(client, account);
+        const parsed = sortStatements(rows.map(row => authorityStatementFromEntry(row, namespace)).filter(Boolean));
+        statementCache.set(account, parsed);
+        return parsed;
+      }
+
+      while (transitionCount < maxTransitions) {
+        const candidates = (await statementsFor(currentAccount)).filter(statement =>
+          statement.account === currentAccount && isAfter({ ledger: statement.ledger, txIndex: statement.txIndex }, activeFromExclusive)
+        );
+
+        let rotation = null;
+        for (const candidate of candidates) {
+          statements.push({ ...candidate, kind: candidate.value === currentAccount ? "REAFFIRM" : "ROTATION" });
+          activeFromExclusive = { ledger: candidate.ledger, txIndex: candidate.txIndex };
+          if (candidate.value !== currentAccount) {
+            rotation = candidate;
+            break;
+          }
+        }
+
+        if (!rotation) break;
+
+        transitions.push({
+          from: currentAccount,
+          to: rotation.value,
+          ledger: rotation.ledger,
+          txIndex: rotation.txIndex,
+          hash: rotation.hash,
+          memo: rotation.memo
+        });
+
+        if (seen.has(rotation.value)) throw new Error(`${communityId} authority history contains a rotation loop.`);
+        currentAccount = rotation.value;
+        seen.add(currentAccount);
+        accounts.push(currentAccount);
+        transitionCount += 1;
+      }
+
+      if (transitionCount >= maxTransitions) throw new Error(`${communityId} authority state exceeded the ${maxTransitions}-rotation safety limit.`);
+
+      return {
+        communityId,
+        namespace,
+        currentAccount,
+        accounts,
+        statements,
+        transitions,
+        establishment: {
+          ownerWallet: provision.ownerWallet || "",
+          firstWallet,
+          ledger: provision.ledger,
+          txIndex: provision.txIndex,
+          hash: provision.hash || "",
+          memo: provision.memo || ""
+        }
+      };
+    }
+
+    function backendIdFor(community) {
+      return String(
+        window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) ||
+        community?.backendId ||
+        community?.id ||
+        ""
+      ).trim().toUpperCase();
+    }
+
+    async function identifyCommunityAuthority(account) {
+      const target = String(account || "").trim();
+      if (!isClassicAddress(target)) throw new Error("The verified wallet is not a valid XRPL classic address.");
+
+      const serverUrl = String(cfg.xrplWebSocket || "").trim();
+      if (!serverUrl) throw new Error("XRPL server is not configured.");
+
+      const ownerState = await resolveOwnerAuthority({ serverUrl, force: true });
+      if (!ownerState?.authorityEstablished) throw new Error("Canonical Wild Ledger Owner authority is not established on XRPL.");
+
+      const matches = [];
+      const evaluated = [];
+      const provisionedIds = new Set();
+      const client = new DirectXRPLClient(serverUrl);
+
+      try {
+        await client.connect();
+        for (const provision of ownerState.provisionedCommunities || []) {
+          const communityId = String(provision?.communityId || "").trim().toUpperCase();
+          if (!communityId) continue;
+          provisionedIds.add(communityId);
+
+          const state = await resolveProvisionedCommunityAuthority(client, provision);
+          const configured = window.WILD_LEDGER_GET_COMMUNITY?.(communityId) || null;
+          const record = {
+            communityId,
+            communityName: configured?.communityName || communityId,
+            namespace: state.namespace,
+            currentAccount: state.currentAccount,
+            source: "Owner provisioning + community authority history",
+            configured: Boolean(configured),
+            establishment: state.establishment,
+            transitions: state.transitions
+          };
+          evaluated.push(record);
+          if (state.currentAccount === target) matches.push(record);
+        }
+      } finally {
+        client.close();
+      }
+
+      const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
+      for (const community of Object.values(registry)) {
+        const communityId = backendIdFor(community);
+        if (!communityId || provisionedIds.has(communityId) || community?.directoryTone === "reference") continue;
+        const configuredWallet = String(community?.operatingWallet || "").trim();
+        if (!isClassicAddress(configuredWallet)) continue;
+
+        const authority = await resolveCommunityAuthority({ community, serverUrl, force: true });
+        if (!authority?.authorityEstablished) continue;
+        const record = {
+          communityId,
+          communityName: community?.communityName || communityId,
+          namespace: authority.namespace || community?.leapNamespace || `${communityId}-LEAP`,
+          currentAccount: authority.currentAccount || authority.canonicalCurrentAccount || "",
+          source: "Existing-community canonical authority history",
+          configured: true,
+          establishment: authority.initialStatement || null,
+          transitions: authority.transitions || []
+        };
+        evaluated.push(record);
+        if (record.currentAccount === target) matches.push(record);
+      }
+
+      return {
+        verifiedAccount: target,
+        matches,
+        evaluated,
+        ownerWallet: ownerState.currentAccount || ownerState.canonicalCurrentAccount || "",
+        resolvedAt: new Date().toISOString()
+      };
+    }
+
+    function resetSessionCandidate(message = "Identify exactly one community first.") {
+      sessionCandidate = null;
+      lastAuthorityResult = null;
+      createSessionButton.disabled = true;
+      setStatus(sessionStatus, message, "");
+    }
+
+    function clearAuthorityResult(message = "Verify wallet control first.") {
+      identifyButton.disabled = true;
+      authorityResult.hidden = true;
+      authorityDetails.hidden = true;
+      authorityRaw.textContent = "";
+      resetSessionCandidate();
+      setStatus(authorityStatus, message, "");
+    }
+
+    function renderAuthorityResult(result) {
+      const matches = result.matches || [];
+      lastAuthorityResult = result;
+      authorityResult.hidden = false;
+      authorityWallet.textContent = result.verifiedAccount || "—";
+      authorityRaw.textContent = JSON.stringify(result, null, 2);
+      authorityDetails.hidden = false;
+
+      if (matches.length === 0) {
+        sessionCandidate = null;
+        createSessionButton.disabled = true;
+        authorityBig.textContent = "No current community authority found";
+        authorityBig.className = "result-big bad";
+        authorityCommunity.textContent = "None";
+        authorityNamespace.textContent = "—";
+        authorityCurrent.textContent = "—";
+        authoritySource.textContent = "Validated XRPL history";
+        setStatus(authorityStatus, "Wallet control is proven, but this address is not the current Community Operating Wallet for any canonical Wild Ledger community found by this test.", "bad");
+        setStatus(sessionStatus, "No Operator session can be created because no current community authority was found.", "bad");
+        return;
+      }
+
+      if (matches.length === 1) {
+        const match = matches[0];
+        sessionCandidate = {
+          verifiedWallet: result.verifiedAccount,
+          communityId: match.communityId,
+          communityName: match.communityName,
+          namespace: match.namespace || "",
+          authoritySource: match.source || "Validated XRPL history",
+          authorityResolvedAt: result.resolvedAt || new Date().toISOString()
+        };
+        createSessionButton.disabled = false;
+        authorityBig.textContent = "Community authority identified";
+        authorityBig.className = "result-big good";
+        authorityCommunity.textContent = `${match.communityId} — ${match.communityName}`;
+        authorityNamespace.textContent = match.namespace || "—";
+        authorityCurrent.textContent = match.currentAccount || "—";
+        authoritySource.textContent = match.source || "Validated XRPL history";
+        setStatus(authorityStatus, `Good. This verified wallet is the current Community Operating Wallet for ${match.communityId}.`, "good");
+        setStatus(sessionStatus, `Ready. Wild Ledger can establish an Operator session for ${match.communityId} from this verified authority.`, "wait");
+        return;
+      }
+
+      sessionCandidate = null;
+      createSessionButton.disabled = true;
+      authorityBig.textContent = `${matches.length} communities controlled`;
+      authorityBig.className = "result-big good";
+      authorityCommunity.textContent = matches.map(match => match.communityId).join(", ");
+      authorityNamespace.textContent = matches.map(match => match.namespace).join(", ");
+      authorityCurrent.textContent = result.verifiedAccount;
+      authoritySource.textContent = "Validated XRPL authority histories";
+      setStatus(authorityStatus, "This verified wallet currently operates more than one Wild Ledger community.", "good");
+      setStatus(sessionStatus, "This test will not guess which community to enter. A multi-community chooser is required before a session can be established.", "wait");
+    }
+
+    function renderStoredSession(session) {
+      sessionResult.hidden = false;
+      sessionBig.textContent = "Operator session established";
+      sessionBig.className = "result-big good";
+      sessionRole.textContent = session.role;
+      sessionCommunity.textContent = session.communityId;
+      sessionWallet.textContent = session.verifiedWallet;
+      sessionSource.textContent = session.source;
+      sessionEstablished.textContent = new Date(session.establishedAt).toLocaleString();
+      sessionRaw.textContent = JSON.stringify({
+        wildLedgerRole: sessionStorage.getItem("wildLedgerRole"),
+        wildLedgerCommunity: sessionStorage.getItem("wildLedgerCommunity"),
+        wildLedgerOperatorWallet: sessionStorage.getItem("wildLedgerOperatorWallet"),
+        wildLedgerOperatorSession: JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null")
+      }, null, 2);
+      setStatus(sessionStatus, `Good. The browser Operator session is now bound to ${session.communityId} from verified wallet authority.`, "good");
+    }
+
+    function clearStoredOperatorSession() {
+      sessionStorage.removeItem("wildLedgerRole");
+      sessionStorage.removeItem("wildLedgerCommunity");
+      sessionStorage.removeItem("wildLedgerOperatorWallet");
+      sessionStorage.removeItem("wildLedgerOperatorSession");
+      sessionResult.hidden = true;
+      sessionRaw.textContent = "";
+      setStatus(sessionStatus, sessionCandidate
+        ? `Test session cleared. Authority for ${sessionCandidate.communityId} is still verified; you may create the session again.`
+        : "Test session cleared. Identify exactly one community first.", "wait");
+    }
+
+    function renderVerificationSuccess(verified, result) {
+      proofResult.hidden = false;
+      resultBig.textContent = "Wallet control verified";
+      resultBig.className = "result-big good";
+      proofAccount.textContent = verified.account;
+      signatureCheck.textContent = "Valid";
+      messageCheck.textContent = "Exact match";
+      nonceCheck.textContent = "Fresh and accepted once";
+      rawProof.textContent = JSON.stringify({ returnedByWallet: result, decodedSignedEnvelope: verified.signedTx }, null, 2);
+      lastVerifiedAccount = verified.account;
+      lastAuthorityResult = null;
+      sessionCandidate = null;
+      createSessionButton.disabled = true;
+      identifyButton.disabled = false;
+      authorityResult.hidden = true;
+      setStatus(sessionStatus, "Wallet proof passed. Identify exactly one community before creating a session.", "wait");
+      setStatus(authorityStatus, "Wallet proof passed. Tap Identify My Community to read validated XRPL authority history.", "wait");
+      setStatus(proofStatus, "The wallet signed this exact one-time challenge. Wild Ledger verified it locally. Nothing was submitted to XRPL.", "good");
+    }
+
+    function renderVerificationFailure(error) {
+      proofResult.hidden = false;
+      resultBig.textContent = "Verification failed";
+      resultBig.className = "result-big bad";
+      proofAccount.textContent = "—";
+      signatureCheck.textContent = "Not verified";
+      messageCheck.textContent = "Not verified";
+      nonceCheck.textContent = "Not accepted";
+      lastVerifiedAccount = "";
+      clearAuthorityResult("Wallet proof must pass before community authority can be identified.");
+      setStatus(proofStatus, error?.message || String(error), "bad");
+    }
+
+    if (!window.XRPLWalletKit?.createWalletKit) {
+      throw new Error("XRPL Wallet Kit did not load.");
+    }
+    if (!projectId) {
+      throw new Error("Wild Ledger WalletConnect Project ID is missing.");
+    }
+    if (!proofDestination) {
+      throw new Error("A valid non-self proof destination is required.");
+    }
+
+    const kit = window.XRPLWalletKit.createWalletKit({
+      metadata: {
+        name: "Wild Ledger Operator Session Test",
+        description: "Practice wallet proof, XRPL community authority resolution, and Operator session establishment"
+        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+        icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+      },
+      network: "mainnet",
+      wallets: ["walletconnect"],
+      autoReconnect: false,
+      walletConnectProjectId: projectId,
+      walletConnectSignMessageDestination: proofDestination,
+      connectButton: "#wallet-kit-button",
+      ui: {
+        themeMode: "light",
+        walletConnect: { mode: "default" },
+        toast: true
+      }
+    });
+
+    try { kit.button?.mount?.("#wallet-kit-button"); } catch (_) {}
+
+    generateButton.addEventListener("click", () => {
+      currentChallenge = makeChallenge();
+      lastSignedResult = null;
+      lastVerifiedAccount = "";
+      clearAuthorityResult("Complete this new wallet proof before identifying community authority.");
+      challengeTextEl.textContent = currentChallenge.message;
+      nonceText.textContent = currentChallenge.nonce;
+      expiresText.textContent = new Date(currentChallenge.expiresAt).toLocaleString();
+      challengeArea.hidden = false;
+      proofResult.hidden = true;
+      replayButton.disabled = true;
+      refreshConnection();
+      setStatus(proofStatus, "Challenge ready. Tap Prove Wallet Control and review Bifrost carefully.", "wait");
+    });
+
+    signButton.addEventListener("click", async () => {
+      try {
+        const address = sessionAddress(getSession());
+        if (!address) throw new Error("Connect Bifrost first.");
+        if (!currentChallenge) throw new Error("Generate a challenge first.");
+        if (Date.now() > currentChallenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
+        if (usedNonces.has(currentChallenge.nonce)) throw new Error("This challenge was already used. Generate a new one.");
+
+        signButton.disabled = true;
+        generateButton.disabled = true;
+        setStatus(proofStatus, "Waiting for Bifrost. Review the request, then approve the signature if it looks right.", "wait");
+
+        // IMPORTANT: signMessage only. This harness never calls signAndSubmit,
+        // submit, submitAndWait, xrpl_submit, or any Wild Ledger XRPL submit helper.
+        const result = await kit.signMessage({ message: currentChallenge.message });
+        lastSignedResult = result;
+
+        const verified = verifySignedProof(result, currentChallenge);
+        usedNonces.add(currentChallenge.nonce);
+        renderVerificationSuccess(verified, result);
+        replayButton.disabled = false;
+      } catch (error) {
+        renderVerificationFailure(error);
+      } finally {
+        generateButton.disabled = false;
+        signButton.disabled = usedNonces.has(currentChallenge?.nonce || "") || !sessionAddress(getSession());
+      }
+    });
+
+    identifyButton.addEventListener("click", async () => {
+      try {
+        if (!lastVerifiedAccount) throw new Error("Prove wallet control first.");
+        const connected = sessionAddress(getSession());
+        if (!connected || connected !== lastVerifiedAccount) throw new Error("The connected wallet changed. Prove wallet control again.");
+
+        identifyButton.disabled = true;
+        authorityResult.hidden = true;
+        setStatus(authorityStatus, "Reading validated XRPL authority history…", "wait");
+        const result = await identifyCommunityAuthority(lastVerifiedAccount);
+        renderAuthorityResult(result);
+      } catch (error) {
+        authorityResult.hidden = false;
+        authorityBig.textContent = "Authority lookup failed";
+        authorityBig.className = "result-big bad";
+        authorityWallet.textContent = lastVerifiedAccount || "—";
+        authorityCommunity.textContent = "—";
+        authorityNamespace.textContent = "—";
+        authorityCurrent.textContent = "—";
+        authoritySource.textContent = "—";
+        authorityDetails.hidden = true;
+        setStatus(authorityStatus, error?.message || String(error), "bad");
+      } finally {
+        identifyButton.disabled = !lastVerifiedAccount;
+      }
+    });
+
+    createSessionButton.addEventListener("click", async () => {
+      try {
+        if (!lastVerifiedAccount || !sessionCandidate) throw new Error("Verify wallet control and identify exactly one community first.");
+        const connected = sessionAddress(getSession());
+        if (!connected || connected !== lastVerifiedAccount) throw new Error("The connected wallet changed. Prove wallet control again.");
+
+        createSessionButton.disabled = true;
+        sessionResult.hidden = true;
+        setStatus(sessionStatus, "Rechecking validated XRPL authority before creating the session…", "wait");
+
+        const fresh = await identifyCommunityAuthority(lastVerifiedAccount);
+        const matches = fresh.matches || [];
+        if (matches.length !== 1) {
+          throw new Error(matches.length
+            ? "This wallet now controls more than one community. A community chooser is required."
+            : "This wallet is no longer the current Operating Wallet for a Wild Ledger community.");
+        }
+
+        const match = matches[0];
+        if (match.communityId !== sessionCandidate.communityId || match.currentAccount !== lastVerifiedAccount) {
+          throw new Error("Community authority changed since the previous check. Identify the community again.");
+        }
+
+        const establishedAt = new Date().toISOString();
+        const session = {
+          version: 1,
+          role: "operator",
+          communityId: match.communityId,
+          communityName: match.communityName,
+          namespace: match.namespace || "",
+          verifiedWallet: lastVerifiedAccount,
+          source: "wallet-proof + validated-xrpl-authority",
+          authoritySource: match.source || "Validated XRPL history",
+          authorityResolvedAt: fresh.resolvedAt || establishedAt,
+          proofNonce: currentChallenge?.nonce || "",
+          establishedAt
+        };
+
+        sessionStorage.setItem("wildLedgerRole", "operator");
+        sessionStorage.setItem("wildLedgerCommunity", match.communityId);
+        sessionStorage.setItem("wildLedgerOperatorWallet", lastVerifiedAccount);
+        sessionStorage.setItem("wildLedgerOperatorSession", JSON.stringify(session));
+
+        sessionCandidate = {
+          verifiedWallet: lastVerifiedAccount,
+          communityId: match.communityId,
+          communityName: match.communityName,
+          namespace: match.namespace || "",
+          authoritySource: match.source || "Validated XRPL history",
+          authorityResolvedAt: fresh.resolvedAt || establishedAt
+        };
+        renderStoredSession(session);
+      } catch (error) {
+        sessionResult.hidden = false;
+        sessionBig.textContent = "Session not established";
+        sessionBig.className = "result-big bad";
+        sessionRole.textContent = "—";
+        sessionCommunity.textContent = "—";
+        sessionWallet.textContent = lastVerifiedAccount || "—";
+        sessionSource.textContent = "—";
+        sessionEstablished.textContent = "—";
+        sessionRaw.textContent = "";
+        setStatus(sessionStatus, error?.message || String(error), "bad");
+      } finally {
+        createSessionButton.disabled = !sessionCandidate;
+      }
+    });
+
+    clearSessionButton.addEventListener("click", clearStoredOperatorSession);
+
+    replayButton.addEventListener("click", () => {
+      try {
+        if (!lastSignedResult || !currentChallenge) throw new Error("There is no completed proof to replay.");
+        verifySignedProof(lastSignedResult, currentChallenge);
+        throw new Error("Unexpected: an already-used nonce was accepted.");
+      } catch (error) {
+        proofResult.hidden = false;
+        resultBig.textContent = "Replay correctly rejected";
+        resultBig.className = "result-big good";
+        nonceCheck.textContent = "Already used — rejected";
+        setStatus(proofStatus, `Good. ${error?.message || String(error)}`, "good");
+      }
+    });
+
+    refreshConnection();
+    setInterval(refreshConnection, 800);
+  </script>
+</body>
+</html>
