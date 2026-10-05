@@ -3,470 +3,665 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b2d36">
+  <meta name="theme-color" content="#031c29">
   <title>Wallet Proof Test — Wild Ledger</title>
   <style>
     :root{
-      --bg:#e8eee9;
-      --card:#fbf8ef;
-      --ink:#17313a;
-      --deep:#0b2d36;
-      --sea:#2f7481;
-      --gold:#d7ae62;
-      --line:rgba(15,52,64,.18);
-      --muted:#60757a;
-      --ok:#226b4e;
-      --bad:#9b3e32;
-      --warn:#8b641e;
-      --shadow:0 18px 55px rgba(11,45,54,.13);
+      --deep:#031c29;--deep2:#062f3d;--panel:rgba(7,43,57,.76);--card:rgba(5,34,46,.58);
+      --lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;--coral:#ef735f;
+      --ink:#f4fbfa;--muted:rgba(236,249,247,.68);--line:rgba(255,255,255,.09);
+      --good:#9fe0b0;--bad:#ffb7aa;--wait:#f5d38f;--blue:#9fddff;
     }
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
-      margin:0;
-      font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      color:var(--ink);
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       background:
-        radial-gradient(circle at 10% -10%,rgba(215,174,98,.18),transparent 30%),
-        linear-gradient(180deg,#edf1ec,#d6e3df);
-      min-height:100vh;
+        radial-gradient(circle at 12% 10%,rgba(47,168,160,.26),transparent 31%),
+        radial-gradient(circle at 88% 8%,rgba(239,115,95,.13),transparent 25%),
+        radial-gradient(circle at 72% 82%,rgba(243,182,74,.12),transparent 28%),
+        linear-gradient(145deg,#021720 0%,var(--deep) 42%,var(--deep2) 100%);
     }
-    .shell{width:min(780px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}
-    .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-    .brand{font-weight:900;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem;color:var(--deep)}
-    .badge{font-size:.72rem;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.55)}
-    .hero,.card{background:rgba(251,248,239,.92);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px}
-    .hero{padding:24px;margin-bottom:16px}
-    h1{margin:0 0 8px;font-size:clamp(1.8rem,7vw,2.65rem);line-height:1.02;color:var(--deep)}
-    .lede{margin:0;color:var(--muted);font-size:1rem;line-height:1.55}
-    .hard-stop{margin-top:18px;border:1px solid rgba(34,107,78,.25);background:rgba(34,107,78,.08);border-radius:16px;padding:14px 15px;font-weight:750;line-height:1.45;color:#1e5b43}
-    .card{padding:20px;margin-top:14px}
-    .step{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-    .step-number{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--deep);color:white;font-weight:900;font-size:.82rem}
-    h2{font-size:1.15rem;margin:0;color:var(--deep)}
-    p{line-height:1.55}
-    button{appearance:none;border:0;border-radius:14px;padding:13px 16px;font:inherit;font-weight:850;cursor:pointer;background:var(--deep);color:white;min-height:48px}
-    button.secondary{background:transparent;color:var(--deep);border:1px solid var(--line)}
-    button:disabled{opacity:.42;cursor:not-allowed}
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;
+      background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+      background-size:36px 36px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%);
+      -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%);
+    }
+    .shell{width:min(930px,100%);margin:0 auto;padding:28px 16px 52px;position:relative;z-index:1}
+    .console{
+      overflow:visible;border:1px solid var(--line);border-radius:30px;
+      background:linear-gradient(155deg,rgba(8,56,70,.90),rgba(4,31,43,.88));
+      box-shadow:0 30px 90px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    }
+    .console::before{content:"";display:block;height:4px;border-radius:30px 30px 0 0;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
+    header{padding:30px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .back{display:block;width:max-content;margin:0 0 28px;color:var(--blue);text-decoration:none;font-weight:800;font-size:.78rem}
+    .eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+    h1{margin:8px 0 0;font-size:clamp(2.35rem,8vw,4.6rem);line-height:.96;letter-spacing:-.055em}
+    .intro{max-width:790px;margin:16px 0 0;color:var(--muted);line-height:1.62}
+    .safety{margin-top:16px;padding:13px 14px;border-radius:14px;border:1px solid rgba(134,215,201,.16);background:rgba(47,168,160,.07);color:rgba(236,249,247,.78);font-size:.78rem;line-height:1.52}
+    .safety strong{color:#dffbf5}
+
+    .progress{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:24px}
+    .progress-item{padding:9px 8px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(1,21,30,.28);text-align:center;transition:.18s ease}
+    .progress-num{display:block;color:var(--sea-glass);font-size:.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+    .progress-label{display:block;margin-top:3px;color:rgba(236,249,247,.57);font-size:.61rem;font-weight:800;line-height:1.25}
+    .progress-state{display:block;margin-top:5px;font-size:.56rem;font-weight:950;letter-spacing:.09em;text-transform:uppercase;color:rgba(236,249,247,.34)}
+    .progress-item.is-active{border-color:rgba(243,182,74,.60);background:rgba(243,182,74,.11);box-shadow:0 0 0 2px rgba(243,182,74,.045)}
+    .progress-item.is-active .progress-num,.progress-item.is-active .progress-state{color:#ffe6ad}
+    .progress-item.is-done{border-color:rgba(159,224,176,.42);background:rgba(159,224,176,.10)}
+    .progress-item.is-done .progress-num,.progress-item.is-done .progress-state{color:#dfffe7}
+    .progress-item.is-locked{opacity:.55}
+
+    .body{padding:22px;display:grid;gap:12px}
+    .next-panel{
+      position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:30;
+      margin:0 0 4px;padding:15px 16px;border:2px solid rgba(243,182,74,.68);border-radius:17px;
+      background:linear-gradient(145deg,rgba(93,66,13,.96),rgba(53,42,17,.96));
+      box-shadow:0 14px 36px rgba(0,0,0,.28),0 0 0 3px rgba(243,182,74,.05);
+    }
+    .next-panel.is-complete{border-color:rgba(159,224,176,.65);background:linear-gradient(145deg,rgba(23,85,55,.96),rgba(14,56,42,.96))}
+    .next-panel-label{font-size:.67rem;font-weight:950;letter-spacing:.13em;text-transform:uppercase;color:#ffd986}
+    .next-panel.is-complete .next-panel-label{color:#cffff0}
+    .next-panel-text{margin-top:4px;font-size:1.15rem;font-weight:950;line-height:1.25;color:#fff3cf}
+    .next-panel.is-complete .next-panel-text{color:#effff6}
+    .next-panel-detail{margin-top:4px;font-size:.80rem;line-height:1.48;color:rgba(255,243,207,.76)}
+    .next-panel.is-complete .next-panel-detail{color:rgba(239,255,246,.76)}
+
+    .purpose{border:1px solid rgba(134,215,201,.14);border-radius:17px;background:rgba(47,168,160,.045);overflow:hidden}
+    .purpose summary{list-style:none;cursor:pointer;padding:14px 16px;color:#dffbf5;font-size:.82rem;font-weight:900}
+    .purpose summary::-webkit-details-marker{display:none}
+    .purpose summary::after{content:"+";float:right;color:var(--sea-glass);font-size:1.15rem;line-height:1}
+    .purpose[open] summary::after{content:"−"}
+    .purpose-body{padding:0 16px 16px;color:rgba(236,249,247,.70);font-size:.80rem;line-height:1.55}
+    .purpose-body strong{color:#f4fbfa}
+
+    .step-folder{
+      border:1px solid var(--line);border-radius:20px;overflow:hidden;
+      background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),var(--card);
+      transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease;
+    }
+    .step-folder.is-active{border:2px solid rgba(243,182,74,.72);box-shadow:0 0 0 3px rgba(243,182,74,.055),0 18px 44px rgba(0,0,0,.22)}
+    .step-folder.is-done{border-color:rgba(159,224,176,.38)}
+    .step-folder.is-locked{opacity:.48}
+    .step-folder summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) auto 20px;gap:12px;align-items:center;padding:17px 18px}
+    .step-folder summary::-webkit-details-marker{display:none}
+    .step-folder.is-locked summary{cursor:not-allowed}
+    .step-number{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;border:1px solid rgba(134,215,201,.28);background:rgba(47,168,160,.10);color:#e5fff9;font-size:.80rem;font-weight:950}
+    .step-kicker{color:var(--sea-glass);font-size:.61rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    h2{margin:3px 0 0;font-size:1.06rem;letter-spacing:-.02em}
+    .step-state{border-radius:999px;padding:6px 9px;font-size:.60rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.055);color:rgba(236,249,247,.47)}
+    .step-folder.is-active .step-state{background:rgba(243,182,74,.16);border:1px solid rgba(243,182,74,.42);color:#ffe7ae}
+    .step-folder.is-done .step-state{background:rgba(159,224,176,.13);border:1px solid rgba(159,224,176,.34);color:#eaffef}
+    .caret{font-size:1.2rem;color:rgba(236,249,247,.42);transition:transform .18s ease}
+    .step-folder[open] .caret{transform:rotate(90deg);color:var(--sea-glass)}
+    .folder-body{padding:0 18px 18px;border-top:1px solid rgba(255,255,255,.055)}
+    .step-summary{margin:14px 0 0;color:rgba(236,249,247,.62);font-size:.80rem;line-height:1.50}
+    .instruction{margin:14px 0 0;padding:13px 14px;border-radius:15px;border:1px solid rgba(243,182,74,.18);background:rgba(243,182,74,.06)}
+    .instruction strong{display:block;color:#f7deb0;font-size:.77rem}
+    .instruction span{display:block;margin-top:4px;color:rgba(247,222,176,.78);font-size:.76rem;line-height:1.5}
     .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-    .status{margin-top:13px;padding:12px 13px;border-radius:14px;background:rgba(23,49,58,.055);border:1px solid var(--line);line-height:1.45;word-break:break-word}
-    .status.good{background:rgba(34,107,78,.09);border-color:rgba(34,107,78,.25);color:var(--ok)}
-    .status.bad{background:rgba(155,62,50,.08);border-color:rgba(155,62,50,.22);color:var(--bad)}
-    .status.wait{background:rgba(139,100,30,.08);border-color:rgba(139,100,30,.20);color:var(--warn)}
-    .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:var(--muted);margin-bottom:7px}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.79rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:#102f37;color:#eaf5f1;border-radius:14px;padding:14px;margin-top:9px;max-height:270px;overflow:auto}
-    .kv{display:grid;grid-template-columns:125px 1fr;gap:7px 12px;margin-top:12px;font-size:.9rem}
-    .kv b{color:var(--muted)}
-    .result-big{font-size:1.25rem;font-weight:950;margin-top:10px}
-    .result-big.good{color:var(--ok)}
+    button{appearance:none;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-size:.82rem;font-weight:900;cursor:pointer;min-height:46px}
+    button.secondary{color:#b9e5ff;background:rgba(77,167,235,.08)}
+    button:disabled{opacity:.34;cursor:not-allowed}
+    .primary-action{width:100%;min-height:56px;background:rgba(47,168,160,.18);border-color:rgba(134,215,201,.34);color:#effffa;font-size:1rem}
+    .step-folder.is-active .primary-action:not(:disabled){background:linear-gradient(180deg,rgba(47,168,160,.32),rgba(47,168,160,.21));border:2px solid rgba(134,215,201,.78);box-shadow:0 0 0 4px rgba(47,168,160,.09),0 11px 26px rgba(0,0,0,.22)}
+    .step-folder.is-active .primary-action:not(:disabled)::before{content:"NEXT · ";color:#d7fff7}
+    .step-folder.is-active .primary-action:not(:disabled)::after{content:"  →"}
+
+    #walletActionShell{margin-top:12px;border-radius:16px}
+    #step1Folder.is-active #walletActionShell{padding:10px;border:2px solid rgba(134,215,201,.72);background:rgba(47,168,160,.065);box-shadow:0 0 0 4px rgba(47,168,160,.07)}
+    #wallet-kit-button{min-height:58px}
+    #wallet-kit-button:empty{display:none}
+    #wallet-kit-button button,#wallet-kit-button [role="button"]{width:100%!important;min-height:58px!important;border-radius:12px!important;font-size:1rem!important;font-weight:900!important}
+    .wallet-loading{padding:14px 15px;border:1px dashed rgba(243,182,74,.38);border-radius:12px;color:var(--wait);font-weight:850;text-align:center}
+    .wallet-loading.bad{border-color:rgba(255,183,170,.38);color:var(--bad);background:rgba(255,183,170,.05)}
+
+    .status{margin-top:13px;padding:12px 13px;border-radius:13px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.07);line-height:1.45;word-break:break-word;color:rgba(236,249,247,.76);font-size:.80rem}
+    .status.good{background:rgba(159,224,176,.075);border-color:rgba(159,224,176,.24);color:var(--good)}
+    .status.bad{background:rgba(255,183,170,.065);border-color:rgba(255,183,170,.22);color:var(--bad)}
+    .status.wait{background:rgba(243,182,74,.065);border-color:rgba(243,182,74,.18);color:var(--wait)}
+    .label{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;font-weight:900;color:rgba(236,249,247,.50);margin-bottom:7px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.74rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:rgba(0,11,18,.48);color:#cae9e5;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:9px;max-height:270px;overflow:auto}
+    .kv{display:grid;grid-template-columns:145px 1fr;gap:8px 12px;margin-top:12px;font-size:.80rem}
+    .kv b{color:rgba(236,249,247,.48)}
+    .result-big{font-size:1.15rem;font-weight:950;margin-top:14px}
+    .result-big.good{color:var(--good)}
     .result-big.bad{color:var(--bad)}
-    details{margin-top:14px}
-    summary{cursor:pointer;font-weight:800;color:var(--deep)}
-    .fine{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:16px}
+    .raw-details{margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:12px}
+    .raw-details summary{cursor:pointer;color:var(--blue);font-size:.76rem;font-weight:850}
+    .fine{font-size:.74rem;color:rgba(236,249,247,.48);line-height:1.52;margin:6px 2px 0}
+    footer{padding:18px 24px 22px;text-align:center;color:rgba(236,249,247,.36);font-size:.63rem;font-weight:900;letter-spacing:.10em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.055)}
     [hidden]{display:none!important}
-    @media(max-width:600px){
-      .shell{width:min(100% - 20px,780px);padding-top:16px}
-      .hero,.card{border-radius:20px;padding:17px}
-      .kv{grid-template-columns:1fr;gap:2px}
-      .button-row button{width:100%}
+
+    @media(max-width:650px){
+      .shell{padding:12px 10px 34px}.console{border-radius:22px}.console::before{border-radius:22px 22px 0 0}
+      header{padding:22px 18px}.body{padding:14px 12px}.progress{grid-template-columns:repeat(2,1fr)}
+      .progress-item{text-align:left;padding:8px 10px}.progress-num,.progress-label,.progress-state{display:inline}.progress-label{margin-left:4px}.progress-state{float:right;margin-top:1px}
+      .step-folder summary{grid-template-columns:40px minmax(0,1fr) auto 16px;gap:9px;padding:14px 13px}
+      .folder-body{padding:0 13px 14px}.kv{grid-template-columns:1fr;gap:3px}.button-row button{width:100%}
+      .step-state{padding:5px 7px;font-size:.55rem}.next-panel{top:calc(env(safe-area-inset-top,0px) + 5px)}
     }
   </style>
-  <script src="js/wildLedgerConfig.js"></script>
+  <script src="../js/wildLedgerConfig.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@xrpl-wallet-kit/browser@0.1.18/dist/xrpl-wallet-kit.iife.min.js"></script>
 </head>
 <body>
-  <main class="shell">
-    <div class="topline">
-      <div class="brand">Wild Ledger</div>
-      <div class="badge">Learning Harness</div>
-    </div>
-
-    <section class="hero">
+<main class="shell">
+  <section class="console">
+    <header>
+      <a class="back" href="../testHub.html">← TestHub</a>
+      <div class="eyebrow">Test Harness · Safe Diagnostic</div>
       <h1>Wallet Proof Test</h1>
-      <p class="lede">This page practices one thing only: proving that you control an XRPL wallet.</p>
-      <div class="hard-stop">No XRPL transaction is submitted by this page. No Payment, AccountSet, Check, or other ledger write is sent.</div>
-    </section>
-
-    <section class="card">
-      <div class="step"><span class="step-number">1</span><h2>Connect Bifrost</h2></div>
-      <p>Use the wallet button below. In the wallet chooser, choose Bifrost and approve the connection.</p>
-      <div id="wallet-kit-button"></div>
-      <div class="status wait" id="connectionStatus">No wallet connected yet.</div>
-      <div class="kv" id="connectionDetails" hidden>
-        <b>Wallet</b><span id="connectedWallet">—</span>
-        <b>XRPL address</b><span id="connectedAddress">—</span>
+      <p class="intro"><strong>Use this when you need to answer one question:</strong> does the person holding this connected wallet actually control the XRPL account it claims?</p>
+      <div class="safety"><strong>No XRPL transaction is submitted.</strong> This harness asks the wallet to sign a short-lived challenge, verifies that proof locally, and then confirms the same proof cannot be reused.</div>
+      <div class="progress" aria-label="Wallet proof test steps">
+        <div class="progress-item is-active" id="progress1"><span class="progress-num">Step 1</span><span class="progress-label">Connect</span><span class="progress-state" id="progress1State">NEXT</span></div>
+        <div class="progress-item is-locked" id="progress2"><span class="progress-num">Step 2</span><span class="progress-label">Challenge</span><span class="progress-state" id="progress2State">LOCKED</span></div>
+        <div class="progress-item is-locked" id="progress3"><span class="progress-num">Step 3</span><span class="progress-label">Prove control</span><span class="progress-state" id="progress3State">LOCKED</span></div>
+        <div class="progress-item is-locked" id="progress4"><span class="progress-num">Step 4</span><span class="progress-label">Reject replay</span><span class="progress-state" id="progress4State">LOCKED</span></div>
       </div>
-    </section>
+    </header>
 
-    <section class="card">
-      <div class="step"><span class="step-number">2</span><h2>Make a one-time challenge</h2></div>
-      <p>Wild Ledger makes a new random code. You do not type it.</p>
-      <div class="button-row">
-        <button id="generateButton" type="button">Generate Challenge</button>
+    <div class="body">
+      <div class="next-panel" id="nextPanel" aria-live="polite">
+        <div class="next-panel-label" id="nextPanelLabel">Your next action</div>
+        <div class="next-panel-text" id="nextPanelText">Step 1 — Connect Bifrost</div>
+        <div class="next-panel-detail" id="nextPanelDetail">Open Step 1 and tap the highlighted wallet button. Everything else stays locked.</div>
       </div>
-      <div id="challengeArea" hidden>
-        <div class="label" style="margin-top:16px">Exact message Bifrost will sign</div>
-        <pre class="mono" id="challengeText"></pre>
-        <div class="kv">
-          <b>Nonce</b><span id="nonceText">—</span>
-          <b>Expires</b><span id="expiresText">—</span>
+
+      <details class="purpose">
+        <summary>When do I use this harness?</summary>
+        <div class="purpose-body"><strong>Use it when wallet ownership itself is the thing you need to isolate.</strong> It does not identify a community, create an Operator session, change authority, or write to XRPL. A clean pass tells you the connected XRPL account can produce a valid one-time cryptographic proof and that Wild Ledger rejects reuse of that proof.</div>
+      </details>
+
+      <details class="step-folder is-active" id="step1Folder" open>
+        <summary data-step-summary="1"><span class="step-number">1</span><span><span class="step-kicker">Wallet connection</span><h2>Connect the wallet</h2></span><span class="step-state" id="step1State">NEXT</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="step-summary">Wild Ledger reads the XRPL account directly from the wallet connection. You do not type or paste an address.</p>
+          <div class="instruction"><strong>Your action: tap the wallet button, choose Bifrost, and approve the connection.</strong><span>When the connection succeeds, this folder closes and Step 2 opens automatically.</span></div>
+          <div id="walletActionShell"><div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div><div id="wallet-kit-button"></div></div>
+          <div class="status wait" id="connectionStatus">Waiting for wallet connection.</div>
+          <div class="kv" id="connectionDetails" hidden><b>Wallet</b><span id="connectedWallet">—</span><b>XRPL address</b><span id="connectedAddress">—</span></div>
         </div>
-      </div>
-    </section>
+      </details>
 
-    <section class="card">
-      <div class="step"><span class="step-number">3</span><h2>Ask Bifrost for the proof</h2></div>
-      <p>Bifrost may show a transaction-shaped signing screen. That is the compatibility envelope used to create the signature. Wild Ledger does not submit it.</p>
-      <div class="button-row">
-        <button id="signButton" type="button" disabled>Prove Wallet Control</button>
-        <button id="replayButton" class="secondary" type="button" disabled>Test Same Proof Again</button>
-      </div>
-      <div class="status" id="proofStatus">Generate a challenge after Bifrost is connected.</div>
-      <div id="proofResult" hidden>
-        <div class="result-big" id="resultBig"></div>
-        <div class="kv">
-          <b>Signed by</b><span id="proofAccount">—</span>
-          <b>Signature</b><span id="signatureCheck">—</span>
-          <b>Message</b><span id="messageCheck">—</span>
-          <b>Nonce</b><span id="nonceCheck">—</span>
-          <b>Ledger submit</b><span>Not performed</span>
+      <details class="step-folder is-locked" id="step2Folder">
+        <summary data-step-summary="2"><span class="step-number">2</span><span><span class="step-kicker">Fresh one-time proof</span><h2>Generate the challenge</h2></span><span class="step-state" id="step2State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="step-summary">Wild Ledger creates a random challenge that belongs only to this browser session and expires after five minutes.</p>
+          <div class="instruction"><strong>Your action: tap Generate Challenge.</strong><span>You do not type the challenge. Wild Ledger creates it for you.</span></div>
+          <div class="button-row"><button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button></div>
+          <div id="challengeArea" hidden><div class="label" style="margin-top:16px">Exact message the wallet will sign</div><pre class="mono" id="challengeText"></pre><div class="kv"><b>Nonce</b><span id="nonceText">—</span><b>Expires</b><span id="expiresText">—</span></div></div>
         </div>
-        <details>
-          <summary>Show returned proof data</summary>
-          <pre class="mono" id="rawProof"></pre>
-        </details>
-      </div>
-    </section>
+      </details>
 
-    <p class="fine">Practice harness only. Verifier v2 uses the current ripple-keypairs browser implementation. It does not check S9U authority and it does not publish community settings. Those come later, after the wallet-proof process is familiar.</p>
-  </main>
+      <details class="step-folder is-locked" id="step3Folder">
+        <summary data-step-summary="3"><span class="step-number">3</span><span><span class="step-kicker">Cryptographic proof</span><h2>Prove wallet control</h2></span><span class="step-state" id="step3State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="step-summary">The wallet signs the exact one-time challenge. Wild Ledger verifies the account, public key, digital signature, message, and nonce locally.</p>
+          <div class="instruction"><strong>Your action: tap Prove Wallet Control, then approve the signing request in Bifrost.</strong><span>Bifrost may show a transaction-shaped signing screen. It is only the signature envelope. This harness never submits it.</span></div>
+          <div class="button-row"><button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button></div>
+          <div class="status" id="proofStatus">Waiting for Steps 1 and 2.</div>
+          <div id="proofResult" hidden><div class="result-big" id="resultBig"></div><div class="kv"><b>Signed by</b><span id="proofAccount">—</span><b>Signature</b><span id="signatureCheck">—</span><b>Message</b><span id="messageCheck">—</span><b>Nonce</b><span id="nonceCheck">—</span><b>Ledger submit</b><span>Not performed</span></div><details class="raw-details"><summary>Show returned proof data</summary><pre class="mono" id="rawProof"></pre></details></div>
+        </div>
+      </details>
 
-  <script type="module">
-    import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
-    import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@3.1.0?bundle";
+      <details class="step-folder is-locked" id="step4Folder">
+        <summary data-step-summary="4"><span class="step-number">4</span><span><span class="step-kicker">Anti-replay check</span><h2>Try the same proof again</h2></span><span class="step-state" id="step4State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="step-summary">A valid proof should work once. This step deliberately tries to reuse the exact same proof and confirms Wild Ledger rejects it.</p>
+          <div class="instruction"><strong>Your action: tap Test Same Proof Again.</strong><span>Success here means the reused nonce is rejected. That completes the harness.</span></div>
+          <div class="button-row"><button id="replayButton" class="primary-action" type="button" disabled>Test Same Proof Again</button></div>
+          <div class="status" id="replayStatus">Waiting for a successful wallet proof.</div>
+        </div>
+      </details>
 
-    const cfg = window.WILD_LEDGER_CONFIG || {};
-    const projectId = String(cfg.walletConnectProjectId || "").trim();
-    const proofDestination = String(cfg.leapIssuer || "").trim();
+      <p class="fine">Scope: wallet-control proof only. This harness does not identify Community Operating Wallet authority, establish an Operator session, publish settings, or submit an XRPL transaction.</p>
+    </div>
+    <footer>WILD LEDGER · WALLET PROOF TEST · HUMANS TAP. WALLETS SIGN. LEDGERS CARRY.</footer>
+  </section>
+</main>
 
-    const connectionStatus = document.getElementById("connectionStatus");
-    const connectionDetails = document.getElementById("connectionDetails");
-    const connectedWallet = document.getElementById("connectedWallet");
-    const connectedAddress = document.getElementById("connectedAddress");
-    const generateButton = document.getElementById("generateButton");
-    const signButton = document.getElementById("signButton");
-    const replayButton = document.getElementById("replayButton");
-    const challengeArea = document.getElementById("challengeArea");
-    const challengeTextEl = document.getElementById("challengeText");
-    const nonceText = document.getElementById("nonceText");
-    const expiresText = document.getElementById("expiresText");
-    const proofStatus = document.getElementById("proofStatus");
-    const proofResult = document.getElementById("proofResult");
-    const resultBig = document.getElementById("resultBig");
-    const proofAccount = document.getElementById("proofAccount");
-    const signatureCheck = document.getElementById("signatureCheck");
-    const messageCheck = document.getElementById("messageCheck");
-    const nonceCheck = document.getElementById("nonceCheck");
-    const rawProof = document.getElementById("rawProof");
+<script type="module">
+  import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
+  import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@3.1.0?bundle";
 
-    let currentChallenge = null;
-    let lastSignedResult = null;
-    const usedNonces = new Set();
+  const cfg = window.WILD_LEDGER_CONFIG || {};
+  const projectId = String(cfg.walletConnectProjectId || "").trim();
+  const proofDestination = String(cfg.leapIssuer || "").trim();
 
-    function setStatus(element, message, tone = "") {
-      element.textContent = message;
-      element.className = `status${tone ? ` ${tone}` : ""}`;
+  const connectionStatus = document.getElementById("connectionStatus");
+  const connectionDetails = document.getElementById("connectionDetails");
+  const connectedWallet = document.getElementById("connectedWallet");
+  const connectedAddress = document.getElementById("connectedAddress");
+  const generateButton = document.getElementById("generateButton");
+  const signButton = document.getElementById("signButton");
+  const replayButton = document.getElementById("replayButton");
+  const challengeArea = document.getElementById("challengeArea");
+  const challengeTextEl = document.getElementById("challengeText");
+  const nonceText = document.getElementById("nonceText");
+  const expiresText = document.getElementById("expiresText");
+  const proofStatus = document.getElementById("proofStatus");
+  const proofResult = document.getElementById("proofResult");
+  const resultBig = document.getElementById("resultBig");
+  const proofAccount = document.getElementById("proofAccount");
+  const signatureCheck = document.getElementById("signatureCheck");
+  const messageCheck = document.getElementById("messageCheck");
+  const nonceCheck = document.getElementById("nonceCheck");
+  const rawProof = document.getElementById("rawProof");
+  const replayStatus = document.getElementById("replayStatus");
+  const nextPanel = document.getElementById("nextPanel");
+  const nextPanelLabel = document.getElementById("nextPanelLabel");
+  const nextPanelText = document.getElementById("nextPanelText");
+  const nextPanelDetail = document.getElementById("nextPanelDetail");
+  const walletButtonLoading = document.getElementById("walletButtonLoading");
+  const walletButtonHost = document.getElementById("wallet-kit-button");
+  const stepFolders = [1,2,3,4].map(n => document.getElementById(`step${n}Folder`));
+  const stepStates = [1,2,3,4].map(n => document.getElementById(`step${n}State`));
+  const progressItems = [1,2,3,4].map(n => document.getElementById(`progress${n}`));
+  const progressStates = [1,2,3,4].map(n => document.getElementById(`progress${n}State`));
+
+  let currentChallenge = null;
+  let lastSignedResult = null;
+  let lastVerifiedAccount = "";
+  let replayPassed = false;
+  let busyStep = 0;
+  let currentActiveStep = 1;
+  const usedNonces = new Set();
+
+  function setStatus(element, message, tone = "") {
+    element.textContent = message;
+    element.className = `status${tone ? ` ${tone}` : ""}`;
+  }
+
+  function setStepState(stepNumber, state) {
+    const folder = stepFolders[stepNumber - 1];
+    const badge = stepStates[stepNumber - 1];
+    const progress = progressItems[stepNumber - 1];
+    const progressBadge = progressStates[stepNumber - 1];
+    folder.classList.remove("is-active", "is-done", "is-locked");
+    progress.classList.remove("is-active", "is-done", "is-locked");
+    if (state === "active") {
+      folder.classList.add("is-active"); badge.textContent = "NEXT";
+      progress.classList.add("is-active"); progressBadge.textContent = "NEXT";
+    } else if (state === "done") {
+      folder.classList.add("is-done"); badge.textContent = "DONE";
+      progress.classList.add("is-done"); progressBadge.textContent = "DONE";
+    } else {
+      folder.classList.add("is-locked"); badge.textContent = "LOCKED";
+      progress.classList.add("is-locked"); progressBadge.textContent = "LOCKED";
     }
+  }
 
-    function randomNonce() {
-      const bytes = new Uint8Array(16);
-      crypto.getRandomValues(bytes);
-      return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+  function openStep(stepNumber, { scroll = false } = {}) {
+    stepFolders.forEach((folder, index) => {
+      if (index + 1 !== stepNumber) folder.open = false;
+    });
+    const target = stepFolders[stepNumber - 1];
+    if (target && !target.classList.contains("is-locked")) {
+      target.open = true;
+      if (scroll) setTimeout(() => target.scrollIntoView({ behavior:"smooth", block:"start" }), 80);
     }
+  }
 
-    function makeChallenge() {
-      const issued = new Date();
-      const expires = new Date(issued.getTime() + 5 * 60 * 1000);
-      const nonce = randomNonce();
-      const origin = location.origin && location.origin !== "null" ? location.origin : "local-test";
-      const message = [
-        "Wild Ledger Wallet Proof",
-        "Purpose: prove wallet control",
-        `Nonce: ${nonce}`,
-        `Issued: ${issued.toISOString()}`,
-        `Expires: ${expires.toISOString()}`,
-        `Site: ${origin}`
-      ].join("\n");
-      return { nonce, issuedAt: issued.getTime(), expiresAt: expires.getTime(), message };
-    }
-
-    function getSession() {
-      try {
-        return kit?.getSession?.() || kit?.manager?.getSession?.() || null;
-      } catch (_) {
-        return null;
-      }
-    }
-
-    function sessionAddress(session) {
-      return String(
-        session?.account?.address ||
-        session?.accountAddress ||
-        session?.address ||
-        session?.accounts?.[0]?.address ||
-        ""
-      ).trim();
-    }
-
-    function sessionWalletName(session) {
-      return String(
-        session?.wallet?.name ||
-        session?.adapter?.name ||
-        session?.walletName ||
-        session?.adapterId ||
-        "Connected wallet"
-      );
-    }
-
-    function refreshConnection() {
-      const session = getSession();
-      const address = sessionAddress(session);
-      if (!address) {
-        setStatus(connectionStatus, "No wallet connected yet.", "wait");
-        connectionDetails.hidden = true;
-        signButton.disabled = true;
+  document.querySelectorAll("[data-step-summary]").forEach(summary => {
+    summary.addEventListener("click", event => {
+      const stepNumber = Number(summary.dataset.stepSummary || 0);
+      const folder = stepFolders[stepNumber - 1];
+      if (folder?.classList.contains("is-locked")) {
+        event.preventDefault();
         return;
       }
-
-      connectedWallet.textContent = sessionWalletName(session);
-      connectedAddress.textContent = address;
-      connectionDetails.hidden = false;
-      setStatus(connectionStatus, "Wallet connected. You can make a one-time challenge.", "good");
-      signButton.disabled = !currentChallenge;
-    }
-
-    function hexToUtf8(hex) {
-      const clean = String(hex || "").replace(/[^A-Fa-f0-9]/g, "");
-      if (!clean || clean.length % 2) return "";
-      const bytes = new Uint8Array(clean.length / 2);
-      for (let i = 0; i < bytes.length; i += 1) bytes[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
-      try { return new TextDecoder().decode(bytes); } catch (_) { return ""; }
-    }
-
-    function isHex(value) {
-      return typeof value === "string" && value.length > 80 && /^[A-Fa-f0-9]+$/.test(value);
-    }
-
-    function walk(value, visitor, seen = new Set()) {
-      if (value == null) return null;
-      if (typeof value === "object") {
-        if (seen.has(value)) return null;
-        seen.add(value);
-      }
-      const hit = visitor(value);
-      if (hit) return hit;
-      if (Array.isArray(value)) {
-        for (const item of value) {
-          const found = walk(item, visitor, seen);
-          if (found) return found;
-        }
-      } else if (value && typeof value === "object") {
-        for (const item of Object.values(value)) {
-          const found = walk(item, visitor, seen);
-          if (found) return found;
-        }
-      }
-      return null;
-    }
-
-    function findSignedTransaction(result) {
-      const objectHit = walk(result, value => {
-        if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-        if (value.TransactionType && value.Account && (value.TxnSignature || value.Signers)) return value;
-        return null;
-      });
-      if (objectHit) return JSON.parse(JSON.stringify(objectHit));
-
-      const blob = walk(result, value => {
-        if (!isHex(value)) return null;
-        try {
-          const tx = decode(value);
-          if (tx?.TransactionType && tx?.Account && (tx?.TxnSignature || tx?.Signers)) return { blob:value, tx };
-        } catch (_) {}
-        return null;
-      });
-      return blob?.tx ? JSON.parse(JSON.stringify(blob.tx)) : null;
-    }
-
-    function extractMemoText(tx) {
-      const memo = Array.isArray(tx?.Memos) ? tx.Memos[0]?.Memo : null;
-      return hexToUtf8(memo?.MemoData || "");
-    }
-
-    function verifySignedProof(result, challenge, { allowUsedNonce = false } = {}) {
-      if (!challenge) throw new Error("There is no active challenge.");
-      if (Date.now() > challenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
-      if (!allowUsedNonce && usedNonces.has(challenge.nonce)) throw new Error("This nonce was already used. Generate a new challenge.");
-
-      const session = getSession();
-      const expectedAccount = sessionAddress(session);
-      if (!expectedAccount) throw new Error("The wallet session is no longer connected.");
-
-      const signedTx = findSignedTransaction(result);
-      if (!signedTx) throw new Error("The wallet returned a proof, but this test page could not locate the signed XRPL proof envelope.");
-      if (Array.isArray(signedTx.Signers) && signedTx.Signers.length) throw new Error("This first test expects a normal single-sign wallet proof.");
-
-      const account = String(signedTx.Account || "");
-      const publicKey = String(signedTx.SigningPubKey || "");
-      const signature = String(signedTx.TxnSignature || "");
-      if (!account || !publicKey || !signature) throw new Error("The signed proof is missing Account, SigningPubKey, or TxnSignature.");
-      if (account !== expectedAccount) throw new Error("The signed proof came from a different XRPL account than the connected wallet.");
-
-      let derived;
-      try {
-        derived = deriveAddress(publicKey);
-      } catch (error) {
-        throw new Error(`Public-key address check failed: ${error?.message || String(error)}`);
-      }
-      if (derived !== account) throw new Error("The public key in the proof does not belong to the signed XRPL account.");
-
-      const unsigned = JSON.parse(JSON.stringify(signedTx));
-      delete unsigned.TxnSignature;
-      delete unsigned.hash;
-
-      let signingData;
-      try {
-        signingData = encodeForSigning(unsigned);
-      } catch (error) {
-        throw new Error(`XRPL signing-data encoding failed: ${error?.message || String(error)}`);
-      }
-
-      let signatureIsValid;
-      try {
-        signatureIsValid = verify(signingData, signature, publicKey);
-      } catch (error) {
-        throw new Error(`Digital-signature check failed: ${error?.message || String(error)}`);
-      }
-      if (!signatureIsValid) throw new Error("The digital signature is not valid.");
-
-      const signedMessage = extractMemoText(signedTx);
-      if (signedMessage !== challenge.message) throw new Error("The signed message does not match this one-time challenge.");
-
-      return { account, publicKey, signature, signedMessage, signedTx };
-    }
-
-    function renderVerificationSuccess(verified, result) {
-      proofResult.hidden = false;
-      resultBig.textContent = "Wallet control verified";
-      resultBig.className = "result-big good";
-      proofAccount.textContent = verified.account;
-      signatureCheck.textContent = "Valid";
-      messageCheck.textContent = "Exact match";
-      nonceCheck.textContent = "Fresh and accepted once";
-      rawProof.textContent = JSON.stringify({ returnedByWallet: result, decodedSignedEnvelope: verified.signedTx }, null, 2);
-      setStatus(proofStatus, "The wallet signed this exact one-time challenge. Wild Ledger verified it locally. Nothing was submitted to XRPL.", "good");
-    }
-
-    function renderVerificationFailure(error) {
-      proofResult.hidden = false;
-      resultBig.textContent = "Verification failed";
-      resultBig.className = "result-big bad";
-      proofAccount.textContent = "—";
-      signatureCheck.textContent = "Not verified";
-      messageCheck.textContent = "Not verified";
-      nonceCheck.textContent = "Not accepted";
-      setStatus(proofStatus, error?.message || String(error), "bad");
-    }
-
-    if (!window.XRPLWalletKit?.createWalletKit) {
-      throw new Error("XRPL Wallet Kit did not load.");
-    }
-    if (!projectId) {
-      throw new Error("Wild Ledger WalletConnect Project ID is missing.");
-    }
-    if (!proofDestination) {
-      throw new Error("A valid non-self proof destination is required.");
-    }
-
-    const kit = window.XRPLWalletKit.createWalletKit({
-      metadata: {
-        name: "Wild Ledger Wallet Proof Test",
-        description: "Practice proving control of an XRPL wallet without submitting a transaction",
-        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
-        icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
-      },
-      network: "mainnet",
-      wallets: ["walletconnect"],
-      autoReconnect: false,
-      walletConnectProjectId: projectId,
-      walletConnectSignMessageDestination: proofDestination,
-      connectButton: "#wallet-kit-button",
-      ui: {
-        themeMode: "light",
-        walletConnect: { mode: "default" },
-        toast: true
-      }
+      setTimeout(() => {
+        if (!folder.open) return;
+        stepFolders.forEach((other, index) => { if (index + 1 !== stepNumber) other.open = false; });
+      }, 0);
     });
+  });
 
-    try { kit.button?.mount?.("#wallet-kit-button"); } catch (_) {}
+  function updateGuidance({ autoOpen = false } = {}) {
+    const address = sessionAddress(getSession());
+    const challengeReady = !!currentChallenge && !usedNonces.has(currentChallenge.nonce);
+    const proofDone = !!lastVerifiedAccount && lastVerifiedAccount === address;
+    const complete = proofDone && replayPassed;
 
-    generateButton.addEventListener("click", () => {
-      currentChallenge = makeChallenge();
+    nextPanel.classList.toggle("is-complete", complete);
+    generateButton.disabled = !address || proofDone || !!busyStep;
+    signButton.disabled = !address || !challengeReady || proofDone || !!busyStep;
+    replayButton.disabled = !proofDone || replayPassed || !!busyStep;
+
+    let active = 1;
+    if (!address) {
+      setStepState(1,"active"); [2,3,4].forEach(n => setStepState(n,"locked"));
+      nextPanelLabel.textContent = "Your next action";
+      nextPanelText.textContent = "Step 1 — Connect Bifrost";
+      nextPanelDetail.textContent = "Open Step 1 and tap the highlighted wallet button. Everything else stays locked.";
+      active = 1;
+    } else if (!challengeReady && !proofDone) {
+      setStepState(1,"done"); setStepState(2,"active"); setStepState(3,"locked"); setStepState(4,"locked");
+      nextPanelLabel.textContent = "Your next action";
+      nextPanelText.textContent = "Step 2 — Generate Challenge";
+      nextPanelDetail.textContent = "The wallet is connected. Open Step 2 and tap the highlighted Generate Challenge button.";
+      active = 2;
+    } else if (!proofDone) {
+      setStepState(1,"done"); setStepState(2,"done"); setStepState(3,"active"); setStepState(4,"locked");
+      nextPanelLabel.textContent = "Your next action";
+      nextPanelText.textContent = busyStep === 3 ? "Step 3 — Waiting for Bifrost…" : "Step 3 — Prove Wallet Control";
+      nextPanelDetail.textContent = busyStep === 3 ? "Review the signing request in Bifrost and approve it if it matches this test." : "The challenge is ready. Open Step 3, tap the highlighted button, and approve the signing request in Bifrost.";
+      active = 3;
+    } else if (!replayPassed) {
+      setStepState(1,"done"); setStepState(2,"done"); setStepState(3,"done"); setStepState(4,"active");
+      nextPanelLabel.textContent = "Your next action";
+      nextPanelText.textContent = "Step 4 — Confirm replay protection";
+      nextPanelDetail.textContent = "Wallet control is verified. Open Step 4 and deliberately try the exact same proof again. It should be rejected.";
+      active = 4;
+    } else {
+      [1,2,3,4].forEach(n => setStepState(n,"done"));
+      nextPanelLabel.textContent = "Test complete";
+      nextPanelText.textContent = "Wallet proof passed";
+      nextPanelDetail.textContent = "The wallet produced a valid proof once, and Wild Ledger correctly rejected reuse of the same proof.";
+      active = 4;
+    }
+
+    if (autoOpen && active !== currentActiveStep) {
+      currentActiveStep = active;
+      openStep(active, { scroll:true });
+    } else {
+      currentActiveStep = active;
+    }
+  }
+
+  function randomNonce() {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
+  }
+
+  function makeChallenge() {
+    const issued = new Date();
+    const expires = new Date(issued.getTime() + 5 * 60 * 1000);
+    const nonce = randomNonce();
+    const origin = location.origin && location.origin !== "null" ? location.origin : "local-test";
+    const message = [
+      "Wild Ledger Wallet Proof",
+      "Purpose: prove wallet control",
+      `Nonce: ${nonce}`,
+      `Issued: ${issued.toISOString()}`,
+      `Expires: ${expires.toISOString()}`,
+      `Site: ${origin}`
+    ].join("\n");
+    return { nonce, issuedAt: issued.getTime(), expiresAt: expires.getTime(), message };
+  }
+
+  function getSession() {
+    try { return kit?.getSession?.() || kit?.manager?.getSession?.() || null; }
+    catch (_) { return null; }
+  }
+
+  function sessionAddress(session) {
+    return String(session?.account?.address || session?.accountAddress || session?.address || session?.accounts?.[0]?.address || "").trim();
+  }
+
+  function sessionWalletName(session) {
+    return String(session?.wallet?.name || session?.adapter?.name || session?.walletName || session?.adapterId || "Connected wallet");
+  }
+
+  function refreshConnection() {
+    const session = getSession();
+    const address = sessionAddress(session);
+    const walletButtonRendered = !!walletButtonHost?.children?.length;
+    if (walletButtonRendered) walletButtonLoading.hidden = true;
+
+    if (!address) {
+      setStatus(connectionStatus, "No wallet connected yet. Your next action is the Connect Wallet button above.", "wait");
+      connectionDetails.hidden = true;
+      updateGuidance();
+      return;
+    }
+
+    connectedWallet.textContent = sessionWalletName(session);
+    connectedAddress.textContent = address;
+    connectionDetails.hidden = false;
+    walletButtonLoading.hidden = true;
+
+    if (lastVerifiedAccount && lastVerifiedAccount !== address) {
+      lastVerifiedAccount = "";
+      currentChallenge = null;
       lastSignedResult = null;
-      challengeTextEl.textContent = currentChallenge.message;
-      nonceText.textContent = currentChallenge.nonce;
-      expiresText.textContent = new Date(currentChallenge.expiresAt).toLocaleString();
-      challengeArea.hidden = false;
+      replayPassed = false;
+      challengeArea.hidden = true;
       proofResult.hidden = true;
-      replayButton.disabled = true;
-      refreshConnection();
-      setStatus(proofStatus, "Challenge ready. Tap Prove Wallet Control and review Bifrost carefully.", "wait");
+      setStatus(replayStatus, "Waiting for a successful wallet proof.");
+    }
+
+    setStatus(connectionStatus, "Wallet connected. NEXT: Generate Challenge in Step 2.", "good");
+    updateGuidance({ autoOpen:true });
+  }
+
+  function hexToUtf8(hex) {
+    const clean = String(hex || "").replace(/[^A-Fa-f0-9]/g, "");
+    if (!clean || clean.length % 2) return "";
+    const bytes = new Uint8Array(clean.length / 2);
+    for (let i = 0; i < bytes.length; i += 1) bytes[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+    try { return new TextDecoder().decode(bytes); } catch (_) { return ""; }
+  }
+
+  function isHex(value) {
+    return typeof value === "string" && value.length > 80 && /^[A-Fa-f0-9]+$/.test(value);
+  }
+
+  function walk(value, visitor, seen = new Set()) {
+    if (value == null) return null;
+    if (typeof value === "object") {
+      if (seen.has(value)) return null;
+      seen.add(value);
+    }
+    const hit = visitor(value);
+    if (hit) return hit;
+    if (Array.isArray(value)) {
+      for (const item of value) { const found = walk(item, visitor, seen); if (found) return found; }
+    } else if (value && typeof value === "object") {
+      for (const item of Object.values(value)) { const found = walk(item, visitor, seen); if (found) return found; }
+    }
+    return null;
+  }
+
+  function findSignedTransaction(result) {
+    const objectHit = walk(result, value => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+      if (value.TransactionType && value.Account && (value.TxnSignature || value.Signers)) return value;
+      return null;
     });
+    if (objectHit) return JSON.parse(JSON.stringify(objectHit));
 
-    signButton.addEventListener("click", async () => {
+    const blob = walk(result, value => {
+      if (!isHex(value)) return null;
       try {
-        const address = sessionAddress(getSession());
-        if (!address) throw new Error("Connect Bifrost first.");
-        if (!currentChallenge) throw new Error("Generate a challenge first.");
-        if (Date.now() > currentChallenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
-        if (usedNonces.has(currentChallenge.nonce)) throw new Error("This challenge was already used. Generate a new one.");
-
-        signButton.disabled = true;
-        generateButton.disabled = true;
-        setStatus(proofStatus, "Waiting for Bifrost. Review the request, then approve the signature if it looks right.", "wait");
-
-        // IMPORTANT: signMessage only. This harness never calls signAndSubmit,
-        // submit, submitAndWait, xrpl_submit, or any Wild Ledger XRPL submit helper.
-        const result = await kit.signMessage({ message: currentChallenge.message });
-        lastSignedResult = result;
-
-        const verified = verifySignedProof(result, currentChallenge);
-        usedNonces.add(currentChallenge.nonce);
-        renderVerificationSuccess(verified, result);
-        replayButton.disabled = false;
-      } catch (error) {
-        renderVerificationFailure(error);
-      } finally {
-        generateButton.disabled = false;
-        signButton.disabled = usedNonces.has(currentChallenge?.nonce || "") || !sessionAddress(getSession());
-      }
+        const tx = decode(value);
+        if (tx?.TransactionType && tx?.Account && (tx?.TxnSignature || tx?.Signers)) return { blob:value, tx };
+      } catch (_) {}
+      return null;
     });
+    return blob?.tx ? JSON.parse(JSON.stringify(blob.tx)) : null;
+  }
 
-    replayButton.addEventListener("click", () => {
-      try {
-        if (!lastSignedResult || !currentChallenge) throw new Error("There is no completed proof to replay.");
-        verifySignedProof(lastSignedResult, currentChallenge);
-        throw new Error("Unexpected: an already-used nonce was accepted.");
-      } catch (error) {
-        proofResult.hidden = false;
-        resultBig.textContent = "Replay correctly rejected";
-        resultBig.className = "result-big good";
+  function extractMemoText(tx) {
+    const memo = Array.isArray(tx?.Memos) ? tx.Memos[0]?.Memo : null;
+    return hexToUtf8(memo?.MemoData || "");
+  }
+
+  function verifySignedProof(result, challenge, { allowUsedNonce = false } = {}) {
+    if (!challenge) throw new Error("There is no active challenge.");
+    if (Date.now() > challenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
+    if (!allowUsedNonce && usedNonces.has(challenge.nonce)) throw new Error("This nonce was already used. Generate a new challenge.");
+
+    const session = getSession();
+    const expectedAccount = sessionAddress(session);
+    if (!expectedAccount) throw new Error("The wallet session is no longer connected.");
+
+    const signedTx = findSignedTransaction(result);
+    if (!signedTx) throw new Error("The wallet returned a proof, but this test page could not locate the signed XRPL proof envelope.");
+    if (Array.isArray(signedTx.Signers) && signedTx.Signers.length) throw new Error("This test expects a normal single-sign wallet proof.");
+
+    const account = String(signedTx.Account || "");
+    const publicKey = String(signedTx.SigningPubKey || "");
+    const signature = String(signedTx.TxnSignature || "");
+    if (!account || !publicKey || !signature) throw new Error("The signed proof is missing Account, SigningPubKey, or TxnSignature.");
+    if (account !== expectedAccount) throw new Error("The signed proof came from a different XRPL account than the connected wallet.");
+
+    let derived;
+    try { derived = deriveAddress(publicKey); }
+    catch (error) { throw new Error(`Public-key address check failed: ${error?.message || String(error)}`); }
+    if (derived !== account) throw new Error("The public key in the proof does not belong to the signed XRPL account.");
+
+    const unsigned = JSON.parse(JSON.stringify(signedTx));
+    delete unsigned.TxnSignature;
+    delete unsigned.hash;
+
+    let signingData;
+    try { signingData = encodeForSigning(unsigned); }
+    catch (error) { throw new Error(`XRPL signing-data encoding failed: ${error?.message || String(error)}`); }
+
+    let signatureIsValid;
+    try { signatureIsValid = verify(signingData, signature, publicKey); }
+    catch (error) { throw new Error(`Digital-signature check failed: ${error?.message || String(error)}`); }
+    if (!signatureIsValid) throw new Error("The digital signature is not valid.");
+
+    const signedMessage = extractMemoText(signedTx);
+    if (signedMessage !== challenge.message) throw new Error("The signed message does not match this one-time challenge.");
+
+    return { account, publicKey, signature, signedMessage, signedTx };
+  }
+
+  function renderVerificationSuccess(verified, result) {
+    proofResult.hidden = false;
+    resultBig.textContent = "Wallet control verified";
+    resultBig.className = "result-big good";
+    proofAccount.textContent = verified.account;
+    signatureCheck.textContent = "Valid";
+    messageCheck.textContent = "Exact match";
+    nonceCheck.textContent = "Fresh and accepted once";
+    rawProof.textContent = JSON.stringify({ returnedByWallet: result, decodedSignedEnvelope: verified.signedTx }, null, 2);
+    setStatus(proofStatus, "Wallet control verified. NEXT: confirm the same proof cannot be reused in Step 4.", "good");
+  }
+
+  function renderVerificationFailure(error) {
+    proofResult.hidden = false;
+    resultBig.textContent = "Verification failed";
+    resultBig.className = "result-big bad";
+    proofAccount.textContent = "—";
+    signatureCheck.textContent = "Not verified";
+    messageCheck.textContent = "Not verified";
+    nonceCheck.textContent = "Not accepted";
+    setStatus(proofStatus, error?.message || String(error), "bad");
+  }
+
+  if (!window.XRPLWalletKit?.createWalletKit) throw new Error("XRPL Wallet Kit did not load.");
+  if (!projectId) throw new Error("Wild Ledger WalletConnect Project ID is missing.");
+  if (!proofDestination) throw new Error("A valid non-self proof destination is required.");
+
+  const kit = window.XRPLWalletKit.createWalletKit({
+    metadata: {
+      name: "Wild Ledger Wallet Proof Test",
+      description: "Practice proving control of an XRPL wallet without submitting a transaction",
+      url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+      icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+    },
+    network: "mainnet",
+    wallets: ["walletconnect"],
+    autoReconnect: false,
+    walletConnectProjectId: projectId,
+    walletConnectSignMessageDestination: proofDestination,
+    connectButton: "#wallet-kit-button",
+    ui: { themeMode:"light", walletConnect:{ mode:"default" }, toast:true }
+  });
+
+  try { kit.button?.mount?.("#wallet-kit-button"); }
+  catch (error) {
+    walletButtonLoading.textContent = `Connect Wallet button failed to mount: ${error?.message || String(error)}`;
+    walletButtonLoading.classList.add("bad");
+  }
+
+  setTimeout(() => {
+    const rendered = !!walletButtonHost?.children?.length;
+    if (!rendered && !sessionAddress(getSession())) {
+      walletButtonLoading.hidden = false;
+      walletButtonLoading.textContent = "Connect Wallet button did not load. Reload this page. If it is still missing, stop the test — the harness is not ready.";
+      walletButtonLoading.classList.add("bad");
+      setStatus(connectionStatus, "Harness error: the wallet-connect control did not render.", "bad");
+    }
+  }, 2500);
+
+  generateButton.addEventListener("click", () => {
+    currentChallenge = makeChallenge();
+    lastSignedResult = null;
+    lastVerifiedAccount = "";
+    replayPassed = false;
+    challengeTextEl.textContent = currentChallenge.message;
+    nonceText.textContent = currentChallenge.nonce;
+    expiresText.textContent = new Date(currentChallenge.expiresAt).toLocaleString();
+    challengeArea.hidden = false;
+    proofResult.hidden = true;
+    setStatus(proofStatus, "Challenge ready. NEXT: Prove Wallet Control in Step 3.", "wait");
+    setStatus(replayStatus, "Waiting for a successful wallet proof.");
+    updateGuidance({ autoOpen:true });
+  });
+
+  signButton.addEventListener("click", async () => {
+    try {
+      const address = sessionAddress(getSession());
+      if (!address) throw new Error("Connect Bifrost first.");
+      if (!currentChallenge) throw new Error("Generate a challenge first.");
+      if (Date.now() > currentChallenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
+      if (usedNonces.has(currentChallenge.nonce)) throw new Error("This challenge was already used. Generate a new one.");
+
+      busyStep = 3;
+      updateGuidance();
+      setStatus(proofStatus, "Waiting for Bifrost. Review the request, then approve the signature if it looks right.", "wait");
+
+      const result = await kit.signMessage({ message: currentChallenge.message });
+      lastSignedResult = result;
+      const verified = verifySignedProof(result, currentChallenge);
+      usedNonces.add(currentChallenge.nonce);
+      lastVerifiedAccount = verified.account;
+      renderVerificationSuccess(verified, result);
+    } catch (error) {
+      lastVerifiedAccount = "";
+      renderVerificationFailure(error);
+    } finally {
+      busyStep = 0;
+      updateGuidance({ autoOpen:true });
+    }
+  });
+
+  replayButton.addEventListener("click", () => {
+    try {
+      if (!lastSignedResult || !currentChallenge) throw new Error("There is no completed proof to replay.");
+      verifySignedProof(lastSignedResult, currentChallenge);
+      replayPassed = false;
+      setStatus(replayStatus, "Unexpected: the already-used proof was accepted. Stop and investigate.", "bad");
+    } catch (error) {
+      if (String(error?.message || error).toLowerCase().includes("already used")) {
+        replayPassed = true;
         nonceCheck.textContent = "Already used — rejected";
-        setStatus(proofStatus, `Good. ${error?.message || String(error)}`, "good");
+        resultBig.textContent = "Wallet proof passed";
+        resultBig.className = "result-big good";
+        setStatus(replayStatus, "Good. The same proof was rejected because its nonce was already used.", "good");
+      } else {
+        replayPassed = false;
+        setStatus(replayStatus, error?.message || String(error), "bad");
       }
-    });
+    }
+    updateGuidance();
+  });
 
-    refreshConnection();
-    setInterval(refreshConnection, 800);
-  </script>
+  updateGuidance();
+  refreshConnection();
+  setInterval(refreshConnection, 800);
+</script>
 </body>
 </html>
