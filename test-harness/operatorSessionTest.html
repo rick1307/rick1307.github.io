@@ -62,6 +62,61 @@
     details{margin-top:14px}
     summary{cursor:pointer;font-weight:800;color:var(--deep)}
     .fine{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:16px}
+
+    /* Guided harness: there should never be any doubt about what to do next. */
+    .next-panel{
+      position:sticky;
+      top:calc(env(safe-area-inset-top, 0px) + 8px);
+      z-index:20;
+      margin:0 0 16px;
+      padding:14px 16px;
+      border:2px solid var(--gold);
+      border-radius:18px;
+      background:#fffaf0;
+      box-shadow:0 12px 32px rgba(11,45,54,.16);
+    }
+    .next-panel-label{font-size:.72rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)}
+    .next-panel-text{margin-top:3px;font-size:1.12rem;font-weight:950;line-height:1.28;color:var(--deep)}
+    .next-panel-detail{margin-top:3px;font-size:.86rem;line-height:1.4;color:var(--muted)}
+
+    .step-card{position:relative;transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease}
+    .step-card.is-active{border:3px solid var(--gold);box-shadow:0 18px 50px rgba(139,100,30,.18)}
+    .step-card.is-done{border:2px solid rgba(34,107,78,.42)}
+    .step-card.is-locked{opacity:.62}
+    .step-state{margin-left:auto;border-radius:999px;padding:6px 9px;font-size:.68rem;font-weight:950;letter-spacing:.07em;text-transform:uppercase;background:rgba(23,49,58,.08);color:var(--muted)}
+    .step-card.is-active .step-state{background:var(--gold);color:#2e260f}
+    .step-card.is-done .step-state{background:rgba(34,107,78,.12);color:var(--ok)}
+    .step-card.is-locked .step-state{background:rgba(23,49,58,.07);color:var(--muted)}
+
+    .action-callout{display:none;margin:14px 0 8px;font-size:.72rem;font-weight:950;letter-spacing:.09em;text-transform:uppercase;color:var(--warn)}
+    .step-card.is-active .action-callout{display:block}
+    .primary-action{width:100%;font-size:1.03rem;min-height:56px}
+    .step-card.is-active .primary-action:not(:disabled){
+      outline:4px solid rgba(215,174,98,.32);
+      box-shadow:0 8px 22px rgba(11,45,54,.18);
+    }
+    .primary-action:not(:disabled)::after{content:"  →"}
+
+    #walletActionShell{margin-top:12px;border-radius:16px}
+    #step1Card.is-active #walletActionShell{padding:10px;border:3px solid var(--gold);background:rgba(215,174,98,.08)}
+    #wallet-kit-button{min-height:58px}
+    #wallet-kit-button:empty{display:none}
+    #wallet-kit-button button,
+    #wallet-kit-button [role="button"]{
+      width:100%!important;
+      min-height:58px!important;
+      border-radius:14px!important;
+      font-size:1.03rem!important;
+      font-weight:900!important;
+    }
+    #step1Card.is-active #wallet-kit-button button,
+    #step1Card.is-active #wallet-kit-button [role="button"]{
+      outline:4px solid rgba(215,174,98,.32)!important;
+      box-shadow:0 8px 22px rgba(11,45,54,.18)!important;
+    }
+    .wallet-loading{padding:14px 15px;border:2px dashed rgba(139,100,30,.35);border-radius:14px;color:var(--warn);font-weight:850;text-align:center}
+    .wallet-loading.bad{border-color:rgba(155,62,50,.35);color:var(--bad);background:rgba(155,62,50,.05)}
+
     [hidden]{display:none!important}
     @media(max-width:600px){
       .shell{width:min(100% - 20px,780px);padding-top:16px}
@@ -87,10 +142,20 @@
       <div class="hard-stop">No XRPL transaction is submitted by this page. The final step writes only browser session state for this test. It does not create or change protocol authority.</div>
     </section>
 
-    <section class="card">
-      <div class="step"><span class="step-number">1</span><h2>Connect Bifrost</h2></div>
+    <div class="next-panel" id="nextPanel" aria-live="polite">
+      <div class="next-panel-label">Next action</div>
+      <div class="next-panel-text" id="nextPanelText">Connect Bifrost</div>
+      <div class="next-panel-detail" id="nextPanelDetail">Step 1 is highlighted below.</div>
+    </div>
+
+    <section class="card step-card is-active" id="step1Card">
+      <div class="step"><span class="step-number">1</span><h2>Connect Bifrost</h2><span class="step-state" id="step1State">NEXT</span></div>
       <p>Use the wallet button below. In the wallet chooser, choose Bifrost and approve the connection.</p>
-      <div id="wallet-kit-button"></div>
+      <div id="walletActionShell">
+        <div class="action-callout">NEXT BUTTON ↓</div>
+        <div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div>
+        <div id="wallet-kit-button"></div>
+      </div>
       <div class="status wait" id="connectionStatus">No wallet connected yet.</div>
       <div class="kv" id="connectionDetails" hidden>
         <b>Wallet</b><span id="connectedWallet">—</span>
@@ -98,11 +163,12 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="step"><span class="step-number">2</span><h2>Make a one-time challenge</h2></div>
+    <section class="card step-card is-locked" id="step2Card">
+      <div class="step"><span class="step-number">2</span><h2>Make a one-time challenge</h2><span class="step-state" id="step2State">LOCKED</span></div>
       <p>Wild Ledger makes a new random code. You do not type it.</p>
+      <div class="action-callout">NEXT BUTTON ↓</div>
       <div class="button-row">
-        <button id="generateButton" type="button">Generate Challenge</button>
+        <button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button>
       </div>
       <div id="challengeArea" hidden>
         <div class="label" style="margin-top:16px">Exact message Bifrost will sign</div>
@@ -114,11 +180,12 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="step"><span class="step-number">3</span><h2>Ask Bifrost for the proof</h2></div>
+    <section class="card step-card is-locked" id="step3Card">
+      <div class="step"><span class="step-number">3</span><h2>Ask Bifrost for the proof</h2><span class="step-state" id="step3State">LOCKED</span></div>
       <p>Bifrost may show a transaction-shaped signing screen. That is the compatibility envelope used to create the signature. Wild Ledger does not submit it.</p>
+      <div class="action-callout">NEXT BUTTON ↓</div>
       <div class="button-row">
-        <button id="signButton" type="button" disabled>Prove Wallet Control</button>
+        <button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button>
         <button id="replayButton" class="secondary" type="button" disabled>Test Same Proof Again</button>
       </div>
       <div class="status" id="proofStatus">Generate a challenge after Bifrost is connected.</div>
@@ -138,11 +205,12 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="step"><span class="step-number">4</span><h2>Identify community authority</h2></div>
+    <section class="card step-card is-locked" id="step4Card">
+      <div class="step"><span class="step-number">4</span><h2>Identify community authority</h2><span class="step-state" id="step4State">LOCKED</span></div>
       <p>After wallet control is verified, Wild Ledger reads validated XRPL authority history and checks whether this exact address is the current Community Operating Wallet for any community.</p>
+      <div class="action-callout">NEXT BUTTON ↓</div>
       <div class="button-row">
-        <button id="identifyButton" type="button" disabled>Identify My Community</button>
+        <button id="identifyButton" class="primary-action" type="button" disabled>Identify My Community</button>
       </div>
       <div class="status" id="authorityStatus">Verify wallet control first.</div>
       <div id="authorityResult" hidden>
@@ -161,11 +229,12 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="step"><span class="step-number">5</span><h2>Establish Operator session</h2></div>
+    <section class="card step-card is-locked" id="step5Card">
+      <div class="step"><span class="step-number">5</span><h2>Establish Operator session</h2><span class="step-state" id="step5State">LOCKED</span></div>
       <p>This step is enabled only after one current community authority match is found. Before writing the session, Wild Ledger rechecks validated XRPL history so the session is created from fresh authority, not a typed Community ID or URL value.</p>
+      <div class="action-callout">NEXT BUTTON ↓</div>
       <div class="button-row">
-        <button id="createSessionButton" type="button" disabled>Create Operator Session</button>
+        <button id="createSessionButton" class="primary-action" type="button" disabled>Create Operator Session</button>
         <button id="clearSessionButton" class="secondary" type="button">Clear Test Session</button>
       </div>
       <div class="status" id="sessionStatus">Identify exactly one community first.</div>
@@ -240,17 +309,122 @@
     const sessionSource = document.getElementById("sessionSource");
     const sessionEstablished = document.getElementById("sessionEstablished");
     const sessionRaw = document.getElementById("sessionRaw");
+    const nextPanelText = document.getElementById("nextPanelText");
+    const nextPanelDetail = document.getElementById("nextPanelDetail");
+    const walletButtonLoading = document.getElementById("walletButtonLoading");
+    const walletButtonHost = document.getElementById("wallet-kit-button");
+    const stepCards = [1,2,3,4,5].map(n => document.getElementById(`step${n}Card`));
+    const stepStates = [1,2,3,4,5].map(n => document.getElementById(`step${n}State`));
 
     let currentChallenge = null;
     let lastSignedResult = null;
     let lastVerifiedAccount = "";
     let lastAuthorityResult = null;
     let sessionCandidate = null;
+    let busyStep = 0;
     const usedNonces = new Set();
 
     function setStatus(element, message, tone = "") {
       element.textContent = message;
       element.className = `status${tone ? ` ${tone}` : ""}`;
+    }
+
+    function setStepState(stepNumber, state) {
+      const card = stepCards[stepNumber - 1];
+      const badge = stepStates[stepNumber - 1];
+      if (!card || !badge) return;
+      card.classList.remove("is-active", "is-done", "is-locked");
+      if (state === "active") { card.classList.add("is-active"); badge.textContent = "NEXT"; }
+      else if (state === "done") { card.classList.add("is-done"); badge.textContent = "DONE"; }
+      else { card.classList.add("is-locked"); badge.textContent = "LOCKED"; }
+    }
+
+    function storedSessionMatchesCurrentWallet() {
+      try {
+        const stored = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
+        return !!(stored?.communityId && stored?.verifiedWallet && stored.verifiedWallet === lastVerifiedAccount);
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function updateGuidance() {
+      const address = sessionAddress(getSession());
+      const proofDone = !!lastVerifiedAccount && lastVerifiedAccount === address;
+      const authorityMatches = lastAuthorityResult?.matches || [];
+      const candidateReady = !!sessionCandidate && proofDone;
+      const sessionDone = candidateReady && storedSessionMatchesCurrentWallet();
+      const challengeReady = !!currentChallenge && !usedNonces.has(currentChallenge.nonce);
+
+      generateButton.disabled = !address || proofDone || !!busyStep;
+      signButton.disabled = !address || !challengeReady || proofDone || !!busyStep;
+      identifyButton.disabled = !proofDone || !!lastAuthorityResult || !!busyStep;
+      createSessionButton.disabled = !candidateReady || sessionDone || !!busyStep;
+
+      if (!address) {
+        setStepState(1, "active");
+        [2,3,4,5].forEach(n => setStepState(n, "locked"));
+        nextPanelText.textContent = "Step 1 — Connect Bifrost";
+        nextPanelDetail.textContent = "Tap the highlighted wallet button in Step 1. Nothing else is ready yet.";
+        return;
+      }
+
+      setStepState(1, "done");
+
+      if (proofDone) {
+        setStepState(2, "done");
+        setStepState(3, "done");
+
+        if (!lastAuthorityResult) {
+          setStepState(4, "active");
+          setStepState(5, "locked");
+          nextPanelText.textContent = busyStep === 4 ? "Step 4 — Reading XRPL authority…" : "Step 4 — Identify My Community";
+          nextPanelDetail.textContent = busyStep === 4
+            ? "Please wait while validated XRPL authority history is checked."
+            : "Wallet control is verified. Tap the highlighted authority button.";
+          return;
+        }
+
+        setStepState(4, "done");
+        if (authorityMatches.length !== 1 || !candidateReady) {
+          setStepState(5, "locked");
+          nextPanelText.textContent = authorityMatches.length > 1 ? "STOP — Community chooser required" : "STOP — No Operator authority found";
+          nextPanelDetail.textContent = authorityMatches.length > 1
+            ? "This wallet controls more than one community, so this harness will not guess."
+            : "This verified wallet is not the current Operating Wallet for a community found by this test.";
+          return;
+        }
+
+        if (!sessionDone) {
+          setStepState(5, "active");
+          nextPanelText.textContent = busyStep === 5 ? "Step 5 — Rechecking authority…" : "Step 5 — Create Operator Session";
+          nextPanelDetail.textContent = busyStep === 5
+            ? "Please wait while authority is rechecked before the browser session is written."
+            : `Authority is verified for ${sessionCandidate.communityId}. Tap the highlighted Create Operator Session button.`;
+          return;
+        }
+
+        setStepState(5, "done");
+        nextPanelText.textContent = "TEST COMPLETE";
+        nextPanelDetail.textContent = `Operator session established for ${sessionCandidate.communityId}.`;
+        return;
+      }
+
+      if (!challengeReady) {
+        setStepState(2, "active");
+        [3,4,5].forEach(n => setStepState(n, "locked"));
+        nextPanelText.textContent = "Step 2 — Generate Challenge";
+        nextPanelDetail.textContent = "Bifrost is connected. Tap the highlighted Generate Challenge button.";
+        return;
+      }
+
+      setStepState(2, "done");
+      setStepState(3, "active");
+      [4,5].forEach(n => setStepState(n, "locked"));
+      nextPanelText.textContent = busyStep === 3 ? "Step 3 — Waiting for Bifrost…" : "Step 3 — Prove Wallet Control";
+      nextPanelDetail.textContent = busyStep === 3
+        ? "Review the signing request in Bifrost and approve it if it matches this test."
+        : "The challenge is ready. Tap the highlighted proof button and approve the signing request in Bifrost.";
     }
 
     function randomNonce() {
@@ -306,22 +480,29 @@
     function refreshConnection() {
       const session = getSession();
       const address = sessionAddress(session);
+      const walletButtonRendered = !!walletButtonHost?.children?.length;
+      if (walletButtonRendered) walletButtonLoading.hidden = true;
+
       if (!address) {
-        setStatus(connectionStatus, "No wallet connected yet.", "wait");
+        setStatus(connectionStatus, "No wallet connected yet. Your next action is the Connect Wallet button above.", "wait");
         connectionDetails.hidden = true;
         signButton.disabled = true;
+        updateGuidance();
         return;
       }
 
       connectedWallet.textContent = sessionWalletName(session);
       connectedAddress.textContent = address;
       connectionDetails.hidden = false;
+      walletButtonLoading.hidden = true;
       if (lastVerifiedAccount && lastVerifiedAccount !== address) {
         lastVerifiedAccount = "";
-        clearAuthorityResult("The connected wallet changed. Prove wallet control again.");
+        currentChallenge = null;
+        challengeArea.hidden = true;
+        clearAuthorityResult("The connected wallet changed. Generate a new challenge and prove wallet control again.");
       }
-      setStatus(connectionStatus, "Wallet connected. You can make a one-time challenge.", "good");
-      signButton.disabled = !currentChallenge;
+      setStatus(connectionStatus, "Wallet connected. NEXT: Generate Challenge in Step 2.", "good");
+      updateGuidance();
     }
 
     function hexToUtf8(hex) {
@@ -753,6 +934,7 @@
         authoritySource.textContent = "Validated XRPL history";
         setStatus(authorityStatus, "Wallet control is proven, but this address is not the current Community Operating Wallet for any canonical Wild Ledger community found by this test.", "bad");
         setStatus(sessionStatus, "No Operator session can be created because no current community authority was found.", "bad");
+        updateGuidance();
         return;
       }
 
@@ -774,7 +956,8 @@
         authorityCurrent.textContent = match.currentAccount || "—";
         authoritySource.textContent = match.source || "Validated XRPL history";
         setStatus(authorityStatus, `Good. This verified wallet is the current Community Operating Wallet for ${match.communityId}.`, "good");
-        setStatus(sessionStatus, `Ready. Wild Ledger can establish an Operator session for ${match.communityId} from this verified authority.`, "wait");
+        setStatus(sessionStatus, `Ready. NEXT: Create Operator Session for ${match.communityId}.`, "wait");
+        updateGuidance();
         return;
       }
 
@@ -788,6 +971,7 @@
       authoritySource.textContent = "Validated XRPL authority histories";
       setStatus(authorityStatus, "This verified wallet currently operates more than one Wild Ledger community.", "good");
       setStatus(sessionStatus, "This test will not guess which community to enter. A multi-community chooser is required before a session can be established.", "wait");
+      updateGuidance();
     }
 
     function renderStoredSession(session) {
@@ -805,7 +989,8 @@
         wildLedgerOperatorWallet: sessionStorage.getItem("wildLedgerOperatorWallet"),
         wildLedgerOperatorSession: JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null")
       }, null, 2);
-      setStatus(sessionStatus, `Good. The browser Operator session is now bound to ${session.communityId} from verified wallet authority.`, "good");
+      setStatus(sessionStatus, `Good. The browser Operator session is now bound to ${session.communityId} from verified wallet authority. TEST COMPLETE.`, "good");
+      updateGuidance();
     }
 
     function clearStoredOperatorSession() {
@@ -816,8 +1001,9 @@
       sessionResult.hidden = true;
       sessionRaw.textContent = "";
       setStatus(sessionStatus, sessionCandidate
-        ? `Test session cleared. Authority for ${sessionCandidate.communityId} is still verified; you may create the session again.`
+        ? `Test session cleared. Authority for ${sessionCandidate.communityId} is still verified; NEXT: Create Operator Session again.`
         : "Test session cleared. Identify exactly one community first.", "wait");
+      updateGuidance();
     }
 
     function renderVerificationSuccess(verified, result) {
@@ -837,7 +1023,8 @@
       authorityResult.hidden = true;
       setStatus(sessionStatus, "Wallet proof passed. Identify exactly one community before creating a session.", "wait");
       setStatus(authorityStatus, "Wallet proof passed. Tap Identify My Community to read validated XRPL authority history.", "wait");
-      setStatus(proofStatus, "The wallet signed this exact one-time challenge. Wild Ledger verified it locally. Nothing was submitted to XRPL.", "good");
+      setStatus(proofStatus, "The wallet signed this exact one-time challenge. Wild Ledger verified it locally. Nothing was submitted to XRPL. NEXT: Identify My Community.", "good");
+      updateGuidance();
     }
 
     function renderVerificationFailure(error) {
@@ -851,6 +1038,7 @@
       lastVerifiedAccount = "";
       clearAuthorityResult("Wallet proof must pass before community authority can be identified.");
       setStatus(proofStatus, error?.message || String(error), "bad");
+      updateGuidance();
     }
 
     if (!window.XRPLWalletKit?.createWalletKit) {
@@ -866,7 +1054,7 @@
     const kit = window.XRPLWalletKit.createWalletKit({
       metadata: {
         name: "Wild Ledger Operator Session Test",
-        description: "Practice wallet proof, XRPL community authority resolution, and Operator session establishment"
+        description: "Practice wallet proof, XRPL community authority resolution, and Operator session establishment",
         url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
         icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
       },
@@ -883,7 +1071,22 @@
       }
     });
 
-    try { kit.button?.mount?.("#wallet-kit-button"); } catch (_) {}
+    try {
+      kit.button?.mount?.("#wallet-kit-button");
+    } catch (error) {
+      walletButtonLoading.textContent = `Connect Wallet button failed to mount: ${error?.message || String(error)}`;
+      walletButtonLoading.classList.add("bad");
+    }
+
+    setTimeout(() => {
+      const rendered = !!walletButtonHost?.children?.length;
+      if (!rendered && !sessionAddress(getSession())) {
+        walletButtonLoading.hidden = false;
+        walletButtonLoading.textContent = "Connect Wallet button did not load. Reload this page. If it is still missing, stop the test — the harness is not ready.";
+        walletButtonLoading.classList.add("bad");
+        setStatus(connectionStatus, "Harness error: the wallet-connect control did not render.", "bad");
+      }
+    }, 2500);
 
     generateButton.addEventListener("click", () => {
       currentChallenge = makeChallenge();
@@ -897,7 +1100,8 @@
       proofResult.hidden = true;
       replayButton.disabled = true;
       refreshConnection();
-      setStatus(proofStatus, "Challenge ready. Tap Prove Wallet Control and review Bifrost carefully.", "wait");
+      setStatus(proofStatus, "Challenge ready. NEXT: Tap Prove Wallet Control and review Bifrost carefully.", "wait");
+      updateGuidance();
     });
 
     signButton.addEventListener("click", async () => {
@@ -908,8 +1112,8 @@
         if (Date.now() > currentChallenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
         if (usedNonces.has(currentChallenge.nonce)) throw new Error("This challenge was already used. Generate a new one.");
 
-        signButton.disabled = true;
-        generateButton.disabled = true;
+        busyStep = 3;
+        updateGuidance();
         setStatus(proofStatus, "Waiting for Bifrost. Review the request, then approve the signature if it looks right.", "wait");
 
         // IMPORTANT: signMessage only. This harness never calls signAndSubmit,
@@ -924,8 +1128,8 @@
       } catch (error) {
         renderVerificationFailure(error);
       } finally {
-        generateButton.disabled = false;
-        signButton.disabled = usedNonces.has(currentChallenge?.nonce || "") || !sessionAddress(getSession());
+        busyStep = 0;
+        updateGuidance();
       }
     });
 
@@ -935,9 +1139,10 @@
         const connected = sessionAddress(getSession());
         if (!connected || connected !== lastVerifiedAccount) throw new Error("The connected wallet changed. Prove wallet control again.");
 
-        identifyButton.disabled = true;
+        busyStep = 4;
         authorityResult.hidden = true;
         setStatus(authorityStatus, "Reading validated XRPL authority history…", "wait");
+        updateGuidance();
         const result = await identifyCommunityAuthority(lastVerifiedAccount);
         renderAuthorityResult(result);
       } catch (error) {
@@ -952,7 +1157,8 @@
         authorityDetails.hidden = true;
         setStatus(authorityStatus, error?.message || String(error), "bad");
       } finally {
-        identifyButton.disabled = !lastVerifiedAccount;
+        busyStep = 0;
+        updateGuidance();
       }
     });
 
@@ -962,9 +1168,10 @@
         const connected = sessionAddress(getSession());
         if (!connected || connected !== lastVerifiedAccount) throw new Error("The connected wallet changed. Prove wallet control again.");
 
-        createSessionButton.disabled = true;
+        busyStep = 5;
         sessionResult.hidden = true;
         setStatus(sessionStatus, "Rechecking validated XRPL authority before creating the session…", "wait");
+        updateGuidance();
 
         const fresh = await identifyCommunityAuthority(lastVerifiedAccount);
         const matches = fresh.matches || [];
@@ -1020,7 +1227,8 @@
         sessionRaw.textContent = "";
         setStatus(sessionStatus, error?.message || String(error), "bad");
       } finally {
-        createSessionButton.disabled = !sessionCandidate;
+        busyStep = 0;
+        updateGuidance();
       }
     });
 
@@ -1037,9 +1245,11 @@
         resultBig.className = "result-big good";
         nonceCheck.textContent = "Already used — rejected";
         setStatus(proofStatus, `Good. ${error?.message || String(error)}`, "good");
+        updateGuidance();
       }
     });
 
+    updateGuidance();
     refreshConnection();
     setInterval(refreshConnection, 800);
   </script>
