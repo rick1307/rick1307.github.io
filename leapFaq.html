@@ -536,19 +536,47 @@
       h1{font-size:clamp(3.5rem,17vw,5.4rem)}
     }
 
+
+    /* Match Start Community's top treatment. */
+    header{
+      padding:44px 0 42px;
+    }
+    .back{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:max-content;
+      min-height:34px;
+      margin:0 0 34px;
+      padding:0 14px;
+      color:var(--wl-ink);
+      border:2px solid rgba(247,241,223,.72);
+      border-radius:4px;
+      background:rgba(255,255,255,.02);
+      text-decoration:none;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:11px;
+      font-weight:900;
+      line-height:1;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .back:hover,.back:focus-visible{
+      background:var(--wl-ink);
+      color:#0a0c0b;
+    }
+    @media(max-width:800px){
+      header{padding:34px 0 34px}
+    }
+
 </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
 <body>
-<nav>
-<div class="wrap nav-inner">
-<div class="brand topbar-simple wl-nav-right">
-<a aria-label="Back to Wild Ledger" class="back-link wl-header-control" href="splash.html">Back to Wild Ledger</a>
-</div>
-</div>
-</nav>
 <header>
 <div class="wrap">
+<a aria-label="Wild Ledger" class="back wl-header-control" href="splash.html">← Wild Ledger</a>
 <div class="kicker">Wild Ledger · Frequently Asked Questions</div>
 <h1>Wild Ledger FAQ</h1>
 <p class="lede">These are the rules and mechanics that apply across participating LEAP communities. Each community has its own identity and experience, but LEAP on the XRP Ledger is the common thread that connects them. This technology is still new to many people, so this FAQ is here to explain clearly what we’re building, how it works, and what stays the same in every Wild Ledger community you participate in.</p>
