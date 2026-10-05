@@ -1205,44 +1205,30 @@
       align-items:center;
     }
 
-    .wallet-community-link{
+    .wallet-community-item{
       flex:0 0 auto;
       display:inline-flex;
       align-items:center;
       gap:8px;
       min-height:40px;
       padding:0 18px;
-      color:#f5f1df;
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
       font-size:.72rem;
       font-weight:800;
       letter-spacing:.035em;
       line-height:1;
-      text-decoration:none;
       text-transform:uppercase;
       white-space:nowrap;
-      touch-action:manipulation;
     }
 
-    .wallet-community-link span:nth-of-type(even){
-      color:#e0b955;
-    }
+    /* Alternate by community, not by repeated ticker copy. That makes each
+       community visually recognizable while the tape loops continuously. */
+    .wallet-community-item.tone-a{color:#f0c965}
+    .wallet-community-item.tone-b{color:#70d0cf}
 
-    .wallet-community-link:hover,
-    .wallet-community-link:focus-visible{
-      color:#ffffff;
-      background:rgba(255,255,255,.07);
-      text-decoration:none;
-      outline:none;
-    }
-
-    .wallet-community-link[aria-current="page"]{
-      color:#ffffff;
-    }
-
-    .wallet-community-link[aria-current="page"]::before{
+    .wallet-community-item.is-current::before{
       content:"●";
-      color:#e0b955;
+      color:currentColor;
       font-size:.55rem;
       margin-right:1px;
     }
@@ -1274,7 +1260,7 @@
         font-size:.56rem;
         letter-spacing:.09em;
       }
-      .wallet-community-link{
+      .wallet-community-item{
         min-height:40px;
         padding-left:14px;
         padding-right:14px;
@@ -1611,14 +1597,13 @@
           const unit = document.createElement("div");
           unit.className = "wallet-community-ticker-unit";
 
-          relationships.forEach((relationship) => {
+          relationships.forEach((relationship, relationshipIndex) => {
             const key = String(relationship?.communityKey || relationship?.communityId || "").trim().toLowerCase();
             if (!key) return;
 
-            const link = document.createElement("a");
-            link.className = "wallet-community-link";
-            link.href = `index.html?community=${encodeURIComponent(key)}`;
-            if (key === String(communityId).toLowerCase()) link.setAttribute("aria-current", "page");
+            const item = document.createElement("span");
+            item.className = `wallet-community-item ${relationshipIndex % 2 === 0 ? "tone-a" : "tone-b"}`;
+            if (key === String(communityId).toLowerCase()) item.classList.add("is-current");
 
             const labelParts = relationshipRibbonLabel(relationship);
             labelParts.forEach((part, partIndex) => {
@@ -1626,14 +1611,14 @@
                 const dot = document.createElement("span");
                 dot.setAttribute("aria-hidden", "true");
                 dot.textContent = "•";
-                link.appendChild(dot);
+                item.appendChild(dot);
               }
               const span = document.createElement("span");
               span.textContent = part;
-              link.appendChild(span);
+              item.appendChild(span);
             });
 
-            unit.appendChild(link);
+            unit.appendChild(item);
 
             const separator = document.createElement("span");
             separator.className = "wallet-community-separator";
