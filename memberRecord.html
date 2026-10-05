@@ -1629,16 +1629,34 @@
         operatorJourneyMilestone.replaceChildren();
 
         const journey = record?.operatorJourney || null;
-        if (!journey || String(journey.state || "").toUpperCase() !== "WAITING") return;
+        const journeyState = String(journey?.state || "").toUpperCase();
+        if (!journey || !journeyState) return;
 
-        const title = document.createElement("strong");
-        title.textContent = "Community request received.";
+        if (journeyState === "WAITING") {
+          const title = document.createElement("strong");
+          title.textContent = "Community request received.";
 
-        const copy = document.createElement("span");
-        copy.textContent = "Your request is being processed. No action is required right now. Community setup is usually completed within 24 hours.";
+          const copy = document.createElement("span");
+          copy.textContent = "Your request is being processed. No action is required right now. Community setup is usually completed within 24 hours.";
 
-        operatorJourneyMilestone.append(title, copy);
-        operatorJourneyMilestone.classList.add("show", "success");
+          operatorJourneyMilestone.append(title, copy);
+          operatorJourneyMilestone.classList.add("show", "success");
+          return;
+        }
+
+        if (journeyState === "SETUP_REQUIRED") {
+          const communityId = String(journey?.community?.communityId || "").trim().toUpperCase();
+          const communityName = String(journey?.community?.communityName || communityId || "Your community").trim();
+
+          const title = document.createElement("strong");
+          title.textContent = `${communityName} is ready.`;
+
+          const copy = document.createElement("span");
+          copy.textContent = `${communityId || "Your community"} has been established on the XRP Ledger. Community setup is your next step.`;
+
+          operatorJourneyMilestone.append(title, copy);
+          operatorJourneyMilestone.classList.add("show", "action");
+        }
       }
 
       function renderWildLedgerCommunityRibbon(record) {
