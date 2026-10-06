@@ -11,9 +11,11 @@
     WILD-LEDGER/VISIBILITY/<COMMUNITY-ID>=VISIBLE
 
   Visibility rule:
-    no valid statement => visible
-    latest valid statement VISIBLE => visible
-    latest valid statement HIDDEN => hidden
+    explicit latest VISIBLE => visible
+    explicit latest HIDDEN => hidden
+    no valid statement => caller-supplied default
+      (legacy/existing communities default visible;
+       newly Owner-provisioned communities default hidden)
 */
 
 import {
@@ -276,10 +278,12 @@ export async function readCommunityVisibility({ serverUrl, force = false } = {})
   return cloneState(state);
 }
 
-export function communityIsHidden(visibilityState, communityId) {
+export function communityIsHidden(visibilityState, communityId, defaultHidden = false) {
   const id = normalizeCommunityId(communityId);
   const map = visibilityState instanceof Map ? visibilityState : visibilityState?.visibility;
-  return Boolean(map?.get?.(id)?.hidden);
+  const record = map?.get?.(id) || null;
+  if (record) return Boolean(record.hidden);
+  return Boolean(defaultHidden);
 }
 
 export async function prepareCommunityVisibility({
