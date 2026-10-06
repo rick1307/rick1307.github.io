@@ -216,6 +216,13 @@
     .console-header { padding: 26px 20px 28px; }
     .top-nav { gap: 10px; margin-bottom: 28px; }
   }
+
+/* Wild Ledger cinematic view dissolve — local demo */
+html{background:#071d2a}
+body{animation:wildViewIn .34s ease both}
+body.wl-view-leaving{opacity:0;transform:scale(.995);transition:opacity .28s ease,transform .28s ease;pointer-events:none}
+@keyframes wildViewIn{from{opacity:0;transform:scale(1.004)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){body{animation:none}body.wl-view-leaving{transition:none}}
 </style>
 <link rel="stylesheet" href="wildLedgerControls.css">
   <link rel="stylesheet" href="wildLedgerBackend.css">
@@ -247,6 +254,18 @@
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script>
 (() => {
+  let viewIsLeaving = false;
+  const fadeNavigate = (url, { replace = false } = {}) => {
+    if (viewIsLeaving) return;
+    viewIsLeaving = true;
+    document.body.classList.add("wl-view-leaving");
+    const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    setTimeout(() => {
+      if (replace) window.location.replace(url);
+      else window.location.href = url;
+    }, reduced ? 0 : 280);
+  };
+
   const params = new URLSearchParams(window.location.search);
   const registry = window.WILD_LEDGER_COMMUNITY_REGISTRY || {};
   const defaultCommunity = Object.values(registry)[0] || null;
@@ -333,7 +352,7 @@
   } else if (operatorLogout) {
     operatorLogout.addEventListener("click", () => {
       clearOperatorSession();
-      window.location.href = "getWild.html";
+      fadeNavigate("getWild.html");
     });
   }
 
@@ -356,6 +375,14 @@
   if (communityEditLink) {
     communityEditLink.href = `setup.html?mode=edit&community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
+
+  [ownerCommunitiesBack, communityEditLink, communityTokenomicsLink, communityRecognitionLink, communityCheckbookLink, communityLibraryLink]
+    .filter(Boolean)
+    .forEach(link => link.addEventListener("click", event => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      fadeNavigate(link.href);
+    }));
 
   let cachedCommunityName = "";
   try {
