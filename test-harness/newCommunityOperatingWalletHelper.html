@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#031c29">
+<title>New Community Operating Wallet — Wild Ledger</title>
+<style>
+:root{
+  --deep:#031c29;--deep2:#062f3d;--panel:rgba(7,43,57,.82);--card:rgba(5,34,46,.62);
+  --lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;--coral:#ef735f;
+  --ink:#f4fbfa;--muted:rgba(236,249,247,.68);--line:rgba(255,255,255,.09);
+  --good:#82e39f;--bad:#ff8878;--wait:#ffd36d;--blue:#9fddff;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(47,168,160,.26),transparent 31%),radial-gradient(circle at 88% 8%,rgba(239,115,95,.13),transparent 25%),radial-gradient(circle at 72% 82%,rgba(243,182,74,.12),transparent 28%),linear-gradient(145deg,#021720 0%,var(--deep) 42%,var(--deep2) 100%)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%);-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%)}
+.shell{width:min(930px,100%);margin:0 auto;padding:28px 16px 52px;position:relative;z-index:1}
+.console{overflow:visible;border:1px solid var(--line);border-radius:30px;background:linear-gradient(155deg,rgba(8,56,70,.92),rgba(4,31,43,.90));box-shadow:0 30px 90px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.console::before{content:"";display:block;height:4px;border-radius:30px 30px 0 0;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
+header{padding:30px;border-bottom:1px solid rgba(255,255,255,.08)}
+.back{display:block;width:max-content;margin:0 0 28px;color:var(--blue);text-decoration:none;font-weight:800;font-size:.78rem}
+.eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+h1{margin:8px 0 0;font-size:clamp(2.25rem,8vw,4.4rem);line-height:.96;letter-spacing:-.055em}
+.question{max-width:800px;margin:17px 0 0;color:#f9fffd;font-size:1rem;line-height:1.58}.question strong{color:var(--sea-glass)}
+.scope-line{margin:12px 0 0;color:#ffd99a;font-size:.80rem;font-weight:850}
+.body{padding:22px;display:grid;gap:12px}
+.step-folder{border:1px solid var(--line);border-radius:20px;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),var(--card);transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease}
+.step-folder.is-active{border:2px solid rgba(243,182,74,.72);box-shadow:0 0 0 3px rgba(243,182,74,.055),0 18px 44px rgba(0,0,0,.22)}
+.step-folder.is-working{border:2px solid rgba(134,215,201,.72);box-shadow:0 0 0 3px rgba(47,168,160,.07),0 18px 44px rgba(0,0,0,.22)}
+.step-folder.is-done{border-color:rgba(130,227,159,.42)}
+.step-folder.is-failed{border:2px solid rgba(255,136,120,.72);box-shadow:0 0 0 3px rgba(255,136,120,.06),0 18px 44px rgba(0,0,0,.22)}
+.step-folder.is-locked{opacity:.44}
+.step-folder summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) 46px auto 18px;gap:10px;align-items:center;padding:16px 17px}
+.step-folder summary::-webkit-details-marker{display:none}.step-folder.is-locked summary{cursor:not-allowed}
+.step-number{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;border:1px solid rgba(134,215,201,.28);background:rgba(47,168,160,.10);color:#e5fff9;font-size:.80rem;font-weight:950}
+.step-kicker{display:block;color:var(--sea-glass);font-size:.59rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+h2{margin:3px 0 0;font-size:1.06rem;letter-spacing:-.02em}
+.step-state{border-radius:999px;padding:6px 9px;font-size:.58rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#ffe6ad;border:1px solid rgba(243,182,74,.34);background:rgba(243,182,74,.09)}
+.is-done .step-state{color:#eaffef;border-color:rgba(130,227,159,.36);background:rgba(130,227,159,.10)}
+.is-failed .step-state{color:#ffd1ca;border-color:rgba(255,136,120,.50);background:rgba(255,136,120,.10)}
+.is-working .step-state{color:#e1fff9;border-color:rgba(134,215,201,.40);background:rgba(47,168,160,.10)}
+.is-locked .step-state{color:rgba(236,249,247,.46);border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.025)}
+.state-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;font-size:1.35rem;font-weight:1000}
+.state-icon.pending,.state-icon.locked{border:2px solid rgba(255,211,109,.45);color:var(--wait);background:rgba(255,211,109,.07)}
+.state-icon.locked{border-color:rgba(255,255,255,.12);color:rgba(236,249,247,.38);background:rgba(255,255,255,.025)}
+.state-icon.done{border:2px solid rgba(130,227,159,.64);background:rgba(130,227,159,.12);color:#eaffef}
+.state-icon.failed{border:2px solid rgba(255,136,120,.70);background:rgba(255,136,120,.13);color:#ffe0da}
+.state-icon.working{position:relative}.state-icon.working::before{content:"";width:30px;height:30px;border-radius:50%;padding:4px;background:conic-gradient(var(--lagoon),var(--sea-glass),var(--mango),var(--coral),var(--lagoon));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin .85s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.caret{color:rgba(236,249,247,.44);font-size:1.25rem;transition:transform .18s ease}.step-folder[open] .caret{transform:rotate(90deg)}
+.folder-body{padding:0 17px 17px}.action-line{margin:0 0 14px;color:#f9fffd;font-size:1.03rem;font-weight:950;line-height:1.42}.action-sub{margin:-7px 0 14px;color:var(--muted);font-size:.79rem;line-height:1.48}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}@media(max-width:680px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.step-folder summary{grid-template-columns:38px minmax(0,1fr) 40px 18px}.step-state{display:none}header{padding:24px 20px}.body{padding:15px}.folder-body{padding:0 14px 14px}}
+label{display:block;margin-bottom:7px;color:rgba(236,249,247,.62);font-size:.67rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+input{width:100%;min-height:48px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(1,18,27,.54);color:var(--ink);padding:10px 12px;font:inherit;outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+input:focus{border-color:rgba(134,215,201,.58);box-shadow:0 0 0 3px rgba(47,168,160,.12)}input::placeholder{color:rgba(236,249,247,.34)}
+.button-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.button-row button{flex:1 1 180px;appearance:none;border-radius:13px;border:1px solid rgba(255,255,255,.12);padding:11px 14px;background:rgba(255,255,255,.055);color:var(--ink);font:inherit;font-size:.80rem;font-weight:900;cursor:pointer;min-height:46px}.button-row button:disabled{opacity:.34;cursor:not-allowed}
+.primary-action{width:100%;min-height:58px!important;background:linear-gradient(180deg,#2e9a5d,#1f7948)!important;border:2px solid rgba(169,255,197,.72)!important;color:#f5fff8!important;font-size:1rem!important;box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.14)}
+.copy-button{background:rgba(255,136,120,.12)!important;border:1px solid rgba(255,136,120,.38)!important;color:#ffe4de!important;min-height:42px!important}
+.human-status{display:grid;grid-template-columns:56px 1fr;gap:13px;align-items:center;margin-top:14px;padding:13px 14px;border-radius:15px;border:1px solid rgba(255,211,109,.28);background:rgba(255,211,109,.065)}
+.human-status .big{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;font-size:1.65rem;font-weight:1000;border:2px solid rgba(255,211,109,.55);color:var(--wait);background:rgba(255,211,109,.09)}
+.human-status strong{display:block;color:#fff0c6;font-size:.88rem}.human-status span{display:block;margin-top:3px;color:rgba(255,240,198,.72);font-size:.74rem;line-height:1.45;overflow-wrap:anywhere}
+.human-status.working{border-color:rgba(134,215,201,.32);background:rgba(47,168,160,.07)}.human-status.working .big{border:none;background:transparent;position:relative;font-size:0}.human-status.working .big::before{content:"";width:38px;height:38px;border-radius:50%;padding:4px;background:conic-gradient(var(--lagoon),var(--sea-glass),var(--mango),var(--coral),var(--lagoon));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin .85s linear infinite}.human-status.working strong{color:#e5fff9}.human-status.working span{color:rgba(229,255,249,.74)}
+.human-status.good{border-color:rgba(130,227,159,.34);background:rgba(130,227,159,.075)}.human-status.good .big{border-color:rgba(130,227,159,.62);background:rgba(130,227,159,.12);color:#eaffef}.human-status.good strong{color:#eaffef}.human-status.good span{color:rgba(234,255,239,.74)}
+.human-status.bad{border-color:rgba(255,136,120,.46);background:rgba(255,136,120,.075)}.human-status.bad .big{border-color:rgba(255,136,120,.72);background:rgba(255,136,120,.13);color:#ffe1dc}.human-status.bad strong{color:#ffe2dc}.human-status.bad span{color:rgba(255,226,220,.82)}
+.failure-panel{margin-top:12px;border:2px solid rgba(255,136,120,.48);border-radius:15px;background:rgba(115,35,29,.28);padding:13px 14px}.failure-panel h3{margin:0;color:#ffe0da;font-size:.88rem}.failure-panel p{margin:6px 0 0;color:#ffc7bd;font-size:.77rem;line-height:1.48;word-break:break-word}.failure-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.failure-actions button{flex:1}
+.detail-card,.about{border:1px solid rgba(134,215,201,.14);border-radius:15px;background:rgba(47,168,160,.04);overflow:hidden;margin-top:9px}.detail-card summary,.about summary{list-style:none;cursor:pointer;padding:13px 14px;color:#dffbf5;font-size:.78rem;font-weight:900}.detail-card summary::-webkit-details-marker,.about summary::-webkit-details-marker{display:none}.detail-card summary::after,.about summary::after{content:"+";float:right;color:var(--sea-glass);font-size:1.1rem;line-height:.8}.detail-card[open] summary::after,.about[open] summary::after{content:"−"}.detail-content{padding:0 14px 14px;color:var(--muted);font-size:.76rem;line-height:1.58}.detail-content strong{color:#e8fffb}
+.mono,pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.kv{display:grid;grid-template-columns:155px minmax(0,1fr);gap:7px 11px;margin-top:10px}.kv b{color:rgba(236,249,247,.62);font-size:.70rem}.kv span{font-size:.72rem;overflow-wrap:anywhere}
+pre{margin:10px 0 0;padding:13px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,10,17,.64);color:#dffbf5;font-size:.70rem;max-height:310px;overflow:auto}
+#qrWrap{display:none;text-align:center;margin:14px 0 0}#qrWrap.show{display:block}#qrImage{width:min(320px,82vw);height:auto;background:#fff;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.12)}#qrUri{display:block;margin-top:8px;color:rgba(236,249,247,.42);font-size:.64rem;max-height:64px;overflow:auto}
+.write-warning{margin-top:12px;border:1px solid rgba(243,182,74,.40);border-radius:13px;background:rgba(243,182,74,.09);padding:12px 13px;color:#ffe3ad;font-size:.76rem;line-height:1.48}.write-warning strong{color:#fff0c6}
+.complete{display:none;margin-top:2px;border:2px solid rgba(130,227,159,.56);border-radius:20px;background:linear-gradient(145deg,rgba(130,227,159,.13),rgba(47,168,160,.07));padding:20px;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,.19)}.complete.show{display:block}.complete .check{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 12px;border-radius:50%;border:2px solid rgba(130,227,159,.68);background:rgba(130,227,159,.12);color:#eaffef;font-size:2rem;font-weight:1000}.complete h3{margin:0;color:#eaffef;font-size:1.15rem}.complete p{margin:7px 0 0;color:rgba(234,255,239,.72);font-size:.78rem;line-height:1.5}
+.about{margin-top:3px}.fine{margin:13px 2px 0;color:rgba(236,249,247,.48);font-size:.68rem;line-height:1.55}footer{padding:0 22px 24px;color:rgba(236,249,247,.35);font-size:.62rem;font-weight:800;letter-spacing:.07em;text-align:center}
+</style>
+<script src="../js/wildLedgerConfig.js"></script>
+</head>
+<body>
+<main class="shell">
+<section class="console">
+<header>
+  <a class="back" href="../testHub.html">← TestHub</a>
+  <div class="eyebrow">Test Harness · Conversational by Design</div>
+  <h1>New Community Operating Wallet</h1>
+  <p class="question"><strong>Question this harness answers:</strong> can the entered Owner Wallet establish a brand-new community's first Operating Wallet using the exact canonical authority statement?</p>
+  <p class="scope-line">New communities only. Do not use this harness to rotate an established community's Operating Wallet.</p>
+</header>
+
+<div class="body">
+
+<details class="step-folder" id="step1" data-step="1" open>
+  <summary>
+    <span class="step-number">1</span>
+    <span><span class="step-kicker">Authority details</span><h2>Enter the authority statement</h2></span>
+    <span class="state-icon pending" id="icon1">•</span>
+    <span class="step-state" id="state1">Pending</span>
+    <span class="caret">›</span>
+  </summary>
+  <div class="folder-body">
+    <p class="action-line">Enter the current Owner Wallet, the new Operating Wallet, and the exact canonical memo.</p>
+    <div class="grid">
+      <div class="full">
+        <label for="ownerAddressInput">Current Wild Ledger Owner Wallet</label>
+        <input id="ownerAddressInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="r...">
+      </div>
+      <div class="full">
+        <label for="operatingAddressInput">New Community Operating Wallet</label>
+        <input id="operatingAddressInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="r...">
+      </div>
+      <div class="full">
+        <label for="memoInput">Exact authority memo</label>
+        <input id="memoInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="<COMMUNITY-ID>-LEAP/AUTHORITY/OPERATING-WALLET=<OPERATING-WALLET>">
+      </div>
+    </div>
+    <div class="button-row"><button id="validateButton" class="primary-action" type="button">Validate Authority Details</button></div>
+    <div class="human-status" id="human1"><div class="big">•</div><div><strong>Waiting for authority details</strong><span>Nothing has been signed or submitted.</span></div></div>
+    <div class="failure-panel" id="failure1" hidden><h3>✕ Step 1 failed</h3><p id="failureText1"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-step="1">Copy Diagnostic Report</button></div></div>
+    <details class="detail-card"><summary>Exact syntax this step expects</summary><div class="detail-content"><div class="mono">&lt;COMMUNITY-ID&gt;-LEAP/AUTHORITY/OPERATING-WALLET=&lt;OPERATING-WALLET&gt;</div><p>The address after the equals sign must exactly match the New Community Operating Wallet field.</p></div></details>
+    <details class="detail-card"><summary>Parsed authority details</summary><div class="detail-content"><div class="kv"><b>Community ID</b><span id="parsedCommunity">—</span><b>Operating Wallet</b><span id="parsedOperating">—</span><b>Validation</b><span id="memoCheck">Not checked.</span></div></div></details>
+  </div>
+</details>
+
+<details class="step-folder is-locked" id="step2" data-step="2">
+  <summary>
+    <span class="step-number">2</span>
+    <span><span class="step-kicker">Owner signer</span><h2>Connect the Owner Wallet</h2></span>
+    <span class="state-icon locked" id="icon2">•</span>
+    <span class="step-state" id="state2">Locked</span>
+    <span class="caret">›</span>
+  </summary>
+  <div class="folder-body">
+    <p class="action-line">Connect Bifrost using the exact Owner Wallet entered in Step 1.</p>
+    <div class="button-row"><button id="connectButton" class="primary-action" type="button" disabled>Connect Bifrost</button></div>
+    <div id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"><code id="qrUri"></code></div>
+    <div class="human-status" id="human2"><div class="big">•</div><div><strong>Waiting for Step 1</strong><span>The connected signer must exactly match the entered Owner Wallet.</span></div></div>
+    <div class="failure-panel" id="failure2" hidden><h3>✕ Step 2 failed</h3><p id="failureText2"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-step="2">Copy Diagnostic Report</button></div></div>
+    <details class="detail-card"><summary>What this step proves</summary><div class="detail-content">This step confirms that Bifrost returned the same XRPL classic address entered as the current Owner Wallet. It does not independently reconstruct Owner authority history from XRPL.</div></details>
+    <details class="detail-card"><summary>Technical details</summary><div class="detail-content"><div class="kv"><b>Connected signing wallet</b><span id="connectedAddress">—</span><b>Connection status</b><span id="connectStatus">Not connected.</span></div></div></details>
+  </div>
+</details>
+
+<details class="step-folder is-locked" id="step3" data-step="3">
+  <summary>
+    <span class="step-number">3</span>
+    <span><span class="step-kicker">Prepare</span><h2>Prepare the AccountSet</h2></span>
+    <span class="state-icon locked" id="icon3">•</span>
+    <span class="step-state" id="state3">Locked</span>
+    <span class="caret">›</span>
+  </summary>
+  <div class="folder-body">
+    <p class="action-line">Prepare the no-op AccountSet with the exact authority memo from Step 1.</p>
+    <div class="button-row"><button id="prepareButton" class="primary-action" type="button" disabled>Prepare AccountSet</button></div>
+    <div class="human-status" id="human3"><div class="big">•</div><div><strong>Waiting for Owner Wallet</strong><span>No transaction has been prepared.</span></div></div>
+    <div class="failure-panel" id="failure3" hidden><h3>✕ Step 3 failed</h3><p id="failureText3"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-step="3">Copy Diagnostic Report</button></div></div>
+    <details class="detail-card"><summary>What this step proves</summary><div class="detail-content">XRPL prepares an <code>AccountSet</code> whose Account is the connected Owner Wallet and whose only memo exactly matches the authority statement you validated.</div></details>
+    <details class="detail-card"><summary>Prepared transaction</summary><div class="detail-content"><div id="prepareStatus">Not prepared.</div><pre id="preparedJson">No prepared transaction yet.</pre></div></details>
+  </div>
+</details>
+
+<details class="step-folder is-locked" id="step4" data-step="4">
+  <summary>
+    <span class="step-number">4</span>
+    <span><span class="step-kicker">Wallet signature</span><h2>Sign in Bifrost</h2></span>
+    <span class="state-icon locked" id="icon4">•</span>
+    <span class="step-state" id="state4">Locked</span>
+    <span class="caret">›</span>
+  </summary>
+  <div class="folder-body">
+    <p class="action-line">Ask the connected Owner Wallet to sign the prepared AccountSet.</p>
+    <div class="button-row"><button id="signButton" class="primary-action" type="button" disabled>Sign AccountSet</button></div>
+    <div class="human-status" id="human4"><div class="big">•</div><div><strong>Waiting for prepared transaction</strong><span>Nothing has been submitted to XRPL.</span></div></div>
+    <div class="failure-panel" id="failure4" hidden><h3>✕ Step 4 failed</h3><p id="failureText4"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-step="4">Copy Diagnostic Report</button></div></div>
+    <details class="detail-card"><summary>What this step proves</summary><div class="detail-content">Bifrost returned a signed transaction for the prepared AccountSet. This step still does not submit anything to XRPL.</div></details>
+    <details class="detail-card"><summary>Technical status</summary><div class="detail-content"><div id="signStatus">Not signed.</div></div></details>
+  </div>
+</details>
+
+<details class="step-folder is-locked" id="step5" data-step="5">
+  <summary>
+    <span class="step-number">5</span>
+    <span><span class="step-kicker">XRPL write</span><h2>Submit and confirm</h2></span>
+    <span class="state-icon locked" id="icon5">•</span>
+    <span class="step-state" id="state5">Locked</span>
+    <span class="caret">›</span>
+  </summary>
+  <div class="folder-body">
+    <p class="action-line">Submit the signed AccountSet and wait for validated XRPL success.</p>
+    <div class="write-warning"><strong>This step writes to XRPL.</strong> Tapping Submit creates permanent ledger history and charges the normal XRPL transaction fee.</div>
+    <div class="button-row"><button id="submitButton" class="primary-action" type="button" disabled>Submit to XRPL</button></div>
+    <div class="human-status" id="human5"><div class="big">•</div><div><strong>Waiting for signed transaction</strong><span>Nothing has been submitted yet.</span></div></div>
+    <div class="failure-panel" id="failure5" hidden><h3>✕ Step 5 failed</h3><p id="failureText5"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-step="5">Copy Diagnostic Report</button></div></div>
+    <details class="detail-card"><summary>Validated result</summary><div class="detail-content"><div class="kv"><b>Result</b><span id="resultCode">—</span><b>Ledger</b><span id="resultLedger">—</span><b>Owner Wallet signer</b><span id="resultOwner">—</span><b>Community ID</b><span id="resultCommunity">—</span><b>New Operating Wallet</b><span id="resultOperating">—</span><b>Transaction hash</b><span id="resultHash">—</span><b>Canonical memo</b><span id="resultMemo">—</span></div><div id="submitStatus" style="margin-top:10px">Nothing submitted.</div></div></details>
+  </div>
+</details>
+
+<section class="complete" id="completeBox" aria-live="polite">
+  <div class="check">✓</div>
+  <h3>TEST COMPLETE — first Operating Wallet statement validated</h3>
+  <p id="completeText">The authority statement is now validated on XRPL.</p>
+</section>
+
+<details class="about">
+  <summary>About this test</summary>
+  <div class="detail-content">
+    <p><strong>Use this harness only for a brand-new community.</strong> A later Operating Wallet replacement must follow the established-community authority transition path.</p>
+    <p>This helper validates the entered authority syntax, requires the connected Bifrost signer to match the entered Owner Wallet, prepares and signs a no-op <code>AccountSet</code>, and writes the first Operating Wallet authority statement to XRPL only in Step 5.</p>
+    <p>This helper does not independently resolve the canonical Owner Wallet from XRPL history; it uses the Owner Wallet address you enter and enforces an exact signer match.</p>
+  </div>
+</details>
+<p class="fine">Human path on the surface. Technical proof underneath. Green checks all the way down means the harness completed successfully.</p>
+</div>
+<footer>WILD LEDGER · NEW COMMUNITY OPERATING WALLET · HUMANS TAP. WALLETS SIGN. LEDGERS CARRY.</footer>
+</section>
+</main>
+
+<script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { prepareNoOpAccountSet, submitSignedTransaction, isClassicAddress } from "../js/xrplTransport.js";
+import { WalletConnectXrplSigner } from "../js/walletConnectSigner.js";
+
+const runtime = window.WILD_LEDGER_CONFIG || {};
+const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
+const FEE_CUSHION = Number(runtime.xrplFeeCushion || 1.2);
+const PROJECT_ID = String(runtime.walletConnectProjectId || "").trim();
+const $ = id => document.getElementById(id);
+
+const ownerAddressInput = $("ownerAddressInput");
+const operatingAddressInput = $("operatingAddressInput");
+const memoInput = $("memoInput");
+const validateButton = $("validateButton");
+const memoCheck = $("memoCheck");
+const parsedCommunity = $("parsedCommunity");
+const parsedOperating = $("parsedOperating");
+const connectButton = $("connectButton");
+const prepareButton = $("prepareButton");
+const signButton = $("signButton");
+const submitButton = $("submitButton");
+const connectStatus = $("connectStatus");
+const prepareStatus = $("prepareStatus");
+const signStatus = $("signStatus");
+const submitStatus = $("submitStatus");
+const connectedAddress = $("connectedAddress");
+const qrWrap = $("qrWrap");
+const qrImage = $("qrImage");
+const qrUri = $("qrUri");
+const preparedJson = $("preparedJson");
+const resultCode = $("resultCode");
+const resultLedger = $("resultLedger");
+const resultOwner = $("resultOwner");
+const resultCommunity = $("resultCommunity");
+const resultOperating = $("resultOperating");
+const resultHash = $("resultHash");
+const resultMemo = $("resultMemo");
+const completeBox = $("completeBox");
+const completeText = $("completeText");
+
+let signer = null;
+let connectedAccount = "";
+let preparedTx = null;
+let signedBlob = "";
+let detailsValidated = false;
+let validatedSnapshot = null;
+let finalSuccess = false;
+let busyStep = 0;
+let lastTxHash = "";
+const failures = new Map();
+
+function ownerAddress(){ return ownerAddressInput.value.trim(); }
+function operatingAddress(){ return operatingAddressInput.value.trim(); }
+function memoText(){ return memoInput.value.trim(); }
+
+function parseAuthorityMemo(text){
+  const match = /^([A-Z0-9][A-Z0-9-]*)-LEAP\/AUTHORITY\/OPERATING-WALLET=(r[1-9A-HJ-NP-Za-km-z]{24,34})$/.exec(String(text || "").trim());
+  if (!match) return null;
+  return { communityId: match[1], operatingWallet: match[2] };
+}
+
+function inputState(){
+  const owner = ownerAddress();
+  const operating = operatingAddress();
+  const memo = memoText();
+  const parsed = parseAuthorityMemo(memo);
+  if (!owner || !operating || !memo) return { ok:false, reason:"Enter the Owner Wallet, new Operating Wallet, and canonical memo.", parsed:null };
+  if (!isClassicAddress(owner)) return { ok:false, reason:"The Owner Wallet is not a valid XRPL classic address.", parsed:null };
+  if (!isClassicAddress(operating)) return { ok:false, reason:"The new Operating Wallet is not a valid XRPL classic address.", parsed:null };
+  if (!parsed) return { ok:false, reason:"The memo syntax is not canonical. Use <COMMUNITY-ID>-LEAP/AUTHORITY/OPERATING-WALLET=<OPERATING-WALLET>.", parsed:null };
+  if (parsed.operatingWallet !== operating) return { ok:false, reason:"The wallet address in the memo does not exactly match the new Operating Wallet field.", parsed };
+  return { ok:true, reason:"Canonical memo syntax matches the new Operating Wallet.", parsed };
+}
+
+function exactOwnerReady(){
+  return isClassicAddress(connectedAccount) && isClassicAddress(ownerAddress()) && connectedAccount === ownerAddress();
+}
+
+function validatedDetailsReady(){
+  const state = inputState();
+  if (!detailsValidated || !state.ok || !validatedSnapshot) return false;
+  return validatedSnapshot.owner === ownerAddress() && validatedSnapshot.operating === operatingAddress() && validatedSnapshot.memo === memoText();
+}
+
+function decodeHexText(hex){
+  if (!hex) return "";
+  const pairs = String(hex).match(/.{1,2}/g) || [];
+  return new TextDecoder().decode(Uint8Array.from(pairs.map(b => parseInt(b, 16))));
+}
+
+function assertOwnerSigner(){
+  const owner = ownerAddress();
+  if (!isClassicAddress(owner)) throw new Error("Enter a valid current Owner Wallet first.");
+  if (!isClassicAddress(connectedAccount)) throw new Error("Bifrost did not return a valid XRPL classic address.");
+  if (connectedAccount !== owner) throw new Error(`STOPPED: connected wallet ${connectedAccount} does not equal the expected Owner Wallet ${owner}.`);
+}
+
+function assertInputs(){
+  const state = inputState();
+  if (!state.ok) throw new Error(state.reason);
+  if (!validatedDetailsReady()) throw new Error("Authority details changed. Validate Step 1 again before continuing.");
+  return state.parsed;
+}
+
+function assertPrepared(tx){
+  assertOwnerSigner();
+  const parsed = assertInputs();
+  if (!tx || tx.TransactionType !== "AccountSet") throw new Error("XRPL returned an unexpected transaction type.");
+  if (tx.Account !== ownerAddress()) throw new Error("Prepared Account changed unexpectedly.");
+  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+  if (memos.length !== 1) throw new Error("Prepared AccountSet does not contain exactly one memo.");
+  const preparedMemo = decodeHexText(String(memos[0]?.Memo?.MemoData || ""));
+  if (preparedMemo !== memoText()) throw new Error("Prepared authority memo changed unexpectedly.");
+  if (parsed.operatingWallet !== operatingAddress()) throw new Error("Prepared memo no longer matches the new Operating Wallet.");
+}
+
+function setFailure(step, error){
+  failures.set(step, error?.message || String(error));
+  busyStep = 0;
+  renderFlow(true);
+}
+function clearFailure(step){ failures.delete(step); }
+function clearLaterFailures(fromStep){ for (let i=fromStep;i<=5;i++) failures.delete(i); }
+
+function safeDiagnosticValue(value){
+  if (Array.isArray(value)) return value.map(safeDiagnosticValue);
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const [key,val] of Object.entries(value)) {
+      out[key] = /seed|secret|private|mnemonic|password|passphrase|token|cookie|authorization|accesskey/i.test(key) ? "[REDACTED]" : safeDiagnosticValue(val);
+    }
+    return out;
+  }
+  return value;
+}
+
+function diagnosticReport(step){
+  const state = inputState();
+  return `WILD LEDGER DIAGNOSTIC REPORT\n\n${JSON.stringify({
+    harness:"New Community Operating Wallet",
+    failedStep:step,
+    failedStepName:{1:"Validate authority details",2:"Connect Owner Wallet",3:"Prepare AccountSet",4:"Sign in Bifrost",5:"Submit and confirm"}[step],
+    timestamp:new Date().toISOString(),
+    error:failures.get(step) || "",
+    context:{
+      page:location.href,
+      ownerWallet:ownerAddress(),
+      newOperatingWallet:operatingAddress(),
+      memo:memoText(),
+      parsedAuthority:state.parsed,
+      detailsValidated:validatedDetailsReady(),
+      connectedWallet:connectedAccount,
+      preparedTransaction:preparedTx,
+      signedBlobPresent:Boolean(signedBlob),
+      submittedTransactionHash:lastTxHash,
+      finalSuccess
+    }
+  }, safeDiagnosticValue, 2)}`;
+}
+
+async function copyDiagnostic(step, button){
+  const text = diagnosticReport(step);
+  try {
+    await navigator.clipboard.writeText(text);
+    const old = button.textContent;
+    button.textContent = "Copied — paste into ChatGPT";
+    setTimeout(()=>button.textContent=old,2200);
+  } catch (_) {
+    window.prompt("Copy this diagnostic report:", text);
+  }
+}
+
+document.querySelectorAll("[data-copy-step]").forEach(button => {
+  button.addEventListener("click", () => copyDiagnostic(Number(button.dataset.copyStep), button));
+});
+
+function resetTransactionState(message="Not prepared."){
+  preparedTx = null;
+  signedBlob = "";
+  finalSuccess = false;
+  lastTxHash = "";
+  preparedJson.textContent = "No prepared transaction yet.";
+  prepareStatus.textContent = message;
+  signStatus.textContent = "Not signed.";
+  submitStatus.textContent = "Nothing submitted.";
+  resultCode.textContent = "—";
+  resultLedger.textContent = "—";
+  resultOwner.textContent = "—";
+  resultCommunity.textContent = "—";
+  resultOperating.textContent = "—";
+  resultHash.textContent = "—";
+  resultMemo.textContent = "—";
+  completeBox.classList.remove("show");
+  clearLaterFailures(3);
+}
+
+function setHuman(step, tone, title, detail){
+  const el = $(`human${step}`);
+  el.classList.remove("working","good","bad");
+  if (tone) el.classList.add(tone);
+  const big = el.querySelector(".big");
+  big.textContent = tone === "good" ? "✓" : tone === "bad" ? "✕" : tone === "working" ? "" : "•";
+  el.querySelector("strong").textContent = title;
+  el.querySelector("span").textContent = detail;
+}
+
+function stepState(step, state){
+  const folder = $(`step${step}`);
+  const icon = $(`icon${step}`);
+  const badge = $(`state${step}`);
+  folder.classList.remove("is-active","is-working","is-done","is-failed","is-locked");
+  icon.className = "state-icon";
+  const map = {
+    active:["is-active","pending","•","Pending"],
+    working:["is-working","working","","Working"],
+    done:["is-done","done","✓","Passed"],
+    failed:["is-failed","failed","✕","Failed"],
+    locked:["is-locked","locked","•","Locked"]
+  };
+  const [folderClass,iconClass,iconText,badgeText] = map[state];
+  folder.classList.add(folderClass); icon.classList.add(iconClass); icon.textContent = iconText; badge.textContent = badgeText;
+  const failure = $(`failure${step}`);
+  const failureText = $(`failureText${step}`);
+  if (state === "failed") { failure.hidden = false; failureText.textContent = failures.get(step) || derivedFailure(step) || "This step cannot continue."; }
+  else failure.hidden = true;
+}
+
+function derivedFailure(step){
+  if (step === 2 && validatedDetailsReady() && connectedAccount && !exactOwnerReady()) return `Connected wallet ${connectedAccount} does not match the Owner Wallet entered in Step 1.`;
+  return "";
+}
+
+function renderFlow(autoOpen=false){
+  const detailsDone = validatedDetailsReady();
+  const connectedDone = detailsDone && exactOwnerReady();
+  const preparedDone = connectedDone && Boolean(preparedTx);
+  const signedDone = preparedDone && Boolean(signedBlob);
+  const done = signedDone && finalSuccess;
+
+  const states = {};
+  if (failures.has(1)) states[1] = "failed";
+  else if (busyStep === 1) states[1] = "working";
+  else states[1] = detailsDone ? "done" : "active";
+
+  const mismatch = detailsDone && connectedAccount && !exactOwnerReady();
+  if (!detailsDone) states[2] = "locked";
+  else if (failures.has(2) || mismatch) states[2] = "failed";
+  else if (busyStep === 2) states[2] = "working";
+  else states[2] = connectedDone ? "done" : "active";
+
+  if (!connectedDone) states[3] = "locked";
+  else if (failures.has(3)) states[3] = "failed";
+  else if (busyStep === 3) states[3] = "working";
+  else states[3] = preparedDone ? "done" : "active";
+
+  if (!preparedDone) states[4] = "locked";
+  else if (failures.has(4)) states[4] = "failed";
+  else if (busyStep === 4) states[4] = "working";
+  else states[4] = signedDone ? "done" : "active";
+
+  if (!signedDone) states[5] = "locked";
+  else if (failures.has(5)) states[5] = "failed";
+  else if (busyStep === 5) states[5] = "working";
+  else states[5] = done ? "done" : "active";
+
+  for (let i=1;i<=5;i++) stepState(i, states[i]);
+
+  if (states[1] === "working") setHuman(1,"working","Checking authority details…","Validating addresses, memo syntax, and exact wallet match inside the memo.");
+  else if (states[1] === "failed") setHuman(1,"bad","Authority details did not pass",failures.get(1) || "Correct the fields and validate again.");
+  else if (detailsDone) {
+    const parsed = inputState().parsed;
+    setHuman(1,"good","Authority details validated",`${parsed.communityId} will establish ${parsed.operatingWallet} as its first Operating Wallet.`);
+  } else setHuman(1,"","Enter the three authority values","Then tap Validate Authority Details.");
+
+  if (states[2] === "working") setHuman(2,"working","Waiting for Bifrost…","Approve the WalletConnect request using the exact Owner Wallet from Step 1.");
+  else if (states[2] === "failed") setHuman(2,"bad","Owner Wallet did not match",failures.get(2) || derivedFailure(2));
+  else if (connectedDone) setHuman(2,"good","Owner signer matched",`Connected Bifrost wallet: ${connectedAccount}`);
+  else if (detailsDone) setHuman(2,"","Connect the Owner Wallet","The signing wallet must exactly match the Owner Wallet entered in Step 1.");
+  else setHuman(2,"","Waiting for Step 1","Validate the authority details first.");
+
+  if (states[3] === "working") setHuman(3,"working","Preparing AccountSet…","XRPL is simulating/autofilling the no-op AccountSet and Wild Ledger is checking it.");
+  else if (states[3] === "failed") setHuman(3,"bad","AccountSet preparation failed",failures.get(3));
+  else if (preparedDone) setHuman(3,"good","AccountSet prepared","Account, memo count, memo text, and Operating Wallet match were verified.");
+  else if (connectedDone) setHuman(3,"","Ready to prepare","Tap Prepare AccountSet.");
+  else setHuman(3,"","Waiting for Owner Wallet","No transaction has been prepared.");
+
+  if (states[4] === "working") setHuman(4,"working","Waiting for Bifrost signature…","Review the transaction in Bifrost and approve it if it matches this test.");
+  else if (states[4] === "failed") setHuman(4,"bad","Bifrost signing failed",failures.get(4));
+  else if (signedDone) setHuman(4,"good","Signed transaction received","Nothing has been submitted to XRPL yet.");
+  else if (preparedDone) setHuman(4,"","Ready for signature","Tap Sign AccountSet and approve it in Bifrost.");
+  else setHuman(4,"","Waiting for prepared transaction","Nothing has been submitted to XRPL.");
+
+  if (states[5] === "working") setHuman(5,"working","Waiting for XRPL validation…","The signed transaction has been submitted. Waiting for a validated ledger result.");
+  else if (states[5] === "failed") setHuman(5,"bad","XRPL submission failed",failures.get(5));
+  else if (done) setHuman(5,"good","Validated tesSUCCESS",`${inputState().parsed.communityId} now has its first Operating Wallet statement on XRPL.`);
+  else if (signedDone) setHuman(5,"","Ready to submit","This is the one step that writes permanent XRPL history.");
+  else setHuman(5,"","Waiting for signed transaction","Nothing has been submitted yet.");
+
+  validateButton.disabled = busyStep !== 0;
+  connectButton.disabled = busyStep !== 0 || !detailsDone || !PROJECT_ID;
+  prepareButton.disabled = busyStep !== 0 || !XRPL_SERVER || !connectedDone;
+  signButton.disabled = busyStep !== 0 || !preparedDone || !signer;
+  submitButton.disabled = busyStep !== 0 || !signedDone || done;
+
+  if (done) {
+    completeBox.classList.add("show");
+    completeText.textContent = `${inputState().parsed.communityId} → ${operatingAddress()} validated in ledger ${resultLedger.textContent}.`;
+  } else completeBox.classList.remove("show");
+
+  if (autoOpen) {
+    const target = [1,2,3,4,5].find(i => states[i] === "failed") || [1,2,3,4,5].find(i => states[i] === "working") || [1,2,3,4,5].find(i => states[i] === "active");
+    if (target) {
+      for (let i=1;i<=5;i++) if (i !== target && states[i] !== "done") $(`step${i}`).open = false;
+      $(`step${target}`).open = true;
+      if (target > 1) setTimeout(()=>$(`step${target}`).scrollIntoView({behavior:"smooth",block:"center"}),80);
+    }
+  }
+}
+
+for (let i=1;i<=5;i++) {
+  const folder = $(`step${i}`);
+  folder.addEventListener("toggle", () => {
+    if (folder.open && folder.classList.contains("is-locked")) folder.open = false;
+  });
+}
+
+function refreshParsed(){
+  const state = inputState();
+  if (state.parsed) {
+    parsedCommunity.textContent = state.parsed.communityId;
+    parsedOperating.textContent = state.parsed.operatingWallet;
+  } else {
+    parsedCommunity.textContent = "—";
+    parsedOperating.textContent = "—";
+  }
+  memoCheck.textContent = state.reason;
+}
+
+[ownerAddressInput, operatingAddressInput, memoInput].forEach(input => {
+  input.addEventListener("input", () => {
+    refreshParsed();
+    if (detailsValidated) {
+      detailsValidated = false;
+      validatedSnapshot = null;
+      resetTransactionState("Authority details changed — validate Step 1 again.");
+    }
+    clearLaterFailures(1);
+    renderFlow(false);
+  });
+});
+
+validateButton.addEventListener("click", () => {
+  busyStep = 1; clearFailure(1); renderFlow(false);
+  try {
+    const state = inputState();
+    if (!state.ok) throw new Error(state.reason);
+    detailsValidated = true;
+    validatedSnapshot = { owner:ownerAddress(), operating:operatingAddress(), memo:memoText() };
+    resetTransactionState();
+    clearLaterFailures(1);
+    refreshParsed();
+  } catch (error) {
+    detailsValidated = false;
+    validatedSnapshot = null;
+    setFailure(1,error);
+    return;
+  }
+  busyStep = 0; renderFlow(true);
+});
+
+connectButton.addEventListener("click", async () => {
+  busyStep = 2; clearFailure(2); renderFlow(false);
+  try {
+    if (!PROJECT_ID) throw new Error("WalletConnect project ID is not configured.");
+    assertInputs();
+    if (signer) { try { await signer.disconnect(); } catch (_) {} }
+    signer = new WalletConnectXrplSigner({
+      projectId: PROJECT_ID,
+      metadata: {
+        name: "Wild Ledger Community Provisioning",
+        description: "Establish a brand-new community Operating Wallet authority statement",
+        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+        icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+      }
+    });
+    connectedAccount = ""; connectedAddress.textContent = "—";
+    const connection = await signer.connect({
+      onUri: async uri => {
+        qrImage.src = await QRCode.toDataURL(uri,{width:520,margin:2,errorCorrectionLevel:"M"});
+        qrUri.textContent = uri;
+        qrWrap.classList.add("show");
+      }
+    });
+    qrWrap.classList.remove("show"); qrUri.textContent = "";
+    connectedAccount = String(connection.account || "");
+    connectedAddress.textContent = connectedAccount || "—";
+    assertOwnerSigner();
+    connectStatus.textContent = "MATCH CONFIRMED — connected signer equals the Owner Wallet entered in Step 1.";
+    resetTransactionState();
+  } catch (error) {
+    connectedAccount = "";
+    connectedAddress.textContent = "—";
+    connectStatus.textContent = error?.message || String(error);
+    setFailure(2,error);
+    return;
+  }
+  busyStep = 0; renderFlow(true);
+});
+
+prepareButton.addEventListener("click", async () => {
+  busyStep = 3; clearFailure(3); renderFlow(false); signedBlob = "";
+  try {
+    assertOwnerSigner();
+    assertInputs();
+    prepareStatus.textContent = "Asking XRPL to simulate and autofill the no-op AccountSet…";
+    const prepared = await prepareNoOpAccountSet({
+      serverUrl:XRPL_SERVER,
+      account:connectedAccount,
+      memoText:memoText(),
+      feeCushion:FEE_CUSHION
+    });
+    assertPrepared(prepared.preparedTx);
+    preparedTx = prepared.preparedTx;
+    preparedJson.textContent = JSON.stringify(preparedTx,null,2);
+    prepareStatus.textContent = "Prepared safely. Owner signer and canonical memo were verified.";
+    signStatus.textContent = "Ready for Bifrost signature.";
+  } catch (error) {
+    preparedTx = null;
+    preparedJson.textContent = "No prepared transaction yet.";
+    prepareStatus.textContent = error?.message || String(error);
+    setFailure(3,error);
+    return;
+  }
+  busyStep = 0; renderFlow(true);
+});
+
+signButton.addEventListener("click", async () => {
+  busyStep = 4; clearFailure(4); renderFlow(false); signedBlob = "";
+  try {
+    assertOwnerSigner();
+    assertPrepared(preparedTx);
+    signStatus.textContent = "Waiting for Bifrost approval…";
+    const result = await signer.signTransaction(preparedTx);
+    signedBlob = String(result.signedBlob || "");
+    if (!signedBlob) throw new Error("Bifrost did not return a signed transaction.");
+    signStatus.textContent = "Signed blob received. Nothing has been submitted yet.";
+    submitStatus.textContent = "Ready to submit and wait for validation.";
+  } catch (error) {
+    signedBlob = "";
+    signStatus.textContent = error?.message || String(error);
+    setFailure(4,error);
+    return;
+  }
+  busyStep = 0; renderFlow(true);
+});
+
+submitButton.addEventListener("click", async () => {
+  busyStep = 5; clearFailure(5); renderFlow(false);
+  try {
+    assertOwnerSigner();
+    const parsed = assertInputs();
+    assertPrepared(preparedTx);
+    if (!signedBlob) throw new Error("No signed transaction is available.");
+    submitStatus.textContent = "Submitting signed AccountSet to XRPL and waiting for validated result…";
+    const result = await submitSignedTransaction({
+      serverUrl:XRPL_SERVER,
+      signedBlob,
+      onSubmitted:({txHash}) => {
+        lastTxHash = txHash || "";
+        resultHash.textContent = lastTxHash || "—";
+        submitStatus.textContent = "Accepted by XRPL. Waiting for ledger validation…";
+      }
+    });
+    if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated transaction returned ${result.finalResult}.`);
+    lastTxHash = result.txHash || lastTxHash;
+    resultCode.textContent = result.finalResult;
+    resultLedger.textContent = String(result.ledgerIndex ?? "—");
+    resultOwner.textContent = ownerAddress();
+    resultCommunity.textContent = parsed.communityId;
+    resultOperating.textContent = operatingAddress();
+    resultHash.textContent = lastTxHash || "—";
+    resultMemo.textContent = memoText();
+    submitStatus.textContent = `VALIDATED tesSUCCESS — ${parsed.communityId} community establishment is on XRPL.`;
+    finalSuccess = true;
+  } catch (error) {
+    submitStatus.textContent = error?.message || String(error);
+    setFailure(5,error);
+    return;
+  }
+  busyStep = 0; renderFlow(true);
+});
+
+refreshParsed();
+if (!PROJECT_ID) failures.set(2,"WalletConnect project ID is missing from wildLedgerConfig.js.");
+if (!XRPL_SERVER) failures.set(3,"XRPL WebSocket server is missing from wildLedgerConfig.js.");
+renderFlow(false);
+</script>
+</body>
+</html>
