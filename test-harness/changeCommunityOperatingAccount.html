@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a34">
+  <title>Change Community Operating Wallet — Wild Ledger Test Harness</title>
+  <style>
+    :root{
+      --ink:#f5fbfa;--deep:#071f2c;--lagoon:#29b8b1;--sea:#79d5c2;--mango:#f4bd58;
+      --green:#9fe0b0;--red:#ff9f9f;--yellow:#f7d786;--panel:rgba(10,45,58,.72);
+      --line:rgba(219,248,244,.14);--muted:rgba(236,249,247,.64);--shadow:0 28px 78px rgba(0,16,24,.38)
+    }
+    *{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 12% 14%,rgba(41,184,177,.30),transparent 42%),radial-gradient(circle at 88% 12%,rgba(244,189,88,.20),transparent 38%),linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input{font:inherit}a{color:inherit}.shell{width:min(100%,920px);margin:0 auto;padding:34px 18px 54px}.console{overflow:hidden;border:1px solid var(--line);border-radius:28px;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+    .console::before{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--lagoon),var(--sea),var(--mango))}.header{padding:26px 24px 22px;border-bottom:1px solid rgba(219,248,244,.08)}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}.back{color:#b7f0df;text-decoration:none;font-weight:850}.tag{color:#b7f0df;font-size:.7rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.eyebrow{color:var(--sea);font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}h1{margin:0;font-size:clamp(1.9rem,6vw,3.6rem);line-height:1;letter-spacing:-.045em}.question{margin:14px 0 0;color:var(--muted);font-size:1rem;line-height:1.55}.question strong{color:#fff}.body{padding:18px}.steps{display:grid;gap:12px}
+    details.step{border:1px solid rgba(255,255,255,.11);border-radius:20px;background:rgba(3,27,38,.42);overflow:hidden}details.step[open]{border-color:rgba(121,213,194,.26)}summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:12px;padding:16px 16px}summary::-webkit-details-marker{display:none}.step-num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);font-size:.8rem;font-weight:950}.step-title{font-weight:900}.step-state{font-size:.72rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.state-icon{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.22);margin-right:6px;vertical-align:-5px}.step.pending .state-icon{border-color:var(--yellow)}.step.working .state-icon{border-color:transparent;background:conic-gradient(var(--lagoon),transparent 30%,var(--sea));animation:spin .9s linear infinite}.step.done .state-icon{border-color:var(--green);color:var(--green)}.step.done .state-icon::after{content:"✓";font-weight:950}.step.failed .state-icon{border-color:var(--red);color:var(--red)}.step.failed .state-icon::after{content:"×";font-weight:950;font-size:1.1rem}.step.locked{opacity:.58}.step-body{padding:0 16px 16px}.action-line{margin:0 0 6px;font-size:1.02rem;font-weight:900}.subline{margin:0 0 14px;color:var(--muted);font-size:.84rem;line-height:1.5}.buttons{display:flex;flex-wrap:wrap;gap:10px}.primary,.secondary{min-height:44px;border-radius:12px;padding:10px 15px;font-weight:900;cursor:pointer}.primary{border:1px solid rgba(121,213,194,.42);background:rgba(121,213,194,.14);color:#eafff9}.secondary{border:1px solid rgba(219,248,244,.14);background:rgba(255,255,255,.05);color:var(--ink)}button:disabled{opacity:.38;cursor:not-allowed}.field{display:grid;gap:8px}.field label{font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:rgba(236,249,247,.76)}input{width:100%;border:1px solid rgba(219,248,244,.14);border-radius:12px;background:rgba(0,0,0,.14);color:var(--ink);padding:13px 14px;outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.status{margin-top:12px;padding:11px 12px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(0,0,0,.12);color:var(--muted);font-size:.8rem;line-height:1.45}.status.good{border-color:rgba(159,224,176,.27);color:var(--green)}.status.bad{border-color:rgba(255,159,159,.3);color:var(--red)}.status.wait{border-color:rgba(247,215,134,.24);color:var(--yellow)}.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 12px;margin-top:12px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.1);font-size:.76rem}.kv b{color:var(--muted);text-transform:uppercase;font-size:.65rem;letter-spacing:.06em}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere;white-space:pre-wrap}.detail-card{margin-top:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.025)}.detail-card summary{display:block;padding:11px 12px;font-size:.78rem;font-weight:850;color:#c9eee7}.detail-content{padding:0 12px 12px;color:var(--muted);font-size:.77rem;line-height:1.55}.qr{display:none;margin-top:12px;padding:12px;border-radius:14px;background:#fff;text-align:center}.qr.show{display:block}.qr img{width:min(100%,280px);height:auto}.uri{margin-top:8px;color:#223;font-size:.6rem;overflow-wrap:anywhere}.failure{display:none;margin-top:12px;padding:12px;border:1px solid rgba(255,159,159,.32);border-radius:12px;background:rgba(95,0,0,.12)}.failure.show{display:block}.failure strong{color:var(--red)}.copy{margin-top:10px}.warning{margin-top:12px;padding:12px;border:1px solid rgba(244,189,88,.28);border-radius:12px;background:rgba(244,189,88,.08);color:#f8dfaa;font-size:.78rem;line-height:1.5}.complete{display:none;margin:14px 0 0;padding:16px;border:1px solid rgba(159,224,176,.34);border-radius:16px;background:rgba(60,135,84,.12);text-align:center}.complete.show{display:block}.complete strong{display:block;color:var(--green);font-size:1.1rem}.about{margin-top:14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,0,0,.08)}.about summary{display:block;padding:13px 14px;font-size:.8rem;font-weight:850;color:#c9eee7}.about-body{padding:0 14px 14px;color:var(--muted);font-size:.78rem;line-height:1.55}.footer{padding:0 22px 22px;text-align:center;color:rgba(236,249,247,.35);font-size:.7rem}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:680px){.shell{padding:16px 9px 28px}.console{border-radius:21px}.header{padding:22px 16px}.body{padding:12px}.kv{grid-template-columns:105px minmax(0,1fr)}summary{grid-template-columns:36px minmax(0,1fr) auto;padding:14px 12px}.step-body{padding:0 12px 14px}}
+  </style>
+  <link rel="stylesheet" href="../wildLedgerControls.css">
+  <link rel="stylesheet" href="../wildLedgerBackend.css">
+</head>
+<body>
+<main class="shell">
+  <section class="console">
+    <header class="header">
+      <div class="top"><a class="back wl-header-control" href="../testHub.html">← TestHub</a><div class="tag">Test Harness</div></div>
+      <div class="eyebrow">Community Authority</div>
+      <h1>Change Community Operating Wallet</h1>
+      <p class="question"><strong>Question this harness answers:</strong> can the current Community Operating Wallet publish the next canonical Operating Wallet to XRPL?</p>
+    </header>
+
+    <div class="body">
+      <div class="steps">
+        <details class="step pending" id="step1" open>
+          <summary><span class="step-num">1</span><span class="step-title"><span class="state-icon"></span>Read current authority</span><span class="step-state" id="stepState1">Pending</span></summary>
+          <div class="step-body">
+            <p class="action-line">Confirm which wallet is currently authorized to make the change.</p>
+            <p class="subline">Wild Ledger reads validated XRPL authority history. Nothing is submitted.</p>
+            <div class="buttons"><button class="secondary" id="refreshButton" type="button">Refresh XRPL Authority</button></div>
+            <div class="status wait" id="authorityStatus">Resolving validated XRPL authority state…</div>
+            <div class="kv">
+              <b>Community</b><span id="communityDisplay">—</span>
+              <b>Configured wallet</b><span class="mono" id="migrationAccount">—</span>
+              <b>Canonical wallet</b><span class="mono" id="currentAccount">—</span>
+              <b>Required signer</b><span class="mono" id="requiredSigner">—</span>
+            </div>
+            <div class="failure" id="failure1"><strong>Authority lookup failed.</strong><div id="failureText1"></div><button class="secondary copy" data-copy-step="1" type="button">Copy Diagnostic Report</button></div>
+            <details class="detail-card"><summary>What this step proves</summary><div class="detail-content">This establishes the current authority from validated XRPL history before any replacement is prepared.</div></details>
+          </div>
+        </details>
+
+        <details class="step locked" id="step2">
+          <summary><span class="step-num">2</span><span class="step-title"><span class="state-icon"></span>Choose the next Operating Wallet</span><span class="step-state" id="stepState2">Locked</span></summary>
+          <div class="step-body">
+            <p class="action-line" id="targetActionLine">Enter the XRPL address that should become the next Operating Wallet.</p>
+            <p class="subline" id="statementHelp">The current Operating Wallet may name its replacement directly.</p>
+            <div class="field"><label for="newAccount">New Operating Wallet address</label><input id="newAccount" autocomplete="off" spellcheck="false" placeholder="r..."></div>
+            <div class="status wait mono" id="memoPreview">Resolve authority first.</div>
+            <div class="failure" id="failure2"><strong>The replacement wallet is not ready.</strong><div id="failureText2"></div><button class="secondary copy" data-copy-step="2" type="button">Copy Diagnostic Report</button></div>
+            <details class="detail-card"><summary>Technical details</summary><div class="detail-content">The protocol statement uses <span class="mono">OPERATING-WALLET</span>. For an existing community, the replacement must differ from the current canonical Operating Wallet.</div></details>
+          </div>
+        </details>
+
+        <details class="step locked" id="step3">
+          <summary><span class="step-num">3</span><span class="step-title"><span class="state-icon"></span>Connect the current Operating Wallet</span><span class="step-state" id="stepState3">Locked</span></summary>
+          <div class="step-body">
+            <p class="action-line">Connect the wallet that XRPL says currently has authority.</p>
+            <p class="subline">A different connected wallet cannot sign this authority change.</p>
+            <div class="buttons"><button class="primary" id="connectButton" type="button">Connect Signer</button><button class="secondary" id="disconnectButton" type="button" disabled>Disconnect</button></div>
+            <div class="status wait" id="connectionStatus">Not connected.</div>
+            <div class="kv"><b>Wallet</b><span id="walletName">—</span><b>Signer account</b><span class="mono" id="signerAccount">—</span></div>
+            <div class="qr" id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"><div class="uri" id="uriText"></div></div>
+            <div class="failure" id="failure3"><strong>Signer connection failed.</strong><div id="failureText3"></div><button class="secondary copy" data-copy-step="3" type="button">Copy Diagnostic Report</button></div>
+            <details class="detail-card"><summary>What this step proves</summary><div class="detail-content">The connected signer must exactly match the current canonical Operating Wallet resolved in Step 1.</div></details>
+          </div>
+        </details>
+
+        <details class="step locked" id="step4">
+          <summary><span class="step-num">4</span><span class="step-title"><span class="state-icon"></span>Prepare the authority statement</span><span class="step-state" id="stepState4">Locked</span></summary>
+          <div class="step-body">
+            <p class="action-line">Prepare the no-op AccountSet carrying the Operating Wallet statement.</p>
+            <p class="subline">Wild Ledger simulates and autofills the transaction. It is not submitted yet.</p>
+            <div class="buttons"><button class="primary" id="prepareButton" type="button" disabled>Prepare Statement</button></div>
+            <div class="status wait" id="publicationStatus">Not prepared.</div>
+            <div class="failure" id="failure4"><strong>Preparation failed.</strong><div id="failureText4"></div><button class="secondary copy" data-copy-step="4" type="button">Copy Diagnostic Report</button></div>
+            <details class="detail-card"><summary>Technical details</summary><div class="detail-content"><pre class="mono" id="preparedDetails">No prepared transaction.</pre></div></details>
+          </div>
+        </details>
+
+        <details class="step locked" id="step5">
+          <summary><span class="step-num">5</span><span class="step-title"><span class="state-icon"></span>Sign the statement</span><span class="step-state" id="stepState5">Locked</span></summary>
+          <div class="step-body">
+            <p class="action-line">Approve the prepared authority statement in the current Operating Wallet.</p>
+            <p class="subline">Before signing, Wild Ledger rechecks current XRPL authority so a stale signer cannot proceed.</p>
+            <div class="buttons"><button class="primary" id="signButton" type="button" disabled>Sign Statement</button></div>
+            <div class="status wait" id="signStatus">Prepare the statement first.</div>
+            <div class="failure" id="failure5"><strong>Signing failed.</strong><div id="failureText5"></div><button class="secondary copy" data-copy-step="5" type="button">Copy Diagnostic Report</button></div>
+            <details class="detail-card"><summary>What this step proves</summary><div class="detail-content">The authority statement was signed by the wallet that was canonical immediately before the change.</div></details>
+          </div>
+        </details>
+
+        <details class="step locked" id="step6">
+          <summary><span class="step-num">6</span><span class="step-title"><span class="state-icon"></span>Submit and confirm</span><span class="step-state" id="stepState6">Locked</span></summary>
+          <div class="step-body">
+            <p class="action-line">Submit the signed statement to XRPL and wait for validated success.</p>
+            <p class="subline">This is the step that permanently changes the community's canonical Operating Wallet.</p>
+            <div class="warning"><strong>Writes to XRPL.</strong> The transaction creates permanent ledger history and charges the normal XRPL transaction fee.</div>
+            <div class="buttons" style="margin-top:12px"><button class="primary" id="submitButton" type="button" disabled>Submit + Validate</button></div>
+            <div class="status wait" id="submitStatus">Sign the statement first.</div>
+            <div class="kv"><b>Validated transaction</b><span class="mono" id="txStatus">—</span></div>
+            <div class="failure" id="failure6"><strong>Submission failed.</strong><div id="failureText6"></div><button class="secondary copy" data-copy-step="6" type="button">Copy Diagnostic Report</button></div>
+            <details class="detail-card"><summary>Technical details</summary><div class="detail-content">Immediately before submission, Wild Ledger rechecks XRPL authority again. After validation, authority is reconstructed from XRPL so the new canonical Operating Wallet is confirmed from ledger history.</div></details>
+          </div>
+        </details>
+      </div>
+
+      <div class="complete" id="completeBanner"><strong>TEST COMPLETE</strong><span id="completeText">The new Community Operating Wallet is canonical on XRPL.</span></div>
+
+      <details class="about"><summary>About this test</summary><div class="about-body">Use this harness to establish or change a community's canonical Operating Wallet authority statement. For an existing community, the currently canonical Operating Wallet must sign the replacement. If the first on-ledger statement has not yet been published, the configured current Operating Wallet must publish the initial statement naming itself. Emergency recovery is not defined by this harness.</div></details>
+    </div>
+    <div class="footer">Wild Ledger • Community Authority Test Harness</div>
+  </section>
+</main>
+
+<script src="../js/wildLedgerConfig.js"></script>
+<script src="../js/communityConfig.js" data-registry-only="true"></script>
+<script type="module">
+  import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+  import { isClassicAddress, prepareNoOpAccountSet, submitSignedTransaction } from "../js/xrplTransport.js";
+  import { WalletConnectXrplSigner } from "../js/walletConnectSigner.js";
+  import { resolveCommunityAuthority, operatingWalletMemo, clearCommunityAuthorityCache } from "../js/communityAuthority.js";
+
+  const params = new URLSearchParams(location.search);
+  const requestedRole = (params.get("role") || sessionStorage.getItem("wildLedgerRole") || "owner").trim().toLowerCase();
+  const role = requestedRole === "operator" || requestedRole === "manager" ? "operator" : "owner";
+  const requestedValue = params.get("community") || sessionStorage.getItem("wildLedgerCommunity") || "SFL";
+  const community = window.WILD_LEDGER_GET_COMMUNITY?.(requestedValue) || null;
+  const communityId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community || requestedValue) || String(requestedValue).trim().toUpperCase();
+  const communityName = community?.communityName || "Community";
+  const namespace = community?.leapNamespace || `${communityId}-LEAP`;
+  const config = window.WILD_LEDGER_CONFIG || {};
+  const xrplServer = config.xrplWebSocket || "wss://s1.ripple.com/";
+  const projectId = String(config.walletConnectProjectId || "").trim();
+  const feeCushion = Number(config.xrplFeeCushion || 1.2);
+
+  const communityDisplay = document.getElementById("communityDisplay");
+  const migrationAccount = document.getElementById("migrationAccount");
+  const currentAccount = document.getElementById("currentAccount");
+  const authorityStatus = document.getElementById("authorityStatus");
+  const requiredSignerDisplay = document.getElementById("requiredSigner");
+  const statementHelp = document.getElementById("statementHelp");
+  const targetActionLine = document.getElementById("targetActionLine");
+  const newAccount = document.getElementById("newAccount");
+  const memoPreview = document.getElementById("memoPreview");
+  const refreshButton = document.getElementById("refreshButton");
+  const prepareButton = document.getElementById("prepareButton");
+  const connectButton = document.getElementById("connectButton");
+  const disconnectButton = document.getElementById("disconnectButton");
+  const signButton = document.getElementById("signButton");
+  const submitButton = document.getElementById("submitButton");
+  const walletName = document.getElementById("walletName");
+  const signerAccount = document.getElementById("signerAccount");
+  const connectionStatus = document.getElementById("connectionStatus");
+  const publicationStatus = document.getElementById("publicationStatus");
+  const signStatus = document.getElementById("signStatus");
+  const submitStatus = document.getElementById("submitStatus");
+  const preparedDetails = document.getElementById("preparedDetails");
+  const txStatus = document.getElementById("txStatus");
+  const qrWrap = document.getElementById("qrWrap");
+  const qrImage = document.getElementById("qrImage");
+  const uriText = document.getElementById("uriText");
+  const completeBanner = document.getElementById("completeBanner");
+  const completeText = document.getElementById("completeText");
+
+  let authority = null;
+  let requiredSigner = "";
+  let signer = null;
+  let connectedAccount = "";
+  let preparedTransaction = null;
+  let signedBlob = "";
+  let busyStep = 0;
+  let completedResult = null;
+  const failures = new Map();
+
+  communityDisplay.textContent = `${communityId} — ${communityName}`;
+  migrationAccount.textContent = String(community?.operatingWallet || "") || "Missing from community config";
+
+  function setStatus(element, text, tone = "") {
+    element.textContent = text;
+    element.classList.remove("good", "bad", "wait");
+    if (tone) element.classList.add(tone);
+  }
+
+  function safeDiagnosticValue(value, depth = 0) {
+    if (depth > 5) return "[depth limited]";
+    if (Array.isArray(value)) return value.slice(0, 20).map(v => safeDiagnosticValue(v, depth + 1));
+    if (value && typeof value === "object") {
+      const out = {};
+      for (const [key, val] of Object.entries(value)) {
+        if (/seed|secret|private|mnemonic|password|passphrase|token|cookie|authorization|accesskey/i.test(key)) out[key] = "[REDACTED]";
+        else out[key] = safeDiagnosticValue(val, depth + 1);
+      }
+      return out;
+    }
+    if (typeof value === "string" && value.length > 8000) return `${value.slice(0, 8000)}…[truncated]`;
+    return value;
+  }
+
+  function diagnosticReport(step) {
+    const payload = {
+      harness: "Wild Ledger Change Community Operating Wallet Test",
+      failedStep: step,
+      timestamp: new Date().toISOString(),
+      error: failures.get(step) || "Unknown error",
+      community: { communityId, communityName, namespace },
+      context: {
+        requiredSigner,
+        connectedAccount,
+        targetAccount: targetAccount(),
+        authority: safeDiagnosticValue(authority),
+        preparedTransaction: safeDiagnosticValue(preparedTransaction),
+        signedBlobPresent: !!signedBlob,
+        xrplServer
+      }
+    };
+    return `WILD LEDGER DIAGNOSTIC REPORT\n\n${JSON.stringify(payload, null, 2)}`;
+  }
+
+  function setFailure(step, error) {
+    const message = error?.message || String(error);
+    failures.set(step, message);
+    const panel = document.getElementById(`failure${step}`);
+    const text = document.getElementById(`failureText${step}`);
+    if (text) text.textContent = message;
+    panel?.classList.add("show");
+    setStepState(step, "failed");
+  }
+
+  function clearFailure(step) {
+    failures.delete(step);
+    document.getElementById(`failure${step}`)?.classList.remove("show");
+  }
+
+  async function copyDiagnostic(step, button) {
+    const report = diagnosticReport(step);
+    try {
+      await navigator.clipboard.writeText(report);
+      button.textContent = "Copied — paste into ChatGPT";
+    } catch (_) {
+      window.prompt("Copy this diagnostic report:", report);
+    }
+  }
+
+  document.querySelectorAll("[data-copy-step]").forEach(button => button.addEventListener("click", () => copyDiagnostic(Number(button.dataset.copyStep), button)));
+
+  function setStepState(step, state) {
+    const el = document.getElementById(`step${step}`);
+    const label = document.getElementById(`stepState${step}`);
+    if (!el || !label) return;
+    el.classList.remove("pending", "working", "done", "failed", "locked");
+    el.classList.add(state);
+    label.textContent = ({pending:"Pending",working:"Working",done:"Passed",failed:"Failed",locked:"Locked"})[state] || state;
+  }
+
+  function targetAccount() { return String(newAccount.value || "").trim(); }
+
+  function validTarget() {
+    const target = targetAccount();
+    if (!requiredSigner || !isClassicAddress(target)) return false;
+    if (authority?.initialStatementNeeded) return target === requiredSigner;
+    if (authority?.authorityEstablished) return target !== authority.currentAccount;
+    return false;
+  }
+
+  function refreshMemo() {
+    const target = targetAccount();
+    if (!requiredSigner) {
+      setStatus(memoPreview, "Resolve authority first.", "wait");
+      return;
+    }
+    if (!target) {
+      setStatus(memoPreview, `${namespace}/AUTHORITY/OPERATING-WALLET=<XRPL-ADDRESS>`, "wait");
+      return;
+    }
+    if (!isClassicAddress(target)) {
+      setStatus(memoPreview, "Enter a valid XRPL classic address.", "bad");
+      return;
+    }
+    if (authority?.initialStatementNeeded && target !== requiredSigner) {
+      setStatus(memoPreview, "The first on-ledger statement must name the current Operating Wallet itself.", "bad");
+      return;
+    }
+    if (authority?.authorityEstablished && target === authority.currentAccount) {
+      setStatus(memoPreview, "Enter a different wallet to change the Operating Wallet.", "bad");
+      return;
+    }
+    setStatus(memoPreview, operatingWalletMemo(namespace, target), "good");
+  }
+
+  function clearPrepared() {
+    preparedTransaction = null;
+    signedBlob = "";
+    preparedDetails.textContent = "No prepared transaction.";
+    setStatus(publicationStatus, "Not prepared.", "wait");
+    setStatus(signStatus, "Prepare the statement first.", "wait");
+    setStatus(submitStatus, "Sign the statement first.", "wait");
+    txStatus.textContent = "—";
+  }
+
+  function updateButtons() {
+    const signerMatches = !!connectedAccount && connectedAccount === requiredSigner;
+    connectButton.disabled = !!busyStep || !!signer || !requiredSigner || !validTarget();
+    disconnectButton.disabled = !!busyStep || !signer;
+    prepareButton.disabled = !!busyStep || !validTarget() || !signerMatches;
+    signButton.disabled = !!busyStep || !preparedTransaction || !signerMatches;
+    submitButton.disabled = !!busyStep || !signedBlob;
+  }
+
+  function renderFlow() {
+    const targetReady = validTarget();
+    const signerReady = !!connectedAccount && connectedAccount === requiredSigner;
+    const prepared = !!preparedTransaction;
+    const signed = !!signedBlob;
+
+    for (let i=1;i<=6;i++) {
+      if (failures.has(i)) continue;
+      setStepState(i, "locked");
+    }
+
+    if (completedResult) {
+      for (let i=1;i<=6;i++) setStepState(i, "done");
+      completeBanner.classList.add("show");
+      completeText.textContent = `The authority change validated on XRPL. Transaction ${completedResult.txHash}.`;
+      return;
+    }
+    completeBanner.classList.remove("show");
+
+    if (!requiredSigner || !authority) {
+      setStepState(1, busyStep === 1 ? "working" : "pending");
+      openOnly(1); return;
+    }
+    setStepState(1, "done");
+
+    if (!targetReady) {
+      setStepState(2, "pending"); openOnly(2); return;
+    }
+    setStepState(2, "done");
+
+    if (!signerReady) {
+      setStepState(3, busyStep === 3 ? "working" : "pending"); openOnly(3); return;
+    }
+    setStepState(3, "done");
+
+    if (!prepared) {
+      setStepState(4, busyStep === 4 ? "working" : "pending"); openOnly(4); return;
+    }
+    setStepState(4, "done");
+
+    if (!signed) {
+      setStepState(5, busyStep === 5 ? "working" : "pending"); openOnly(5); return;
+    }
+    setStepState(5, "done");
+    setStepState(6, busyStep === 6 ? "working" : "pending"); openOnly(6);
+  }
+
+  function openOnly(step) {
+    for (let i=1;i<=6;i++) {
+      const el = document.getElementById(`step${i}`);
+      if (!el) continue;
+      if (i === step && !el.open) el.open = true;
+      if (i > step) el.open = false;
+    }
+  }
+
+  async function resolveAuthority(force = false) {
+    clearFailure(1); busyStep = 1; updateButtons(); renderFlow();
+    setStatus(authorityStatus, "Resolving validated XRPL authority state…", "wait");
+    try {
+      authority = await resolveCommunityAuthority({ community, serverUrl: xrplServer, force });
+      if (authority.initialStatementNeeded) {
+        requiredSigner = authority.legacyConfiguredAccount || authority.currentAccount || "";
+        currentAccount.textContent = requiredSigner || "Not yet established on XRPL";
+        setStatus(authorityStatus, "First on-ledger OPERATING-WALLET statement has not been published.", "wait");
+        requiredSignerDisplay.textContent = requiredSigner || "—";
+        targetActionLine.textContent = "Publish the configured Operating Wallet as the first canonical on-ledger value.";
+        statementHelp.textContent = "The configured current Operating Wallet must publish the first statement naming itself.";
+        newAccount.value = requiredSigner;
+        newAccount.readOnly = true;
+      } else {
+        newAccount.readOnly = false;
+        requiredSigner = authority.currentAccount || "";
+        currentAccount.textContent = authority.currentAccount || "—";
+        setStatus(authorityStatus, `Canonical on XRPL. ${authority.transitions.length} prior wallet change${authority.transitions.length === 1 ? "" : "s"} resolved.`, "good");
+        requiredSignerDisplay.textContent = requiredSigner || "—";
+        targetActionLine.textContent = "Enter the XRPL address that should become the next Operating Wallet.";
+        statementHelp.textContent = "The current Operating Wallet may publish a replacement value directly.";
+      }
+      if (!isClassicAddress(requiredSigner)) throw new Error("This community does not currently have a resolvable Community Operating Wallet.");
+      clearPrepared();
+      refreshMemo();
+    } catch (error) {
+      authority = null; requiredSigner = "";
+      currentAccount.textContent = "—"; requiredSignerDisplay.textContent = "—";
+      setStatus(authorityStatus, error?.message || String(error), "bad");
+      setFailure(1, error);
+    } finally {
+      busyStep = 0; refreshMemo(); updateButtons(); renderFlow();
+    }
+  }
+
+  async function connectSigner() {
+    clearFailure(3);
+    if (!projectId) { const error = new Error("WalletConnect Project ID is missing from Wild Ledger config."); setStatus(connectionStatus,error.message,"bad"); setFailure(3,error); renderFlow(); return; }
+    busyStep = 3; updateButtons(); renderFlow();
+    try {
+      signer = new WalletConnectXrplSigner({ projectId, metadata: {
+        name:"Wild Ledger", description:"Wild Ledger XRPL external signer",
+        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+        icons:[location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+      }});
+      setStatus(connectionStatus,"Initializing WalletConnect…","wait");
+      const connection = await signer.connect({ onUri: async uri => {
+        uriText.textContent = uri; qrImage.src = await QRCode.toDataURL(uri,{width:300,margin:1}); qrWrap.classList.add("show");
+        setStatus(connectionStatus,"QR ready. Approve the connection in Bifrost or another compatible XRPL signer.","wait");
+      }});
+      qrWrap.classList.remove("show");
+      connectedAccount = String(connection.account || "");
+      walletName.textContent = connection.walletName || "Connected wallet";
+      signerAccount.textContent = connectedAccount || "—";
+      if (connectedAccount !== requiredSigner) throw new Error(`Connected account is not the required signer (${requiredSigner || "unresolved"}).`);
+      setStatus(connectionStatus,"Connected wallet is the current Community Operating Wallet.","good");
+    } catch (error) {
+      try { if (signer) await signer.disconnect(); } catch (_) {}
+      signer = null; connectedAccount = ""; walletName.textContent="—"; signerAccount.textContent="—";
+      setStatus(connectionStatus,error?.message || String(error),"bad"); setFailure(3,error);
+    } finally { busyStep=0; updateButtons(); renderFlow(); }
+  }
+
+  async function disconnectSigner() {
+    try { if (signer) await signer.disconnect(); } catch (_) {}
+    signer=null; connectedAccount=""; walletName.textContent="—"; signerAccount.textContent="—"; qrWrap.classList.remove("show");
+    setStatus(connectionStatus,"Not connected.","wait"); clearPrepared(); clearFailure(3); updateButtons(); renderFlow();
+  }
+
+  async function assertPreparedAuthorityCurrent(stage) {
+    if (!preparedTransaction?.Account) throw new Error("No prepared transaction is available for authority verification.");
+    const preparedAccount = String(preparedTransaction.Account || "");
+    clearCommunityAuthorityCache();
+    const latestAuthority = await resolveCommunityAuthority({ community, serverUrl: xrplServer, force: true });
+    const latestRequiredSigner = String(latestAuthority.initialStatementNeeded ? (latestAuthority.legacyConfiguredAccount || latestAuthority.currentAccount || "") : (latestAuthority.currentAccount || ""));
+    if (!isClassicAddress(latestRequiredSigner)) { clearPrepared(); throw new Error("This community does not currently have a resolvable Community Operating Wallet."); }
+    authority = latestAuthority; requiredSigner = latestRequiredSigner; requiredSignerDisplay.textContent = requiredSigner;
+    currentAccount.textContent = latestAuthority.initialStatementNeeded ? requiredSigner : (latestAuthority.currentAccount || "—");
+    if (connectedAccount && connectedAccount !== requiredSigner) setStatus(connectionStatus,`Connected account is not the required signer (${requiredSigner}).`,"bad");
+    if (preparedAccount !== requiredSigner) { clearPrepared(); throw new Error(`The Community Operating Wallet changed before ${stage}. Recheck validated XRPL history and prepare a new statement using ${requiredSigner}.`); }
+    return requiredSigner;
+  }
+
+  newAccount.addEventListener("input", () => {
+    completedResult = null; clearFailure(2); clearPrepared(); refreshMemo();
+    if (targetAccount() && !validTarget()) setFailure(2, new Error(memoPreview.textContent));
+    updateButtons(); renderFlow();
+  });
+  refreshButton.addEventListener("click", () => { completedResult=null; clearCommunityAuthorityCache(); resolveAuthority(true); });
+  connectButton.addEventListener("click", connectSigner);
+  disconnectButton.addEventListener("click", disconnectSigner);
+
+  prepareButton.addEventListener("click", async () => {
+    clearFailure(4); const target = targetAccount();
+    if (!validTarget()) { const error=new Error("Choose a valid replacement Operating Wallet first."); setFailure(4,error); renderFlow(); return; }
+    busyStep=4; updateButtons(); renderFlow(); signedBlob="";
+    try {
+      setStatus(publicationStatus,"Simulating and autofilling the canonical no-op AccountSet…","wait");
+      const prepared = await prepareNoOpAccountSet({ serverUrl:xrplServer, account:requiredSigner, memoText:operatingWalletMemo(namespace,target), feeCushion });
+      preparedTransaction = prepared.preparedTx;
+      preparedDetails.textContent = JSON.stringify(preparedTransaction,null,2);
+      setStatus(publicationStatus,"Prepared. Review it, then sign with the current Operating Wallet.","good");
+      setStatus(signStatus,"Ready for the current Operating Wallet to sign.","wait");
+    } catch (error) {
+      preparedTransaction=null; preparedDetails.textContent="No prepared transaction."; setStatus(publicationStatus,error?.message || String(error),"bad"); setFailure(4,error);
+    } finally { busyStep=0; updateButtons(); renderFlow(); }
+  });
+
+  signButton.addEventListener("click", async () => {
+    clearFailure(5); if (!signer || !preparedTransaction) return;
+    busyStep=5; updateButtons(); renderFlow();
+    try {
+      setStatus(signStatus,"Rechecking Community Operating Wallet authority before signing…","wait");
+      await assertPreparedAuthorityCurrent("signing");
+      if (connectedAccount !== requiredSigner) throw new Error(`Connected signer ${connectedAccount || "—"} is not the current Community Operating Wallet ${requiredSigner}.`);
+      setStatus(signStatus,"Waiting for signer approval…","wait");
+      const result = await signer.signTransaction(preparedTransaction);
+      signedBlob = result.signedBlob;
+      setStatus(signStatus,`${result.signatureType} received. Ready to submit the signed authority statement.`,"good");
+      setStatus(submitStatus,"Signed statement ready. Submission will write permanent XRPL history.","wait");
+    } catch (error) {
+      signedBlob=""; setStatus(signStatus,error?.message || String(error),"bad"); setFailure(5,error);
+    } finally { busyStep=0; updateButtons(); renderFlow(); }
+  });
+
+  submitButton.addEventListener("click", async () => {
+    clearFailure(6); if (!signedBlob) return;
+    busyStep=6; updateButtons(); renderFlow();
+    const targetBeforeSubmit = targetAccount();
+    try {
+      setStatus(submitStatus,"Rechecking Community Operating Wallet authority before submission…","wait");
+      await assertPreparedAuthorityCurrent("submission");
+      setStatus(submitStatus,"Submitting directly to XRPL and waiting for validated success…","wait");
+      const result = await submitSignedTransaction({serverUrl:xrplServer,signedBlob});
+      if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated transaction returned ${result.finalResult}.`);
+      txStatus.textContent = result.txHash;
+      clearCommunityAuthorityCache();
+      preparedTransaction=null; signedBlob="";
+      await resolveCommunityAuthority({community,serverUrl:xrplServer,force:true});
+      completedResult = {txHash:result.txHash,ledgerIndex:result.ledgerIndex,target:targetBeforeSubmit};
+      setStatus(submitStatus,`Validated on XRPL at ledger ${result.ledgerIndex}.`,"good");
+    } catch (error) {
+      setStatus(submitStatus,error?.message || String(error),"bad"); setFailure(6,error);
+    } finally { busyStep=0; updateButtons(); renderFlow(); }
+  });
+
+  resolveAuthority();
+</script>
+</body>
+</html>
