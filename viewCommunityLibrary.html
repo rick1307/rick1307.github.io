@@ -78,12 +78,6 @@
   h1 { margin: 0 0 8px; font-size: 32px; line-height: 1.1; }
   .hero p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); }
 
-  .role-line {
-    margin-top: 14px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #50657d;
-  }
 
   .section-label {
     margin: 24px 4px 12px;
@@ -388,7 +382,6 @@
   }
 
   .hero p,
-  .role-line,
   .section-note { color: var(--muted); }
 
   .section-label {
@@ -479,25 +472,25 @@
     color: var(--text);
   }
 
-  .library-heading {
+  .title-line {
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    margin: 30px 0 12px;
+    gap: 10px;
+    flex-wrap: wrap;
     min-width: 0;
   }
 
-  .library-title {
-    color: var(--text);
-    font-size: .96rem;
+  .owner-view-note {
+    color: rgba(183,240,223,.76);
+    font-size: .78rem;
     line-height: 1;
-    font-weight: 900;
-    letter-spacing: .02em;
-    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: .04em;
+    white-space: nowrap;
   }
 
   @media (max-width: 560px) {
-    .library-heading { margin-top: 28px; }
+    .owner-view-note { font-size: .72rem; }
   }
 
 </style>
@@ -508,13 +501,15 @@
 <div class="shell">
   <div class="hero">
     <a class="back-link wl-header-control" id="backLink" href="viewCommunity.html">← Back</a>
-    <h1 id="view-community-title">Community</h1>
-    <div class="library-heading" aria-label="Library section">
-      <div class="library-title">Library</div>
+    <div class="title-line">
+      <h1 id="view-community-title">Wild Ledger Library</h1>
+      <span class="owner-view-note" id="ownerViewNote">(Owner View)</span>
     </div>
-    <p id="libraryIntro">The operating shelf for Wild Ledger. Formal doctrine starts with the LEAP Protocol, followed by the Operations Manual. Working material stays below until it is ready to be absorbed into one of those documents.</p>
-    <div class="role-line" id="roleLine">Owner View</div>
+    <p id="libraryIntro">The operating shelf for Wild Ledger. Core doctrine comes first; working material stays below until it is ready to be absorbed into the authoritative documents.</p>
   </div>
+
+  <div class="section-label">Core Doctrine</div>
+  <div class="section-note">The authoritative foundation of Wild Ledger. The LEAP Protocol defines the rules; the Operations Manual defines how Wild Ledger is operated.</div>
   <div class="menu primary-docs">
     <a id="leapProtocolLink" href="documentation/leapProtocol.html">
       <span class="link-title">LEAP Protocol</span>
@@ -608,17 +603,16 @@
   const registeredCommunity = window.WILD_LEDGER_GET_COMMUNITY?.(effectiveCommunity) || null;
   const canonicalBackendId = window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(registeredCommunity) || effectiveCommunity;
   const viewCommunityTitle = document.getElementById('view-community-title');
-  const communityName = registeredCommunity?.communityName || (ownerEntry ? 'Wild Ledger' : 'Community');
-  if (viewCommunityTitle) viewCommunityTitle.textContent = communityName;
-  document.title = `${communityName} | Library`;
+  const ownerViewNote = document.getElementById('ownerViewNote');
+  if (viewCommunityTitle) viewCommunityTitle.textContent = 'Wild Ledger Library';
+  if (ownerViewNote) ownerViewNote.hidden = role !== 'owner';
+  document.title = 'Wild Ledger Library';
 
   document.documentElement.dataset.role = role;
 
-  const roleLine = document.getElementById('roleLine');
   const libraryIntro = document.getElementById('libraryIntro');
-  if (roleLine) roleLine.textContent = role === 'operator' ? 'Community Operator View' : 'Owner View';
   if (libraryIntro && role === 'operator') {
-    libraryIntro.textContent = 'Use the LEAP Protocol for the authoritative rules and the Operations Manual for wallets, recognition, distribution, replenishment, and community procedures.';
+    libraryIntro.textContent = 'The operating shelf for Wild Ledger. Core doctrine comes first: the LEAP Protocol defines the rules, and the Operations Manual defines how Wild Ledger is operated.';
   }
 
   document.querySelectorAll('[data-audience]').forEach((node) => {
