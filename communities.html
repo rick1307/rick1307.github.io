@@ -228,7 +228,12 @@
 
     function renderCommunity(community) {
       const reference = Boolean(community.reference);
-      const hidden = visibilityReady && communityIsHidden(visibilityState, community.communityId);
+      const newlyProvisioned = community?.source === "owner-xrpl";
+      const hidden = visibilityReady && communityIsHidden(
+        visibilityState,
+        community.communityId,
+        newlyProvisioned
+      );
       const article = document.createElement("article");
       article.className = `community${reference ? " reference-community" : ""}${hidden ? " hidden-community" : ""}`;
 
@@ -509,7 +514,7 @@
           visibilityState = result;
           visibilityReady = true;
           visibilityNote.classList.remove("error");
-          visibilityNote.textContent = "Public visibility comes from Owner-signed XRPL statements. No statement means visible.";
+          visibilityNote.textContent = "Public visibility comes from Owner-signed XRPL statements. Newly provisioned communities default hidden until explicitly made visible; legacy communities keep their existing visible default.";
           renderList();
           refreshModalButtons();
         })

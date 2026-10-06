@@ -442,7 +442,14 @@ function failDirectory() {
 }
 
 function publicCommunities(communities, visibilityState) {
-  return communities.filter(community => !communityIsHidden(visibilityState, community.communityId));
+  return communities.filter(community => {
+    const newlyProvisioned = community?.source === "owner-xrpl";
+    return !communityIsHidden(
+      visibilityState,
+      community.communityId,
+      newlyProvisioned
+    );
+  });
 }
 
 try {
