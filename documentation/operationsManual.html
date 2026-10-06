@@ -310,6 +310,8 @@
         <span class="lesson-kicker">1.1 · The Four Wallet Roles</span>
         <h3>Know which wallet is doing the job</h3>
         <p>The same XRPL network and even the same transaction type can be used for different purposes. Wild Ledger determines protocol meaning from the role of the signing account, the transaction, the direction of value, and the canonical memo or state statement.</p>
+        <div class="lesson"><strong>Stars are universal</strong><p>Wild Ledger calculates stars from community Earned LEAP using one fixed scale everywhere: 1, 10, 20, 50, and 100 Earned LEAP unlock one through five stars. Operators do not name, edit, or configure star levels. A member may have different stars in different communities because each community has its own Earned LEAP history.</p></div>
+
         <div class="wallet-grid">
           <article class="wallet-card">
             <div class="wallet-role">Asset Identity</div>
@@ -415,7 +417,7 @@
         <div class="checklist"><ul>
           <li><strong>No visibility statement means Visible.</strong> Wild Ledger shows the community publicly unless a later valid Owner statement says otherwise.</li>
           <li><strong>Latest valid state wins.</strong> Wild Ledger reconstructs visibility from validated Owner history and historical Owner authority.</li>
-          <li><strong>Hidden is presentation only.</strong> It removes the community from Wild Ledger's public community selector. It does not change the Community ID, Operating Wallet authority, recognition history, allocations, Earned LEAP, or rank.</li>
+          <li><strong>Hidden is presentation only.</strong> It removes the community from Wild Ledger's public community selector. It does not change the Community ID, Operating Wallet authority, recognition history, allocations, Earned LEAP, or stars.</li>
           <li><strong>The Owner still sees it.</strong> A hidden community remains in Owner operations because it still exists on XRPL.</li>
         </ul></div>
       </div>
@@ -446,7 +448,7 @@
           <li><strong>The request payment has one meaning.</strong> Wild Ledger records the native-XRP setup payment as a request to start a community. The person using the form does not need to know or build the ledger memo that carries that meaning.</li>
           <li><strong>Historical price is honored.</strong> A request is judged against the valid Owner Wallet and setup fee that were in force immediately before that payment. A later price change does not invalidate or increase an earlier valid request.</li>
           <li><strong>The request wallet matters.</strong> The sender of the valid request payment is the wallet Wild Ledger expects the Owner to provision as the first Community Operating Wallet.</li>
-          <li><strong>Business state stays separate from LEAP state.</strong> Setup-fee state and request payments do not create recognition, Earned LEAP, rank, or community authority.</li>
+          <li><strong>Business state stays separate from LEAP state.</strong> Setup-fee state and request payments do not create recognition, Earned LEAP, stars, or community authority.</li>
         </ul></div>
         <div class="lesson"><strong>Owner operating procedure</strong><p>Use the Owner Setup Fee control to publish or change the current fee; do not hand-build the underlying XRPL record. Before provisioning a new community, verify the applicant wallet's validated request payment against historical Owner authority and the setup fee in force at that payment's ledger position. Then provision the exact requesting wallet under a new Community ID.</p></div>
       </div>
@@ -521,7 +523,7 @@
             <li><strong>CREATE establishes a legitimate community-defined recognition.</strong> Create it when the community genuinely intends to use that Badge, Event, or Challenge.</li>
             <li><strong>END means retire it.</strong> Future use stops, but legitimate recognition already earned remains part of the member's history.</li>
             <li><strong>IGNORE means quarantine it.</strong> Use IGNORE for an erroneous, test, invalid, or otherwise non-operational definition. It is removed from normal recognition presentation and history, but the underlying XRPL facts remain.</li>
-            <li><strong>IGNORE does not claw back LEAP.</strong> LEAP already delivered by otherwise valid recognition remains Earned LEAP and continues to count toward rank.</li>
+            <li><strong>IGNORE does not claw back LEAP.</strong> LEAP already delivered by otherwise valid recognition remains Earned LEAP and continues to count toward stars.</li>
             <li><strong>END and IGNORE are final.</strong> There is no reopen, un-end, or un-ignore. Once a community-defined recognition ID has been established, that ID remains permanently reserved and is never reused, whether it is later ended or ignored.</li>
           </ul>
         </div>
@@ -562,7 +564,7 @@
           <article class="wallet-card">
             <div class="wallet-role">Member View</div>
             <h4>What did this member earn?</h4>
-            <p>This belongs in the member record. Only protocol-valid recognition adds Earned LEAP and recognition history. That history can include Badges, Events, Challenges, Great Chat, and the Earned LEAP used to reconstruct rank.</p>
+            <p>This belongs in the member record. Only protocol-valid recognition adds Earned LEAP and recognition history. That history can include Badges, Events, Challenges, Great Chat, and the Earned LEAP used to reconstruct stars.</p>
           </article>
           <article class="wallet-card">
             <div class="wallet-role">Community View</div>
@@ -572,8 +574,8 @@
         </div>
 
         <div class="lesson"><strong>One transaction can answer both questions</strong><p>If Alice receives 10 LEAP through a protocol-valid Great Chat recognition, Alice's member record gains 10 Earned LEAP. If Alice is also a qualifying outside wallet, that same outward distribution can contribute up to 10 points to the community's Spread Score.</p></div>
-        <div class="lesson"><strong>A LEAP transfer is not automatically recognition</strong><p>If Bob receives 10 LEAP in an ordinary transfer that does not satisfy the LEAP Protocol's recognition rules, the transfer may still contribute to Spread Score if Bob is a qualifying outside wallet. But Bob did not earn a Badge, Event, Challenge, Great Chat, Earned LEAP, or rank credit from that transfer.</p></div>
-        <div class="lesson"><strong>Spread Score is a Wild Ledger metric</strong><p>Spread Score is calculated from validated XRPL history, but it is not LEAP, a token, an award, a rank, or canonical LEAP Protocol state. It is Wild Ledger's operating measure of community reach.</p></div>
+        <div class="lesson"><strong>A LEAP transfer is not automatically recognition</strong><p>If Bob receives 10 LEAP in an ordinary transfer that does not satisfy the LEAP Protocol's recognition rules, the transfer may still contribute to Spread Score if Bob is a qualifying outside wallet. But Bob did not earn a Badge, Event, Challenge, Great Chat, Earned LEAP, or star credit from that transfer.</p></div>
+        <div class="lesson"><strong>Spread Score is a Wild Ledger metric</strong><p>Spread Score is calculated from validated XRPL history, but it is not LEAP, a token, an award, a star, or canonical LEAP Protocol state. It is Wild Ledger's operating measure of community reach.</p></div>
         <div class="rule">Member side: What have I earned? Community side: How far have we spread?</div>
       </div>
 
