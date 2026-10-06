@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b2d36">
+  <meta name="theme-color" content="#031c29">
   <title>Operator Session Test — Wild Ledger</title>
   <style>
     :root{
-      --deep:#031c29;--deep2:#062f3d;--panel:rgba(7,43,57,.76);--card:rgba(5,34,46,.58);
+      --deep:#031c29;--deep2:#062f3d;--panel:rgba(7,43,57,.82);--card:rgba(5,34,46,.62);
       --lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;--coral:#ef735f;
       --ink:#f4fbfa;--muted:rgba(236,249,247,.68);--line:rgba(255,255,255,.09);
-      --good:#9fe0b0;--bad:#ffb7aa;--wait:#f5d38f;--blue:#9fddff;
+      --good:#82e39f;--good-deep:#1d7b49;--bad:#ff8878;--bad-deep:#8f2e25;--wait:#ffd36d;--blue:#9fddff;
     }
-    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
       margin:0;min-height:100vh;color:var(--ink);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -31,7 +32,7 @@
     .shell{width:min(930px,100%);margin:0 auto;padding:28px 16px 52px;position:relative;z-index:1}
     .console{
       overflow:visible;border:1px solid var(--line);border-radius:30px;
-      background:linear-gradient(155deg,rgba(8,56,70,.90),rgba(4,31,43,.88));
+      background:linear-gradient(155deg,rgba(8,56,70,.92),rgba(4,31,43,.90));
       box-shadow:0 30px 90px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045);
       backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
     }
@@ -44,90 +45,169 @@
     .safety{margin-top:16px;padding:13px 14px;border-radius:14px;border:1px solid rgba(134,215,201,.16);background:rgba(47,168,160,.07);color:rgba(236,249,247,.78);font-size:.78rem;line-height:1.52}
     .safety strong{color:#dffbf5}
 
-    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:24px}
-    .progress-item{position:relative;padding:9px 8px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(1,21,30,.28);text-align:center;transition:.18s ease}
+    .run-meter{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;padding:14px 15px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(1,21,30,.25)}
+    .run-meter strong{font-size:.86rem;color:#effffa}.run-meter span{font-size:.72rem;color:var(--muted)}
+    .run-count{min-width:84px;text-align:center;padding:8px 10px;border-radius:999px;background:rgba(243,182,74,.11);border:1px solid rgba(243,182,74,.25);color:#ffe8b2!important;font-weight:950!important;letter-spacing:.05em}
+    .run-meter.is-complete .run-count{background:rgba(130,227,159,.12);border-color:rgba(130,227,159,.38);color:#eaffef!important}
+
+    .progress{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:10px}
+    .progress-item{padding:9px 8px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(1,21,30,.28);text-align:center;transition:.18s ease}
     .progress-num{display:block;color:var(--sea-glass);font-size:.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
     .progress-label{display:block;margin-top:3px;color:rgba(236,249,247,.57);font-size:.61rem;font-weight:800;line-height:1.25}
     .progress-state{display:block;margin-top:5px;font-size:.56rem;font-weight:950;letter-spacing:.09em;text-transform:uppercase;color:rgba(236,249,247,.34)}
-    .progress-item.is-active{border-color:rgba(243,182,74,.60);background:rgba(243,182,74,.11);box-shadow:0 0 0 2px rgba(243,182,74,.045)}
+    .progress-item.is-active{border-color:rgba(243,182,74,.60);background:rgba(243,182,74,.11)}
     .progress-item.is-active .progress-num,.progress-item.is-active .progress-state{color:#ffe6ad}
-    .progress-item.is-done{border-color:rgba(159,224,176,.42);background:rgba(159,224,176,.10)}
+    .progress-item.is-working{border-color:rgba(134,215,201,.60);background:rgba(47,168,160,.11)}
+    .progress-item.is-working .progress-num,.progress-item.is-working .progress-state{color:#dffff8}
+    .progress-item.is-done{border-color:rgba(130,227,159,.42);background:rgba(130,227,159,.10)}
     .progress-item.is-done .progress-num,.progress-item.is-done .progress-state{color:#dfffe7}
-    .progress-item.is-locked{opacity:.58}
+    .progress-item.is-failed{border-color:rgba(255,136,120,.58);background:rgba(255,136,120,.11)}
+    .progress-item.is-failed .progress-num,.progress-item.is-failed .progress-state{color:#ffd1ca}
+    .progress-item.is-locked{opacity:.48}
 
-    .body{padding:22px;display:grid;gap:16px}
+    .body{padding:22px;display:grid;gap:12px}
     .next-panel{
       position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:30;
-      margin:0;padding:15px 16px;border:2px solid rgba(243,182,74,.68);border-radius:17px;
+      margin:0 0 4px;padding:15px 16px;border:2px solid rgba(243,182,74,.68);border-radius:17px;
       background:linear-gradient(145deg,rgba(93,66,13,.96),rgba(53,42,17,.96));
       box-shadow:0 14px 36px rgba(0,0,0,.28),0 0 0 3px rgba(243,182,74,.05);
     }
+    .next-panel.is-working{border-color:rgba(134,215,201,.65);background:linear-gradient(145deg,rgba(13,76,76,.96),rgba(9,49,58,.96))}
+    .next-panel.is-failed{border-color:rgba(255,136,120,.75);background:linear-gradient(145deg,rgba(101,32,26,.97),rgba(61,22,24,.97))}
+    .next-panel.is-complete{border-color:rgba(130,227,159,.65);background:linear-gradient(145deg,rgba(23,85,55,.96),rgba(14,56,42,.96))}
     .next-panel-label{font-size:.67rem;font-weight:950;letter-spacing:.13em;text-transform:uppercase;color:#ffd986}
     .next-panel-text{margin-top:4px;font-size:1.15rem;font-weight:950;line-height:1.25;color:#fff3cf}
     .next-panel-detail{margin-top:4px;font-size:.80rem;line-height:1.48;color:rgba(255,243,207,.76)}
+    .next-panel.is-working .next-panel-label,.next-panel.is-working .next-panel-text{color:#e1fff9}
+    .next-panel.is-working .next-panel-detail{color:rgba(225,255,249,.78)}
+    .next-panel.is-failed .next-panel-label,.next-panel.is-failed .next-panel-text{color:#ffe1db}
+    .next-panel.is-failed .next-panel-detail{color:rgba(255,225,219,.82)}
+    .next-panel.is-complete .next-panel-label,.next-panel.is-complete .next-panel-text{color:#effff6}
+    .next-panel.is-complete .next-panel-detail{color:rgba(239,255,246,.78)}
 
-    .card{
-      position:relative;padding:22px;border:1px solid var(--line);border-radius:22px;
-      background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),var(--card);
-      transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease,transform .18s ease;
+    .purpose,.detail-card{border:1px solid rgba(134,215,201,.14);border-radius:15px;background:rgba(47,168,160,.04);overflow:hidden}
+    .purpose summary,.detail-card summary{list-style:none;cursor:pointer;padding:13px 14px;color:#dffbf5;font-size:.78rem;font-weight:900}
+    .purpose summary::-webkit-details-marker,.detail-card summary::-webkit-details-marker{display:none}
+    .purpose summary::after,.detail-card summary::after{content:"+";float:right;color:var(--sea-glass);font-size:1.1rem;line-height:1}
+    .purpose[open] summary::after,.detail-card[open] summary::after{content:"−"}
+    .purpose-body,.detail-body{padding:0 14px 14px;color:rgba(236,249,247,.70);font-size:.78rem;line-height:1.55}
+    .purpose-body strong,.detail-body strong{color:#f4fbfa}
+    .detail-card{margin-top:9px;background:rgba(255,255,255,.018)}
+
+    .step-folder{
+      border:1px solid var(--line);border-radius:20px;overflow:hidden;
+      background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),var(--card);
+      transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease;
     }
-    .step-card.is-active{border:2px solid rgba(243,182,74,.72);box-shadow:0 0 0 3px rgba(243,182,74,.055),0 18px 44px rgba(0,0,0,.22);transform:translateY(-1px)}
-    .step-card.is-done{border-color:rgba(159,224,176,.38)}
-    .step-card.is-locked{opacity:.52}
-    .step-head{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:start;margin-bottom:15px}
-    .step-number{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;border:1px solid rgba(134,215,201,.28);background:rgba(47,168,160,.10);color:#e5fff9;font-size:.82rem;font-weight:950}
-    .step-kicker{color:var(--sea-glass);font-size:.64rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-    h2{margin:4px 0 0;font-size:1.2rem;letter-spacing:-.02em}
-    .step-summary{margin:7px 0 0;color:rgba(236,249,247,.60);font-size:.80rem;line-height:1.50}
-    .step-state{align-self:start;border-radius:999px;padding:6px 9px;font-size:.62rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.055);color:rgba(236,249,247,.47)}
-    .step-card.is-active .step-state{background:rgba(243,182,74,.16);border:1px solid rgba(243,182,74,.42);color:#ffe7ae}
-    .step-card.is-done .step-state{background:rgba(159,224,176,.13);border:1px solid rgba(159,224,176,.34);color:#eaffef}
+    .step-folder.is-active{border:2px solid rgba(243,182,74,.72);box-shadow:0 0 0 3px rgba(243,182,74,.055),0 18px 44px rgba(0,0,0,.22)}
+    .step-folder.is-working{border:2px solid rgba(134,215,201,.72);box-shadow:0 0 0 3px rgba(47,168,160,.07),0 18px 44px rgba(0,0,0,.22)}
+    .step-folder.is-done{border-color:rgba(130,227,159,.42)}
+    .step-folder.is-failed{border:2px solid rgba(255,136,120,.72);box-shadow:0 0 0 3px rgba(255,136,120,.06),0 18px 44px rgba(0,0,0,.22)}
+    .step-folder.is-locked{opacity:.44}
+    .step-folder summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:44px minmax(0,1fr) 46px auto 18px;gap:10px;align-items:center;padding:16px 17px}
+    .step-folder summary::-webkit-details-marker{display:none}
+    .step-folder.is-locked summary{cursor:not-allowed}
+    .step-number{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;border:1px solid rgba(134,215,201,.28);background:rgba(47,168,160,.10);color:#e5fff9;font-size:.80rem;font-weight:950}
+    .step-kicker{color:var(--sea-glass);font-size:.59rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    h2{margin:3px 0 0;font-size:1.06rem;letter-spacing:-.02em}
+    .step-state{border-radius:999px;padding:6px 9px;font-size:.58rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.055);color:rgba(236,249,247,.47);white-space:nowrap}
+    .step-folder.is-active .step-state{background:rgba(243,182,74,.16);border:1px solid rgba(243,182,74,.42);color:#ffe7ae}
+    .step-folder.is-working .step-state{background:rgba(47,168,160,.16);border:1px solid rgba(134,215,201,.42);color:#e0fff8}
+    .step-folder.is-done .step-state{background:rgba(130,227,159,.13);border:1px solid rgba(130,227,159,.34);color:#eaffef}
+    .step-folder.is-failed .step-state{background:rgba(255,136,120,.13);border:1px solid rgba(255,136,120,.38);color:#ffd7d1}
+    .caret{font-size:1.2rem;color:rgba(236,249,247,.42);transition:transform .18s ease}
+    .step-folder[open] .caret{transform:rotate(90deg);color:var(--sea-glass)}
+    .folder-body{padding:0 17px 17px;border-top:1px solid rgba(255,255,255,.055)}
+    .action-line{margin:15px 0 0;font-size:1rem;line-height:1.42;font-weight:900;color:#f8fffd}
+    .action-sub{margin:5px 0 0;color:rgba(236,249,247,.57);font-size:.76rem;line-height:1.5}
 
-    .instruction{margin:0 0 15px;padding:13px 14px;border-radius:15px;border:1px solid rgba(243,182,74,.18);background:rgba(243,182,74,.06)}
-    .instruction strong{display:block;color:#f7deb0;font-size:.76rem}
-    .instruction span{display:block;margin-top:4px;color:rgba(247,222,176,.78);font-size:.76rem;line-height:1.5}
-    .step-card.is-locked .instruction{border-color:rgba(255,255,255,.06);background:rgba(255,255,255,.025)}
-    .step-card.is-locked .instruction strong,.step-card.is-locked .instruction span{color:rgba(236,249,247,.43)}
+    .state-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-size:1.2rem;font-weight:1000;color:rgba(236,249,247,.38)}
+    .state-icon.pending{border-color:rgba(255,211,109,.52);background:rgba(255,211,109,.10);color:var(--wait)}
+    .state-icon.done{border-color:rgba(130,227,159,.58);background:rgba(130,227,159,.13);color:#dffff0}
+    .state-icon.failed{border-color:rgba(255,136,120,.68);background:rgba(255,136,120,.13);color:#ffe0da}
+    .state-icon.locked{opacity:.45}
+    .state-icon.working{border:none;background:transparent;position:relative}
+    .state-icon.working::before{
+      content:"";width:30px;height:30px;border-radius:50%;padding:3px;
+      background:conic-gradient(var(--lagoon),var(--sea-glass),var(--mango),var(--coral),var(--lagoon));
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+      animation:spin .85s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-    button{appearance:none;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-size:.82rem;font-weight:900;cursor:pointer;min-height:46px}
-    button.secondary{color:#b9e5ff;background:rgba(77,167,235,.08)}
+    .button-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    button{appearance:none;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:12px 14px;color:var(--ink);font:inherit;font-size:.82rem;font-weight:900;cursor:pointer;min-height:46px}
     button:disabled{opacity:.34;cursor:not-allowed}
-    .primary-action{width:100%;min-height:56px;background:rgba(47,168,160,.18);border-color:rgba(134,215,201,.34);color:#effffa;font-size:1rem}
-    .step-card.is-active .primary-action:not(:disabled){background:linear-gradient(180deg,rgba(47,168,160,.32),rgba(47,168,160,.21));border:2px solid rgba(134,215,201,.78);box-shadow:0 0 0 4px rgba(47,168,160,.09),0 11px 26px rgba(0,0,0,.22)}
-    .step-card.is-active .primary-action:not(:disabled)::before{content:"NEXT · ";color:#d7fff7}
-    .step-card.is-active .primary-action:not(:disabled)::after{content:"  →"}
+    .primary-action{width:100%;min-height:58px;background:linear-gradient(180deg,#2e9a5d,#1f7948);border:2px solid rgba(169,255,197,.72);color:#f5fff8;font-size:1rem;box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.14)}
+    .primary-action:not(:disabled):hover,.primary-action:not(:disabled):focus-visible{background:linear-gradient(180deg,#39aa6b,#238451);outline:none;box-shadow:0 0 0 4px rgba(130,227,159,.10),0 12px 28px rgba(0,0,0,.25)}
+    .copy-button{background:rgba(255,136,120,.12);border:1px solid rgba(255,136,120,.38);color:#ffe4de;min-height:42px}
 
-    #walletActionShell{margin-top:10px;border-radius:16px}
-    #step1Card.is-active #walletActionShell{padding:10px;border:2px solid rgba(134,215,201,.72);background:rgba(47,168,160,.065);box-shadow:0 0 0 4px rgba(47,168,160,.07)}
+    #walletActionShell{margin-top:14px;border-radius:16px;padding:9px;border:2px solid rgba(130,227,159,.48);background:rgba(130,227,159,.055)}
     #wallet-kit-button{min-height:58px}
     #wallet-kit-button:empty{display:none}
-    #wallet-kit-button button,#wallet-kit-button [role="button"]{width:100%!important;min-height:58px!important;border-radius:12px!important;font-size:1rem!important;font-weight:900!important}
-    #step1Card.is-active #wallet-kit-button button,#step1Card.is-active #wallet-kit-button [role="button"]{outline:3px solid rgba(134,215,201,.18)!important;box-shadow:0 10px 24px rgba(0,0,0,.22)!important}
-    .wallet-loading{padding:14px 15px;border:1px dashed rgba(243,182,74,.38);border-radius:12px;color:var(--wait);font-weight:850;text-align:center}
-    .wallet-loading.bad{border-color:rgba(255,183,170,.38);color:var(--bad);background:rgba(255,183,170,.05)}
+    #wallet-kit-button button,#wallet-kit-button [role="button"]{width:100%!important;min-height:58px!important;border-radius:13px!important;font-size:1rem!important;font-weight:900!important;background:#267d4d!important;color:#fff!important;border:2px solid rgba(169,255,197,.72)!important;box-shadow:0 10px 24px rgba(0,0,0,.22)!important}
+    .wallet-loading{padding:14px 15px;border:1px dashed rgba(255,211,109,.38);border-radius:12px;color:var(--wait);font-weight:850;text-align:center}
+    .wallet-loading.bad{border-color:rgba(255,136,120,.45);color:#ffd1ca;background:rgba(255,136,120,.06)}
 
-    .status{margin-top:13px;padding:12px 13px;border-radius:13px;background:rgba(0,0,0,.12);border:1px solid rgba(255,255,255,.07);line-height:1.45;word-break:break-word;color:rgba(236,249,247,.76);font-size:.80rem}
-    .status.good{background:rgba(159,224,176,.075);border-color:rgba(159,224,176,.24);color:var(--good)}
-    .status.bad{background:rgba(255,183,170,.065);border-color:rgba(255,183,170,.22);color:var(--bad)}
-    .status.wait{background:rgba(243,182,74,.065);border-color:rgba(243,182,74,.18);color:var(--wait)}
-    .label{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;font-weight:900;color:rgba(236,249,247,.50);margin-bottom:7px}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.74rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;background:rgba(0,11,18,.48);color:#cae9e5;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:9px;max-height:270px;overflow:auto}
-    .kv{display:grid;grid-template-columns:150px 1fr;gap:8px 12px;margin-top:12px;font-size:.80rem}
-    .kv b{color:rgba(236,249,247,.48);font-weight:800}
-    .kv span{overflow-wrap:anywhere}
-    .result-big{font-size:1.18rem;font-weight:950;margin-top:12px}.result-big.good{color:var(--good)}.result-big.bad{color:var(--bad)}
-    details{margin-top:14px} summary{cursor:pointer;font-weight:850;color:#b9e5ff}
-    .fine{margin:0;padding:0 4px 2px;color:rgba(236,249,247,.46);font-size:.72rem;line-height:1.5}
-    footer{padding:0 22px 26px;color:rgba(236,249,247,.38);font-size:.68rem;text-align:center}
+    .human-status{display:grid;grid-template-columns:56px 1fr;gap:13px;align-items:center;margin-top:14px;padding:13px 14px;border-radius:15px;border:1px solid rgba(255,211,109,.28);background:rgba(255,211,109,.065)}
+    .human-status .big{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;font-size:1.65rem;font-weight:1000;border:2px solid rgba(255,211,109,.55);color:var(--wait);background:rgba(255,211,109,.09)}
+    .human-status strong{display:block;color:#fff0c6;font-size:.88rem}.human-status span{display:block;margin-top:3px;color:rgba(255,240,198,.72);font-size:.74rem;line-height:1.45}
+    .human-status.working{border-color:rgba(134,215,201,.32);background:rgba(47,168,160,.07)}
+    .human-status.working .big{border:none;background:transparent;position:relative;font-size:0}
+    .human-status.working .big::before{content:"";width:38px;height:38px;border-radius:50%;padding:4px;background:conic-gradient(var(--lagoon),var(--sea-glass),var(--mango),var(--coral),var(--lagoon));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin .85s linear infinite}
+    .human-status.working strong{color:#e5fff9}.human-status.working span{color:rgba(229,255,249,.74)}
+    .human-status.good{border-color:rgba(130,227,159,.34);background:rgba(130,227,159,.075)}
+    .human-status.good .big{border-color:rgba(130,227,159,.62);background:rgba(130,227,159,.12);color:#eaffef}
+    .human-status.good strong{color:#eaffef}.human-status.good span{color:rgba(234,255,239,.74)}
+    .human-status.bad{border-color:rgba(255,136,120,.46);background:rgba(255,136,120,.075)}
+    .human-status.bad .big{border-color:rgba(255,136,120,.72);background:rgba(255,136,120,.13);color:#ffe1dc}
+    .human-status.bad strong{color:#ffe2dc}.human-status.bad span{color:rgba(255,226,220,.82)}
+
+    .failure-panel{margin-top:12px;border:2px solid rgba(255,136,120,.48);border-radius:15px;background:rgba(115,35,29,.28);padding:13px 14px}
+    .failure-panel h3{margin:0;color:#ffe0da;font-size:.88rem}.failure-panel p{margin:6px 0 0;color:#ffc7bd;font-size:.77rem;line-height:1.48;word-break:break-word}
+    .failure-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.failure-actions button{flex:1}
+
+    .kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 11px;margin-top:10px;font-size:.75rem}.kv b{color:rgba(236,249,247,.48)}
+    .mono{white-space:pre-wrap;word-break:break-word;background:#02151e;color:#dffbf5;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px;margin-top:8px;max-height:280px;overflow:auto;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+    .fine{font-size:.72rem;color:rgba(236,249,247,.46);line-height:1.52;margin:6px 2px 0}
+    .overall-result{margin:14px 0 10px;padding:16px;border:1px solid rgba(130,227,159,.62);border-radius:18px;background:linear-gradient(135deg,rgba(19,102,65,.46),rgba(16,80,57,.30));box-shadow:0 0 0 1px rgba(130,227,159,.12) inset;display:grid;grid-template-columns:52px 1fr;gap:13px;align-items:center}
+    .overall-result[hidden]{display:none!important}
+    .overall-result-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(130,227,159,.74);background:rgba(130,227,159,.12);color:#dfffe7;font-size:1.85rem;font-weight:950}
+    .overall-result-label{display:block;color:#bdf7ce;font-size:.66rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase;margin-bottom:3px}
+    .overall-result strong{display:block;color:#f3fff6;font-size:1.15rem}
+    .overall-result p{margin:4px 0 0;color:#c7ddd8;font-size:.84rem;line-height:1.45}
+    .harness-about{margin-top:12px}
+    .harness-about .safety,.harness-about .run-meter,.harness-about .progress,.harness-about .next-panel{margin-top:12px}
+    footer{padding:18px 24px 22px;text-align:center;color:rgba(236,249,247,.36);font-size:.63rem;font-weight:900;letter-spacing:.10em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.055)}
     [hidden]{display:none!important}
-    @media(max-width:760px){
-      .shell{padding:18px 10px 34px}.console{border-radius:22px}header{padding:24px 18px}.body{padding:14px;gap:12px}
-      .progress{grid-template-columns:repeat(2,1fr)}.progress-item{text-align:left;padding:8px 10px}.progress-num,.progress-label,.progress-state{display:inline}.progress-label{margin-left:4px}.progress-state{float:right;margin-top:1px}
-      .step-head{grid-template-columns:42px minmax(0,1fr) auto;gap:10px}.step-number{width:38px;height:38px;border-radius:12px}.step-state{padding:5px 7px;font-size:.56rem}
-      .kv{grid-template-columns:1fr;gap:2px}.button-row button{width:100%}.next-panel{top:calc(env(safe-area-inset-top,0px) + 6px)}
+
+    @media(max-width:650px){
+      .shell{padding:12px 10px 34px}.console{border-radius:22px}.console::before{border-radius:22px 22px 0 0}
+      header{padding:22px 18px}.body{padding:14px 12px}.progress{grid-template-columns:repeat(2,1fr)}
+      .progress-item{text-align:left;padding:8px 10px}.progress-num,.progress-label,.progress-state{display:inline}.progress-label{margin-left:4px}.progress-state{float:right;margin-top:1px}
+      .step-folder summary{grid-template-columns:38px minmax(0,1fr) 38px auto 14px;gap:7px;padding:13px 12px}
+      .step-number{width:36px;height:36px}.state-icon{width:36px;height:36px}.state-icon.working::before{width:26px;height:26px}
+      .folder-body{padding:0 12px 14px}.kv{grid-template-columns:1fr;gap:3px}.button-row button{width:100%}
+      .step-state{padding:5px 7px;font-size:.52rem}.next-panel{top:calc(env(safe-area-inset-top,0px) + 5px)}
+      .human-status{grid-template-columns:48px 1fr;padding:12px}.human-status .big{width:44px;height:44px}.run-meter{align-items:flex-start}.run-meter span{display:block;margin-top:3px}.run-count{min-width:76px}
     }
-  </style>
+  
+    .authority-answer{margin-top:12px;padding:14px;border-radius:15px;border:1px solid rgba(134,215,201,.20);background:rgba(47,168,160,.06)}
+    .authority-answer strong{display:block;font-size:1rem;color:#f5fffc}
+    .authority-answer p{margin:5px 0 0;color:rgba(236,249,247,.68);font-size:.78rem;line-height:1.5}
+    .authority-answer.none{border-color:rgba(159,221,255,.25);background:rgba(159,221,255,.06)}
+    .authority-answer.multi{border-color:rgba(243,182,74,.28);background:rgba(243,182,74,.07)}
+    .optional-action{margin-top:10px;padding:12px;border-radius:14px;border:1px dashed rgba(134,215,201,.20);background:rgba(255,255,255,.018)}
+    .optional-action button{margin-top:8px;width:100%;background:rgba(47,168,160,.10);border-color:rgba(134,215,201,.26);color:#dcfff8}
+
+    .authority-answer,.session-answer{margin-top:12px;padding:13px 14px;border-radius:15px;border:1px solid rgba(130,227,159,.32);background:rgba(130,227,159,.07)}
+    .authority-answer strong,.session-answer strong{display:block;color:#eaffef;font-size:.90rem}
+    .authority-answer p,.session-answer p{margin:5px 0 0;color:rgba(234,255,239,.74);font-size:.76rem;line-height:1.48}
+    .authority-answer.stop{border-color:rgba(255,136,120,.42);background:rgba(255,136,120,.07)}
+    .authority-answer.stop strong{color:#ffe0da}.authority-answer.stop p{color:rgba(255,224,218,.78)}
+    .secondary-action{width:100%;margin-top:10px;background:rgba(159,221,255,.08);border:1px solid rgba(159,221,255,.24);color:#d9f2ff}
+    .legacy-status{margin-top:9px;padding:9px 10px;border-radius:11px;border:1px solid rgba(255,255,255,.06);background:rgba(1,21,30,.22);color:rgba(236,249,247,.55);font-size:.70rem;line-height:1.45}
+</style>
   <script src="../js/wildLedgerConfig.js"></script>
   <script src="../js/communityConfig.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@xrpl-wallet-kit/browser@0.1.18/dist/xrpl-wallet-kit.iife.min.js"></script>
@@ -136,352 +216,235 @@
 <main class="shell">
   <section class="console">
     <header>
-      <a class="back" href="../communities.html">← Owner Communities</a>
-      <div class="eyebrow">Wild Ledger · Test Harness</div>
-      <h1>Operator Session + Handoff</h1>
-      <p class="intro">Prove control of the connected XRPL wallet, identify the community that wallet currently operates from validated ledger history, establish the browser Operator session, then hand that verified session to the real community page.</p>
-      <div class="safety"><strong>Safe test:</strong> this harness does not submit an XRPL transaction and does not change protocol authority. It only asks the wallet to sign a one-time proof message, reads validated XRPL history, and writes temporary browser session state.</div>
-      <div class="progress" aria-label="Operator session test steps">
-        <div class="progress-item is-active" id="progress1"><span class="progress-num">Step 1</span><span class="progress-label">Connect wallet</span><span class="progress-state" id="progress1State">NEXT</span></div>
-        <div class="progress-item is-locked" id="progress2"><span class="progress-num">Step 2</span><span class="progress-label">Challenge</span><span class="progress-state" id="progress2State">LOCKED</span></div>
-        <div class="progress-item is-locked" id="progress3"><span class="progress-num">Step 3</span><span class="progress-label">Prove control</span><span class="progress-state" id="progress3State">LOCKED</span></div>
-        <div class="progress-item is-locked" id="progress4"><span class="progress-num">Step 4</span><span class="progress-label">Find authority</span><span class="progress-state" id="progress4State">LOCKED</span></div>
-        <div class="progress-item is-locked" id="progress5"><span class="progress-num">Step 5</span><span class="progress-label">Create session</span><span class="progress-state" id="progress5State">LOCKED</span></div>
-        <div class="progress-item is-locked" id="progress6"><span class="progress-num">Step 6</span><span class="progress-label">Open community</span><span class="progress-state" id="progress6State">LOCKED</span></div>
-      </div>
+      <a class="back" href="../testHub.html">← TestHub</a>
+      <div class="eyebrow">Test Harness · Conversational by Design</div>
+      <h1>Operator Session Test</h1>
+      <p class="intro"><strong>Question this harness answers:</strong> can a verified wallet be turned into the correct Operator session and handed to the right community without typing a Community ID or role?</p>
     </header>
 
     <div class="body">
-      <div class="next-panel" id="nextPanel" aria-live="polite">
-        <div class="next-panel-label">Your next action</div>
-        <div class="next-panel-text" id="nextPanelText">Step 1 — Connect Bifrost</div>
-        <div class="next-panel-detail" id="nextPanelDetail">Tap the highlighted wallet button below. Everything else stays locked until this is complete.</div>
+      <details class="step-folder is-active" id="step1Folder" open>
+        <summary data-step-summary="1"><span class="step-number">1</span><span><span class="step-kicker">Wallet connection</span><h2>Connect the wallet</h2></span><span class="state-icon pending" id="step1Icon">•</span><span class="step-state" id="step1State">NEXT</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="action-line">Connect Bifrost and approve the wallet connection.</p>
+          <div id="walletActionShell"><div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div><div id="wallet-kit-button"></div></div>
+          <div class="human-status" id="step1Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for a wallet connection.</span></div></div>
+          <div class="failure-panel" id="step1Failure" hidden><h3>✕ Step 1 failed</h3><p id="step1Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="1">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">No address typing. Wild Ledger reads the XRPL account directly from the connected wallet.</div></details>
+          <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">A live wallet session exists and presents the XRPL account that will be cryptographically verified before any Operator authority is trusted.</div></details>
+          <details class="detail-card"><summary>Technical details</summary><div class="detail-body"><div class="kv"><b>Wallet</b><span id="connectedWallet">—</span><b>XRPL address</b><span id="connectedAddress">—</span></div><div class="legacy-status" id="connectionStatus">Waiting for wallet connection.</div><div id="connectionDetails" hidden></div></div></details>
+        </div>
+      </details>
+
+      <details class="step-folder is-locked" id="step2Folder">
+        <summary data-step-summary="2"><span class="step-number">2</span><span><span class="step-kicker">Fresh one-time proof</span><h2>Generate the challenge</h2></span><span class="state-icon locked" id="step2Icon">•</span><span class="step-state" id="step2State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="action-line">Create a fresh one-time challenge for this wallet to sign.</p>
+          <div class="button-row"><button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button></div>
+          <div class="human-status" id="step2Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for Step 1.</span></div></div>
+          <div class="failure-panel" id="step2Failure" hidden><h3>✕ Step 2 failed</h3><p id="step2Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="2">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">Wild Ledger creates the challenge automatically. You do not type or paste anything.</div></details>
+          <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">The proof request is fresh, random, short-lived, and specific to this browser session.</div></details>
+          <details class="detail-card"><summary>Technical details</summary><div class="detail-body"><div id="challengeArea" hidden><div class="kv"><b>Nonce</b><span id="nonceText">—</span><b>Expires</b><span id="expiresText">—</span></div><div style="margin-top:10px;font-weight:850">Exact message the wallet will sign</div><pre class="mono" id="challengeText"></pre></div><div id="challengeEmpty">No challenge has been generated yet.</div></div></details>
+        </div>
+      </details>
+
+      <details class="step-folder is-locked" id="step3Folder">
+        <summary data-step-summary="3"><span class="step-number">3</span><span><span class="step-kicker">Cryptographic proof</span><h2>Prove wallet control</h2></span><span class="state-icon locked" id="step3Icon">•</span><span class="step-state" id="step3State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="action-line">Ask Bifrost to sign the challenge, then approve the signing request.</p>
+          <div class="button-row"><button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button></div>
+          <div class="human-status" id="step3Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for Steps 1 and 2.</span></div></div>
+          <div class="failure-panel" id="step3Failure" hidden><h3>✕ Step 3 failed</h3><p id="step3Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="3">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">Bifrost may show a transaction-shaped signing screen. This harness never submits that envelope to XRPL.</div></details>
+          <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">Wild Ledger verifies the connected account, public key, digital signature, exact challenge message, and fresh nonce before using this wallet for Operator authority.</div></details>
+          <details class="detail-card"><summary>Verification details and raw proof</summary><div class="detail-body"><div class="legacy-status" id="proofStatus">Waiting for a challenge.</div><div id="proofResult"><div class="result-big" id="resultBig" hidden></div><div class="kv"><b>Signed by</b><span id="proofAccount">—</span><b>Signature</b><span id="signatureCheck">—</span><b>Message</b><span id="messageCheck">—</span><b>Nonce</b><span id="nonceCheck">—</span><b>Ledger submit</b><span>Not performed</span></div><details class="detail-card" style="margin-top:10px"><summary>Raw returned proof data</summary><div class="detail-body"><pre class="mono" id="rawProof">No proof returned yet.</pre></div></details><div class="optional-action"><strong>Optional diagnostic: replay protection</strong><div id="replayTechnical" style="margin-top:4px;color:rgba(236,249,247,.63)">Not tested.</div><button id="replayButton" type="button" disabled>Test Same Proof Again</button></div></div></div></details>
+        </div>
+      </details>
+
+      <details class="step-folder is-locked" id="step4Folder">
+        <summary data-step-summary="4"><span class="step-number">4</span><span><span class="step-kicker">Validated XRPL history</span><h2>Identify community authority</h2></span><span class="state-icon locked" id="step4Icon">•</span><span class="step-state" id="step4State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="action-line">Read validated XRPL authority history and identify the one community this verified wallet currently operates.</p>
+          <div class="button-row"><button id="identifyButton" class="primary-action" type="button" disabled>Identify My Community</button></div>
+          <div class="human-status" id="step4Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for a verified wallet.</span></div></div>
+          <div class="failure-panel" id="step4Failure" hidden><h3>✕ Step 4 failed</h3><p id="step4Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="4">Copy Diagnostic Report</button></div></div>
+          <div class="authority-answer" id="authorityAnswer" hidden><strong id="authorityAnswerTitle"></strong><p id="authorityAnswerText"></p></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">This full sign-in test needs exactly one current community authority match. If none is found, or this wallet currently operates more than one community, the harness stops instead of guessing.</div></details>
+          <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">Wild Ledger does not trust a typed Community ID or URL value. It starts from the verified wallet and resolves current Community Operating Wallet authority from validated XRPL history.</div></details>
+          <details class="detail-card"><summary>Authority details and raw result</summary><div class="detail-body"><div class="legacy-status" id="authorityStatus">Waiting for verified wallet control.</div><div id="authorityResult"><div class="result-big" id="authorityBig" hidden></div><div class="kv"><b>Verified wallet</b><span id="authorityWallet">—</span><b>Community</b><span id="authorityCommunity">—</span><b>Namespace</b><span id="authorityNamespace">—</span><b>Current authority</b><span id="authorityCurrent">—</span><b>Source</b><span id="authoritySource">—</span></div><details class="detail-card" id="authorityDetails" style="margin-top:10px"><summary>Raw authority result</summary><div class="detail-body"><pre class="mono" id="authorityRaw">No authority lookup has been run yet.</pre></div></details></div></div></details>
+        </div>
+      </details>
+
+      <details class="step-folder is-locked" id="step5Folder">
+        <summary data-step-summary="5"><span class="step-number">5</span><span><span class="step-kicker">Verified browser context</span><h2>Create the Operator session</h2></span><span class="state-icon locked" id="step5Icon">•</span><span class="step-state" id="step5State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="action-line">Create the Operator browser session from fresh verified XRPL authority.</p>
+          <div class="button-row"><button id="createSessionButton" class="primary-action" type="button" disabled>Create Operator Session</button></div>
+          <div class="human-status" id="step5Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for exactly one community authority match.</span></div></div>
+          <div class="failure-panel" id="step5Failure" hidden><h3>✕ Step 5 failed</h3><p id="step5Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="5">Copy Diagnostic Report</button></div></div>
+          <div class="session-answer" id="sessionAnswer" hidden><strong id="sessionAnswerTitle"></strong><p id="sessionAnswerText"></p></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">Before writing session state, Wild Ledger rechecks validated authority. The session is not granted from a typed Community ID or a role in the URL.</div></details>
+          <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">The browser's Operator role, community, and verified wallet are all derived from the wallet proof plus fresh XRPL authority.</div></details>
+          <details class="detail-card"><summary>Session details and test controls</summary><div class="detail-body"><div class="legacy-status" id="sessionStatus">Waiting for exactly one authority match.</div><div id="sessionResult"><div class="result-big" id="sessionBig" hidden></div><div class="kv"><b>Role</b><span id="sessionRole">—</span><b>Community</b><span id="sessionCommunity">—</span><b>Verified wallet</b><span id="sessionWallet">—</span><b>Source</b><span id="sessionSource">—</span><b>Established</b><span id="sessionEstablished">—</span></div><details class="detail-card" style="margin-top:10px"><summary>Raw browser session values</summary><div class="detail-body"><pre class="mono" id="sessionRaw">No Operator session has been created by this harness yet.</pre></div></details></div><button id="clearSessionButton" class="secondary-action" type="button">Clear Test Session</button></div></details>
+        </div>
+      </details>
+
+      <details class="step-folder is-locked" id="step6Folder">
+        <summary data-step-summary="6"><span class="step-number">6</span><span><span class="step-kicker">Real-page handoff</span><h2>Open the verified community</h2></span><span class="state-icon locked" id="step6Icon">•</span><span class="step-state" id="step6State">LOCKED</span><span class="caret">›</span></summary>
+        <div class="folder-body">
+          <p class="action-line">Hand the verified Operator session to the real community page.</p>
+          <div class="button-row"><button id="openCommunityButton" class="primary-action" type="button" disabled>Open Verified Community</button></div>
+          <div class="human-status" id="step6Human"><span class="big">•</span><div><strong>Pending</strong><span>Waiting for the Operator session.</span></div></div>
+          <div class="failure-panel" id="step6Failure" hidden><h3>✕ Step 6 failed</h3><p id="step6Error"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-report="6">Copy Diagnostic Report</button></div></div>
+          <details class="detail-card"><summary>Helpful note</summary><div class="detail-body">This button leaves the harness. On the real page, the pass condition is: the XRPL-identified community opens in Operator mode, Log Out is visible, Owner-only Communities navigation is absent, and the URL is plain <code>viewCommunity.html</code> with no Community ID or role added.</div></details>
+          <details class="detail-card"><summary>What this step proves</summary><div class="detail-body">The real community page is entered from the verified browser Operator session rather than from typed identifiers or URL authority.</div></details>
+          <details class="detail-card"><summary>Technical details</summary><div class="detail-body"><div class="legacy-status" id="handoffStatus">Waiting for the Operator session.</div><div class="kv"><b>Destination</b><span>../viewCommunity.html</span><b>Community in URL</b><span>None</span><b>Role in URL</b><span>None</span></div></div></details>
+        </div>
+      </details>
+
+      <div class="overall-result" id="overallResult" hidden aria-live="polite">
+        <span class="overall-result-icon" aria-hidden="true">✓</span>
+        <div><span class="overall-result-label">TEST COMPLETE</span><strong id="overallTitle">Operator handoff launched</strong><p id="overallText">Six green checks.</p></div>
       </div>
 
-      <section class="card step-card is-active" id="step1Card">
-        <div class="step-head"><span class="step-number">1</span><div><div class="step-kicker">Wallet connection</div><h2>Connect Bifrost</h2><p class="step-summary">Wild Ledger needs the XRPL account directly from your wallet. No address is typed or pasted.</p></div><span class="step-state" id="step1State">NEXT</span></div>
-        <div class="instruction"><strong>Your action: tap the wallet button below, choose Bifrost, and approve the connection.</strong><span>When the connection is complete, this card turns green and Step 2 becomes the only highlighted next action.</span></div>
-        <div id="walletActionShell">
-          <div id="walletButtonLoading" class="wallet-loading">Loading Connect Wallet button…</div>
-          <div id="wallet-kit-button"></div>
+      <details class="purpose harness-about">
+        <summary>About this test</summary>
+        <div class="purpose-body">
+          <p><strong>When do I use this harness?</strong> Use it when you want to isolate the complete Operator entrance path: wallet connection, wallet proof, current community authority, browser session creation, and the final handoff into the real community page.</p>
+          <div class="safety"><strong>How to read the status:</strong> yellow means not done, the spinning ring means working, a green check means the step completed correctly, and a red X means stop and use the diagnostic report. This harness does not submit an XRPL transaction.</div>
+          <div class="run-meter" id="runMeter"><div><strong id="runHeadline">Run the six checks from top to bottom.</strong><span id="runDetail">The real handoff is the last action.</span></div><span class="run-count" id="runCount">0 / 6 PASSED</span></div>
+          <div class="progress" aria-label="Operator session test steps">
+            <div class="progress-item is-active" id="progress1"><span class="progress-num">Step 1</span><span class="progress-label">Connect</span><span class="progress-state" id="progress1State">NEXT</span></div>
+            <div class="progress-item is-locked" id="progress2"><span class="progress-num">Step 2</span><span class="progress-label">Challenge</span><span class="progress-state" id="progress2State">LOCKED</span></div>
+            <div class="progress-item is-locked" id="progress3"><span class="progress-num">Step 3</span><span class="progress-label">Prove control</span><span class="progress-state" id="progress3State">LOCKED</span></div>
+            <div class="progress-item is-locked" id="progress4"><span class="progress-num">Step 4</span><span class="progress-label">Authority</span><span class="progress-state" id="progress4State">LOCKED</span></div>
+            <div class="progress-item is-locked" id="progress5"><span class="progress-num">Step 5</span><span class="progress-label">Session</span><span class="progress-state" id="progress5State">LOCKED</span></div>
+            <div class="progress-item is-locked" id="progress6"><span class="progress-num">Step 6</span><span class="progress-label">Handoff</span><span class="progress-state" id="progress6State">LOCKED</span></div>
+          </div>
+          <div class="next-panel" id="nextPanel" aria-live="polite"><div class="next-panel-label" id="nextPanelLabel">Your next action</div><div class="next-panel-text" id="nextPanelText">Step 1 — Connect the wallet</div><div class="next-panel-detail" id="nextPanelDetail">Use the wallet button in Step 1.</div></div>
         </div>
-        <div class="status wait" id="connectionStatus">Waiting for Bifrost connection.</div>
-        <div class="kv" id="connectionDetails" hidden><b>Wallet</b><span id="connectedWallet">—</span><b>XRPL address</b><span id="connectedAddress">—</span></div>
-      </section>
+      </details>
 
-      <section class="card step-card is-locked" id="step2Card">
-        <div class="step-head"><span class="step-number">2</span><div><div class="step-kicker">Fresh one-time proof</div><h2>Generate the challenge</h2><p class="step-summary">Wild Ledger creates a random, short-lived message for this browser session. You do not type anything.</p></div><span class="step-state" id="step2State">LOCKED</span></div>
-        <div class="instruction"><strong>Your action: tap Generate Challenge.</strong><span>The challenge expires after five minutes and can be accepted only once.</span></div>
-        <div class="button-row"><button id="generateButton" class="primary-action" type="button" disabled>Generate Challenge</button></div>
-        <div id="challengeArea" hidden><div class="label" style="margin-top:16px">Exact message Bifrost will sign</div><pre class="mono" id="challengeText"></pre><div class="kv"><b>Nonce</b><span id="nonceText">—</span><b>Expires</b><span id="expiresText">—</span></div></div>
-      </section>
-
-      <section class="card step-card is-locked" id="step3Card">
-        <div class="step-head"><span class="step-number">3</span><div><div class="step-kicker">Wallet-control proof</div><h2>Prove control in Bifrost</h2><p class="step-summary">Bifrost signs the exact one-time challenge. Wild Ledger verifies the signature locally and submits nothing to XRPL.</p></div><span class="step-state" id="step3State">LOCKED</span></div>
-        <div class="instruction"><strong>Your action: tap Prove Wallet Control, then approve the signing request in Bifrost.</strong><span>Bifrost may show a transaction-shaped signing screen. It is only the signature envelope; this harness never submits it.</span></div>
-        <div class="button-row"><button id="signButton" class="primary-action" type="button" disabled>Prove Wallet Control</button><button id="replayButton" class="secondary" type="button" disabled>Test Same Proof Again</button></div>
-        <div class="status" id="proofStatus">Waiting for Steps 1 and 2.</div>
-        <div id="proofResult" hidden><div class="result-big" id="resultBig"></div><div class="kv"><b>Signed by</b><span id="proofAccount">—</span><b>Signature</b><span id="signatureCheck">—</span><b>Message</b><span id="messageCheck">—</span><b>Nonce</b><span id="nonceCheck">—</span><b>Ledger submit</b><span>Not performed</span></div><details><summary>Show returned proof data</summary><pre class="mono" id="rawProof"></pre></details></div>
-      </section>
-
-      <section class="card step-card is-locked" id="step4Card">
-        <div class="step-head"><span class="step-number">4</span><div><div class="step-kicker">Validated XRPL authority</div><h2>Identify the community</h2><p class="step-summary">Wild Ledger reads validated authority history and checks whether this verified wallet is the current Community Operating Wallet.</p></div><span class="step-state" id="step4State">LOCKED</span></div>
-        <div class="instruction"><strong>Your action: tap Identify My Community.</strong><span>No Community ID is entered. Wild Ledger discovers the community from the verified wallet and ledger history.</span></div>
-        <div class="button-row"><button id="identifyButton" class="primary-action" type="button" disabled>Identify My Community</button></div>
-        <div class="status" id="authorityStatus">Waiting for verified wallet control.</div>
-        <div id="authorityResult" hidden><div class="result-big" id="authorityBig"></div><div class="kv"><b>Verified wallet</b><span id="authorityWallet">—</span><b>Community</b><span id="authorityCommunity">—</span><b>Namespace</b><span id="authorityNamespace">—</span><b>Current authority</b><span id="authorityCurrent">—</span><b>Source</b><span id="authoritySource">—</span></div><details id="authorityDetails" hidden><summary>Show authority details</summary><pre class="mono" id="authorityRaw"></pre></details></div>
-      </section>
-
-      <section class="card step-card is-locked" id="step5Card">
-        <div class="step-head"><span class="step-number">5</span><div><div class="step-kicker">Verified browser context</div><h2>Create the Operator session</h2><p class="step-summary">Wild Ledger rechecks current authority, then writes the Operator browser session from the verified wallet result.</p></div><span class="step-state" id="step5State">LOCKED</span></div>
-        <div class="instruction"><strong>Your action: tap Create Operator Session.</strong><span>The session is built from fresh XRPL authority. It is not granted from a typed Community ID or a URL parameter.</span></div>
-        <div class="button-row"><button id="createSessionButton" class="primary-action" type="button" disabled>Create Operator Session</button><button id="clearSessionButton" class="secondary" type="button">Clear Test Session</button></div>
-        <div class="status" id="sessionStatus">Waiting for exactly one community authority match.</div>
-        <div id="sessionResult" hidden><div class="result-big" id="sessionBig"></div><div class="kv"><b>Role</b><span id="sessionRole">—</span><b>Community</b><span id="sessionCommunity">—</span><b>Verified wallet</b><span id="sessionWallet">—</span><b>Source</b><span id="sessionSource">—</span><b>Established</b><span id="sessionEstablished">—</span></div><details><summary>Show browser session values</summary><pre class="mono" id="sessionRaw"></pre></details></div>
-      </section>
-
-      <section class="card step-card is-locked" id="step6Card">
-        <div class="step-head"><span class="step-number">6</span><div><div class="step-kicker">Real-page handoff</div><h2>Open the verified community</h2><p class="step-summary">This tests the real handoff. The community page receives no Community ID and no role in its URL; it must use the verified Operator session.</p></div><span class="step-state" id="step6State">LOCKED</span></div>
-        <div class="instruction"><strong>Your action: tap Open Verified Community.</strong><span>Pass condition: the correct community opens in Operator mode, with Log Out visible and Owner-only navigation absent.</span></div>
-        <div class="button-row"><button id="openCommunityButton" class="primary-action" type="button" disabled>Open Verified Community</button></div>
-        <div class="status" id="handoffStatus">Waiting for the Operator session.</div>
-      </section>
-
-      <p class="fine">Test harness only. Steps 1–4 prove wallet control and resolve current Community Operating Wallet authority from validated XRPL history. Step 5 writes the browser Operator session from that verified result. Step 6 hands that session to the real community page without putting role or Community ID in the URL.</p>
+      <p class="fine">Scope: verified wallet → current community authority → verified Operator browser session → real-page handoff. Green checks all the way down mean the harness completed its work. A red X is the handoff point for diagnostics and a ChatGPT troubleshooting conversation.</p>
     </div>
-    <footer>WILD LEDGER · OPERATOR SESSION TEST HARNESS · HUMANS TAP. WALLETS SIGN. LEDGERS CARRY.</footer>
+    <footer>WILD LEDGER · OPERATOR SESSION TEST · HUMANS TAP. WALLETS SIGN. LEDGERS CARRY.</footer>
   </section>
 </main>
 
   <script type="module">
-    import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
-    import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@3.1.0?bundle";
-    import { DirectXRPLClient, isClassicAddress } from "../js/xrplTransport.js?wl=20261005-operator-session";
-    import { resolveOwnerAuthority } from "../js/ownerAuthority.js?wl=20261005-operator-session";
-    import { resolveCommunityAuthority, isCanonicalNoOpAccountSet, operatingWalletMemo } from "../js/communityAuthority.js?wl=20261005-operator-session";
+  import { decode, encodeForSigning } from "https://esm.sh/ripple-binary-codec@2.11.0?bundle";
+  import { verify, deriveAddress } from "https://esm.sh/ripple-keypairs@3.1.0?bundle";
+  import { DirectXRPLClient, isClassicAddress } from "../js/xrplTransport.js?wl=20261005-operator-session-human";
+  import { resolveOwnerAuthority } from "../js/ownerAuthority.js?wl=20261005-operator-session-human";
+  import { resolveCommunityAuthority, isCanonicalNoOpAccountSet, operatingWalletMemo } from "../js/communityAuthority.js?wl=20261005-operator-session-human";
 
-    const cfg = window.WILD_LEDGER_CONFIG || {};
-    const projectId = String(cfg.walletConnectProjectId || "").trim();
-    const proofDestination = String(cfg.leapIssuer || "").trim();
+  const cfg = window.WILD_LEDGER_CONFIG || {};
+  const projectId = String(cfg.walletConnectProjectId || "").trim();
+  const proofDestination = String(cfg.leapIssuer || "").trim();
 
-    const connectionStatus = document.getElementById("connectionStatus");
-    const connectionDetails = document.getElementById("connectionDetails");
-    const connectedWallet = document.getElementById("connectedWallet");
-    const connectedAddress = document.getElementById("connectedAddress");
-    const generateButton = document.getElementById("generateButton");
-    const signButton = document.getElementById("signButton");
-    const replayButton = document.getElementById("replayButton");
-    const challengeArea = document.getElementById("challengeArea");
-    const challengeTextEl = document.getElementById("challengeText");
-    const nonceText = document.getElementById("nonceText");
-    const expiresText = document.getElementById("expiresText");
-    const proofStatus = document.getElementById("proofStatus");
-    const proofResult = document.getElementById("proofResult");
-    const resultBig = document.getElementById("resultBig");
-    const proofAccount = document.getElementById("proofAccount");
-    const signatureCheck = document.getElementById("signatureCheck");
-    const messageCheck = document.getElementById("messageCheck");
-    const nonceCheck = document.getElementById("nonceCheck");
-    const rawProof = document.getElementById("rawProof");
-    const identifyButton = document.getElementById("identifyButton");
-    const authorityStatus = document.getElementById("authorityStatus");
-    const authorityResult = document.getElementById("authorityResult");
-    const authorityBig = document.getElementById("authorityBig");
-    const authorityWallet = document.getElementById("authorityWallet");
-    const authorityCommunity = document.getElementById("authorityCommunity");
-    const authorityNamespace = document.getElementById("authorityNamespace");
-    const authorityCurrent = document.getElementById("authorityCurrent");
-    const authoritySource = document.getElementById("authoritySource");
-    const authorityDetails = document.getElementById("authorityDetails");
-    const authorityRaw = document.getElementById("authorityRaw");
-    const createSessionButton = document.getElementById("createSessionButton");
-    const clearSessionButton = document.getElementById("clearSessionButton");
-    const sessionStatus = document.getElementById("sessionStatus");
-    const sessionResult = document.getElementById("sessionResult");
-    const sessionBig = document.getElementById("sessionBig");
-    const sessionRole = document.getElementById("sessionRole");
-    const sessionCommunity = document.getElementById("sessionCommunity");
-    const sessionWallet = document.getElementById("sessionWallet");
-    const sessionSource = document.getElementById("sessionSource");
-    const sessionEstablished = document.getElementById("sessionEstablished");
-    const sessionRaw = document.getElementById("sessionRaw");
-    const openCommunityButton = document.getElementById("openCommunityButton");
-    const handoffStatus = document.getElementById("handoffStatus");
-    const nextPanelText = document.getElementById("nextPanelText");
-    const nextPanelDetail = document.getElementById("nextPanelDetail");
-    const walletButtonLoading = document.getElementById("walletButtonLoading");
-    const walletButtonHost = document.getElementById("wallet-kit-button");
-    const stepCards = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Card`));
-    const stepStates = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}State`));
-    const progressItems = [1,2,3,4,5,6].map(n => document.getElementById(`progress${n}`));
-    const progressStates = [1,2,3,4,5,6].map(n => document.getElementById(`progress${n}State`));
+  const walletButtonHost = document.getElementById("wallet-kit-button");
+  const walletButtonLoading = document.getElementById("walletButtonLoading");
+  const connectionStatus = document.getElementById("connectionStatus");
+  const connectionDetails = document.getElementById("connectionDetails");
+  const connectedWallet = document.getElementById("connectedWallet");
+  const connectedAddress = document.getElementById("connectedAddress");
+  const generateButton = document.getElementById("generateButton");
+  const signButton = document.getElementById("signButton");
+  const replayButton = document.getElementById("replayButton");
+  const challengeArea = document.getElementById("challengeArea");
+  const challengeEmpty = document.getElementById("challengeEmpty");
+  const challengeTextEl = document.getElementById("challengeText");
+  const nonceText = document.getElementById("nonceText");
+  const expiresText = document.getElementById("expiresText");
+  const proofStatus = document.getElementById("proofStatus");
+  const proofResult = document.getElementById("proofResult");
+  const resultBig = document.getElementById("resultBig");
+  const proofAccount = document.getElementById("proofAccount");
+  const signatureCheck = document.getElementById("signatureCheck");
+  const messageCheck = document.getElementById("messageCheck");
+  const nonceCheck = document.getElementById("nonceCheck");
+  const rawProof = document.getElementById("rawProof");
+  const replayTechnical = document.getElementById("replayTechnical");
+  const identifyButton = document.getElementById("identifyButton");
+  const authorityStatus = document.getElementById("authorityStatus");
+  const authorityResult = document.getElementById("authorityResult");
+  const authorityBig = document.getElementById("authorityBig");
+  const authorityAnswer = document.getElementById("authorityAnswer");
+  const authorityAnswerTitle = document.getElementById("authorityAnswerTitle");
+  const authorityAnswerText = document.getElementById("authorityAnswerText");
+  const authorityWallet = document.getElementById("authorityWallet");
+  const authorityCommunity = document.getElementById("authorityCommunity");
+  const authorityNamespace = document.getElementById("authorityNamespace");
+  const authorityCurrent = document.getElementById("authorityCurrent");
+  const authoritySource = document.getElementById("authoritySource");
+  const authorityDetails = document.getElementById("authorityDetails");
+  const authorityRaw = document.getElementById("authorityRaw");
+  const createSessionButton = document.getElementById("createSessionButton");
+  const clearSessionButton = document.getElementById("clearSessionButton");
+  const sessionStatus = document.getElementById("sessionStatus");
+  const sessionResult = document.getElementById("sessionResult");
+  const sessionBig = document.getElementById("sessionBig");
+  const sessionRole = document.getElementById("sessionRole");
+  const sessionCommunity = document.getElementById("sessionCommunity");
+  const sessionWallet = document.getElementById("sessionWallet");
+  const sessionSource = document.getElementById("sessionSource");
+  const sessionEstablished = document.getElementById("sessionEstablished");
+  const sessionRaw = document.getElementById("sessionRaw");
+  const sessionAnswer = document.getElementById("sessionAnswer");
+  const sessionAnswerTitle = document.getElementById("sessionAnswerTitle");
+  const sessionAnswerText = document.getElementById("sessionAnswerText");
+  const openCommunityButton = document.getElementById("openCommunityButton");
+  const handoffStatus = document.getElementById("handoffStatus");
+  const overallResult = document.getElementById("overallResult");
+  const overallTitle = document.getElementById("overallTitle");
+  const overallText = document.getElementById("overallText");
+  const runMeter = document.getElementById("runMeter");
+  const runHeadline = document.getElementById("runHeadline");
+  const runDetail = document.getElementById("runDetail");
+  const runCount = document.getElementById("runCount");
+  const nextPanel = document.getElementById("nextPanel");
+  const nextPanelLabel = document.getElementById("nextPanelLabel");
+  const nextPanelText = document.getElementById("nextPanelText");
+  const nextPanelDetail = document.getElementById("nextPanelDetail");
 
-    let currentChallenge = null;
-    let lastSignedResult = null;
-    let lastVerifiedAccount = "";
-    let lastAuthorityResult = null;
-    let sessionCandidate = null;
-    let busyStep = 0;
-    const usedNonces = new Set();
+  const stepFolders = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Folder`));
+  const stepStates = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}State`));
+  const stepIcons = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Icon`));
+  const stepHumans = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Human`));
+  const progressItems = [1,2,3,4,5,6].map(n => document.getElementById(`progress${n}`));
+  const progressStates = [1,2,3,4,5,6].map(n => document.getElementById(`progress${n}State`));
+  const failurePanels = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Failure`));
+  const errorEls = [1,2,3,4,5,6].map(n => document.getElementById(`step${n}Error`));
 
-    function setStatus(element, message, tone = "") {
-      element.textContent = message;
-      element.className = `status${tone ? ` ${tone}` : ""}`;
-    }
+  let currentChallenge = null;
+  let lastSignedResult = null;
+  let lastVerifiedAccount = "";
+  let lastAuthorityResult = null;
+  let sessionCandidate = null;
+  let busyStep = 0;
+  let failedStep = 0;
+  let lastAddress = "";
+  let handoffStarted = false;
+  const usedNonces = new Set();
+  const failureRecords = new Map();
 
-    function setStepState(stepNumber, state) {
-      const card = stepCards[stepNumber - 1];
-      const badge = stepStates[stepNumber - 1];
-      const progress = progressItems[stepNumber - 1];
-      const progressBadge = progressStates[stepNumber - 1];
-      if (!card || !badge) return;
-      card.classList.remove("is-active", "is-done", "is-locked");
-      progress?.classList.remove("is-active", "is-done", "is-locked");
-      if (state === "active") {
-        card.classList.add("is-active"); badge.textContent = "NEXT";
-        progress?.classList.add("is-active"); if (progressBadge) progressBadge.textContent = "NEXT";
-      } else if (state === "done") {
-        card.classList.add("is-done"); badge.textContent = "DONE";
-        progress?.classList.add("is-done"); if (progressBadge) progressBadge.textContent = "DONE";
-      } else {
-        card.classList.add("is-locked"); badge.textContent = "LOCKED";
-        progress?.classList.add("is-locked"); if (progressBadge) progressBadge.textContent = "LOCKED";
-      }
-    }
+  function getSession() { try { return kit?.getSession?.() || kit?.manager?.getSession?.() || null; } catch (_) { return null; } }
+  function sessionAddress(session) { return String(session?.account?.address || session?.accountAddress || session?.address || session?.accounts?.[0]?.address || "").trim(); }
+  function sessionWalletName(session) { return String(session?.wallet?.name || session?.adapter?.name || session?.walletName || session?.adapterId || "Connected wallet"); }
 
-    function storedSessionMatchesCurrentWallet() {
-      try {
-        const stored = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
-        return !!(stored?.communityId && stored?.verifiedWallet && stored.verifiedWallet === lastVerifiedAccount);
-      } catch (_) {
-        return false;
-      }
-    }
+  function randomNonce() {
+    const bytes = new Uint8Array(16); crypto.getRandomValues(bytes);
+    return Array.from(bytes, byte => byte.toString(16).padStart(2,"0")).join("").toUpperCase();
+  }
+  function makeChallenge() {
+    const issued = new Date(); const expires = new Date(issued.getTime()+5*60*1000); const nonce = randomNonce();
+    const origin = location.origin && location.origin !== "null" ? location.origin : "local-test";
+    const message = ["Wild Ledger Wallet Proof","Purpose: prove wallet control",`Nonce: ${nonce}`,`Issued: ${issued.toISOString()}`,`Expires: ${expires.toISOString()}`,`Site: ${origin}`].join("\n");
+    return { nonce,issuedAt:issued.getTime(),expiresAt:expires.getTime(),message };
+  }
 
-    function updateGuidance() {
-      const address = sessionAddress(getSession());
-      const proofDone = !!lastVerifiedAccount && lastVerifiedAccount === address;
-      const authorityMatches = lastAuthorityResult?.matches || [];
-      const candidateReady = !!sessionCandidate && proofDone;
-      const sessionDone = candidateReady && storedSessionMatchesCurrentWallet();
-      const challengeReady = !!currentChallenge && !usedNonces.has(currentChallenge.nonce);
-
-      generateButton.disabled = !address || proofDone || !!busyStep;
-      signButton.disabled = !address || !challengeReady || proofDone || !!busyStep;
-      identifyButton.disabled = !proofDone || !!lastAuthorityResult || !!busyStep;
-      createSessionButton.disabled = !candidateReady || sessionDone || !!busyStep;
-      openCommunityButton.disabled = !sessionDone || !!busyStep;
-
-      if (!address) {
-        setStepState(1, "active");
-        [2,3,4,5,6].forEach(n => setStepState(n, "locked"));
-        nextPanelText.textContent = "Step 1 — Connect Bifrost";
-        nextPanelDetail.textContent = "Tap the highlighted wallet button in Step 1. Nothing else is ready yet.";
-        return;
-      }
-
-      setStepState(1, "done");
-
-      if (proofDone) {
-        setStepState(2, "done");
-        setStepState(3, "done");
-
-        if (!lastAuthorityResult) {
-          setStepState(4, "active");
-          setStepState(5, "locked");
-          setStepState(6, "locked");
-          nextPanelText.textContent = busyStep === 4 ? "Step 4 — Reading XRPL authority…" : "Step 4 — Identify My Community";
-          nextPanelDetail.textContent = busyStep === 4
-            ? "Please wait while validated XRPL authority history is checked."
-            : "Wallet control is verified. Tap the highlighted authority button.";
-          return;
-        }
-
-        setStepState(4, "done");
-        if (authorityMatches.length !== 1 || !candidateReady) {
-          setStepState(5, "locked");
-          setStepState(6, "locked");
-          nextPanelText.textContent = authorityMatches.length > 1 ? "STOP — Community chooser required" : "STOP — No Operator authority found";
-          nextPanelDetail.textContent = authorityMatches.length > 1
-            ? "This wallet controls more than one community, so this harness will not guess."
-            : "This verified wallet is not the current Operating Wallet for a community found by this test.";
-          return;
-        }
-
-        if (!sessionDone) {
-          setStepState(5, "active");
-          setStepState(6, "locked");
-          nextPanelText.textContent = busyStep === 5 ? "Step 5 — Rechecking authority…" : "Step 5 — Create Operator Session";
-          nextPanelDetail.textContent = busyStep === 5
-            ? "Please wait while authority is rechecked before the browser session is written."
-            : `Authority is verified for ${sessionCandidate.communityId}. Tap the highlighted Create Operator Session button.`;
-          return;
-        }
-
-        setStepState(5, "done");
-        setStepState(6, "active");
-        nextPanelText.textContent = "Step 6 — Open Verified Community";
-        nextPanelDetail.textContent = `Session established for ${sessionCandidate.communityId}. Tap the highlighted button to test the real-page handoff.`;
-        setStatus(handoffStatus, `Ready. NEXT: open ${sessionCandidate.communityId} from the verified Operator session.`, "wait");
-        return;
-      }
-
-      if (!challengeReady) {
-        setStepState(2, "active");
-        [3,4,5,6].forEach(n => setStepState(n, "locked"));
-        nextPanelText.textContent = "Step 2 — Generate Challenge";
-        nextPanelDetail.textContent = "Bifrost is connected. Tap the highlighted Generate Challenge button.";
-        return;
-      }
-
-      setStepState(2, "done");
-      setStepState(3, "active");
-      [4,5,6].forEach(n => setStepState(n, "locked"));
-      nextPanelText.textContent = busyStep === 3 ? "Step 3 — Waiting for Bifrost…" : "Step 3 — Prove Wallet Control";
-      nextPanelDetail.textContent = busyStep === 3
-        ? "Review the signing request in Bifrost and approve it if it matches this test."
-        : "The challenge is ready. Tap the highlighted proof button and approve the signing request in Bifrost.";
-    }
-
-    function randomNonce() {
-      const bytes = new Uint8Array(16);
-      crypto.getRandomValues(bytes);
-      return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("").toUpperCase();
-    }
-
-    function makeChallenge() {
-      const issued = new Date();
-      const expires = new Date(issued.getTime() + 5 * 60 * 1000);
-      const nonce = randomNonce();
-      const origin = location.origin && location.origin !== "null" ? location.origin : "local-test";
-      const message = [
-        "Wild Ledger Wallet Proof",
-        "Purpose: prove wallet control",
-        `Nonce: ${nonce}`,
-        `Issued: ${issued.toISOString()}`,
-        `Expires: ${expires.toISOString()}`,
-        `Site: ${origin}`
-      ].join("\n");
-      return { nonce, issuedAt: issued.getTime(), expiresAt: expires.getTime(), message };
-    }
-
-    function getSession() {
-      try {
-        return kit?.getSession?.() || kit?.manager?.getSession?.() || null;
-      } catch (_) {
-        return null;
-      }
-    }
-
-    function sessionAddress(session) {
-      return String(
-        session?.account?.address ||
-        session?.accountAddress ||
-        session?.address ||
-        session?.accounts?.[0]?.address ||
-        ""
-      ).trim();
-    }
-
-    function sessionWalletName(session) {
-      return String(
-        session?.wallet?.name ||
-        session?.adapter?.name ||
-        session?.walletName ||
-        session?.adapterId ||
-        "Connected wallet"
-      );
-    }
-
-    function refreshConnection() {
-      const session = getSession();
-      const address = sessionAddress(session);
-      const walletButtonRendered = !!walletButtonHost?.children?.length;
-      if (walletButtonRendered) walletButtonLoading.hidden = true;
-
-      if (!address) {
-        setStatus(connectionStatus, "No wallet connected yet. Your next action is the Connect Wallet button above.", "wait");
-        connectionDetails.hidden = true;
-        signButton.disabled = true;
-        updateGuidance();
-        return;
-      }
-
-      connectedWallet.textContent = sessionWalletName(session);
-      connectedAddress.textContent = address;
-      connectionDetails.hidden = false;
-      walletButtonLoading.hidden = true;
-      if (lastVerifiedAccount && lastVerifiedAccount !== address) {
-        lastVerifiedAccount = "";
-        currentChallenge = null;
-        challengeArea.hidden = true;
-        clearAuthorityResult("The connected wallet changed. Generate a new challenge and prove wallet control again.");
-      }
-      setStatus(connectionStatus, "Wallet connected. NEXT: Generate Challenge in Step 2.", "good");
-      updateGuidance();
-    }
-
-    function hexToUtf8(hex) {
+function hexToUtf8(hex) {
       const clean = String(hex || "").replace(/[^A-Fa-f0-9]/g, "");
       if (!clean || clean.length % 2) return "";
       const bytes = new Uint8Array(clean.length / 2);
@@ -875,374 +838,183 @@
       };
     }
 
-    function resetSessionCandidate(message = "Identify exactly one community first.") {
-      sessionCandidate = null;
-      lastAuthorityResult = null;
-      createSessionButton.disabled = true;
-      setStatus(sessionStatus, message, "");
+    
+
+  function setStatus(element, message, tone = "") {
+    if (!element) return;
+    element.textContent = message;
+    element.className = `legacy-status${tone ? ` ${tone}` : ""}`;
+  }
+  function setHuman(step,tone,title,message) {
+    const box = stepHumans[step-1]; if(!box) return;
+    const big = box.querySelector(".big"); const strong = box.querySelector("strong"); const text = box.querySelector("span:not(.big)");
+    box.className = `human-status${tone ? ` ${tone}` : ""}`; big.textContent = tone === "good" ? "✓" : tone === "bad" ? "×" : tone === "working" ? "" : "•"; strong.textContent = title; text.textContent = message;
+  }
+  function setFailure(step,error,context="") {
+    const message = error?.message || String(error || "Unknown error"); failedStep = step; busyStep = 0; errorEls[step-1].textContent = message; failurePanels[step-1].hidden = false; failureRecords.set(step,{message,context,at:new Date().toISOString()}); renderFlow({autoOpen:true});
+  }
+  function clearFailure(step) { if (failedStep===step) failedStep=0; if(failurePanels[step-1])failurePanels[step-1].hidden=true; if(errorEls[step-1])errorEls[step-1].textContent=""; failureRecords.delete(step); }
+  function setVisualState(step,state) {
+    const folder=stepFolders[step-1],badge=stepStates[step-1],icon=stepIcons[step-1],progress=progressItems[step-1],progressBadge=progressStates[step-1];
+    if(!folder||!badge||!icon||!progress||!progressBadge)return;
+    folder.classList.remove("is-active","is-working","is-done","is-failed","is-locked"); progress.classList.remove("is-active","is-working","is-done","is-failed","is-locked"); icon.className="state-icon";
+    if(state==="active"){folder.classList.add("is-active");progress.classList.add("is-active");icon.classList.add("pending");icon.textContent="•";badge.textContent="NEXT";progressBadge.textContent="NEXT";}
+    else if(state==="working"){folder.classList.add("is-working");progress.classList.add("is-working");icon.classList.add("working");icon.textContent="";badge.textContent="WORKING";progressBadge.textContent="WORKING";}
+    else if(state==="done"){folder.classList.add("is-done");progress.classList.add("is-done");icon.classList.add("done");icon.textContent="✓";badge.textContent="PASSED";progressBadge.textContent="PASSED";}
+    else if(state==="failed"){folder.classList.add("is-failed");progress.classList.add("is-failed");icon.classList.add("failed");icon.textContent="×";badge.textContent="FAILED";progressBadge.textContent="FAILED";}
+    else{folder.classList.add("is-locked");progress.classList.add("is-locked");icon.classList.add("locked");icon.textContent="•";badge.textContent="LOCKED";progressBadge.textContent="LOCKED";}
+  }
+  function openStep(stepNumber,{scroll=false}={}) {
+    stepFolders.forEach((folder,index)=>{if(index+1!==stepNumber) folder.open=false;}); const target=stepFolders[stepNumber-1]; if(target && !target.classList.contains("is-locked")){target.open=true;if(scroll)setTimeout(()=>target.scrollIntoView({behavior:"smooth",block:"start"}),90);}
+  }
+  document.querySelectorAll("[data-step-summary]").forEach(summary=>summary.addEventListener("click",event=>{const n=Number(summary.dataset.stepSummary||0),folder=stepFolders[n-1];if(folder?.classList.contains("is-locked")){event.preventDefault();return;}setTimeout(()=>{if(!folder.open)return;stepFolders.forEach((other,index)=>{if(index+1!==n)other.open=false;});},0);}));
+
+  function storedSession() {
+    try { return JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null"); } catch (_) { return null; }
+  }
+  function storedSessionMatchesCurrentWallet() {
+    const stored = storedSession();
+    return !!(stored?.communityId && stored?.verifiedWallet && stored.verifiedWallet === lastVerifiedAccount && stored.role === "operator" && stored.source === "wallet-proof + validated-xrpl-authority");
+  }
+  function authorityOutcomeText(result) {
+    const matches = result?.matches || [];
+    if (matches.length === 0) return { title:"No current Operator authority found", text:"This verified wallet is not the current Community Operating Wallet for any canonical Wild Ledger community found by this harness.", cls:"stop" };
+    if (matches.length === 1) { const m=matches[0]; return { title:`${m.communityId} — ${m.communityName}`, text:`This verified wallet is the current Community Operating Wallet for ${m.communityId}.`, cls:"" }; }
+    return { title:`${matches.length} communities controlled`, text:`This full sign-in harness will not guess which community to enter. A multi-community chooser is required.`, cls:"stop" };
+  }
+  function renderAuthorityDetails(result) {
+    const matches=result?.matches||[]; const outcome=authorityOutcomeText(result);
+    authorityAnswer.hidden=false; authorityAnswer.className=`authority-answer${outcome.cls?` ${outcome.cls}`:""}`; authorityAnswerTitle.textContent=outcome.title; authorityAnswerText.textContent=outcome.text;
+    authorityWallet.textContent=result?.verifiedAccount||"—"; authorityRaw.textContent=JSON.stringify(safeDiagnosticValue(result),null,2);
+    if(matches.length===0){authorityCommunity.textContent="None";authorityNamespace.textContent="—";authorityCurrent.textContent="—";authoritySource.textContent="Validated XRPL history";sessionCandidate=null;}
+    else if(matches.length===1){const m=matches[0];authorityCommunity.textContent=`${m.communityId} — ${m.communityName}`;authorityNamespace.textContent=m.namespace||"—";authorityCurrent.textContent=m.currentAccount||"—";authoritySource.textContent=m.source||"Validated XRPL history";sessionCandidate={verifiedWallet:result.verifiedAccount,communityId:m.communityId,communityName:m.communityName,namespace:m.namespace||"",authoritySource:m.source||"Validated XRPL history",authorityResolvedAt:result.resolvedAt||new Date().toISOString()};}
+    else{authorityCommunity.textContent=matches.map(m=>m.communityId).join(", ");authorityNamespace.textContent=matches.map(m=>m.namespace||"—").join(", ");authorityCurrent.textContent=result?.verifiedAccount||"—";authoritySource.textContent="Validated XRPL authority histories";sessionCandidate=null;}
+  }
+  function renderStoredSession(session) {
+    sessionResult.hidden=false; sessionBig.textContent="Operator session established"; sessionRole.textContent=session.role; sessionCommunity.textContent=session.communityId; sessionWallet.textContent=session.verifiedWallet; sessionSource.textContent=session.source; sessionEstablished.textContent=new Date(session.establishedAt).toLocaleString();
+    sessionRaw.textContent=JSON.stringify({wildLedgerRole:sessionStorage.getItem("wildLedgerRole"),wildLedgerCommunity:sessionStorage.getItem("wildLedgerCommunity"),wildLedgerOperatorWallet:sessionStorage.getItem("wildLedgerOperatorWallet"),wildLedgerOperatorSession:storedSession()},null,2);
+    sessionAnswer.hidden=false; sessionAnswerTitle.textContent=`Operator session established for ${session.communityId}`; sessionAnswerText.textContent="The browser session is bound to the verified wallet and fresh XRPL authority. Step 6 can now test the real-page handoff.";
+    setStatus(sessionStatus,`Operator session established for ${session.communityId}.`,"good");
+  }
+  function clearStoredOperatorSession() {
+    sessionStorage.removeItem("wildLedgerRole"); sessionStorage.removeItem("wildLedgerCommunity"); sessionStorage.removeItem("wildLedgerOperatorWallet"); sessionStorage.removeItem("wildLedgerOperatorSession");
+    sessionResult.hidden=true; sessionAnswer.hidden=true; sessionRaw.textContent="No Operator session has been created by this harness yet."; handoffStarted=false; clearFailure(5); clearFailure(6); setStatus(sessionStatus,"Test session cleared.","wait"); setStatus(handoffStatus,"Waiting for the Operator session.","wait"); renderFlow({autoOpen:true});
+  }
+
+  function renderFlow({autoOpen=false}={}) {
+    const address=sessionAddress(getSession());
+    const challengeReady=!!currentChallenge && Date.now()<=currentChallenge.expiresAt && !usedNonces.has(currentChallenge.nonce);
+    const proofDone=!!lastVerifiedAccount && lastVerifiedAccount===address;
+    const authorityMatches=lastAuthorityResult?.matches||[];
+    const authorityReady=proofDone && authorityMatches.length===1 && !!sessionCandidate;
+    const sessionDone=authorityReady && storedSessionMatchesCurrentWallet();
+    const complete=handoffStarted && sessionDone;
+
+    overallResult.hidden=!complete;
+    generateButton.disabled=!address || proofDone || !!busyStep;
+    signButton.disabled=!address || !challengeReady || proofDone || !!busyStep;
+    identifyButton.disabled=!proofDone || !!lastAuthorityResult || !!busyStep;
+    createSessionButton.disabled=!authorityReady || sessionDone || !!busyStep;
+    openCommunityButton.disabled=!sessionDone || !!busyStep;
+    replayButton.disabled=!proofDone || !!busyStep;
+
+    let passed=0; if(address)passed++; if(challengeReady||proofDone)passed++; if(proofDone)passed++; if(authorityReady)passed++; if(sessionDone)passed++; if(complete)passed++;
+    runCount.textContent=`${passed} / 6 PASSED`; runMeter.classList.toggle("is-complete",complete); nextPanel.classList.remove("is-working","is-failed","is-complete");
+    let active=1;
+
+    if(failedStep){
+      for(let n=1;n<=6;n++)setVisualState(n,n<failedStep?"done":n===failedStep?"failed":"locked");
+      nextPanel.classList.add("is-failed"); nextPanelLabel.textContent="Stop here"; nextPanelText.textContent=`Step ${failedStep} — FAILED`; nextPanelDetail.textContent="The red diagnostic under this step contains the exact error. Copy it into ChatGPT if you want help diagnosing it."; runHeadline.textContent=`Step ${failedStep} needs attention.`; runDetail.textContent="A red X is the handoff point to diagnostics."; active=failedStep;
+      setHuman(failedStep,"bad","Failed",failureRecords.get(failedStep)?.message||"This step did not complete.");
+    } else if(busyStep){
+      for(let n=1;n<=6;n++)setVisualState(n,n<busyStep?"done":n===busyStep?"working":"locked");
+      nextPanel.classList.add("is-working"); nextPanelLabel.textContent="Working"; nextPanelText.textContent=`Step ${busyStep} is running…`;
+      const workingText=busyStep===1?"Approve the wallet connection if Bifrost is waiting for you.":busyStep===3?"Bifrost may be waiting for your signature approval.":busyStep===4?"Wild Ledger is reading validated XRPL authority history.":busyStep===5?"Wild Ledger is rechecking authority before writing the Operator session.":"Wild Ledger is processing this step.";
+      nextPanelDetail.textContent=workingText; runHeadline.textContent=`Step ${busyStep} is working.`; runDetail.textContent="Wait for a green check or a red X."; setHuman(busyStep,"working","Working",workingText); active=busyStep;
+    } else if(!address){
+      setVisualState(1,"active");[2,3,4,5,6].forEach(n=>setVisualState(n,"locked"));
+      setHuman(1,"","Pending","Waiting for a wallet connection."); setHuman(2,"","Pending","Waiting for Step 1."); setHuman(3,"","Pending","Waiting for Steps 1 and 2."); setHuman(4,"","Pending","Waiting for a verified wallet."); setHuman(5,"","Pending","Waiting for exactly one community authority match."); setHuman(6,"","Pending","Waiting for the Operator session.");
+      nextPanelLabel.textContent="Your next action"; nextPanelText.textContent="Step 1 — Connect the wallet"; nextPanelDetail.textContent="Use the big wallet button in Step 1."; runHeadline.textContent="Run the six checks from top to bottom."; runDetail.textContent="The real handoff is the last action."; active=1;
+    } else if(!challengeReady && !proofDone){
+      setVisualState(1,"done");setVisualState(2,"active");[3,4,5,6].forEach(n=>setVisualState(n,"locked"));
+      setHuman(1,"good","Passed","Wallet connected and XRPL account detected."); setHuman(2,"","Pending",currentChallenge?"The previous challenge is no longer usable. Generate a fresh one.":"Ready to create the one-time challenge.");
+      nextPanelLabel.textContent="Your next action"; nextPanelText.textContent="Step 2 — Generate the challenge"; nextPanelDetail.textContent="Tap the big green Generate Challenge button."; active=2;
+    } else if(!proofDone){
+      setVisualState(1,"done");setVisualState(2,"done");setVisualState(3,"active");[4,5,6].forEach(n=>setVisualState(n,"locked"));
+      setHuman(1,"good","Passed","Wallet connected and XRPL account detected."); setHuman(2,"good","Passed","Fresh challenge created."); setHuman(3,"","Pending","Ready for the wallet-control signature.");
+      nextPanelLabel.textContent="Your next action"; nextPanelText.textContent="Step 3 — Prove wallet control"; nextPanelDetail.textContent="Tap the big green Prove Wallet Control button and approve the signing request in Bifrost."; active=3;
+    } else if(!lastAuthorityResult){
+      [1,2,3].forEach(n=>setVisualState(n,"done")); setVisualState(4,"active"); [5,6].forEach(n=>setVisualState(n,"locked"));
+      setHuman(1,"good","Passed","Wallet connected and XRPL account detected."); setHuman(2,"good","Passed","Fresh challenge created and signed."); setHuman(3,"good","Passed","Wallet control verified cryptographically."); setHuman(4,"","Pending","Ready to read validated XRPL authority history.");
+      nextPanelLabel.textContent="Your next action"; nextPanelText.textContent="Step 4 — Identify community authority"; nextPanelDetail.textContent="Tap the big green Identify My Community button."; active=4;
+    } else if(authorityReady && !sessionDone){
+      [1,2,3,4].forEach(n=>setVisualState(n,"done")); setVisualState(5,"active"); setVisualState(6,"locked");
+      setHuman(4,"good","Passed",`${sessionCandidate.communityId} identified as the current community authority.`); setHuman(5,"","Pending","Ready to create the verified Operator browser session.");
+      nextPanelLabel.textContent="Your next action"; nextPanelText.textContent="Step 5 — Create Operator Session"; nextPanelDetail.textContent=`Authority is verified for ${sessionCandidate.communityId}. Tap the big green button.`; active=5;
+    } else if(sessionDone && !handoffStarted){
+      [1,2,3,4,5].forEach(n=>setVisualState(n,"done")); setVisualState(6,"active");
+      setHuman(5,"good","Passed",`Operator session established for ${sessionCandidate.communityId}.`); setHuman(6,"","Pending",`Ready to open ${sessionCandidate.communityId} from the verified session.`);
+      nextPanelLabel.textContent="Your next action"; nextPanelText.textContent="Step 6 — Open Verified Community"; nextPanelDetail.textContent="This leaves the harness and opens the real community page with session-only Operator context."; active=6;
+    } else if(complete){
+      [1,2,3,4,5,6].forEach(n=>setVisualState(n,"done")); setHuman(6,"good","Passed","Verified Operator handoff launched."); nextPanel.classList.add("is-complete"); nextPanelLabel.textContent="Test complete"; nextPanelText.textContent="Operator handoff launched"; nextPanelDetail.textContent="The real community page is opening from the verified Operator session."; runHeadline.textContent="Operator session test is complete."; runDetail.textContent="Six green checks."; overallTitle.textContent="Operator handoff launched"; overallText.textContent="Six green checks. The real community page is opening from verified session-only context."; active=6;
     }
+    if(autoOpen)openStep(active,{scroll:active>1});
+  }
 
-    function clearAuthorityResult(message = "Verify wallet control first.") {
-      identifyButton.disabled = true;
-      authorityResult.hidden = true;
-      authorityDetails.hidden = true;
-      authorityRaw.textContent = "";
-      resetSessionCandidate();
-      setStatus(authorityStatus, message, "");
-    }
+  function resetAfterChallenge() {
+    lastSignedResult=null; lastVerifiedAccount=""; lastAuthorityResult=null; sessionCandidate=null; handoffStarted=false; authorityAnswer.hidden=true; sessionAnswer.hidden=true; authorityRaw.textContent="No authority lookup has been run yet.";
+    proofAccount.textContent="—";signatureCheck.textContent="—";messageCheck.textContent="—";nonceCheck.textContent="—";rawProof.textContent="No proof returned yet.";replayTechnical.textContent="Not tested.";
+    clearFailure(2);clearFailure(3);clearFailure(4);clearFailure(5);clearFailure(6);
+  }
+  function refreshConnection() {
+    const session=getSession(),address=sessionAddress(session),rendered=!!walletButtonHost?.children?.length;if(rendered)walletButtonLoading.hidden=true;
+    if(!address){connectedWallet.textContent="—";connectedAddress.textContent="—";connectionDetails.hidden=true;setStatus(connectionStatus,"Waiting for wallet connection.","wait");if(lastAddress){lastAddress="";currentChallenge=null;resetAfterChallenge();challengeArea.hidden=true;challengeEmpty.hidden=false;}renderFlow();return;}
+    connectedWallet.textContent=sessionWalletName(session);connectedAddress.textContent=address;connectionDetails.hidden=false;walletButtonLoading.hidden=true;setStatus(connectionStatus,"Wallet connected.","good");if(failedStep===1)clearFailure(1);if(busyStep===1)busyStep=0;
+    if(lastAddress&&lastAddress!==address){currentChallenge=null;resetAfterChallenge();challengeArea.hidden=true;challengeEmpty.hidden=false;}lastAddress=address;renderFlow({autoOpen:true});
+  }
 
-    function renderAuthorityResult(result) {
-      const matches = result.matches || [];
-      lastAuthorityResult = result;
-      authorityResult.hidden = false;
-      authorityWallet.textContent = result.verifiedAccount || "—";
-      authorityRaw.textContent = JSON.stringify(result, null, 2);
-      authorityDetails.hidden = false;
+  function safeDiagnosticValue(value) {
+    if(value==null)return value;if(Array.isArray(value))return value.map(safeDiagnosticValue);if(typeof value!=="object")return value;const out={};
+    for(const [key,val] of Object.entries(value)){if(/seed|secret|private|mnemonic|password|passphrase|token|cookie|authorization|accesskey|projectid/i.test(key))out[key]="[REDACTED]";else out[key]=safeDiagnosticValue(val);}return out;
+  }
+  function diagnosticReport(step) {
+    const record=failureRecords.get(step)||{message:"No recorded failure",context:"",at:new Date().toISOString()};const address=sessionAddress(getSession());const signedTx=lastSignedResult?findSignedTransaction(lastSignedResult):null;
+    const report={harness:"Wild Ledger Operator Session Test",failedStep:step,failedStepName:["Connect the wallet","Generate the challenge","Prove wallet control","Identify community authority","Create the Operator session","Open the verified community"][step-1],timestamp:record.at,error:record.message,context:record.context||undefined,page:location.href,wallet:sessionWalletName(getSession()),xrplAccount:address||null,verifiedAccount:lastVerifiedAccount||null,challenge:currentChallenge?{nonce:currentChallenge.nonce,issuedAt:new Date(currentChallenge.issuedAt).toISOString(),expiresAt:new Date(currentChallenge.expiresAt).toISOString()}:null,decodedSignedEnvelope:signedTx?safeDiagnosticValue(signedTx):null,lastAuthorityResult:lastAuthorityResult?safeDiagnosticValue(lastAuthorityResult):null,sessionCandidate:sessionCandidate?safeDiagnosticValue(sessionCandidate):null,storedOperatorSession:storedSession()?safeDiagnosticValue(storedSession()):null,viewCommunityDestination:"../viewCommunity.html",ledgerSubmitPerformed:false};
+    return `WILD LEDGER DIAGNOSTIC REPORT\n\n${JSON.stringify(report,null,2)}`;
+  }
+  async function copyDiagnostic(step,button) {const report=diagnosticReport(step);try{await navigator.clipboard.writeText(report);const prior=button.textContent;button.textContent="Copied — paste into ChatGPT";setTimeout(()=>button.textContent=prior,2200);}catch(_){window.prompt("Copy this diagnostic report and paste it into ChatGPT:",report);}}
+  document.querySelectorAll("[data-copy-report]").forEach(button=>button.addEventListener("click",()=>copyDiagnostic(Number(button.dataset.copyReport),button)));
 
-      if (matches.length === 0) {
-        sessionCandidate = null;
-        createSessionButton.disabled = true;
-        authorityBig.textContent = "No current community authority found";
-        authorityBig.className = "result-big bad";
-        authorityCommunity.textContent = "None";
-        authorityNamespace.textContent = "—";
-        authorityCurrent.textContent = "—";
-        authoritySource.textContent = "Validated XRPL history";
-        setStatus(authorityStatus, "Wallet control is proven, but this address is not the current Community Operating Wallet for any canonical Wild Ledger community found by this test.", "bad");
-        setStatus(sessionStatus, "No Operator session can be created because no current community authority was found.", "bad");
-        updateGuidance();
-        return;
-      }
+  let kit = null;
+  try {
+    if(!window.XRPLWalletKit?.createWalletKit)throw new Error("XRPL Wallet Kit did not load.");
+    if(!projectId)throw new Error("Wild Ledger WalletConnect Project ID is missing.");
+    if(!proofDestination)throw new Error("A valid non-self proof destination is required.");
+    kit=window.XRPLWalletKit.createWalletKit({metadata:{name:"Wild Ledger Operator Session Test",description:"Prove wallet control, resolve community authority, create the Operator session, and test the real-page handoff",url:location.protocol.startsWith("http")?location.origin:"https://example.invalid",icons:[location.protocol.startsWith("http")?`${location.origin}/favicon.ico`:"https://example.invalid/favicon.ico"]},network:"mainnet",wallets:["walletconnect"],autoReconnect:false,walletConnectProjectId:projectId,walletConnectSignMessageDestination:proofDestination,connectButton:"#wallet-kit-button",ui:{themeMode:"light",walletConnect:{mode:"default"},toast:true}});
+    try{kit.button?.mount?.("#wallet-kit-button");}catch(error){walletButtonLoading.textContent=`Connect Wallet button failed to mount: ${error?.message||String(error)}`;walletButtonLoading.classList.add("bad");setFailure(1,error,"XRPL Wallet Kit connect button mount failed.");}
+  } catch(error) {
+    walletButtonLoading.textContent=error?.message||String(error); walletButtonLoading.classList.add("bad"); setFailure(1,error,"Wallet proof harness initialization failed before a wallet could connect.");
+  }
 
-      if (matches.length === 1) {
-        const match = matches[0];
-        sessionCandidate = {
-          verifiedWallet: result.verifiedAccount,
-          communityId: match.communityId,
-          communityName: match.communityName,
-          namespace: match.namespace || "",
-          authoritySource: match.source || "Validated XRPL history",
-          authorityResolvedAt: result.resolvedAt || new Date().toISOString()
-        };
-        createSessionButton.disabled = false;
-        authorityBig.textContent = "Community authority identified";
-        authorityBig.className = "result-big good";
-        authorityCommunity.textContent = `${match.communityId} — ${match.communityName}`;
-        authorityNamespace.textContent = match.namespace || "—";
-        authorityCurrent.textContent = match.currentAccount || "—";
-        authoritySource.textContent = match.source || "Validated XRPL history";
-        setStatus(authorityStatus, `Good. This verified wallet is the current Community Operating Wallet for ${match.communityId}.`, "good");
-        setStatus(sessionStatus, `Ready. NEXT: Create Operator Session for ${match.communityId}.`, "wait");
-        updateGuidance();
-        return;
-      }
+  walletButtonHost.addEventListener("click",()=>{if(sessionAddress(getSession()))return;clearFailure(1);busyStep=1;renderFlow();setTimeout(()=>{if(busyStep===1&&!sessionAddress(getSession())){busyStep=0;renderFlow();}},30000);},true);
+  setTimeout(()=>{const rendered=!!walletButtonHost?.children?.length;if(kit&&!rendered&&!sessionAddress(getSession())){walletButtonLoading.hidden=false;walletButtonLoading.textContent="Connect Wallet button did not load. Reload this page. If it is still missing, stop the test.";walletButtonLoading.classList.add("bad");setFailure(1,new Error("The Connect Wallet control did not render."),"Wallet Kit loaded, but no connect control appeared inside #wallet-kit-button after 2.5 seconds.");}},2500);
 
-      sessionCandidate = null;
-      createSessionButton.disabled = true;
-      authorityBig.textContent = `${matches.length} communities controlled`;
-      authorityBig.className = "result-big good";
-      authorityCommunity.textContent = matches.map(match => match.communityId).join(", ");
-      authorityNamespace.textContent = matches.map(match => match.namespace).join(", ");
-      authorityCurrent.textContent = result.verifiedAccount;
-      authoritySource.textContent = "Validated XRPL authority histories";
-      setStatus(authorityStatus, "This verified wallet currently operates more than one Wild Ledger community.", "good");
-      setStatus(sessionStatus, "This test will not guess which community to enter. A multi-community chooser is required before a session can be established.", "wait");
-      updateGuidance();
-    }
+  generateButton.addEventListener("click",()=>{clearFailure(2);clearFailure(3);clearFailure(4);clearFailure(5);clearFailure(6);busyStep=2;renderFlow();setTimeout(()=>{try{currentChallenge=makeChallenge();resetAfterChallenge();challengeTextEl.textContent=currentChallenge.message;nonceText.textContent=currentChallenge.nonce;expiresText.textContent=new Date(currentChallenge.expiresAt).toLocaleString();challengeArea.hidden=false;challengeEmpty.hidden=true;setStatus(proofStatus,"Challenge ready.","wait");busyStep=0;renderFlow({autoOpen:true});}catch(error){busyStep=0;setFailure(2,error,"Creating a fresh random wallet-proof challenge failed before any wallet signing request was made.");}},280);});
 
-    function renderStoredSession(session) {
-      sessionResult.hidden = false;
-      sessionBig.textContent = "Operator session established";
-      sessionBig.className = "result-big good";
-      sessionRole.textContent = session.role;
-      sessionCommunity.textContent = session.communityId;
-      sessionWallet.textContent = session.verifiedWallet;
-      sessionSource.textContent = session.source;
-      sessionEstablished.textContent = new Date(session.establishedAt).toLocaleString();
-      sessionRaw.textContent = JSON.stringify({
-        wildLedgerRole: sessionStorage.getItem("wildLedgerRole"),
-        wildLedgerCommunity: sessionStorage.getItem("wildLedgerCommunity"),
-        wildLedgerOperatorWallet: sessionStorage.getItem("wildLedgerOperatorWallet"),
-        wildLedgerOperatorSession: JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null")
-      }, null, 2);
-      setStatus(sessionStatus, `Good. The browser Operator session is now bound to ${session.communityId} from verified wallet authority. NEXT: Open Verified Community.`, "good");
-      updateGuidance();
-    }
+  signButton.addEventListener("click",async()=>{try{clearFailure(3);const address=sessionAddress(getSession());if(!address)throw new Error("Connect Bifrost first.");if(!currentChallenge)throw new Error("Generate a challenge first.");if(Date.now()>currentChallenge.expiresAt)throw new Error("This challenge expired. Generate a new one.");if(usedNonces.has(currentChallenge.nonce))throw new Error("This challenge was already used. Generate a new one.");busyStep=3;setStatus(proofStatus,"Waiting for Bifrost signature approval…","wait");renderFlow();const result=await kit.signMessage({message:currentChallenge.message});lastSignedResult=result;const verified=verifySignedProof(result,currentChallenge);usedNonces.add(currentChallenge.nonce);lastVerifiedAccount=verified.account;lastAuthorityResult=null;sessionCandidate=null;proofAccount.textContent=verified.account;signatureCheck.textContent="Valid";messageCheck.textContent="Exact match";nonceCheck.textContent="Fresh and accepted once";rawProof.textContent=JSON.stringify({returnedByWallet:safeDiagnosticValue(result),decodedSignedEnvelope:safeDiagnosticValue(verified.signedTx)},null,2);setStatus(proofStatus,"Wallet control verified. Nothing was submitted to XRPL.","good");busyStep=0;renderFlow({autoOpen:true});}catch(error){busyStep=0;lastVerifiedAccount="";lastAuthorityResult=null;sessionCandidate=null;proofAccount.textContent="—";signatureCheck.textContent="Not verified";messageCheck.textContent="Not verified";nonceCheck.textContent="Not accepted";setStatus(proofStatus,error?.message||String(error),"bad");const signedTx=lastSignedResult?findSignedTransaction(lastSignedResult):null;if(signedTx)rawProof.textContent=JSON.stringify({returnedByWallet:safeDiagnosticValue(lastSignedResult),decodedSignedEnvelope:safeDiagnosticValue(signedTx)},null,2);setFailure(3,error,"Bifrost signing or local cryptographic verification failed. No XRPL transaction was submitted.");}});
 
-    function clearStoredOperatorSession() {
-      sessionStorage.removeItem("wildLedgerRole");
-      sessionStorage.removeItem("wildLedgerCommunity");
-      sessionStorage.removeItem("wildLedgerOperatorWallet");
-      sessionStorage.removeItem("wildLedgerOperatorSession");
-      sessionResult.hidden = true;
-      sessionRaw.textContent = "";
-      setStatus(sessionStatus, sessionCandidate
-        ? `Test session cleared. Authority for ${sessionCandidate.communityId} is still verified; NEXT: Create Operator Session again.`
-        : "Test session cleared. Identify exactly one community first.", "wait");
-      setStatus(handoffStatus, "Create the Operator session first.", "wait");
-      updateGuidance();
-    }
+  identifyButton.addEventListener("click",async()=>{try{clearFailure(4);if(!lastVerifiedAccount)throw new Error("Prove wallet control first.");const connected=sessionAddress(getSession());if(!connected||connected!==lastVerifiedAccount)throw new Error("The connected wallet changed. Prove wallet control again.");busyStep=4;authorityAnswer.hidden=true;setStatus(authorityStatus,"Reading validated XRPL authority history…","wait");renderFlow();const result=await identifyCommunityAuthority(lastVerifiedAccount);lastAuthorityResult=result;renderAuthorityDetails(result);busyStep=0;const matches=result.matches||[];if(matches.length!==1){const message=matches.length?"This wallet currently operates more than one Wild Ledger community. This harness will not guess which community to enter.":"No current Wild Ledger Operator authority was found for this verified wallet.";setStatus(authorityStatus,message,"bad");setFailure(4,new Error(message),"Validated XRPL authority lookup completed, but the full Operator sign-in path requires exactly one current community authority match.");return;}setStatus(authorityStatus,`Community authority identified for ${matches[0].communityId}.`,"good");renderFlow({autoOpen:true});}catch(error){busyStep=0;lastAuthorityResult=null;sessionCandidate=null;authorityAnswer.hidden=true;authorityWallet.textContent=lastVerifiedAccount||"—";authorityCommunity.textContent="—";authorityNamespace.textContent="—";authorityCurrent.textContent="—";authoritySource.textContent="—";setStatus(authorityStatus,error?.message||String(error),"bad");setFailure(4,error,"Validated XRPL authority resolution failed after wallet control had already been proven. No XRPL transaction was submitted.");}});
 
-    function renderVerificationSuccess(verified, result) {
-      proofResult.hidden = false;
-      resultBig.textContent = "Wallet control verified";
-      resultBig.className = "result-big good";
-      proofAccount.textContent = verified.account;
-      signatureCheck.textContent = "Valid";
-      messageCheck.textContent = "Exact match";
-      nonceCheck.textContent = "Fresh and accepted once";
-      rawProof.textContent = JSON.stringify({ returnedByWallet: result, decodedSignedEnvelope: verified.signedTx }, null, 2);
-      lastVerifiedAccount = verified.account;
-      lastAuthorityResult = null;
-      sessionCandidate = null;
-      createSessionButton.disabled = true;
-      identifyButton.disabled = false;
-      authorityResult.hidden = true;
-      setStatus(sessionStatus, "Wallet proof passed. Identify exactly one community before creating a session.", "wait");
-      setStatus(authorityStatus, "Wallet proof passed. Tap Identify My Community to read validated XRPL authority history.", "wait");
-      setStatus(proofStatus, "The wallet signed this exact one-time challenge. Wild Ledger verified it locally. Nothing was submitted to XRPL. NEXT: Identify My Community.", "good");
-      updateGuidance();
-    }
+  createSessionButton.addEventListener("click",async()=>{try{clearFailure(5);if(!lastVerifiedAccount||!sessionCandidate)throw new Error("Verify wallet control and identify exactly one community first.");const connected=sessionAddress(getSession());if(!connected||connected!==lastVerifiedAccount)throw new Error("The connected wallet changed. Prove wallet control again.");busyStep=5;sessionAnswer.hidden=true;setStatus(sessionStatus,"Rechecking validated XRPL authority before creating the session…","wait");renderFlow();const fresh=await identifyCommunityAuthority(lastVerifiedAccount);const matches=fresh.matches||[];if(matches.length!==1)throw new Error(matches.length?"This wallet now controls more than one community. A community chooser is required.":"This wallet is no longer the current Operating Wallet for a Wild Ledger community.");const match=matches[0];if(match.communityId!==sessionCandidate.communityId||match.currentAccount!==lastVerifiedAccount)throw new Error("Community authority changed since the previous check. Identify the community again.");const establishedAt=new Date().toISOString();const session={version:1,role:"operator",communityId:match.communityId,communityName:match.communityName,namespace:match.namespace||"",verifiedWallet:lastVerifiedAccount,source:"wallet-proof + validated-xrpl-authority",authoritySource:match.source||"Validated XRPL history",authorityResolvedAt:fresh.resolvedAt||establishedAt,proofNonce:currentChallenge?.nonce||"",establishedAt};sessionStorage.setItem("wildLedgerRole","operator");sessionStorage.setItem("wildLedgerCommunity",match.communityId);sessionStorage.setItem("wildLedgerOperatorWallet",lastVerifiedAccount);sessionStorage.setItem("wildLedgerOperatorSession",JSON.stringify(session));sessionCandidate={verifiedWallet:lastVerifiedAccount,communityId:match.communityId,communityName:match.communityName,namespace:match.namespace||"",authoritySource:match.source||"Validated XRPL history",authorityResolvedAt:fresh.resolvedAt||establishedAt};renderStoredSession(session);busyStep=0;renderFlow({autoOpen:true});}catch(error){busyStep=0;sessionAnswer.hidden=true;sessionBig.textContent="Session not established";sessionRole.textContent="—";sessionCommunity.textContent="—";sessionWallet.textContent=lastVerifiedAccount||"—";sessionSource.textContent="—";sessionEstablished.textContent="—";sessionRaw.textContent="No valid Operator session was created.";setStatus(sessionStatus,error?.message||String(error),"bad");setFailure(5,error,"The harness rechecked validated XRPL authority before writing browser Operator session state, and that step did not complete.");}});
 
-    function renderVerificationFailure(error) {
-      proofResult.hidden = false;
-      resultBig.textContent = "Verification failed";
-      resultBig.className = "result-big bad";
-      proofAccount.textContent = "—";
-      signatureCheck.textContent = "Not verified";
-      messageCheck.textContent = "Not verified";
-      nonceCheck.textContent = "Not accepted";
-      lastVerifiedAccount = "";
-      clearAuthorityResult("Wallet proof must pass before community authority can be identified.");
-      setStatus(proofStatus, error?.message || String(error), "bad");
-      updateGuidance();
-    }
+  openCommunityButton.addEventListener("click",()=>{try{clearFailure(6);const stored=storedSession();if(!stored?.communityId||!stored?.verifiedWallet||stored?.role!=="operator"||stored?.source!=="wallet-proof + validated-xrpl-authority")throw new Error("The verified Operator session is missing or incomplete. Create it again before continuing.");if(stored.verifiedWallet!==lastVerifiedAccount)throw new Error("The stored Operator session does not match the wallet that was verified by this harness.");handoffStarted=true;setStatus(handoffStatus,`Opening ${stored.communityId} with session-only Operator context…`,"good");renderFlow();window.location.href="../viewCommunity.html";}catch(error){handoffStarted=false;setStatus(handoffStatus,error?.message||String(error),"bad");setFailure(6,error,"The final handoff validates the stored Operator session and opens ../viewCommunity.html without Community ID or role query parameters.");}});
 
-    if (!window.XRPLWalletKit?.createWalletKit) {
-      throw new Error("XRPL Wallet Kit did not load.");
-    }
-    if (!projectId) {
-      throw new Error("Wild Ledger WalletConnect Project ID is missing.");
-    }
-    if (!proofDestination) {
-      throw new Error("A valid non-self proof destination is required.");
-    }
+  clearSessionButton.addEventListener("click",clearStoredOperatorSession);
 
-    const kit = window.XRPLWalletKit.createWalletKit({
-      metadata: {
-        name: "Wild Ledger Operator Session Test",
-        description: "Practice wallet proof, XRPL community authority resolution, and Operator session establishment",
-        url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
-        icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
-      },
-      network: "mainnet",
-      wallets: ["walletconnect"],
-      autoReconnect: false,
-      walletConnectProjectId: projectId,
-      walletConnectSignMessageDestination: proofDestination,
-      connectButton: "#wallet-kit-button",
-      ui: {
-        themeMode: "light",
-        walletConnect: { mode: "default" },
-        toast: true
-      }
-    });
+  replayButton.addEventListener("click",()=>{try{if(!lastSignedResult||!currentChallenge)throw new Error("There is no completed proof to replay.");verifySignedProof(lastSignedResult,currentChallenge);replayTechnical.textContent="Unexpected: the already-used proof was accepted again.";}catch(error){const message=String(error?.message||error);replayTechnical.textContent=message.toLowerCase().includes("already used")?"Passed: the reused proof was rejected because its nonce was already used.":`Replay diagnostic returned: ${message}`;}});
 
-    try {
-      kit.button?.mount?.("#wallet-kit-button");
-    } catch (error) {
-      walletButtonLoading.textContent = `Connect Wallet button failed to mount: ${error?.message || String(error)}`;
-      walletButtonLoading.classList.add("bad");
-    }
+  renderFlow();refreshConnection();setInterval(refreshConnection,800);
 
-    setTimeout(() => {
-      const rendered = !!walletButtonHost?.children?.length;
-      if (!rendered && !sessionAddress(getSession())) {
-        walletButtonLoading.hidden = false;
-        walletButtonLoading.textContent = "Connect Wallet button did not load. Reload this page. If it is still missing, stop the test — the harness is not ready.";
-        walletButtonLoading.classList.add("bad");
-        setStatus(connectionStatus, "Harness error: the wallet-connect control did not render.", "bad");
-      }
-    }, 2500);
-
-    generateButton.addEventListener("click", () => {
-      currentChallenge = makeChallenge();
-      lastSignedResult = null;
-      lastVerifiedAccount = "";
-      clearAuthorityResult("Complete this new wallet proof before identifying community authority.");
-      challengeTextEl.textContent = currentChallenge.message;
-      nonceText.textContent = currentChallenge.nonce;
-      expiresText.textContent = new Date(currentChallenge.expiresAt).toLocaleString();
-      challengeArea.hidden = false;
-      proofResult.hidden = true;
-      replayButton.disabled = true;
-      refreshConnection();
-      setStatus(proofStatus, "Challenge ready. NEXT: Tap Prove Wallet Control and review Bifrost carefully.", "wait");
-      updateGuidance();
-    });
-
-    signButton.addEventListener("click", async () => {
-      try {
-        const address = sessionAddress(getSession());
-        if (!address) throw new Error("Connect Bifrost first.");
-        if (!currentChallenge) throw new Error("Generate a challenge first.");
-        if (Date.now() > currentChallenge.expiresAt) throw new Error("This challenge expired. Generate a new one.");
-        if (usedNonces.has(currentChallenge.nonce)) throw new Error("This challenge was already used. Generate a new one.");
-
-        busyStep = 3;
-        updateGuidance();
-        setStatus(proofStatus, "Waiting for Bifrost. Review the request, then approve the signature if it looks right.", "wait");
-
-        // IMPORTANT: signMessage only. This harness never calls signAndSubmit,
-        // submit, submitAndWait, xrpl_submit, or any Wild Ledger XRPL submit helper.
-        const result = await kit.signMessage({ message: currentChallenge.message });
-        lastSignedResult = result;
-
-        const verified = verifySignedProof(result, currentChallenge);
-        usedNonces.add(currentChallenge.nonce);
-        renderVerificationSuccess(verified, result);
-        replayButton.disabled = false;
-      } catch (error) {
-        renderVerificationFailure(error);
-      } finally {
-        busyStep = 0;
-        updateGuidance();
-      }
-    });
-
-    identifyButton.addEventListener("click", async () => {
-      try {
-        if (!lastVerifiedAccount) throw new Error("Prove wallet control first.");
-        const connected = sessionAddress(getSession());
-        if (!connected || connected !== lastVerifiedAccount) throw new Error("The connected wallet changed. Prove wallet control again.");
-
-        busyStep = 4;
-        authorityResult.hidden = true;
-        setStatus(authorityStatus, "Reading validated XRPL authority history…", "wait");
-        updateGuidance();
-        const result = await identifyCommunityAuthority(lastVerifiedAccount);
-        renderAuthorityResult(result);
-      } catch (error) {
-        authorityResult.hidden = false;
-        authorityBig.textContent = "Authority lookup failed";
-        authorityBig.className = "result-big bad";
-        authorityWallet.textContent = lastVerifiedAccount || "—";
-        authorityCommunity.textContent = "—";
-        authorityNamespace.textContent = "—";
-        authorityCurrent.textContent = "—";
-        authoritySource.textContent = "—";
-        authorityDetails.hidden = true;
-        setStatus(authorityStatus, error?.message || String(error), "bad");
-      } finally {
-        busyStep = 0;
-        updateGuidance();
-      }
-    });
-
-    createSessionButton.addEventListener("click", async () => {
-      try {
-        if (!lastVerifiedAccount || !sessionCandidate) throw new Error("Verify wallet control and identify exactly one community first.");
-        const connected = sessionAddress(getSession());
-        if (!connected || connected !== lastVerifiedAccount) throw new Error("The connected wallet changed. Prove wallet control again.");
-
-        busyStep = 5;
-        sessionResult.hidden = true;
-        setStatus(sessionStatus, "Rechecking validated XRPL authority before creating the session…", "wait");
-        updateGuidance();
-
-        const fresh = await identifyCommunityAuthority(lastVerifiedAccount);
-        const matches = fresh.matches || [];
-        if (matches.length !== 1) {
-          throw new Error(matches.length
-            ? "This wallet now controls more than one community. A community chooser is required."
-            : "This wallet is no longer the current Operating Wallet for a Wild Ledger community.");
-        }
-
-        const match = matches[0];
-        if (match.communityId !== sessionCandidate.communityId || match.currentAccount !== lastVerifiedAccount) {
-          throw new Error("Community authority changed since the previous check. Identify the community again.");
-        }
-
-        const establishedAt = new Date().toISOString();
-        const session = {
-          version: 1,
-          role: "operator",
-          communityId: match.communityId,
-          communityName: match.communityName,
-          namespace: match.namespace || "",
-          verifiedWallet: lastVerifiedAccount,
-          source: "wallet-proof + validated-xrpl-authority",
-          authoritySource: match.source || "Validated XRPL history",
-          authorityResolvedAt: fresh.resolvedAt || establishedAt,
-          proofNonce: currentChallenge?.nonce || "",
-          establishedAt
-        };
-
-        sessionStorage.setItem("wildLedgerRole", "operator");
-        sessionStorage.setItem("wildLedgerCommunity", match.communityId);
-        sessionStorage.setItem("wildLedgerOperatorWallet", lastVerifiedAccount);
-        sessionStorage.setItem("wildLedgerOperatorSession", JSON.stringify(session));
-
-        sessionCandidate = {
-          verifiedWallet: lastVerifiedAccount,
-          communityId: match.communityId,
-          communityName: match.communityName,
-          namespace: match.namespace || "",
-          authoritySource: match.source || "Validated XRPL history",
-          authorityResolvedAt: fresh.resolvedAt || establishedAt
-        };
-        renderStoredSession(session);
-      } catch (error) {
-        sessionResult.hidden = false;
-        sessionBig.textContent = "Session not established";
-        sessionBig.className = "result-big bad";
-        sessionRole.textContent = "—";
-        sessionCommunity.textContent = "—";
-        sessionWallet.textContent = lastVerifiedAccount || "—";
-        sessionSource.textContent = "—";
-        sessionEstablished.textContent = "—";
-        sessionRaw.textContent = "";
-        setStatus(sessionStatus, error?.message || String(error), "bad");
-      } finally {
-        busyStep = 0;
-        updateGuidance();
-      }
-    });
-
-    openCommunityButton.addEventListener("click", () => {
-      let stored = null;
-      try {
-        stored = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
-      } catch (_) {}
-      if (!stored?.communityId || !stored?.verifiedWallet || stored?.role !== "operator" || stored?.source !== "wallet-proof + validated-xrpl-authority") {
-        setStatus(handoffStatus, "The verified Operator session is missing or incomplete. Create it again before continuing.", "bad");
-        updateGuidance();
-        return;
-      }
-      setStatus(handoffStatus, `Opening ${stored.communityId} with session-only Operator context…`, "good");
-      window.location.href = "../viewCommunity.html";
-    });
-
-    clearSessionButton.addEventListener("click", clearStoredOperatorSession);
-
-    replayButton.addEventListener("click", () => {
-      try {
-        if (!lastSignedResult || !currentChallenge) throw new Error("There is no completed proof to replay.");
-        verifySignedProof(lastSignedResult, currentChallenge);
-        throw new Error("Unexpected: an already-used nonce was accepted.");
-      } catch (error) {
-        proofResult.hidden = false;
-        resultBig.textContent = "Replay correctly rejected";
-        resultBig.className = "result-big good";
-        nonceCheck.textContent = "Already used — rejected";
-        setStatus(proofStatus, `Good. ${error?.message || String(error)}`, "good");
-        updateGuidance();
-      }
-    });
-
-    updateGuidance();
-    refreshConnection();
-    setInterval(refreshConnection, 800);
   </script>
 </body>
 </html>
