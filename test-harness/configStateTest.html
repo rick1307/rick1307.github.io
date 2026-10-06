@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CONFIG State Harness — Wild Ledger</title>
+<style>
+:root{--bg:#061b25;--panel:#0a2832;--line:rgba(143,222,213,.18);--text:#ecf9f7;--muted:rgba(236,249,247,.67);--mint:#86d7c9;--good:#82e39f;--bad:#ff8878;--warn:#f3b64a}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% -10%,#123d4a 0,#071e28 38%,#04151d 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button{font:inherit}.shell{max-width:930px;margin:0 auto;padding:18px 12px 48px}.console{overflow:hidden;border:1px solid rgba(134,215,201,.18);border-radius:28px;background:linear-gradient(180deg,rgba(11,42,52,.98),rgba(5,25,34,.98));box-shadow:0 28px 80px rgba(0,0,0,.34)}header{padding:26px 24px 22px;border-bottom:1px solid rgba(255,255,255,.06)}.back{color:#bdf5eb;text-decoration:none;font-size:.78rem;font-weight:850}.eyebrow{margin-top:18px;color:#8fe1d5;font-size:.66rem;font-weight:950;letter-spacing:.13em;text-transform:uppercase}h1{margin:6px 0 8px;font-size:clamp(1.85rem,6vw,3.1rem);line-height:1.02;letter-spacing:-.04em}.intro{margin:0;max-width:760px;color:var(--muted);font-size:.94rem;line-height:1.58}.warning{margin-top:14px;padding:12px 13px;border:1px solid rgba(243,182,74,.38);border-radius:13px;background:rgba(243,182,74,.08);color:#ffe5b4;font-size:.77rem;line-height:1.5}.body{padding:16px}.step{margin:0 0 11px;padding:15px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.018)}.step.done{border-color:rgba(130,227,159,.4);background:rgba(130,227,159,.04)}.step.fail{border-color:rgba(255,136,120,.5);background:rgba(255,136,120,.04)}.step.locked{opacity:.5}.head{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center}.num{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid rgba(134,215,201,.18);background:rgba(134,215,201,.08);font-weight:950}.step h2{margin:0;font-size:1rem}.state{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.055);font-size:.58rem;font-weight:950;letter-spacing:.08em}.copy{margin:10px 0 0;color:var(--muted);font-size:.78rem;line-height:1.5}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(134,215,201,.32);font-weight:900;cursor:pointer;background:linear-gradient(135deg,#2fa8a0,#227b80);color:#fff}.actions button:disabled{opacity:.38;cursor:not-allowed}.status{margin-top:11px;padding:11px 12px;border-radius:12px;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.07);font-size:.76rem;line-height:1.5;overflow-wrap:anywhere}.status.good{color:#dffff0;border-color:rgba(130,227,159,.32)}.status.bad{color:#ffd0ca;border-color:rgba(255,136,120,.4)}.mono,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.qr{display:none;margin-top:10px;text-align:center}.qr.show{display:block}.qr img{max-width:260px;width:100%;padding:8px;background:white;border-radius:14px}.grid{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;margin-top:10px;font-size:.75rem}.grid b{color:#bce9e3}.detail{margin-top:10px}.detail summary{cursor:pointer;color:#bfece6;font-size:.72rem;font-weight:900}.detail pre{white-space:pre-wrap;max-height:340px;overflow:auto;padding:11px;border-radius:11px;background:#041720;color:#eafbf7;font-size:.68rem}.complete{display:none;margin-top:14px;padding:20px;border:2px solid rgba(130,227,159,.5);border-radius:20px;background:rgba(130,227,159,.07);text-align:center}.complete.show{display:block}.complete h3{margin:0;color:#eaffef}.complete p{margin:7px 0 0;color:rgba(234,255,239,.72);font-size:.8rem;line-height:1.5}.transition{position:fixed;inset:0;z-index:1000;display:none;place-items:center;background:#061b25;opacity:0;transition:opacity .6s ease}.transition.show{display:grid;opacity:1}.transition-inner{text-align:center;padding:28px;max-width:600px}.transition .check{font-size:3.4rem;color:var(--good)}.transition h2{font-size:clamp(2rem,8vw,4rem);margin:10px 0}.transition p{color:var(--muted);line-height:1.6}.brand{margin-top:24px;font-size:1.1rem;font-weight:1000;letter-spacing:.22em;color:var(--mint);opacity:0;transition:opacity .7s ease}.transition.brand-on .brand{opacity:1}footer{padding:18px;text-align:center;color:rgba(236,249,247,.34);font-size:.62rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.05)}@media(max-width:650px){.grid{grid-template-columns:1fr}.actions button{width:100%}}
+</style>
+<script src="../js/wildLedgerConfig.js"></script>
+<script src="../js/communityConfig.js" data-registry-only="true"></script>
+</head>
+<body>
+<main class="shell"><section class="console">
+<header>
+<a class="back" href="../testHub.html">← TestHub</a>
+<div class="eyebrow">Step 3 · CONFIG Harness</div>
+<h1>Prove CONFIG end to end</h1>
+<p class="intro">This harness publishes the real community CONFIG schema state, reads it back independently from validated XRPL history, reloads the current off-ledger CONFIG by Community ID, validates Schema 1 plus its Layout/Skin selection, then creates the working Operator session and enters the community backend.</p>
+<div class="warning"><strong>This harness writes permanent XRPL history.</strong> It publishes <span class="mono">WILD-LEDGER/STATE/&lt;COMMUNITY-ID&gt;/CONFIG=1</span> from the current Community Operating Wallet. Here <strong>1 means CONFIG Schema 1</strong>, not CONFIG version 1.</div>
+</header>
+<div class="body">
+
+<section class="step" id="step1"><div class="head"><div class="num">1</div><h2>Scan the QR and connect the Operating Wallet</h2><span class="state" id="state1">NEXT</span></div><p class="copy">The wallet connection supplies the XRPL address. There is no username/password or typed wallet address.</p><div class="actions"><button id="connectButton">Create QR</button></div><div class="qr" id="qrWrap"><img id="qrImage" alt="WalletConnect QR"><div class="status mono" id="qrUri"></div></div><div class="status" id="status1">Waiting for wallet connection.</div></section>
+
+<section class="step locked" id="step2"><div class="head"><div class="num">2</div><h2>Resolve current community authority</h2><span class="state" id="state2">LOCKED</span></div><p class="copy">Validated XRPL authority history must identify exactly one community for this current Operating Wallet.</p><div class="actions"><button id="authorityButton" disabled>Resolve community</button></div><div class="grid"><b>Community</b><span id="communityValue">—</span><b>Namespace</b><span id="namespaceValue">—</span><b>Operating Wallet</b><span id="walletValue">—</span></div><div class="status" id="status2">Waiting for Step 1.</div></section>
+
+<section class="step locked" id="step3"><div class="head"><div class="num">3</div><h2>Load and validate the current off-ledger CONFIG</h2><span class="state" id="state3">LOCKED</span></div><p class="copy">For this proof, SFL uses a harness fixture as the off-ledger store. The production store remains provider-neutral. The Community ID is the lookup key.</p><div class="actions"><button id="configButton" disabled>Load current CONFIG</button></div><div class="grid"><b>Schema</b><span id="schemaValue">—</span><b>Layout</b><span id="layoutValue">—</span><b>Skin</b><span id="skinValue">—</span><b>Bytes</b><span id="bytesValue">—</span></div><div class="status" id="status3">Waiting for community authority.</div><details class="detail"><summary>Validated CONFIG</summary><pre id="configRaw">—</pre></details></section>
+
+<section class="step locked" id="step4"><div class="head"><div class="num">4</div><h2>Prepare the exact CONFIG STATE transaction</h2><span class="state" id="state4">LOCKED</span></div><p class="copy">Wild Ledger prepares a canonical no-op AccountSet containing exactly one memo: <span class="mono" id="memoPreview">—</span></p><div class="actions"><button id="prepareButton" disabled>Prepare AccountSet</button></div><div class="status" id="status4">Waiting for a valid current CONFIG.</div><details class="detail"><summary>Prepared transaction</summary><pre id="preparedRaw">—</pre></details></section>
+
+<section class="step locked" id="step5"><div class="head"><div class="num">5</div><h2>Sign with the current Operating Wallet</h2><span class="state" id="state5">LOCKED</span></div><p class="copy">Bifrost signs the transaction Wild Ledger already prepared. <span class="mono">submit=false</span> and <span class="mono">autofill=false</span>.</p><div class="actions"><button id="signButton" disabled>Sign AccountSet</button></div><div class="status" id="status5">Waiting for preparation.</div></section>
+
+<section class="step locked" id="step6"><div class="head"><div class="num">6</div><h2>Submit and wait for XRPL validation</h2><span class="state" id="state6">LOCKED</span></div><p class="copy">This is the permanent ledger write.</p><div class="actions"><button id="submitButton" disabled>Submit to XRPL</button></div><div class="grid"><b>Result</b><span id="resultCode">—</span><b>Ledger</b><span id="resultLedger">—</span><b>Hash</b><span class="mono" id="resultHash">—</span></div><div class="status" id="status6">Waiting for signature.</div></section>
+
+<section class="step locked" id="step7"><div class="head"><div class="num">7</div><h2>Read everything back independently</h2><span class="state" id="state7">LOCKED</span></div><p class="copy">The harness re-resolves authority, reconstructs CONFIG state from account history, and reloads the off-ledger CONFIG independently. It does not trust what it just submitted.</p><div class="actions"><button id="verifyButton" disabled>Independent readback</button></div><div class="grid"><b>XRPL CONFIG</b><span id="readbackSchema">—</span><b>Signer</b><span class="mono" id="readbackSigner">—</span><b>Layout</b><span id="readbackLayout">—</span><b>Skin</b><span id="readbackSkin">—</span></div><div class="status" id="status7">Waiting for validated XRPL state.</div><details class="detail"><summary>Reconstructed STATE</summary><pre id="stateRaw">—</pre></details></section>
+
+<section class="step locked" id="step8"><div class="head"><div class="num">8</div><h2>Create the working session and enter the backend</h2><span class="state" id="state8">LOCKED</span></div><p class="copy">Once every prior gate is green, the harness creates the same wallet-connection Operator session used by Wild Ledger and transitions directly to the community workspace.</p><div class="status" id="status8">Waiting for independent verification. The handoff starts automatically when everything is green.</div></section>
+
+<div class="complete" id="completeBox"><h3>CONFIG architecture proven</h3><p id="completeText"></p></div>
+</div>
+<footer>Wild Ledger · Step 3 CONFIG Harness</footer>
+</section></main>
+
+<div class="transition" id="transition"><div class="transition-inner"><div class="check">✓</div><h2>Community ready.</h2><p id="transitionCopy">Your Wild Ledger CONFIG is validated. Taking you into the community workspace…</p><div class="brand">WILD LEDGER</div></div></div>
+
+<script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { WalletConnectXrplSigner } from "../js/walletConnectSigner.js";
+import { resolveWalletAccess } from "../js/communityAccess.js";
+import { communityStateMemo, readCommunityConfigSchema } from "../js/communityState.js";
+import { loadCurrentCommunityConfig } from "../js/communityConfigStore.js";
+import { COMMUNITY_CONFIG_SCHEMA } from "../js/communityConfigSchema.js";
+import { prepareNoOpAccountSet, submitSignedTransaction, isClassicAddress, textToHex } from "../js/xrplTransport.js";
+import { isCanonicalNoOpAccountSet } from "../js/communityAuthority.js";
+
+const runtime = window.WILD_LEDGER_CONFIG || {};
+const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
+const PROJECT_ID = String(runtime.walletConnectProjectId || "").trim();
+const CONFIG_SCHEMA = COMMUNITY_CONFIG_SCHEMA;
+const fixtureByCommunity = Object.freeze({ SFL: "./fixtures/SFL-current-config.json" });
+
+const $ = id => document.getElementById(id);
+let signer = null;
+let connectedAccount = "";
+let authorityRecord = null;
+let currentConfig = null;
+let preparedTx = null;
+let signedBlob = "";
+let submittedResult = null;
+let readback = null;
+
+function setStep(step, tone, message) {
+  const box = $(`step${step}`), state = $(`state${step}`), status = $(`status${step}`);
+  box.classList.remove("done","fail","locked");
+  if (tone === "done") { box.classList.add("done"); state.textContent = "GREEN"; status.className = "status good"; }
+  else if (tone === "fail") { box.classList.add("fail"); state.textContent = "FAILED"; status.className = "status bad"; }
+  else if (tone === "active") { state.textContent = "NEXT"; status.className = "status"; }
+  else { box.classList.add("locked"); state.textContent = "LOCKED"; status.className = "status"; }
+  status.textContent = message;
+}
+function unlock(step, message) { setStep(step, "active", message); }
+function fail(step, error) { setStep(step, "fail", error?.message || String(error)); }
+function exactMemo() {
+  if (!authorityRecord) throw new Error("Community authority is not resolved.");
+  return communityStateMemo(authorityRecord.communityId, "CONFIG", String(CONFIG_SCHEMA));
+}
+function fixtureUrl(communityId) {
+  const path = fixtureByCommunity[String(communityId || "").toUpperCase()];
+  if (!path) throw new Error(`This Step 3 harness has no current CONFIG fixture for ${communityId}. SFL is the live proof community.`);
+  return path;
+}
+function assertAuthorityStillCurrent(match) {
+  if (!match || match.currentAccount !== connectedAccount) throw new Error("The connected wallet is no longer the current Community Operating Wallet.");
+}
+function assertPrepared(tx) {
+  if (!tx || !isCanonicalNoOpAccountSet(tx)) throw new Error("Prepared transaction is not a canonical no-op AccountSet.");
+  if (tx.Account !== connectedAccount) throw new Error("Prepared transaction signer does not match the connected Operating Wallet.");
+  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+  if (memos.length !== 1) throw new Error("Prepared transaction must contain exactly one memo.");
+  const memo = memos[0]?.Memo || {};
+  if (memo.MemoType || memo.MemoFormat) throw new Error("CONFIG STATE transaction must use MemoData only.");
+  if (String(memo.MemoData || "").toUpperCase() !== textToHex(exactMemo()).toUpperCase()) throw new Error("Prepared transaction memo does not exactly match CONFIG STATE.");
+}
+async function freshAuthorityMatch() {
+  const access = await resolveWalletAccess({ account: connectedAccount, serverUrl: XRPL_SERVER, force: true });
+  const matches = (access.operatorMatches || []).filter(item => item.currentAccount === connectedAccount);
+  const match = matches.find(item => String(item.communityId).toUpperCase() === String(authorityRecord?.communityId || "").toUpperCase());
+  if (!match) throw new Error(`${connectedAccount} is no longer the current Operating Wallet for ${authorityRecord?.communityId || "this community"}.`);
+  return { access, match };
+}
+
+$("connectButton").addEventListener("click", async () => {
+  try {
+    if (!PROJECT_ID) throw new Error("WalletConnect project ID is not configured.");
+    if (signer) { try { await signer.disconnect(); } catch (_) {} }
+    signer = new WalletConnectXrplSigner({ projectId: PROJECT_ID, metadata: { name: "Wild Ledger CONFIG Harness", description: "Prove community CONFIG state", url: location.origin, icons: [`${location.origin}/favicon.ico`] } });
+    const connection = await signer.connect({ onUri: async uri => { $("qrImage").src = await QRCode.toDataURL(uri,{width:520,margin:2,errorCorrectionLevel:"M"}); $("qrUri").textContent = uri; $("qrWrap").classList.add("show"); } });
+    $("qrWrap").classList.remove("show");
+    connectedAccount = String(connection.account || "").trim();
+    if (!isClassicAddress(connectedAccount)) throw new Error("The wallet did not return a valid XRPL classic address.");
+    $("walletValue").textContent = connectedAccount;
+    setStep(1,"done",`XRPL address received from ${connection.walletName || "wallet"}: ${connectedAccount}`);
+    $("authorityButton").disabled = false; unlock(2,"Ready to resolve validated community authority.");
+  } catch (error) { fail(1,error); }
+});
+
+$("authorityButton").addEventListener("click", async () => {
+  try {
+    const access = await resolveWalletAccess({ account: connectedAccount, serverUrl: XRPL_SERVER, force: true });
+    const matches = (access.operatorMatches || []).filter(item => item.currentAccount === connectedAccount);
+    if (matches.length !== 1) throw new Error(matches.length ? `This wallet currently operates ${matches.length} communities; this harness requires exactly one.` : "This wallet is not the current Operating Wallet for a Wild Ledger community.");
+    authorityRecord = matches[0]; assertAuthorityStillCurrent(authorityRecord);
+    $("communityValue").textContent = authorityRecord.communityId; $("namespaceValue").textContent = authorityRecord.namespace || `${authorityRecord.communityId}-LEAP`; $("walletValue").textContent = connectedAccount;
+    setStep(2,"done",`${authorityRecord.communityId} authority resolved from validated XRPL history.`);
+    $("configButton").disabled = false; unlock(3,"Ready to retrieve the complete current CONFIG by Community ID.");
+  } catch (error) { fail(2,error); }
+});
+
+$("configButton").addEventListener("click", async () => {
+  try {
+    currentConfig = await loadCurrentCommunityConfig({ communityId: authorityRecord.communityId, explicitUrl: fixtureUrl(authorityRecord.communityId), cache: "no-store" });
+    if (currentConfig.config.configSchema !== CONFIG_SCHEMA) throw new Error(`Current CONFIG is Schema ${currentConfig.config.configSchema}, expected Schema ${CONFIG_SCHEMA}.`);
+    $("schemaValue").textContent = String(currentConfig.config.configSchema); $("layoutValue").textContent = currentConfig.config.layoutId; $("skinValue").textContent = currentConfig.config.skinId; $("bytesValue").textContent = String(currentConfig.bytes); $("configRaw").textContent = JSON.stringify(currentConfig.config,null,2);
+    $("memoPreview").textContent = exactMemo();
+    setStep(3,"done",`Complete ${authorityRecord.communityId} CONFIG loaded and validated: Schema ${CONFIG_SCHEMA}, ${currentConfig.config.layoutId}, ${currentConfig.config.skinId}.`);
+    $("prepareButton").disabled = false; unlock(4,`Ready to prepare ${exactMemo()}.`);
+  } catch (error) { fail(3,error); }
+});
+
+$("prepareButton").addEventListener("click", async () => {
+  try {
+    const { match } = await freshAuthorityMatch(); authorityRecord = match;
+    const prepared = await prepareNoOpAccountSet({ serverUrl: XRPL_SERVER, account: connectedAccount, memoText: exactMemo(), feeCushion: Number(runtime.xrplFeeCushion || 1.2) });
+    preparedTx = prepared.preparedTx; assertPrepared(preparedTx); $("preparedRaw").textContent = JSON.stringify(preparedTx,null,2);
+    setStep(4,"done","XRPL simulation/autofill completed and the exact CONFIG STATE AccountSet was verified.");
+    $("signButton").disabled = false; unlock(5,"Ready for the current Operating Wallet signature.");
+  } catch (error) { fail(4,error); }
+});
+
+$("signButton").addEventListener("click", async () => {
+  try {
+    const { match } = await freshAuthorityMatch(); authorityRecord = match; assertPrepared(preparedTx);
+    const signed = await signer.signTransaction(preparedTx); signedBlob = String(signed.signedBlob || ""); if (!signedBlob) throw new Error("Wallet did not return a signed transaction.");
+    setStep(5,"done","Signed transaction received. Nothing was submitted during signing.");
+    $("submitButton").disabled = false; unlock(6,"Ready for the permanent XRPL write.");
+  } catch (error) { fail(5,error); }
+});
+
+$("submitButton").addEventListener("click", async () => {
+  try {
+    const { match } = await freshAuthorityMatch(); authorityRecord = match; assertPrepared(preparedTx); if (!signedBlob) throw new Error("No signed transaction is available.");
+    submittedResult = await submitSignedTransaction({ serverUrl: XRPL_SERVER, signedBlob, onSubmitted: ({txHash}) => { $("resultHash").textContent = txHash || "—"; } });
+    if (submittedResult.finalResult !== "tesSUCCESS") throw new Error(`Validated transaction returned ${submittedResult.finalResult}.`);
+    $("resultCode").textContent = submittedResult.finalResult; $("resultLedger").textContent = String(submittedResult.ledgerIndex ?? "—"); $("resultHash").textContent = submittedResult.txHash || $("resultHash").textContent;
+    setStep(6,"done",`Validated tesSUCCESS in ledger ${submittedResult.ledgerIndex}.`);
+    $("verifyButton").disabled = false; unlock(7,"Ready to throw away local assumptions and reconstruct from XRPL + off-ledger CONFIG again.");
+  } catch (error) { fail(6,error); }
+});
+
+$("verifyButton").addEventListener("click", async () => {
+  try {
+    const { access, match } = await freshAuthorityMatch(); authorityRecord = match;
+    let schemaState = null, lastError = null;
+    for (let attempt=0; attempt<8; attempt++) {
+      try { schemaState = await readCommunityConfigSchema({ authority: match, serverUrl: XRPL_SERVER }); if (schemaState.current && schemaState.schema === CONFIG_SCHEMA) break; } catch (error) { lastError = error; }
+      await new Promise(resolve => setTimeout(resolve, 1800));
+    }
+    if (!schemaState?.current) throw new Error(lastError?.message || "CONFIG STATE could not be reconstructed from validated XRPL history.");
+    if (schemaState.schema !== CONFIG_SCHEMA) throw new Error(`Latest authorized CONFIG state is ${schemaState.schema}, expected ${CONFIG_SCHEMA}.`);
+    if (schemaState.current.account !== connectedAccount) throw new Error("Latest CONFIG state was not signed by the current Operating Wallet used in this proof.");
+
+    const reloaded = await loadCurrentCommunityConfig({ communityId: match.communityId, explicitUrl: fixtureUrl(match.communityId), cache: "reload" });
+    if (reloaded.config.configSchema !== schemaState.schema) throw new Error("Off-ledger CONFIG schema does not match XRPL CONFIG state.");
+    readback = { accessResolvedAt: access.resolvedAt, state: schemaState, config: reloaded };
+    $("readbackSchema").textContent = String(schemaState.schema); $("readbackSigner").textContent = schemaState.current.account; $("readbackLayout").textContent = reloaded.config.layoutId; $("readbackSkin").textContent = reloaded.config.skinId; $("stateRaw").textContent = JSON.stringify(schemaState,null,2);
+    setStep(7,"done",`Independent readback agrees: ${match.communityId} → CONFIG Schema ${schemaState.schema} → ${reloaded.config.layoutId} / ${reloaded.config.skinId}.`);
+    unlock(8,"Everything is green. Creating the working Operator session and opening the backend automatically…");
+    setTimeout(completeAndEnter, 350);
+  } catch (error) { fail(7,error); }
+});
+
+function writeOperatorSession() {
+  const establishedAt = new Date().toISOString();
+  const config = readback.config.config;
+  const state = readback.state;
+  const session = {
+    version: 2,
+    role: "operator",
+    communityId: authorityRecord.communityId,
+    communityName: config.communityName,
+    namespace: authorityRecord.namespace || config.leapNamespace,
+    connectedWallet: connectedAccount,
+    source: "wallet-connect + validated-xrpl-authority",
+    authoritySource: String(authorityRecord.source || "Validated XRPL history"),
+    authorityResolvedAt: establishedAt,
+    firstOperatingWallet: String(authorityRecord?.establishment?.firstWallet || connectedAccount),
+    configSchema: state.schema,
+    configLedger: state.current.ledger,
+    configTransactionHash: state.current.hash || "",
+    layoutId: config.layoutId,
+    skinId: config.skinId,
+    establishedAt
+  };
+  sessionStorage.setItem("wildLedgerRole","operator");
+  sessionStorage.setItem("wildLedgerCommunity",session.communityId);
+  sessionStorage.setItem("wildLedgerOperatorWallet",connectedAccount);
+  sessionStorage.setItem("wildLedger.activeWallet",connectedAccount);
+  sessionStorage.setItem("wildLedgerOperatorSession",JSON.stringify(session));
+  sessionStorage.setItem("wildLedger.currentCommunityConfig",JSON.stringify({ communityId: session.communityId, schema: session.configSchema, config }));
+  return session;
+}
+
+async function completeAndEnter() {
+  try {
+    if (!readback?.state?.current || !readback?.config?.config) throw new Error("Independent verification is incomplete.");
+    const session = writeOperatorSession();
+    setStep(8,"done",`Working Operator session created for ${session.communityId}.`);
+    $("completeBox").classList.add("show"); $("completeText").textContent = `${session.communityId} is green end-to-end. Opening the community backend.`;
+    const overlay = $("transition"); $("transitionCopy").textContent = `${session.communityName} is validated and ready. Taking you into the working community view…`; overlay.classList.add("show");
+    setTimeout(() => overlay.classList.add("brand-on"), 2100);
+    setTimeout(() => { window.location.href = `../viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`; }, 4000);
+  } catch (error) { fail(8,error); }
+}
+
+if (!PROJECT_ID) fail(1,new Error("WalletConnect project ID is missing from wildLedgerConfig.js."));
+if (!XRPL_SERVER) fail(2,new Error("XRPL WebSocket server is missing from wildLedgerConfig.js."));
+</script>
+</body>
+</html>

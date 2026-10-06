@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CONFIG Representation Test — Wild Ledger</title>
+<style>
+:root{--deep:#071d2a;--panel:rgba(10,45,58,.78);--line:rgba(121,213,194,.24);--text:#f5fbfa;--muted:rgba(236,249,247,.70);--mint:#79d5c2;--bad:#ff8f7d}*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px 14px 50px;color:var(--text);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#06202e,#0a3444 48%,#071d2a)}.shell{width:min(100%,900px);margin:auto}.hero,.card{border:1px solid var(--line);background:var(--panel);border-radius:24px;box-shadow:0 26px 72px rgba(0,0,0,.28)}.hero{padding:25px;margin-bottom:16px}.card{padding:20px;margin-top:14px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.back{color:#dffff8;text-decoration:none;font-weight:850}.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mint);font-weight:900}h1{margin:18px 0 8px;font-size:clamp(2.2rem,8vw,4.7rem);line-height:.95;letter-spacing:-.055em}.lede{margin:0;color:var(--muted);line-height:1.55}.grid{display:grid;grid-template-columns:180px 1fr;gap:8px 14px;font-size:.9rem}.grid b{color:var(--mint)}code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.memo{padding:14px;border-radius:14px;background:rgba(121,213,194,.07);border:1px solid rgba(121,213,194,.18);overflow-wrap:anywhere;color:#e7fff8}.good{color:#cffff0}.bad{color:var(--bad)}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;padding:14px;border-radius:14px;background:#041720;border:1px solid rgba(255,255,255,.09);color:#eafbf7;font-size:.76rem;line-height:1.5}.state{font-weight:900}.note{margin-top:12px;color:var(--muted);line-height:1.5;font-size:.84rem}@media(max-width:650px){.grid{grid-template-columns:1fr}.hero,.card{padding:18px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<section class="hero"><div class="top"><a class="back" href="../testHub.html">← TestHub</a><div class="eyebrow">Step 2 · No XRPL write</div></div><h1>CONFIG Representation</h1><p class="lede">Proves the corrected representation: XRPL carries the technical CONFIG schema, while the complete current CONFIG is looked up off-ledger by Community ID.</p></section>
+<section class="card"><div class="eyebrow">XRPL state</div><div class="memo" id="memo">Loading…</div><p class="note"><strong>1 means CONFIG Schema 1.</strong> It is not a CONFIG snapshot version.</p></section>
+<section class="card"><div class="eyebrow">Current off-ledger CONFIG</div><div class="grid"><b>Community ID</b><span id="communityId">—</span><b>Schema</b><span id="schema">—</span><b>Layout</b><span id="layout">—</span><b>Skin</b><span id="skin">—</span><b>Canonical bytes</b><span id="bytes">—</span><b>Harness source</b><span>test-harness/fixtures/SFL-current-config.json</span><b>Result</b><span class="state" id="result">Running…</span></div></section>
+<section class="card"><div class="eyebrow">Canonical machine form</div><pre id="canonical">Loading…</pre></section>
+</main>
+<script type="module">
+import { communityStateMemo } from "../js/communityState.js";
+import { loadCurrentCommunityConfig } from "../js/communityConfigStore.js";
+const COMMUNITY_ID="SFL", SCHEMA=1, result=document.getElementById("result");
+try{
+ const current=await loadCurrentCommunityConfig({communityId:COMMUNITY_ID,explicitUrl:"./fixtures/SFL-current-config.json"});
+ if(current.config.configSchema!==SCHEMA)throw new Error("Current CONFIG does not validate as Schema 1.");
+ document.getElementById("memo").textContent=communityStateMemo(COMMUNITY_ID,"CONFIG",String(SCHEMA));
+ document.getElementById("communityId").textContent=current.communityId;
+ document.getElementById("schema").textContent=String(current.config.configSchema);
+ document.getElementById("layout").textContent=current.config.layoutId;
+ document.getElementById("skin").textContent=current.config.skinId;
+ document.getElementById("bytes").textContent=String(current.bytes);
+ document.getElementById("canonical").textContent=current.canonicalText;
+ result.textContent="PASS — Community ID resolves one complete current Schema 1 CONFIG";result.className="state good";
+}catch(error){result.textContent=`FAIL — ${error?.message||String(error)}`;result.className="state bad";document.getElementById("canonical").textContent=error?.stack||String(error)}
+</script>
+</body>
+</html>
