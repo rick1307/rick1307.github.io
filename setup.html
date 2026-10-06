@@ -52,8 +52,6 @@
         <section class="card" id="postLaunchCard" hidden>
           <div class="section-head"><div><h2>Community language</h2><p>After launch, the deeper Schema 1 wording becomes available here. This is the same complete CONFIG, not a second configuration.</p></div><span class="permission">After launch</span></div>
           <div class="grid-2">
-            <div class="field"><label for="operatorName">Community operator</label><input id="operatorName" data-field="operatorName"></div>
-            <div class="field"><label for="operatorPossessive">Operator possessive</label><input id="operatorPossessive" data-field="operatorPossessive"></div>
             <div class="field"><label for="membershipLabel">Membership label</label><input id="membershipLabel" data-field="membershipLabel"></div>
             <div class="field"><label for="groupName">Group name</label><input id="groupName" data-field="groupName"></div>
             <div class="field"><label for="recordLabel">Record label</label><input id="recordLabel" data-field="recordLabel"></div>
@@ -68,11 +66,11 @@
         </section>
 
         <section class="card publish-card">
-          <div class="section-head"><div><h2 id="publishTitle">Publish community</h2><p id="publishCopy">The current Operating Wallet authorizes the CONFIG publication on XRPL. Wild Ledger stores the complete current CONFIG off-ledger only after XRPL validates.</p></div></div>
+          <div class="section-head"><div><h2 id="publishTitle">Publish community</h2><p id="publishCopy">The current Operating Wallet publishes the complete compact CONFIG directly to XRPL in one transaction.</p></div></div>
           <p class="status" id="publishStatus">Reading setup state…</p>
           <button class="primary" id="publishButton" type="button" disabled>Publish community</button>
-          <button class="secondary" id="retryStoreButton" type="button" hidden>Retry CONFIG save</button>
-          <div class="store-note" id="storeNote" hidden></div>
+          <button class="secondary" id="retryReadbackButton" type="button" hidden>Retry XRPL readback</button>
+          <div class="store-note" id="ledgerNote" hidden></div>
         </section>
       </form>
 
@@ -116,22 +114,17 @@ import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
 import { resolveWalletAccess } from "./js/communityAccess.js";
 import { discoverWildLedgerCommunities } from "./js/communityDiscovery.js";
 import { resolveCommunityAuthority } from "./js/communityAuthority.js";
-import { communityStateMemo, readCommunityConfigSchema } from "./js/communityState.js";
+import { communityConfigMemo, readCommunityConfig } from "./js/communityState.js";
 import {
   COMMUNITY_CONFIG_SCHEMA,
   buildCommunityConfigV1Preset,
   communityConfigV1FromLegacy,
   normalizeCommunityConfigV1,
   canonicalCommunityConfigText,
-  canonicalCommunityId
+  canonicalCommunityId,
+  operatorPossessiveFromManager
 } from "./js/communityConfigSchema.js";
 import { availableLayouts, availableSkins, presentationSelection } from "./js/presentationCatalog.js";
-import {
-  communityConfigStoreConfigured,
-  loadCurrentCommunityConfig,
-  stageCurrentCommunityConfig,
-  finalizeCurrentCommunityConfig
-} from "./js/communityConfigStore.js";
 import { prepareNoOpAccountSet, submitSignedTransaction, textToHex, isClassicAddress } from "./js/xrplTransport.js";
 
 const $ = id => document.getElementById(id);
@@ -164,12 +157,6 @@ function operatorSession() {
   return session;
 }
 
-function cachedConfig(id) {
-  const cached = readJson("wildLedger.currentCommunityConfig");
-  if (!cached || String(cached.communityId || "").toUpperCase() !== id) return null;
-  try { return normalizeCommunityConfigV1(cached.config, { communityId: id }); } catch (_) { return null; }
-}
-
 function pendingKey(id) { return `wildLedger.pendingConfigPublication.${id}`; }
 function readPending(id) {
   const value = readJson(pendingKey(id));
@@ -193,10 +180,6 @@ function setBusy(value) {
   busy = Boolean(value);
   document.querySelectorAll("input,textarea,.choice").forEach(el => { el.disabled = busy || role !== "operator"; });
   updatePublishGate();
-}
-
-function ownerCommunityRecord(id) {
-  return window.WILD_LEDGER_GET_COMMUNITY?.(id) || null;
 }
 
 async function resolveContext() {
@@ -230,7 +213,7 @@ async function resolveContext() {
     throw new Error("Canonical Community Operating Wallet authority is not established.");
   }
 
-  schemaState = await readCommunityConfigSchema({ authority, serverUrl: XRPL_SERVER });
+  schemaState = await readCommunityConfig({ authority, serverUrl: XRPL_SERVER });
   preLaunch = !schemaState.current;
 
   $("communityIdValue").textContent = communityId;
@@ -239,17 +222,13 @@ async function resolveContext() {
 }
 
 async function loadConfig() {
-  const cached = cachedConfig(communityId);
-  if (schemaState.current) {
-    if (communityConfigStoreConfigured()) {
-      const loaded = await loadCurrentCommunityConfig({ communityId, cache: "no-store" });
-      return loaded.config;
-    }
-    if (cached) return cached;
-    const legacy = ownerCommunityRecord(communityId);
-    if (legacy) return communityConfigV1FromLegacy(legacy, { communityId });
-    throw new Error(`${communityId} has CONFIG state on XRPL, but the writable CONFIG store is not configured and no current CONFIG is available in this session.`);
-  }
+  if (schemaState.current?.config) return schemaState.current.config;
+
+  // One-time migration convenience only: an existing static presentation can
+  // prefill the first ledger-native CONFIG. After publication, XRPL is the
+  // authoritative source and this fallback is never used.
+  const legacy = window.WILD_LEDGER_GET_COMMUNITY?.(communityId) || null;
+  if (legacy) return communityConfigV1FromLegacy(legacy, { communityId });
 
   return buildCommunityConfigV1Preset({ communityId });
 }
@@ -304,13 +283,13 @@ function populateForm() {
 
 function syncForm() {
   document.querySelectorAll("[data-field]").forEach(input => { currentConfig[input.dataset.field] = input.value; });
-  document.querySelectorAll("[data-array='experienceSteps']").forEach(input => { currentConfig.experienceSteps[Number(input.dataset.index)] = input.value; }); });
+  document.querySelectorAll("[data-array='experienceSteps']").forEach(input => {
+    currentConfig.experienceSteps[Number(input.dataset.index)] = input.value;
+  });
 
-  if (preLaunch) {
-    currentConfig.operatorName = currentConfig.managerName;
-    const manager = String(currentConfig.managerName || "").trim();
-    currentConfig.operatorPossessive = manager ? (/s$/i.test(manager) ? `${manager}'` : `${manager}'s`) : "Operator's";
-  }
+  // These are Schema 1 derived values, not community data that needs ledger space.
+  currentConfig.operatorName = currentConfig.managerName;
+  currentConfig.operatorPossessive = operatorPossessiveFromManager(currentConfig.managerName);
 }
 
 function preLaunchMissing() {
@@ -368,22 +347,31 @@ function updatePublishGate() {
   button.textContent = preLaunch ? "Publish community" : "Publish changes";
   $("publishTitle").textContent = preLaunch ? "Publish community" : "Publish changes";
   const operatorAllowed = role === "operator" && operatorSession();
-  const storeReady = communityConfigStoreConfigured();
   let formReady = true;
-  try { validatedConfig(); } catch (_) { formReady = false; }
-  button.disabled = busy || !operatorAllowed || !storeReady || !formReady || Boolean(pendingPublication);
+  let memoInfo = null;
+  let formError = "";
+  try {
+    const config = validatedConfig();
+    memoInfo = communityConfigMemo(config, { communityId });
+  } catch (error) {
+    formReady = false;
+    formError = error?.message || String(error);
+  }
+  button.disabled = busy || !operatorAllowed || !formReady || Boolean(pendingPublication);
 
   if (role !== "operator") {
     setStatus("Owner view is read-only here. The current Community Operating Wallet publishes CONFIG.");
-  } else if (!storeReady) {
-    setStatus("The setup and preview are ready. Publishing is waiting on the writable Community CONFIG store.");
-    $("storeNote").hidden = false;
-    $("storeNote").textContent = "Wild Ledger will not write CONFIG=1 to XRPL until the durable CONFIG store is configured. This prevents a ledger publication from pointing at nowhere.";
+    $("ledgerNote").hidden = true;
   } else if (!formReady) {
-    setStatus(preLaunch ? "Complete the required before-launch choices to publish." : "Fix the incomplete CONFIG fields before publishing.");
-  } else if (!busy && !pendingPublication) {
-    setStatus(preLaunch ? "Ready. The Operating Wallet can publish this complete Schema 1 CONFIG." : "Ready. The Operating Wallet can publish these complete CONFIG changes.", "ok");
-    $("storeNote").hidden = true;
+    setStatus(preLaunch ? "Complete the required before-launch choices to publish." : formError || "Fix the incomplete CONFIG fields before publishing.");
+    $("ledgerNote").hidden = true;
+  } else if (pendingPublication) {
+    setStatus("The CONFIG transaction already validated. Finish the independent XRPL readback before publishing anything else.", "error");
+    $("ledgerNote").hidden = true;
+  } else if (!busy && memoInfo) {
+    setStatus(preLaunch ? "Ready. One wallet signature publishes the complete Schema 1 CONFIG to XRPL." : "Ready. One wallet signature publishes the complete CONFIG changes to XRPL.", "ok");
+    $("ledgerNote").hidden = false;
+    $("ledgerNote").textContent = `XRPL CONFIG size: ${memoInfo.serializedMemosBytes} / 1024 serialized memo bytes · ${memoInfo.headroomBytes} bytes headroom.`;
   }
 }
 
@@ -394,7 +382,7 @@ function clearPendingIfChanged() {
     const now = canonicalCommunityConfigText(currentConfig, { communityId });
     const pending = canonicalCommunityConfigText(pendingPublication.config, { communityId });
     if (now !== pending) {
-      setStatus("A validated XRPL publication is waiting to be stored. Retry that CONFIG save before making another publication.", "error");
+      setStatus("A validated XRPL CONFIG publication is waiting for independent readback. Retry that readback before making another publication.", "error");
     }
   } catch (_) {}
 }
@@ -436,34 +424,53 @@ async function connectSigner(expectedWallet) {
   return connection;
 }
 
-async function finishStorePublication(pending) {
-  setStatus("XRPL is validated. Finalizing the staged CONFIG…");
-  await finalizeCurrentCommunityConfig({ communityId, transactionHash: pending.txHash });
-  const reloaded = await loadCurrentCommunityConfig({ communityId, cache: "reload" });
-  const reloadedText = canonicalCommunityConfigText(reloaded.config, { communityId });
-  const expectedText = canonicalCommunityConfigText(pending.config, { communityId });
-  if (reloadedText !== expectedText) throw new Error("CONFIG store readback did not exactly match the published CONFIG.");
+async function finishLedgerPublication(pending) {
+  setStatus("XRPL is validated. Reconstructing the complete CONFIG independently…");
 
   let state = null;
-  for (let attempt=0; attempt<8; attempt += 1) {
-    state = await readCommunityConfigSchema({ authority: await freshOperatorAuthority(operatorSession().connectedWallet), serverUrl: XRPL_SERVER });
-    if (state.current && state.schema === COMMUNITY_CONFIG_SCHEMA) break;
+  let lastError = null;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    try {
+      const freshAuthority = await freshOperatorAuthority(operatorSession().connectedWallet);
+      state = await readCommunityConfig({ authority: freshAuthority, serverUrl: XRPL_SERVER });
+      if (state.current?.hash === pending.txHash) break;
+    } catch (error) {
+      lastError = error;
+    }
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
-  if (!state?.current || state.schema !== COMMUNITY_CONFIG_SCHEMA) throw new Error("Validated CONFIG Schema 1 state could not be reconstructed from XRPL.");
+
+  if (!state?.current) {
+    throw new Error(lastError?.message || "Validated CONFIG could not yet be reconstructed from XRPL.");
+  }
+  if (state.current.hash !== pending.txHash) {
+    throw new Error("The validated CONFIG transaction is not yet the current reconstructed CONFIG.");
+  }
+  if (state.current.schema !== COMMUNITY_CONFIG_SCHEMA) {
+    throw new Error(`Reconstructed CONFIG is Schema ${state.current.schema}, expected Schema ${COMMUNITY_CONFIG_SCHEMA}.`);
+  }
+
+  const expectedText = canonicalCommunityConfigText(pending.config, { communityId });
+  const readbackText = canonicalCommunityConfigText(state.current.config, { communityId });
+  if (readbackText !== expectedText) {
+    throw new Error("Independent XRPL CONFIG readback did not exactly match the configuration that was signed.");
+  }
 
   const wasPreLaunch = preLaunch;
-  currentConfig = reloaded.config;
+  currentConfig = state.current.config;
   preLaunch = false;
   schemaState = state;
-  clearPending(communityId); pendingPublication = null;
+  clearPending(communityId);
+  pendingPublication = null;
+  $("retryReadbackButton").hidden = true;
+
   const session = operatorSession();
   const updated = {
     ...session,
     communityName: currentConfig.communityName,
     configSchema: COMMUNITY_CONFIG_SCHEMA,
     configLedger: state.current.ledger,
-    configTransactionHash: state.current.hash || pending.txHash,
+    configTransactionHash: state.current.hash,
     layoutId: currentConfig.layoutId,
     skinId: currentConfig.skinId,
     authorityResolvedAt: new Date().toISOString()
@@ -477,65 +484,68 @@ async function finishStorePublication(pending) {
 async function publish() {
   if (busy) return;
   const session = operatorSession();
-  if (!session) { setStatus("Return to Get Wild and reconnect the Operating Wallet.","error"); return; }
-  if (!communityConfigStoreConfigured()) { updatePublishGate(); return; }
+  if (!session) { setStatus("Return to Get Wild and reconnect the Operating Wallet.", "error"); return; }
 
   try {
     setBusy(true);
     const config = validatedConfig();
+    const memoInfo = communityConfigMemo(config, { communityId });
     const expectedWallet = session.connectedWallet;
-    setStatus("Rechecking the current Operating Wallet on XRPL…");
-    authority = await freshOperatorAuthority(expectedWallet);
-    const memoText = communityStateMemo(communityId,"CONFIG",String(COMMUNITY_CONFIG_SCHEMA));
 
-    setStatus("Preparing the exact CONFIG Schema 1 AccountSet…");
-    const prepared = await prepareNoOpAccountSet({ serverUrl: XRPL_SERVER, account: expectedWallet, memoText, feeCushion: Number(runtime.xrplFeeCushion || 1.2) });
-    assertPrepared(prepared.preparedTx, expectedWallet, memoText);
+    setStatus(`Rechecking the current Operating Wallet. CONFIG uses ${memoInfo.serializedMemosBytes} of 1024 memo bytes…`);
+    authority = await freshOperatorAuthority(expectedWallet);
+
+    setStatus("Preparing the complete compact CONFIG AccountSet…");
+    const prepared = await prepareNoOpAccountSet({
+      serverUrl: XRPL_SERVER,
+      account: expectedWallet,
+      memoText: memoInfo.memoText,
+      feeCushion: Number(runtime.xrplFeeCushion || 1.2)
+    });
+    assertPrepared(prepared.preparedTx, expectedWallet, memoInfo.memoText);
 
     setStatus("Waiting for the Operating Wallet signature…");
     await connectSigner(expectedWallet);
     authority = await freshOperatorAuthority(expectedWallet);
-    assertPrepared(prepared.preparedTx, expectedWallet, memoText);
+    assertPrepared(prepared.preparedTx, expectedWallet, memoInfo.memoText);
     const signed = await signer.signTransaction(prepared.preparedTx);
     const signedBlob = String(signed.signedBlob || "");
     if (!signedBlob) throw new Error("Wallet did not return a signed transaction.");
 
-    // Bind the complete CONFIG to the still-private signed transaction BEFORE
-    // that transaction becomes public on XRPL. The store returns the hash it
-    // derived from that exact signed blob.
-    setStatus("Staging the complete CONFIG against the signed transaction…");
-    const staged = await stageCurrentCommunityConfig({ communityId, config, signedTransactionBlob: signedBlob });
-
-    setStatus("Submitting that exact signed CONFIG state transaction to XRPL…");
+    setStatus("Submitting the complete CONFIG to XRPL and waiting for validation…");
     authority = await freshOperatorAuthority(expectedWallet);
     const submitted = await submitSignedTransaction({ serverUrl: XRPL_SERVER, signedBlob });
     if (submitted.finalResult !== "tesSUCCESS") throw new Error(`Validated XRPL transaction returned ${submitted.finalResult}.`);
     const txHash = String(submitted.txHash || "").toUpperCase();
     if (!/^[A-F0-9]{64}$/.test(txHash)) throw new Error("Validated CONFIG transaction hash is unavailable.");
-    if (txHash !== staged.transactionHash) throw new Error("CONFIG store staged a different signed transaction than the one XRPL validated.");
 
     pendingPublication = { communityId, txHash, config };
     writePending(pendingPublication);
-    $("retryStoreButton").hidden = false;
-    await finishStorePublication(pendingPublication);
+    $("retryReadbackButton").hidden = false;
+    await finishLedgerPublication(pendingPublication);
   } catch (error) {
     $("qrModal").classList.remove("show");
     if (pendingPublication) {
-      $("retryStoreButton").hidden = false;
-      setStatus(`XRPL publication is validated, but the staged CONFIG did not finish finalizing: ${error?.message || String(error)}. Use Retry CONFIG save; do not sign another transaction.`,"error");
+      $("retryReadbackButton").hidden = false;
+      setStatus(`XRPL publication is validated, but independent readback has not finished: ${error?.message || String(error)}. Use Retry XRPL readback; do not sign another transaction.`, "error");
     } else {
-      setStatus(error?.message || String(error),"error");
+      setStatus(error?.message || String(error), "error");
     }
   } finally {
     setBusy(false);
   }
 }
 
-async function retryStore() {
+async function retryReadback() {
   if (busy || !pendingPublication) return;
-  try { setBusy(true); await finishStorePublication(pendingPublication); }
-  catch (error) { setStatus(`CONFIG save still needs attention: ${error?.message || String(error)}`,"error"); }
-  finally { setBusy(false); }
+  try {
+    setBusy(true);
+    await finishLedgerPublication(pendingPublication);
+  } catch (error) {
+    setStatus(`XRPL readback still needs attention: ${error?.message || String(error)}`, "error");
+  } finally {
+    setBusy(false);
+  }
 }
 
 function showSuccess(wasPreLaunch = false) {
@@ -570,7 +580,7 @@ function bind() {
     }
   });
   $("publishButton").addEventListener("click", publish);
-  $("retryStoreButton").addEventListener("click", retryStore);
+  $("retryReadbackButton").addEventListener("click", retryReadback);
 }
 
 async function init() {
@@ -582,8 +592,8 @@ async function init() {
     currentConfig.leapNamespace = `${communityId}-LEAP`;
     pendingPublication = readPending(communityId);
     if (pendingPublication) {
-      $("retryStoreButton").hidden = false;
-      setStatus("A validated XRPL CONFIG publication is waiting for the off-ledger store. Retry that save before publishing anything else.","error");
+      $("retryReadbackButton").hidden = false;
+      setStatus("A validated XRPL CONFIG publication is waiting for independent readback. Retry that readback before publishing anything else.","error");
     }
     configureView(); populateForm();
     if (role === "owner") document.querySelectorAll("input,textarea,.choice").forEach(el => { el.disabled = true; });

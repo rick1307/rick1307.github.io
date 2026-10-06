@@ -145,7 +145,7 @@
             <div class="item"><b>Use it when</b>You want to isolate and prove the new Wild Ledger community STATE primitive before CONFIG publishing is connected to setup.</div>
             <div class="item"><b>Successful finish</b>The Operating Wallet statement validates and Wild Ledger resolves the same HARNESS value as current state.</div>
           </div>
-          <div class="warning"><strong>Writes to XRPL.</strong> The harness uses the reserved HARNESS key so it does not replace a community's production CONFIG pointer.</div>
+          <div class="warning"><strong>Writes to XRPL.</strong> The harness uses the reserved HARNESS key so it does not replace a community's production CONFIG state.</div>
           <a class="open" href="test-harness/communityStateTest.html"><span>Open Harness →</span><span class="file">test-harness/communityStateTest.html</span></a>
         </div>
       </details>
@@ -153,10 +153,10 @@
       <details class="job">
         <summary>Test CONFIG publishing</summary>
         <div class="job-body">
-          <p class="purpose">Publishes the community’s CONFIG state from the current Community Operating Wallet, reads it back independently from validated XRPL history, and verifies the community’s current CONFIG can be resolved.</p>
+          <p class="purpose">Republishes the community’s complete compact CONFIG from the current Community Operating Wallet, then reconstructs that exact CONFIG independently from validated XRPL history.</p>
           <div class="meta">
-            <div class="item"><b>Use it when</b>You want to prove CONFIG state end to end before connecting it to setup.</div>
-            <div class="item"><b>Successful finish</b>The CONFIG statement validates, independent readback matches, and the current community CONFIG loads successfully.</div>
+            <div class="item"><b>Use it when</b>You want to prove the one-transaction ledger-native CONFIG round trip after the community has published its first CONFIG through Setup.</div>
+            <div class="item"><b>Successful finish</b>The complete CONFIG validates on XRPL, independent readback matches exactly, and the Operator backend opens from the reconstructed CONFIG.</div>
           </div>
           <div class="warning"><strong>Writes to XRPL.</strong> The harness publishes the community’s CONFIG state from the current Operating Wallet.</div>
           <a class="open" href="test-harness/configStateTest.html"><span>Open Harness →</span><span class="file">test-harness/configStateTest.html</span></a>

@@ -114,7 +114,7 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
           <div class="route-row"><span class="dot"></span><span><strong>Current Owner Wallet</strong> → Owner Console</span></div>
           <div class="route-row"><span class="dot"></span><span><strong>Current Operating Wallet</strong> → its community</span></div>
           <div class="route-row"><span class="dot"></span><span><strong>Newly provisioned community</strong> → Community Setup</span></div>
-          <div class="route-row"><span class="dot"></span><span><strong>CONFIG pointer</strong> → <code>WILD-LEDGER/STATE/&lt;ID&gt;/CONFIG=&lt;VERSION&gt;</code></span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>Complete CONFIG</strong> → reconstructed directly from validated XRPL history</span></div>
         </div>
       </aside>
     </section>
@@ -129,9 +129,7 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
 import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
 import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
 import { resolveWalletAccess } from "./js/communityAccess.js";
-import { readCommunityConfigSchema } from "./js/communityState.js";
-import { communityConfigStoreConfigured, loadCurrentCommunityConfig } from "./js/communityConfigStore.js";
-import { communityConfigV1FromLegacy } from "./js/communityConfigSchema.js";
+import { readCommunityConfig } from "./js/communityState.js";
 
 const runtime = window.WILD_LEDGER_CONFIG || {};
 const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
@@ -180,31 +178,14 @@ function walletMetadata() {
 
 async function configStateFor(match) {
   try {
-    const state = await readCommunityConfigSchema({ authority: match, serverUrl: XRPL_SERVER });
-    return { state };
+    return await readCommunityConfig({ authority: match, serverUrl: XRPL_SERVER });
   } catch (error) {
-    throw new Error(`CONFIG state resolution for ${match.communityId} failed: ${error?.message || String(error)}`);
+    throw new Error(`CONFIG resolution for ${match.communityId} failed: ${error?.message || String(error)}`);
   }
 }
 
-async function currentConfigFor(match, configState) {
-  if (!configState?.state?.current || !configState?.state?.schema) return null;
-  const id = String(match.communityId || "").trim().toUpperCase();
-
-  if (communityConfigStoreConfigured()) {
-    try {
-      const loaded = await loadCurrentCommunityConfig({ communityId: id, cache: "no-store" });
-      if (loaded.config.configSchema === configState.state.schema) return loaded.config;
-    } catch (_) {}
-  }
-
-  // Migration bridge for communities whose presentation still lives in the
-  // original registry. The production CONFIG store replaces this fallback.
-  const legacy = window.WILD_LEDGER_GET_COMMUNITY?.(id) || null;
-  if (legacy) {
-    try { return communityConfigV1FromLegacy(legacy, { communityId: id }); } catch (_) {}
-  }
-  return null;
+function currentConfigFor(configState) {
+  return configState?.current?.config || null;
 }
 
 function writeOperatorSession(match, configState, config = null) {
@@ -221,9 +202,9 @@ function writeOperatorSession(match, configState, config = null) {
     authoritySource: String(match.source || "Validated XRPL history"),
     authorityResolvedAt: String(lastAccess?.resolvedAt || establishedAt),
     firstOperatingWallet: String(match?.establishment?.firstWallet || match?.establishment?.operatingWallet || connectedWallet),
-    configSchema: configState?.state?.schema || null,
-    configLedger: configState?.state?.current?.ledger || null,
-    configTransactionHash: configState?.state?.current?.hash || "",
+    configSchema: configState?.schema || null,
+    configLedger: configState?.current?.ledger || null,
+    configTransactionHash: configState?.current?.hash || "",
     layoutId: String(config?.layoutId || ""),
     skinId: String(config?.skinId || ""),
     establishedAt
@@ -255,12 +236,12 @@ async function openOperator(match) {
   lastAccess = fresh;
 
   const configState = await configStateFor(current);
-  const config = await currentConfigFor(current, configState);
+  const config = currentConfigFor(configState);
   const session = writeOperatorSession(current, configState, config);
 
   // CONFIG state, not the old presentation registry, decides whether the
   // community has completed its first setup publication.
-  if (!configState?.state?.current) {
+  if (!configState?.current) {
     setStatus(`${session.communityId} identified. Opening Community Setup…`, "good");
     window.location.href = `setup.html?community=${encodeURIComponent(session.communityId)}&role=operator&mode=provisioned`;
     return;

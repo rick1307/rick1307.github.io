@@ -1,0 +1,21 @@
+WILD LEDGER — LEDGER-NATIVE CONFIG MOVE
+
+One architectural move:
+- Complete compact CONFIG Schema 1 is written in one XRPL AccountSet memo.
+- Wild Ledger reconstructs the current complete CONFIG directly from validated XRPL history.
+- Get Wild re-entry reads authority + CONFIG from XRPL and routes straight back to the Operator backend.
+- No external Community CONFIG store is used by this path.
+
+Compact memo grammar:
+WILD-LEDGER/STATE/<COMMUNITY-ID>/CONFIG=1|<COMPACT-JSON>
+
+Measured current reference communities:
+- SFL: 507 / 1024 serialized Memos bytes; 517 bytes headroom.
+- ZHR: 368 / 1024 serialized Memos bytes; 656 bytes headroom.
+
+Migration behavior:
+- Old pointer-only CONFIG=1 records are intentionally ignored as incomplete.
+- A community with only the old pointer is routed to Community Setup once to publish its first complete ledger-native CONFIG.
+- Existing static community presentation may prefill that first migration publication, but XRPL becomes authoritative after publication.
+
+The LEAP Protocol / Operations Manual were not revised in this package. Code should be live-proven first, then documentation can be brought forward to match the proven implementation.
