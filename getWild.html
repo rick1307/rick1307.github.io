@@ -130,6 +130,8 @@ import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
 import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
 import { resolveWalletAccess } from "./js/communityAccess.js";
 import { readCommunityConfigSchema } from "./js/communityState.js";
+import { communityConfigStoreConfigured, loadCurrentCommunityConfig } from "./js/communityConfigStore.js";
+import { communityConfigV1FromLegacy } from "./js/communityConfigSchema.js";
 
 const runtime = window.WILD_LEDGER_CONFIG || {};
 const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
@@ -185,15 +187,35 @@ async function configStateFor(match) {
   }
 }
 
-function writeOperatorSession(match, configState) {
+async function currentConfigFor(match, configState) {
+  if (!configState?.state?.current || !configState?.state?.schema) return null;
+  const id = String(match.communityId || "").trim().toUpperCase();
+
+  if (communityConfigStoreConfigured()) {
+    try {
+      const loaded = await loadCurrentCommunityConfig({ communityId: id, cache: "no-store" });
+      if (loaded.config.configSchema === configState.state.schema) return loaded.config;
+    } catch (_) {}
+  }
+
+  // Migration bridge for communities whose presentation still lives in the
+  // original registry. The production CONFIG store replaces this fallback.
+  const legacy = window.WILD_LEDGER_GET_COMMUNITY?.(id) || null;
+  if (legacy) {
+    try { return communityConfigV1FromLegacy(legacy, { communityId: id }); } catch (_) {}
+  }
+  return null;
+}
+
+function writeOperatorSession(match, configState, config = null) {
   const establishedAt = new Date().toISOString();
   const connectedWallet = activeAccount;
   const session = {
     version: 2,
     role: "operator",
     communityId: String(match.communityId || "").trim().toUpperCase(),
-    communityName: String(match.communityName || match.communityId || "Community"),
-    namespace: String(match.namespace || ""),
+    communityName: String(config?.communityName || match.communityName || match.communityId || "Community"),
+    namespace: String(match.namespace || config?.leapNamespace || ""),
     connectedWallet,
     source: "wallet-connect + validated-xrpl-authority",
     authoritySource: String(match.source || "Validated XRPL history"),
@@ -202,6 +224,8 @@ function writeOperatorSession(match, configState) {
     configSchema: configState?.state?.schema || null,
     configLedger: configState?.state?.current?.ledger || null,
     configTransactionHash: configState?.state?.current?.hash || "",
+    layoutId: String(config?.layoutId || ""),
+    skinId: String(config?.skinId || ""),
     establishedAt
   };
 
@@ -210,7 +234,11 @@ function writeOperatorSession(match, configState) {
   sessionStorage.setItem("wildLedgerOperatorWallet", connectedWallet);
   sessionStorage.setItem("wildLedger.activeWallet", connectedWallet);
   sessionStorage.setItem("wildLedgerOperatorSession", JSON.stringify(session));
-  sessionStorage.removeItem("wildLedger.currentCommunityConfig");
+  if (config) {
+    sessionStorage.setItem("wildLedger.currentCommunityConfig", JSON.stringify({ communityId: session.communityId, schema: session.configSchema, config }));
+  } else {
+    sessionStorage.removeItem("wildLedger.currentCommunityConfig");
+  }
 
   return session;
 }
@@ -227,16 +255,19 @@ async function openOperator(match) {
   lastAccess = fresh;
 
   const configState = await configStateFor(current);
-  const session = writeOperatorSession(current, configState);
+  const config = await currentConfigFor(current, configState);
+  const session = writeOperatorSession(current, configState, config);
 
-  if (!current.configured) {
+  // CONFIG state, not the old presentation registry, decides whether the
+  // community has completed its first setup publication.
+  if (!configState?.state?.current) {
     setStatus(`${session.communityId} identified. Opening Community Setup…`, "good");
     window.location.href = `setup.html?community=${encodeURIComponent(session.communityId)}&role=operator&mode=provisioned`;
     return;
   }
 
   setStatus(`${session.communityId} identified. Opening the community workspace…`, "good");
-  window.location.href = "viewCommunity.html";
+  window.location.href = `viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
 }
 
 function renderCommunityChoices(matches) {

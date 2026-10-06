@@ -357,7 +357,15 @@
     communityEditLink.href = `setup.html?mode=edit&community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
-  const displayName = community?.communityName || operatorSession?.communityName || requestedId || "Community";
+  let cachedCommunityName = "";
+  try {
+    const cached = JSON.parse(sessionStorage.getItem("wildLedger.currentCommunityConfig") || "null");
+    if (cached && String(cached.communityId || "").trim().toUpperCase() === String(requestedId || "").trim().toUpperCase()) {
+      cachedCommunityName = String(cached?.config?.communityName || "").trim();
+    }
+  } catch (_) {}
+
+  const displayName = cachedCommunityName || operatorSession?.communityName || community?.communityName || requestedId || "Community";
   viewCommunityTitle.textContent = displayName;
   document.title = `${displayName} | Wild Ledger`;
 })();
