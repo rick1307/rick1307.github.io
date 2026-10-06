@@ -458,6 +458,53 @@
     margin-top: 15px;
   }
 
+  .required-mark {
+    color: var(--mango);
+    font-weight: 950;
+  }
+
+  .launch-gate {
+    border-color: rgba(244,189,88,.20);
+  }
+
+  .launch-status {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: .84rem;
+    line-height: 1.5;
+  }
+
+  .launch-status.ready {
+    color: var(--ok);
+    font-weight: 850;
+  }
+
+  .launch-status.blocked {
+    color: #f4d28d;
+  }
+
+  .launch-missing {
+    margin: 0;
+    padding-left: 18px;
+    color: rgba(236,249,247,.72);
+    font-size: .78rem;
+    line-height: 1.55;
+  }
+
+  .launch-missing[hidden] {
+    display: none;
+  }
+
+  #launchCommunityButton {
+    min-width: 190px;
+  }
+
+  #launchCommunityButton:disabled {
+    cursor: not-allowed;
+    opacity: .34;
+    filter: saturate(.55);
+  }
+
   details {
     margin-top: 20px;
     padding-top: 16px;
@@ -790,6 +837,22 @@
           </details>
         </section>
 
+        <section class="section-card launch-gate" id="launchGateSection" hidden>
+          <div class="section-head">
+            <div>
+              <h2>Launch Community</h2>
+              <p>Required setup fields are marked with <span class="required-mark">*</span>. Your community stays hidden until setup is complete and the launch step is performed.</p>
+            </div>
+            <span class="permission-tag">First launch</span>
+          </div>
+          <p class="launch-status blocked" id="launchGateStatus">Complete all required fields (*) to launch your community.</p>
+          <ul class="launch-missing" id="launchMissingList"></ul>
+          <div class="button-row">
+            <button class="primary-button" id="launchCommunityButton" type="button" disabled>Launch Community</button>
+          </div>
+          <div class="status" id="launchActionStatus" aria-live="polite"></div>
+        </section>
+
         <section class="section-card output-card">
           <div class="section-head">
             <div>
@@ -860,6 +923,11 @@
       const operatingWalletDisplay = document.getElementById("operatingWalletDisplay");
       const operatingWalletState = document.getElementById("operatingWalletState");
       const manageOperatingAccountLink = document.getElementById("manageOperatingAccountLink");
+      const launchGateSection = document.getElementById("launchGateSection");
+      const launchCommunityButton = document.getElementById("launchCommunityButton");
+      const launchGateStatus = document.getElementById("launchGateStatus");
+      const launchMissingList = document.getElementById("launchMissingList");
+      const launchActionStatus = document.getElementById("launchActionStatus");
       let authorityDisplayRequest = 0;
 
       const params = new URLSearchParams(window.location.search);
@@ -1028,6 +1096,147 @@
 
       const MAX_COMMUNITY_IMAGE_BYTES = 250 * 1024;
 
+      const REQUIRED_SIMPLE_FIELDS = [
+        ["communityName", "Community name"],
+        ["managerName", "Manager display name"],
+        ["operatorName", "Community operator"],
+        ["operatorPossessive", "Operator possessive"],
+        ["membershipLabel", "Membership label"],
+        ["recordLabel", "Record label"],
+        ["memberSingular", "Member — singular"],
+        ["memberPlural", "Member — plural"],
+        ["groupName", "Group name"],
+        ["historyLabel", "History label"],
+        ["joinLabel", "Join button label"],
+        ["unrankedRankLabel", "Unranked label"],
+        ["heading", "Main heading"],
+        ["intro", "Community introduction"],
+        ["bannerDesktop", "Desktop banner"],
+        ["bannerMobile", "Mobile banner"],
+        ["profileImage", "Profile image"],
+        ["heroImage", "Hero image"],
+        ["eventHeroImage", "Event hero image"],
+        ["experienceLine", "Experience line"]
+      ];
+
+      const REQUIRED_EXPERIENCE_FIELDS = [
+        ["experienceStep1", "Experience step 1"],
+        ["experienceStep2", "Experience step 2"],
+        ["experienceStep3", "Experience step 3"]
+      ];
+
+      function requiredLabelFor(id) {
+        return document.querySelector(`label[for='${id}']`);
+      }
+
+      function addRequiredMark(label) {
+        if (!label || label.querySelector(".required-mark")) return;
+        const mark = document.createElement("span");
+        mark.className = "required-mark";
+        mark.textContent = " *";
+        mark.setAttribute("aria-hidden", "true");
+        label.appendChild(mark);
+      }
+
+      function decorateRequiredFields() {
+        if (mode !== "provisioned") return;
+        REQUIRED_SIMPLE_FIELDS.forEach(([id]) => addRequiredMark(requiredLabelFor(id)));
+        REQUIRED_EXPERIENCE_FIELDS.forEach(([id]) => addRequiredMark(requiredLabelFor(id)));
+
+        ranksEditor.querySelectorAll("[data-rank-index][data-rank-key='name']").forEach((input) => {
+          addRequiredMark(requiredLabelFor(input.id));
+        });
+        ranksEditor.querySelectorAll("[data-rank-index][data-rank-key='min']").forEach((input) => {
+          addRequiredMark(requiredLabelFor(input.id));
+        });
+      }
+
+      function trimmed(value) {
+        return String(value ?? "").trim();
+      }
+
+      function launchRequirements() {
+        syncFromForm();
+        const missing = [];
+
+        REQUIRED_SIMPLE_FIELDS.forEach(([key, label]) => {
+          if (!trimmed(current[key])) missing.push(label);
+        });
+
+        const canonicalId = String(current.backendId || "").trim().toUpperCase();
+        if (
+          canonicalId &&
+          trimmed(current.communityName).toUpperCase() === canonicalId
+        ) {
+          missing.push("Community name must be more than the Community ID");
+        }
+
+        const steps = Array.isArray(current.experienceSteps) ? current.experienceSteps : [];
+        REQUIRED_EXPERIENCE_FIELDS.forEach(([, label], index) => {
+          if (!trimmed(steps[index])) missing.push(label);
+        });
+
+        const ranks = Array.isArray(current.ranks) ? current.ranks : [];
+        if (ranks.length < 5) {
+          missing.push("Five community ranks");
+        } else {
+          const firstFive = ranks.slice(0, 5);
+          let previous = -1;
+          firstFive.forEach((rank, index) => {
+            const name = trimmed(rank?.name);
+            const min = Number(rank?.min);
+            if (!name) missing.push(`Rank ${index + 1} name`);
+            if (/^Rank\s+\d+$/i.test(name)) {
+              missing.push(`Customize Rank ${index + 1} name`);
+            }
+            if (!Number.isFinite(min) || min < 0) {
+              missing.push(`Rank ${index + 1} LEAP threshold`);
+            } else if (index > 0 && min <= previous) {
+              missing.push("Rank LEAP thresholds must increase");
+            }
+            if (Number.isFinite(min)) previous = min;
+          });
+        }
+
+        return [...new Set(missing)];
+      }
+
+      function updateLaunchGate() {
+        if (!launchGateSection || !launchCommunityButton || !launchGateStatus || !launchMissingList) return;
+
+        const active = mode === "provisioned";
+        launchGateSection.hidden = !active;
+        if (!active) return;
+
+        decorateRequiredFields();
+        const missing = launchRequirements();
+        const ready = missing.length === 0;
+
+        launchCommunityButton.disabled = !ready;
+        launchGateStatus.className = `launch-status ${ready ? "ready" : "blocked"}`;
+        launchGateStatus.textContent = ready
+          ? "All required setup fields are complete. This community is ready for the launch step."
+          : "Complete all required fields (*) to launch your community.";
+
+        launchMissingList.replaceChildren();
+        launchMissingList.hidden = ready;
+
+        if (!ready) {
+          missing.forEach((label) => {
+            const item = document.createElement("li");
+            item.textContent = label;
+            launchMissingList.appendChild(item);
+          });
+        }
+
+        if (launchActionStatus) {
+          launchActionStatus.textContent = ready
+            ? "Launch is unlocked. The visibility switch itself is wired in the next step."
+            : "";
+          launchActionStatus.className = ready ? "status ok" : "status";
+        }
+      }
+
       function canonicalCommunityIdForImages() {
         const namespace = String(document.getElementById("leapNamespace")?.value || current.leapNamespace || "")
           .trim()
@@ -1107,6 +1316,7 @@
             </div>`;
           ranksEditor.appendChild(row);
         });
+        decorateRequiredFields();
       }
 
       function renderThemeEditors() {
@@ -1259,6 +1469,8 @@
           pill.textContent = rank.name || "Rank";
           rankWrap.appendChild(pill);
         });
+
+        updateLaunchGate();
       }
 
       function setLocked(input, locked) {
@@ -1403,6 +1615,7 @@
           }
           if (manageOperatingAccountLink) manageOperatingAccountLink.hidden = true;
           applyFieldPermissions();
+          updateLaunchGate();
           return;
         }
 
@@ -1438,6 +1651,17 @@
         }
         updateOutputAndPreview();
       });
+
+      if (launchCommunityButton) {
+        launchCommunityButton.addEventListener("click", () => {
+          updateLaunchGate();
+          if (launchCommunityButton.disabled) return;
+          if (launchActionStatus) {
+            launchActionStatus.textContent = "Setup is complete and the launch gate passed. The actual hidden → visible launch action is Move 3.";
+            launchActionStatus.className = "status ok";
+          }
+        });
+      }
 
       document.getElementById("saveDraftButton").addEventListener("click", saveDraft);
 
