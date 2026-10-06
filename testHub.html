@@ -138,6 +138,19 @@
       </details>
 
       <details class="job">
+        <summary>Test community STATE writing</summary>
+        <div class="job-body">
+          <p class="purpose">Publishes one reserved diagnostic <code>WILD-LEDGER/STATE/&lt;COMMUNITY-ID&gt;/HARNESS=&lt;SHA-256&gt;</code> value from the current Community Operating Wallet, then reconstructs that value from validated XRPL history.</p>
+          <div class="meta">
+            <div class="item"><b>Use it when</b>You want to isolate and prove the new Wild Ledger community STATE primitive before CONFIG publishing is connected to setup.</div>
+            <div class="item"><b>Successful finish</b>The Operating Wallet statement validates and Wild Ledger resolves the same HARNESS value as current state.</div>
+          </div>
+          <div class="warning"><strong>Writes to XRPL.</strong> The harness uses the reserved HARNESS key so it does not replace a community's production CONFIG pointer.</div>
+          <a class="open" href="test-harness/communityStateTest.html"><span>Open Harness →</span><span class="file">test-harness/communityStateTest.html</span></a>
+        </div>
+      </details>
+
+      <details class="job">
         <summary>Create a new community directly</summary>
         <div class="job-body">
           <p class="purpose">Creates a canonical Wild Ledger community directly, without using the normal request and setup-fee onboarding path.</p>
