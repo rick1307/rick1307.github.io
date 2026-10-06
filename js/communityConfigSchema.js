@@ -30,10 +30,7 @@ const CONFIG_V1_KEYS = Object.freeze([
   "heading",
   "intro",
   "experienceLine",
-  "experienceSteps",
-  "unrankedRankLabel",
-  "rankNames",
-  "rankThresholds"
+  "experienceSteps"
 ]);
 
 export function canonicalCommunityId(value) {
@@ -101,10 +98,7 @@ export function buildCommunityConfigV1Preset({
     heading: "Welcome",
     intro: "",
     experienceLine: "Show up. Participate. Build a history.",
-    experienceSteps: ["Show up", "Participate", "Build a history"],
-    unrankedRankLabel: "Not ranked",
-    rankNames: ["Rank 1", "Rank 2", "Rank 3", "Rank 4", "Rank 5"],
-    rankThresholds: [1, 5, 10, 25, 51]
+    experienceSteps: ["Show up", "Participate", "Build a history"]
   };
 }
 
@@ -121,7 +115,6 @@ export function communityConfigV1FromLegacy(legacy, { communityId = "" } = {}) {
     skinId
   });
 
-  const ranks = Array.isArray(legacy.ranks) ? legacy.ranks.slice(0, 5) : [];
   return normalizeCommunityConfigV1({
     ...preset,
     communityName: String(legacy.communityName || preset.communityName),
@@ -140,10 +133,7 @@ export function communityConfigV1FromLegacy(legacy, { communityId = "" } = {}) {
     experienceLine: String(legacy.experienceLine || preset.experienceLine),
     experienceSteps: Array.isArray(legacy.experienceSteps) && legacy.experienceSteps.length === 3
       ? legacy.experienceSteps.map(String)
-      : [...preset.experienceSteps],
-    unrankedRankLabel: String(legacy.unrankedRankLabel || preset.unrankedRankLabel),
-    rankNames: ranks.length === 5 ? ranks.map(rank => String(rank?.name || "")) : [...preset.rankNames],
-    rankThresholds: ranks.length === 5 ? ranks.map(rank => Number(rank?.min)) : [...preset.rankThresholds]
+      : [...preset.experienceSteps]
   }, { communityId: id });
 }
 
@@ -167,7 +157,7 @@ export function normalizeCommunityConfigV1(config, { communityId = "" } = {}) {
     "layoutId", "skinId", "communityName", "managerName", "operatorName",
     "operatorPossessive", "membershipLabel", "memberSingular", "memberPlural",
     "groupName", "recordLabel", "historyLabel", "joinLabel", "heading", "intro",
-    "experienceLine", "unrankedRankLabel"
+    "experienceLine"
   ];
   stringKeys.forEach(key => requireString(config[key], `CONFIG ${key}`));
 
@@ -178,30 +168,13 @@ export function normalizeCommunityConfigV1(config, { communityId = "" } = {}) {
   }
   config.experienceSteps.forEach((value, index) => requireString(value, `CONFIG experienceSteps[${index}]`));
 
-  if (!Array.isArray(config.rankNames) || config.rankNames.length !== 5) {
-    throw new Error("CONFIG rankNames must contain exactly five strings.");
-  }
-  config.rankNames.forEach((value, index) => requireString(value, `CONFIG rankNames[${index}]`));
-
-  if (!Array.isArray(config.rankThresholds) || config.rankThresholds.length !== 5) {
-    throw new Error("CONFIG rankThresholds must contain exactly five whole numbers.");
-  }
-  let prior = 0;
-  config.rankThresholds.forEach((value, index) => {
-    const number = Number(value);
-    if (!Number.isInteger(number) || number < 1 || number <= prior) {
-      throw new Error(`CONFIG rankThresholds[${index}] must be a positive whole number greater than the previous threshold.`);
-    }
-    prior = number;
-  });
 
   const normalized = {};
   for (const key of CONFIG_V1_KEYS) {
     if (key === "configSchema") normalized[key] = COMMUNITY_CONFIG_SCHEMA;
     else if (key === "communityId") normalized[key] = id;
     else if (key === "leapNamespace") normalized[key] = `${id}-LEAP`;
-    else if (key === "experienceSteps" || key === "rankNames") normalized[key] = [...config[key]];
-    else if (key === "rankThresholds") normalized[key] = config[key].map(Number);
+    else if (key === "experienceSteps") normalized[key] = [...config[key]];
     else normalized[key] = String(config[key]);
   }
   return normalized;

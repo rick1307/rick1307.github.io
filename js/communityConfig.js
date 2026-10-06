@@ -38,14 +38,6 @@
       experienceSteps: ["Come aboard", "Show up", "Leave a wake"],
       walletStorageKey: "sfl.xrpl.wallet",
       activeWalletKey: "sfl.xrpl.activeWallet",
-      unrankedRankLabel: "Not aboard",
-      ranks: [
-        { min: 1, name: "Deckhand" },
-        { min: 5, name: "Bosun" },
-        { min: 10, name: "Quartermaster" },
-        { min: 25, name: "First Mate" },
-        { min: 51, name: "Master of the Leap" }
-      ],
       badges: [
         {
           name: "Crew",
@@ -130,14 +122,6 @@
       experienceSteps: ["Show up", "Get your hands dirty", "Leave inspired"],
       walletStorageKey: "zach.xrpl.wallet",
       activeWalletKey: "zach.xrpl.activeWallet",
-      unrankedRankLabel: "Not ranked",
-      ranks: [
-        { min: 1, name: "Lug Nut" },
-        { min: 5, name: "Grease Monkey" },
-        { min: 10, name: "Gearhead" },
-        { min: 25, name: "Crew Chief" },
-        { min: 51, name: "Shop Legend" }
-      ],
       badges: [],
       theme: {
         paper: "#e7dfd2",

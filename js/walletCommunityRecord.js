@@ -22,10 +22,11 @@ import {
   recognitionAvailabilityFromCatalog
 } from "./recognitionCatalog.js";
 import { readCommunityRequestStatus } from "./communitySetup.js";
+import "./starStanding.js";
 
 export const WILD_LEDGER_ACTIVE_WALLET_KEY = "wildLedger.activeWallet";
 export const WILD_LEDGER_COMMUNITY_RECORD_KEY = "wildLedger.communityRecord";
-export const WILD_LEDGER_COMMUNITY_RECORD_VERSION = 3;
+export const WILD_LEDGER_COMMUNITY_RECORD_VERSION = 4;
 
 const LEAP_HISTORY_KEYS = ["BADGE", "EVENT", "CHALLENGE"];
 const RIPPLE_EPOCH_MS = Date.UTC(2000, 0, 1);
@@ -399,28 +400,10 @@ function singleOccurrenceRecognitionRecords(records) {
   return kept;
 }
 
-function rankFor(community, earnedLeap) {
-  const configuredRanks = Array.isArray(community?.ranks) && community.ranks.length
-    ? community.ranks
-    : [
-        { min: 1, name: "Deckhand" },
-        { min: 5, name: "Bosun" },
-        { min: 10, name: "Quartermaster" },
-        { min: 25, name: "First Mate" },
-        { min: 51, name: "Master of the Leap" }
-      ];
-
-  const ranks = [...configuredRanks]
-    .map(item => ({ min: Number(item?.min), name: String(item?.name || "").trim() }))
-    .filter(item => Number.isFinite(item.min) && item.min >= 0 && item.name)
-    .sort((a, b) => a.min - b.min);
-
-  let current = null;
-  for (const rank of ranks) {
-    if (earnedLeap >= rank.min) current = rank;
-  }
-
-  return current?.name || community?.unrankedRankLabel || "Not ranked";
+function starStandingFor(earnedLeap) {
+  const system = globalThis.WILD_LEDGER_STAR_SYSTEM;
+  if (!system?.standingForEarnedLeap) throw new Error("Wild Ledger star system is unavailable.");
+  return system.standingForEarnedLeap(earnedLeap);
 }
 
 function communityObjectFromDiscovery(record) {
@@ -431,15 +414,7 @@ function communityObjectFromDiscovery(record) {
     backendId: String(record?.communityId || "").trim().toUpperCase(),
     communityName: String(record?.communityName || record?.communityId || "Community"),
     leapNamespace: String(record?.namespace || `${record?.communityId || ""}-LEAP`),
-    operatingWallet: String(record?.operatingWallet || ""),
-    unrankedRankLabel: "Not ranked",
-    ranks: [
-      { min: 1, name: "Deckhand" },
-      { min: 5, name: "Bosun" },
-      { min: 10, name: "Quartermaster" },
-      { min: 25, name: "First Mate" },
-      { min: 51, name: "Master of the Leap" }
-    ]
+    operatingWallet: String(record?.operatingWallet || "")
   };
 }
 
@@ -542,6 +517,7 @@ function summarizeCommunityRelationship({
   const currentOperator = currentAuthorityWallet === wallet;
   const historicalOperator = currentOperator || authorityAccounts.includes(wallet);
   const member = earnedLeap > 0;
+  const starStanding = starStandingFor(earnedLeap);
 
   return {
     communityId: String(discovered?.communityId || community?.backendId || community?.id || "").trim().toUpperCase(),
@@ -553,7 +529,8 @@ function summarizeCommunityRelationship({
     source: String(discovered?.source || ""),
     member,
     earnedLeap,
-    rank: rankFor(community, earnedLeap),
+    starCount: starStanding.count,
+    stars: starStanding.display,
     currentOperator,
     historicalOperator,
     setupRequired: Boolean(discovered?.canonical && currentOperator && !discovered?.configured),
