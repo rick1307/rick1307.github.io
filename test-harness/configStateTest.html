@@ -38,7 +38,7 @@
 <div class="folder-body"><p class="action-line">Use validated XRPL authority history to identify the one community this wallet currently operates.</p>
 <div class="button-row"><button id="authorityButton" class="primary-action" type="button" disabled>Resolve community</button></div>
 <div class="human-status" id="human2"><div class="big">•</div><div><strong>Locked</strong><span>Complete Step 1 first.</span></div></div>
-<div class="failure-panel" id="failure2" hidden><h3>✕ Step 2 failed</h3><p id="failureText2"></p><div class="failure-actions"><button class="copy-button" type="button" data-copy-step="2">Copy Diagnostic Report</button></div></div>
+<div class="failure-panel" id="failure2" hidden><h3>✕ Step 2 failed</h3><p id="failureText2"></p><div class="failure-actions"><button class="copy-button" id="retryStep2" type="button">Retry</button> <button class="copy-button" type="button" data-copy-step="2">Copy Diagnostic Report</button></div></div>
 <details class="detail-card"><summary>Technical details</summary><div class="detail-body"><div class="kv"><b>Community</b><span id="communityValue">—</span><b>Namespace</b><span id="namespaceValue">—</span><b>Operating Wallet</b><span class="mono" id="walletValue">—</span></div></div></details></div>
 </details>
 
@@ -116,7 +116,9 @@ const runtime = window.WILD_LEDGER_CONFIG || {};
 const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
 const PROJECT_ID = String(runtime.walletConnectProjectId || "").trim();
 const CONFIG_SCHEMA = COMMUNITY_CONFIG_SCHEMA;
-const fixtureByCommunity = Object.freeze({ SFL: "./fixtures/SFL-current-config.json" });
+// Test-only off-ledger store: every community resolves through the same Community-ID path.
+// No community, including SFL, receives special runtime treatment.
+const TEST_CONFIG_FIXTURE_DIRECTORY = "./fixtures/";
 const $ = id => document.getElementById(id);
 const stepFolders = Array.from({length:8},(_,i)=>$(`step${i+1}`));
 const failures = new Map();
@@ -172,7 +174,7 @@ function updateButtons(){
   $("verifyButton").disabled=busyStep!==0||!submittedResult;
 }
 function exactMemo(){if(!authorityRecord)throw new Error("Community authority is not resolved.");return communityStateMemo(authorityRecord.communityId,"CONFIG",String(CONFIG_SCHEMA));}
-function fixtureUrl(communityId){const path=fixtureByCommunity[String(communityId||"").toUpperCase()];if(!path)throw new Error(`This Step 3 harness has no current CONFIG fixture for ${communityId}. SFL is the live proof community.`);return path;}
+function fixtureUrl(communityId){const id=String(communityId||"").trim().toUpperCase();if(!/^[A-Z0-9][A-Z0-9-]*$/.test(id))throw new Error("Community ID is not canonical.");return `${TEST_CONFIG_FIXTURE_DIRECTORY}${encodeURIComponent(id)}-current-config.json`;}
 function assertAuthorityStillCurrent(match){if(!match||match.currentAccount!==connectedAccount)throw new Error("The connected wallet is no longer the current Community Operating Wallet.");}
 function assertPrepared(tx){
   if(!tx||!isCanonicalNoOpAccountSet(tx))throw new Error("Prepared transaction is not a canonical no-op AccountSet.");
@@ -195,6 +197,7 @@ function diagnosticReport(step){
 stepFolders.forEach((folder,index)=>folder.addEventListener("toggle",()=>{if(folder.open&&folder.classList.contains("is-locked"))folder.open=false;else if(folder.open)stepFolders.forEach((other,i)=>{if(i!==index)other.open=false;});}));
 document.querySelectorAll("[data-step-summary]").forEach(summary=>summary.addEventListener("click",event=>{const n=Number(summary.dataset.stepSummary||0),folder=$(`step${n}`);if(folder.classList.contains("is-locked")){event.preventDefault();return;}}));
 document.querySelectorAll("[data-copy-step]").forEach(btn=>btn.addEventListener("click",async()=>{const text=diagnosticReport(Number(btn.dataset.copyStep));try{await navigator.clipboard.writeText(text);const old=btn.textContent;btn.textContent="Copied — paste into ChatGPT";setTimeout(()=>btn.textContent=old,2200);}catch(_){window.prompt("Copy this diagnostic report:",text);}}));
+$("retryStep2").addEventListener("click",()=>{failures.delete(2);$("failure2").hidden=true;$("authorityButton").click();});
 
 $("connectButton").addEventListener("click",async()=>{
   workingStep(1,"Waiting for wallet","Scan the QR and approve the wallet connection.");
