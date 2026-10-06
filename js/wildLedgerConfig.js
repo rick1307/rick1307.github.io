@@ -17,6 +17,9 @@
     xrplWebSocket: "wss://s1.ripple.com/",
     xrplFeeCushion: 1.2,
     walletConnectProjectId: "be456e8bbaa197eaa9d39bb2e4d3208d",
+    // Provider-neutral current CONFIG service. Keep blank until the writable
+    // production store is deployed. May include {communityId}.
+    communityConfigEndpoint: "",
     discordOAuthStartUrl: "https://sfl-discord-auth.yjc26zd6c4.workers.dev/start"
   });
 })();

@@ -6,7 +6,7 @@
   CONFIG itself.
 */
 
-import { presentationSelection } from "./presentationCatalog.js";
+import { defaultPresentationSelection, presentationSelection } from "./presentationCatalog.js";
 
 export const COMMUNITY_CONFIG_SCHEMA = 1;
 
@@ -61,6 +61,90 @@ function ownKeysExact(object, expected, label) {
 function requireString(value, label) {
   if (typeof value !== "string" || !value.trim()) throw new Error(`${label} must be a non-empty string.`);
   return value;
+}
+
+function possessive(name) {
+  const clean = String(name || "").trim();
+  if (!clean) return "Operator's";
+  return /s$/i.test(clean) ? `${clean}'` : `${clean}'s`;
+}
+
+export function buildCommunityConfigV1Preset({
+  communityId,
+  communityName = "",
+  managerName = "",
+  layoutId = "",
+  skinId = ""
+} = {}) {
+  const id = canonicalCommunityId(communityId);
+  const defaults = defaultPresentationSelection();
+  const manager = String(managerName || "").trim();
+  const name = String(communityName || "").trim();
+
+  return {
+    configSchema: COMMUNITY_CONFIG_SCHEMA,
+    communityId: id,
+    leapNamespace: `${id}-LEAP`,
+    layoutId: layoutId || defaults.layoutId,
+    skinId: skinId || defaults.skinId,
+    communityName: name,
+    managerName: manager,
+    operatorName: manager,
+    operatorPossessive: possessive(manager),
+    membershipLabel: "Membership",
+    memberSingular: "member",
+    memberPlural: "members",
+    groupName: "community",
+    recordLabel: "Member Record",
+    historyLabel: "community history",
+    joinLabel: "Join →",
+    heading: "Welcome",
+    intro: "",
+    experienceLine: "Show up. Participate. Build a history.",
+    experienceSteps: ["Show up", "Participate", "Build a history"],
+    unrankedRankLabel: "Not ranked",
+    rankNames: ["Rank 1", "Rank 2", "Rank 3", "Rank 4", "Rank 5"],
+    rankThresholds: [1, 5, 10, 25, 51]
+  };
+}
+
+export function communityConfigV1FromLegacy(legacy, { communityId = "" } = {}) {
+  if (!legacy || typeof legacy !== "object") throw new Error("Legacy community configuration is required.");
+  const id = canonicalCommunityId(communityId || legacy.backendId || legacy.id);
+  const layoutId = legacy.layout === "garage" ? "layout-2" : "layout-1";
+  const skinId = layoutId === "layout-2" ? "skin-2" : "skin-1";
+  const preset = buildCommunityConfigV1Preset({
+    communityId: id,
+    communityName: legacy.communityName || id,
+    managerName: legacy.managerName || legacy.operatorName || "Operator",
+    layoutId,
+    skinId
+  });
+
+  const ranks = Array.isArray(legacy.ranks) ? legacy.ranks.slice(0, 5) : [];
+  return normalizeCommunityConfigV1({
+    ...preset,
+    communityName: String(legacy.communityName || preset.communityName),
+    managerName: String(legacy.managerName || preset.managerName),
+    operatorName: String(legacy.operatorName || legacy.managerName || preset.operatorName),
+    operatorPossessive: String(legacy.operatorPossessive || possessive(legacy.operatorName || legacy.managerName)),
+    membershipLabel: String(legacy.membershipLabel || preset.membershipLabel),
+    memberSingular: String(legacy.memberSingular || preset.memberSingular),
+    memberPlural: String(legacy.memberPlural || preset.memberPlural),
+    groupName: String(legacy.groupName || preset.groupName),
+    recordLabel: String(legacy.recordLabel || preset.recordLabel),
+    historyLabel: String(legacy.historyLabel || preset.historyLabel),
+    joinLabel: String(legacy.joinLabel || preset.joinLabel),
+    heading: String(legacy.heading || preset.heading),
+    intro: String(legacy.intro || `Welcome to ${legacy.communityName || id}.`),
+    experienceLine: String(legacy.experienceLine || preset.experienceLine),
+    experienceSteps: Array.isArray(legacy.experienceSteps) && legacy.experienceSteps.length === 3
+      ? legacy.experienceSteps.map(String)
+      : [...preset.experienceSteps],
+    unrankedRankLabel: String(legacy.unrankedRankLabel || preset.unrankedRankLabel),
+    rankNames: ranks.length === 5 ? ranks.map(rank => String(rank?.name || "")) : [...preset.rankNames],
+    rankThresholds: ranks.length === 5 ? ranks.map(rank => Number(rank?.min)) : [...preset.rankThresholds]
+  }, { communityId: id });
 }
 
 export function normalizeCommunityConfigV1(config, { communityId = "" } = {}) {
@@ -118,7 +202,7 @@ export function normalizeCommunityConfigV1(config, { communityId = "" } = {}) {
     else if (key === "leapNamespace") normalized[key] = `${id}-LEAP`;
     else if (key === "experienceSteps" || key === "rankNames") normalized[key] = [...config[key]];
     else if (key === "rankThresholds") normalized[key] = config[key].map(Number);
-    else normalized[key] = config[key];
+    else normalized[key] = String(config[key]);
   }
   return normalized;
 }
