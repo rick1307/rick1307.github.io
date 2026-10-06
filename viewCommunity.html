@@ -220,8 +220,8 @@
 /* Wild Ledger cinematic view dissolve — local demo */
 html{background:#071d2a}
 body{animation:wildViewIn .34s ease both}
-body.wl-view-leaving{opacity:0;transform:scale(.995);transition:opacity .28s ease,transform .28s ease;pointer-events:none}
-@keyframes wildViewIn{from{opacity:0;transform:scale(1.004)}to{opacity:1;transform:none}}
+body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
+@keyframes wildViewIn{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){body{animation:none}body.wl-view-leaving{transition:none}}
 </style>
 <link rel="stylesheet" href="wildLedgerControls.css">
