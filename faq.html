@@ -408,7 +408,7 @@
 <div class="faq">
 <div class="row"><b>What is LEAP?</b><span id="whatIsLeapCopy">LEAP is how I recognize participation in this community. If you show up, do something worth recognizing, or make a difference, I can award you LEAP. Over time, that builds your history here.</span></div>
 <div class="row"><b>Who decides how this community uses LEAP?</b><span id="whoDecidesLeapCopy">I do. I decide what I want to recognize, which opportunities I put out there, and when something you did deserves recognition. Wild Ledger handles the record behind it.</span></div>
-<div class="row"><b>How does rank work?</b><span id="rankModelCopy">Your rank follows the LEAP you have earned here. If you later send some LEAP somewhere else, your wallet balance changes, but your earned history does not. <a id="ranksFaqLink" href="ranks.html">See this community's ranks →</a></span></div>
+<div class="row"><b>How do stars work?</b><span id="rankModelCopy">Your stars follow the LEAP you have earned here. If you later send some LEAP somewhere else, your wallet balance changes, but your earned history does not. <a id="ranksFaqLink" href="ranks.html">See the five-star scale →</a></span></div>
 <div class="row"><b>Where are the wallet, Xaman, privacy, transfers, and Check instructions?</b><span>I keep those mechanics out of this FAQ on purpose. They work the same across Wild Ledger communities, so they live in the <a href="wildLedgerFaq.html">Wild Ledger FAQ</a>.</span></div>
 </div>
 </div>
@@ -432,10 +432,10 @@
 <span class="category">Member Record</span>
 <h2 id="historyHeading">Your community history</h2>
 <div class="faq">
-<div class="row"><b>What does my Member Record show?</b><span id="recordShowCopy">Think of it as your crew history. It shows what you hold now, what you have earned here, your rank, any LEAP still waiting for you, and the recognitions that make up your history.</span></div>
-<div class="row"><b>What is the difference between Current LEAP and Earned?</b><span id="currentVsEarnedCopy">Current LEAP is what is in your wallet today. Earned is the running total of LEAP I have officially awarded you here. Rank follows Earned. You can send LEAP without erasing what you earned.</span></div>
+<div class="row"><b>What does my Member Record show?</b><span id="recordShowCopy">Think of it as your crew history. It shows what you hold now, what you have earned here, your stars, any LEAP still waiting for you, and the recognitions that make up your history.</span></div>
+<div class="row"><b>What is the difference between Current LEAP and Earned?</b><span id="currentVsEarnedCopy">Current LEAP is what is in your wallet today. Earned is the running total of LEAP I have officially awarded you here. Stars follow Earned. You can send LEAP without erasing what you earned.</span></div>
 <div class="row"><b>When does a recognition count as earned?</b><span>When the LEAP actually reaches you. If I sent it by Check, that means after you cash it. Until then, it is still waiting for you.</span></div>
-<div class="row"><b>What if I never cash a LEAP Check?</b><span>Then it never becomes Earned LEAP. If the Check is later canceled, it does not count toward your crew history or rank.</span></div>
+<div class="row"><b>What if I never cash a LEAP Check?</b><span>Then it never becomes Earned LEAP. If the Check is later canceled, it does not count toward your crew history or stars.</span></div>
 </div>
 </div>
 </section>
@@ -445,7 +445,7 @@
 <h2>How badges work</h2>
 <div class="faq">
 <div class="row"><b>What is a badge?</b><span>A badge is recognition for doing something I value in this community. Badges can be repeatable, so if you do the thing again, I can recognize it again. I can also retire a badge when it no longer fits the community.</span></div>
-<div class="row"><b>Does rank control which badges I can have?</b><span id="badgeRankCopy">No. Rank and badges tell different parts of your story. Rank follows the LEAP you have earned here. Badges show the specific things I have recognized you for.</span></div>
+<div class="row"><b>Do stars control which badges I can have?</b><span id="badgeRankCopy">No. Stars and badges tell different parts of your story. Your stars follow the LEAP you have earned here. Badges show the specific things I have recognized you for.</span></div>
 <div class="row"><b>Can many people earn the same badge?</b><span>Yes. Lots of people can earn the same badge, and the same person can earn a repeatable badge more than once.</span></div>
 <div class="row"><b>What is Great Chat?</b><span>Great Chat is a badge that is always available to me. I use it when somebody adds something meaningful to the conversation. There is no score or formula behind it. I decide when a contribution deserves recognition.</span></div>
 <div class="row"><b>Where can I see this community's badges?</b><span><a id="badgesFaqLink" href="recognitions.html?category=badge">See the Badges page →</a></span></div>
@@ -487,7 +487,7 @@
 <h3 id="exploreCommunityHeading">Explore this community</h3>
 <p>See what I am recognizing here, what you can earn, and what is happening now.</p>
 <div class="cta-actions">
-<a class="button secondary" id="exploreRanksLink" href="ranks.html">Ranks →</a>
+<a class="button secondary" id="exploreRanksLink" href="ranks.html">Stars →</a>
 <a class="button secondary" id="exploreBadgesLink" href="recognitions.html?category=badge">Badges →</a>
 <a class="button secondary" id="exploreChallengesLink" href="recognitions.html?category=challenge">Challenges →</a>
 <a class="button secondary" id="exploreEventsLink" href="recognitions.html?category=event">Events →</a>
@@ -580,13 +580,13 @@
       const rankModel = document.getElementById("rankModelCopy");
       if (rankModel) {
         rankModel.textContent =
-          `Your rank follows the LEAP you have earned in ${communityName}. If you later send some LEAP somewhere else, your wallet balance changes, but your earned history does not.`;
+          `Your stars follow the LEAP you have earned in ${communityName}. If you later send some LEAP somewhere else, your wallet balance changes, but your earned history does not.`;
       }
 
       const currentVsEarned = document.getElementById("currentVsEarnedCopy");
       if (currentVsEarned) {
         currentVsEarned.textContent =
-          `Current LEAP is what is in your wallet today. Earned is the running total of LEAP I have officially awarded you in ${communityName}. Rank follows Earned. You can send LEAP without erasing what you earned.`;
+          `Current LEAP is what is in your wallet today. Earned is the running total of LEAP I have officially awarded you in ${communityName}. Stars follow Earned. You can send LEAP without erasing what you earned.`;
       }
 
       const joiningHeading = document.getElementById("joiningHeading");
@@ -598,13 +598,13 @@
       const recordShow = document.getElementById("recordShowCopy");
       if (recordShow) {
         recordShow.textContent =
-          `Think of your ${recordLabel} as your ${historyLabel}. It shows what you hold now, what you have earned here, your rank, any LEAP still waiting for you, and the recognitions that make up your history.`;
+          `Think of your ${recordLabel} as your ${historyLabel}. It shows what you hold now, what you have earned here, your stars, any LEAP still waiting for you, and the recognitions that make up your history.`;
       }
 
       const badgeRank = document.getElementById("badgeRankCopy");
       if (badgeRank) {
         badgeRank.textContent =
-          `No. Rank and badges tell different parts of your story. Rank follows the LEAP you have earned here. Badges show the specific things I have recognized you for.`;
+          `No. Stars and badges tell different parts of your story. Your stars follow the LEAP you have earned here. Badges show the specific things I have recognized you for.`;
       }
 
       const badgeRecorded = document.getElementById("badgeRecordedCopy");

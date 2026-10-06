@@ -653,7 +653,7 @@
 <div class="mini">
 <div class="num">3</div>
 <h3>Your crew history begins</h3>
-<p id="threeStepWelcome">You’ve earned your first LEAP and your first rank.</p>
+<p id="threeStepWelcome">You’ve earned your first LEAP and your first star.</p>
 </div>
 </div>
 </div>
@@ -668,8 +668,8 @@
           </p>
 <div class="status">
 <div>
-<b>Rank</b>
-<span id="firstRankLabel">First rank</span>
+<b>Stars</b>
+<span id="firstRankLabel">★☆☆☆☆</span>
 </div>
 <div>
 <b>LEAP</b>
@@ -696,7 +696,7 @@
 <span id="takePartCopy">Take part in the community.</span>
               When you do something I want to recognize, I can award you more LEAP.
             </p>
-<a class="button secondary" href="ranks.html" id="nextRanksLink">See the ranks →</a>
+<a class="button secondary" href="ranks.html" id="nextRanksLink">See the stars →</a>
 </div>
 <div class="panel">
 <h3>Your story grows</h3>
@@ -716,7 +716,7 @@
 <div class="help-box">
 <div class="help-copy">
 <h3>Need help before you start?</h3>
-<p id="bottomHelpCopy">If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about ranks, badges, challenges, events, or participation here, use the Community FAQ.</p>
+<p id="bottomHelpCopy">If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about stars, badges, challenges, events, or participation here, use the Community FAQ.</p>
 </div>
 <div class="help-actions">
 <a class="button secondary" href="wildLedgerFaq.html" id="wildLedgerFaqLink">Wild Ledger FAQ →</a>
@@ -745,10 +745,7 @@
       const operatorName = community.operatorName || community.managerName || "the community operator";
       const groupName = community.groupName || "community";
       const historyLabel = community.historyLabel || "community history";
-      const firstRankName =
-        Array.isArray(community.ranks) && community.ranks.length
-          ? community.ranks[0].name
-          : "First rank";
+      const firstStarDisplay = "★☆☆☆☆";
 
       // Community-specific wallet identity for the request and Member Record handoff.
       const walletStorageKey = community.walletStorageKey || `${communityId}.xrpl.wallet`;
@@ -889,7 +886,7 @@
       const bottomHelpCopy = document.getElementById("bottomHelpCopy");
       if (bottomHelpCopy) {
         bottomHelpCopy.textContent =
-          `If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about ranks, badges, challenges, events, or participation in ${communityName}, use the ${communityName} FAQ.`;
+          `If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about stars, badges, challenges, events, or participation in ${communityName}, use the ${communityName} FAQ.`;
       }
 
       const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
@@ -903,7 +900,7 @@
       const threeStepWelcome = document.getElementById("threeStepWelcome");
       if (threeStepWelcome) {
         threeStepWelcome.textContent =
-          `You’ve earned your first LEAP and your first rank: ${firstRankName}.`;
+          `You’ve earned your first LEAP and your first star.`;
       }
 
       const sendAddressHeading = document.getElementById("sendAddressHeading");
@@ -919,7 +916,7 @@
 
       const welcomeRankHeading = document.getElementById("welcomeRankHeading");
       if (welcomeRankHeading) {
-        welcomeRankHeading.textContent = `After you cash it: Welcome, ${firstRankName}.`;
+        welcomeRankHeading.textContent = `After you cash it: ${firstStarDisplay}`;
       }
 
       const welcomeHistoryCopy = document.getElementById("welcomeHistoryCopy");
@@ -929,7 +926,8 @@
       }
 
       const firstRankLabel = document.getElementById("firstRankLabel");
-      if (firstRankLabel) firstRankLabel.textContent = firstRankName;
+      if (firstRankLabel) firstRankLabel.textContent = firstStarDisplay;
+      if (firstRankLabel) firstRankLabel.setAttribute("aria-label", "1 of 5 stars");
 
       const takePartCopy = document.getElementById("takePartCopy");
       if (takePartCopy) takePartCopy.textContent = `Take part in the ${groupName}.`;

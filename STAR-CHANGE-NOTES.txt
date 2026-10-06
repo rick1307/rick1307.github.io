@@ -1,0 +1,19 @@
+WILD LEDGER — UNIVERSAL STARS
+2026-10-06
+
+Universal standing is now stars, not named ranks.
+
+Earned LEAP in each community:
+0       = ☆☆☆☆☆
+1–9     = ★☆☆☆☆
+10–19   = ★★☆☆☆
+20–49   = ★★★☆☆
+50–99   = ★★★★☆
+100+    = ★★★★★
+
+The standing is calculated independently inside each community from cumulative Earned LEAP.
+Star names and thresholds are not community-configurable and were removed from CONFIG Schema 1.
+
+The existing ranks.html filename is intentionally retained so current links/bookmarks do not break; the page itself is now Stars.
+
+Protocol documentation was advanced to LEAP Protocol 0.23 to record the universal star rule.

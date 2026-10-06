@@ -1468,14 +1468,14 @@
 
         <div class="rank-progress community-only">
           <div class="rank-progress-copy">
-            <span id="progressLabel">Rank progress</span>
+            <span id="progressLabel">Star progress</span>
             <strong id="progressValue">—</strong>
           </div>
           <div class="progress-track">
             <div class="progress-fill" id="progressFill"></div>
             <div class="progress-dividers" id="progressDividers" aria-hidden="true"></div>
           </div>
-          <div class="progress-rank-labels" id="progressRankLabels" aria-label="Community ranks"></div>
+          <div class="progress-rank-labels" id="progressRankLabels" aria-label="Wild Ledger star levels"></div>
         </div>
 
         <p class="crew-status" id="crewRecordStatus" role="status" aria-live="polite"></p>
@@ -1522,6 +1522,7 @@
 
   <script src="js/wildLedgerConfig.js"></script>
   <script src="js/communityConfig.js"></script>
+  <script src="js/starStanding.js"></script>
   <script type="module">
     import { resolveCommunityAuthority, isAuthorizedAtLedger } from "./js/communityAuthority.js";
     import { loadRecognitionCatalog, recognitionAvailabilityFromCatalog } from "./js/recognitionCatalog.js";
@@ -1687,7 +1688,7 @@
 
         if (relationship?.member) {
           parts.push(`${formatWholeLeap(relationship.earnedLeap)} LEAP`);
-          if (relationship?.rank) parts.push(String(relationship.rank));
+          if (relationship?.stars) parts.push(String(relationship.stars));
         }
 
         if (relationship?.currentOperator) parts.push("Operator");
@@ -2454,30 +2455,22 @@
       }
 
       function renderProgressRankScale() {
-        const ranks = Array.isArray(community.ranks) && community.ranks.length
-          ? [...community.ranks].sort((a,b) => a.min - b.min)
-          : [
-              { min:1, name:"Deckhand" },
-              { min:5, name:"Bosun" },
-              { min:10, name:"Quartermaster" },
-              { min:25, name:"First Mate" },
-              { min:51, name:"Master of the Leap" }
-            ];
-
-        const fiveRanks = ranks.slice(0,5);
+        const system = globalThis.WILD_LEDGER_STAR_SYSTEM;
+        const thresholds = system?.thresholds || [1,10,20,50,100];
 
         progressDividers.replaceChildren();
         progressRankLabels.replaceChildren();
 
-        for (let i = 0; i < fiveRanks.length; i += 1) {
+        thresholds.forEach((threshold, index) => {
           const divider = document.createElement("span");
           divider.className = "progress-division";
           progressDividers.appendChild(divider);
 
           const label = document.createElement("span");
-          label.textContent = fiveRanks[i].name;
+          label.textContent = `${"★".repeat(index + 1)}${"☆".repeat(4 - index)} · ${threshold}${index === 4 ? "+" : ""}`;
+          label.setAttribute("aria-label", `${index + 1} of 5 stars at ${threshold}${index === 4 ? " or more" : ""} earned LEAP`);
           progressRankLabels.appendChild(label);
-        }
+        });
       }
 
       function resetRecord() {
@@ -2490,7 +2483,7 @@
         earnedEl.textContent = "—";
         earnedNoteEl.textContent = `in ${communityName}`;
 
-        progressLabel.textContent = "Rank progress";
+        progressLabel.textContent = "Star progress";
         progressValue.textContent = "—";
         progressFill.style.width = "0%";
 
@@ -3463,23 +3456,16 @@
           ? String(total)
           : String(total);
         earnedNoteEl.textContent = `in ${communityName}`;
+        const standing = globalThis.WILD_LEDGER_STAR_SYSTEM.standingForEarnedLeap(total);
+        progressLabel.textContent = standing.display;
+        progressLabel.setAttribute("aria-label", standing.ariaLabel);
 
-        const earnedRank = rankFor(total);
-
-        progressLabel.textContent = earnedRank.name;
-
-        if (earnedRank.threshold === null) {
-          progressValue.textContent = "Top rank reached";
-        } else {
-          const remaining = Math.max(0, earnedRank.threshold - total);
-          progressValue.textContent = `${remaining} LEAP to ${earnedRank.next}`;
-        }
-
-        if (earnedRank.threshold === null) {
+        if (standing.nextThreshold === null) {
+          progressValue.textContent = "100+ LEAP";
           progressFill.style.width = "100%";
         } else {
-          progressFill.style.width =
-            `${Math.max(0, Math.min(100, (total / earnedRank.threshold) * 100))}%`;
+          progressValue.textContent = `${standing.remaining} LEAP to next star`;
+          progressFill.style.width = `${Math.max(0, Math.min(100, (total / standing.nextThreshold) * 100))}%`;
         }
       }
 
@@ -3487,7 +3473,7 @@
         currentLogbookRecords = Array.isArray(records) ? records : [];
 
         // IGNORE is interpretive quarantine. Keep the underlying earned LEAP
-        // record for totals/rank, but suppress the recognition from normal
+        // record for totals/star standing, but suppress the recognition from normal
         // Member Record history and recognition counts.
         const visibleRecords = currentLogbookRecords.filter(record => !record?.recognitionIgnored);
         const sorted = sortLogbookRecords(visibleRecords);
@@ -3569,45 +3555,6 @@
 
         renderLogbook(currentLogbookRecords);
       }
-
-      function rankFor(earnedLeap) {
-        const configuredRanks = Array.isArray(community.ranks) && community.ranks.length
-          ? community.ranks
-          : [
-              { min:1, name:"Deckhand" },
-              { min:5, name:"Bosun" },
-              { min:10, name:"Quartermaster" },
-              { min:25, name:"First Mate" },
-              { min:51, name:"Master of the Leap" }
-            ];
-
-        const ranks = [...configuredRanks].sort((a,b) => a.min - b.min);
-        let currentIndex = -1;
-
-        for (let i = 0; i < ranks.length; i += 1) {
-          if (earnedLeap >= ranks[i].min) currentIndex = i;
-        }
-
-        if (currentIndex < 0) {
-          return {
-            name: community.unrankedRankLabel || "Not ranked",
-            next: ranks[0].name,
-            threshold: ranks[0].min,
-            start:0
-          };
-        }
-
-        const current = ranks[currentIndex];
-        const next = ranks[currentIndex + 1] || null;
-
-        return {
-          name: current.name,
-          next: next ? next.name : null,
-          threshold: next ? next.min : null,
-          start: current.min
-        };
-      }
-
       function shortAddress(account) {
         return account.length > 20
           ? `${account.slice(0,10)}…${account.slice(-8)}`
@@ -3622,9 +3569,9 @@
           ? String(balance)
           : String(Number(balance.toFixed(6)));
 
-        // Current wallet balance is a holdings fact only. Rank progress is
+        // Current wallet balance is a holdings fact only. Star progress is
         // rendered separately from reconstructed Earned LEAP history.
-        progressLabel.textContent = "Rank progress";
+        progressLabel.textContent = "Star progress";
         progressValue.textContent = "—";
         progressFill.style.width = "0%";
       }
@@ -3779,7 +3726,7 @@
             greatChatsEl.textContent = "—";
             earnedEl.textContent = "—";
             earnedNoteEl.textContent = `in ${communityName}`;
-            progressLabel.textContent = "Rank progress";
+            progressLabel.textContent = "Star progress";
             progressValue.textContent = "—";
             progressFill.style.width = "0%";
             resetLogbook(

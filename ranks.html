@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Explore the LEAP rank system and how rank recognizes growing participation within a community." />
+  <meta name="description" content="Explore the universal Wild Ledger star system and how earned LEAP builds one through five stars in each community." />
   <meta name="theme-color" content="#efe8d8" />
-  <title>Ranks — LEAP</title>
+  <title>Stars — LEAP</title>
   <style>
     :root{
       --paper:#efe8d8;--paper2:#f8f3e8;--ink:#1a252c;--navy:#16384b;--sea:#2f7481;
@@ -265,8 +265,8 @@
 
   <header>
     <div class="wrap">
-      <div class="kicker" id="communityKicker">Community Ranks</div>
-      <h1>Ranks</h1>
+      <div class="kicker" id="communityKicker">Community Stars</div>
+      <h1>Stars</h1>
       <p class="lede" id="communityLede">Your history leaves a mark.</p>
     </div>
   </header>
@@ -280,13 +280,13 @@
         <div class="principles">
           <div class="principle">
             <b>Rule one</b>
-            <h3>Rank follows earned LEAP</h3>
-            <p id="ruleEarned">Your rank is based on LEAP officially earned from this community.</p>
+            <h3>Stars follow earned LEAP</h3>
+            <p id="ruleEarned">Your stars are based on LEAP officially earned from this community.</p>
           </div>
           <div class="principle">
             <b>Rule two</b>
             <h3>Earned stays earned</h3>
-            <p>Sending LEAP to another wallet or member can change your current balance, but it does not erase rank you already earned.</p>
+            <p>Sending LEAP to another wallet or member can change your current balance, but it does not erase stars you already earned.</p>
           </div>
         </div>
       </div>
@@ -295,8 +295,8 @@
     <section>
       <div class="wrap">
         <div class="section-title">
-          <h2>The rank ladder</h2>
-          <p id="rankLadderIntro">Five rank levels create progression.</p>
+          <h2>The five-star scale</h2>
+          <p id="rankLadderIntro">The same five star levels apply in every Wild Ledger community.</p>
         </div>
 
         <div class="rank-grid" id="rankGrid"></div>
@@ -308,7 +308,7 @@
       <div class="wrap">
         <div class="return-box">
           <h3 id="returnHeading">People will see it.</h3>
-          <p id="returnCopy">Earn 1 LEAP from this community and your rank journey begins.</p>
+          <p id="returnCopy">Earn 1 LEAP from this community and your first star appears.</p>
           <a class="button" id="joinButton" href="join.html">Join →</a>
         </div>
       </div>
@@ -317,11 +317,12 @@
 
   <footer>
     <div class="wrap foot">
-      <div id="footerLabel">LEAP • Community Ranks</div>
+      <div id="footerLabel">LEAP • Community Stars</div>
     </div>
   </footer>
 
   <script src="js/communityConfig.js"></script>
+  <script src="js/starStanding.js"></script>
   <script>
     (() => {
       const community = window.WILD_LEDGER_COMMUNITY;
@@ -366,12 +367,12 @@
       const themeColor = document.querySelector('meta[name="theme-color"]');
       if (themeColor && theme.themeColor) themeColor.setAttribute("content", theme.themeColor);
 
-      document.title = `Ranks — ${communityName}`;
+      document.title = `Stars — ${communityName}`;
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
         metaDescription.setAttribute(
           "content",
-          `Explore the LEAP ranks for ${communityName} and see how earned LEAP builds community rank.`
+          `Explore the Wild Ledger stars for ${communityName} and see how earned LEAP builds community standing.`
         );
       }
 
@@ -389,7 +390,7 @@
       if (bannerMobile && community.bannerMobile) bannerMobile.srcset = community.bannerMobile;
 
       const kicker = document.getElementById("communityKicker");
-      if (kicker) kicker.textContent = `${communityName} Ranks`;
+      if (kicker) kicker.textContent = `${communityName} Stars`;
 
       const lede = document.getElementById("communityLede");
       if (lede) lede.textContent = "Your history leaves a mark.";
@@ -397,12 +398,13 @@
       const ruleEarned = document.getElementById("ruleEarned");
       if (ruleEarned) {
         ruleEarned.textContent =
-          `Your rank in ${communityName} is based on the total LEAP officially awarded to you by ${communityName}.`;
+          `Your stars in ${communityName} are based on the total LEAP officially awarded to you by ${communityName}.`;
       }
-
-      const ranks = Array.isArray(community.ranks)
-        ? [...community.ranks].sort((a, b) => Number(a.min) - Number(b.min))
-        : [];
+      const starSystem = window.WILD_LEDGER_STAR_SYSTEM;
+      const stars = (starSystem?.thresholds || [1, 10, 20, 50, 100]).map((min, index) => ({
+        min: Number(min),
+        stars: starSystem?.glyphs ? starSystem.glyphs(index + 1) : `${"★".repeat(index + 1)}${"☆".repeat(4 - index)}`
+      }));
 
       const rankGrid = document.getElementById("rankGrid");
 
@@ -422,8 +424,8 @@
       if (rankGrid) {
         rankGrid.replaceChildren();
 
-        ranks.forEach((rank, index) => {
-          const next = ranks[index + 1];
+        stars.forEach((rank, index) => {
+          const next = stars[index + 1];
           const min = Number(rank.min);
           const rangeLabel = next
             ? `${min}–${Number(next.min) - 1} LEAP`
@@ -443,16 +445,17 @@
           titleWrap.className = "rank-title";
 
           const title = document.createElement("h3");
-          title.textContent = rank.name || `Rank ${index + 1}`;
+          title.textContent = rank.stars;
+          title.setAttribute("aria-label", `${index + 1} of 5 stars`);
 
           const tagline = document.createElement("p");
-          tagline.textContent = rank.tagline || fallbackTaglines[index] || "I keep building history here.";
+          tagline.textContent = fallbackTaglines[index] || "I keep building history here.";
 
           titleWrap.append(title, tagline);
 
           const badge = document.createElement("div");
           badge.className = "rank-badge";
-          badge.textContent = rank.icon || fallbackIcons[index] || "•";
+          badge.textContent = `${index + 1}`;
           badge.setAttribute("aria-hidden", "true");
 
           head.append(number, titleWrap, badge);
@@ -465,9 +468,7 @@
           bodyHeading.textContent = "What it means";
 
           const description = document.createElement("p");
-          description.textContent =
-            rank.description ||
-            `${rank.name || "This rank"} recognizes growing participation and history in ${communityName}.`;
+          description.textContent = `${rangeLabel} earned in ${communityName}. Stars are universal across Wild Ledger, but your star standing is calculated separately in every community.`;
 
           bodyInner.append(bodyHeading, description);
           body.appendChild(bodyInner);
@@ -482,10 +483,9 @@
 
       const returnCopy = document.getElementById("returnCopy");
       if (returnCopy) {
-        const firstRank = ranks[0]?.name || "first rank";
-        const firstMin = Number(ranks[0]?.min) || 1;
+        const firstMin = Number(stars[0]?.min) || 1;
         returnCopy.textContent =
-          `Earn ${firstMin} LEAP from ${communityName} and you become ${firstRank}. From there, every official award adds to the rank history you have earned in this community.`;
+          `Earn ${firstMin} LEAP from ${communityName} and your first star appears. Every official award adds to the Earned LEAP that determines your stars in this community.`;
       }
 
       const joinButton = document.getElementById("joinButton");
@@ -495,7 +495,7 @@
       }
 
       const footerLabel = document.getElementById("footerLabel");
-      if (footerLabel) footerLabel.textContent = `${communityName} • LEAP Ranks`;
+      if (footerLabel) footerLabel.textContent = `${communityName} • LEAP Stars`;
 
       document.documentElement.classList.remove("community-pending");
     })();
