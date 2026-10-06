@@ -1,7 +1,7 @@
 /*
   Wild Ledger platform-wide runtime configuration.
   These values are shared across every participating community.
-  Community identity, ranks, themes, namespaces, and operator settings belong in communityConfig.js.
+  Community-specific presentation belongs in community state and the static presentation catalog.
 */
 (() => {
   window.WILD_LEDGER_CONFIG = Object.freeze({
@@ -17,9 +17,6 @@
     xrplWebSocket: "wss://s1.ripple.com/",
     xrplFeeCushion: 1.2,
     walletConnectProjectId: "be456e8bbaa197eaa9d39bb2e4d3208d",
-    // Provider-neutral current CONFIG service. Keep blank until the writable
-    // production store is deployed. May include {communityId}.
-    communityConfigEndpoint: "",
     discordOAuthStartUrl: "https://sfl-discord-auth.yjc26zd6c4.workers.dev/start"
   });
 })();

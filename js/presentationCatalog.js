@@ -16,6 +16,7 @@
 export const WILD_LEDGER_LAYOUTS = Object.freeze({
   "layout-1": Object.freeze({
     id: "layout-1",
+    code: 1,
     label: "Layout 1",
     referenceCommunityId: "SFL",
     referenceLabel: "Sailing Frog's Leap",
@@ -25,6 +26,7 @@ export const WILD_LEDGER_LAYOUTS = Object.freeze({
   }),
   "layout-2": Object.freeze({
     id: "layout-2",
+    code: 2,
     label: "Layout 2",
     referenceCommunityId: "ZHR",
     referenceLabel: "Zach's Hot Rods",
@@ -37,6 +39,7 @@ export const WILD_LEDGER_LAYOUTS = Object.freeze({
 export const WILD_LEDGER_SKINS = Object.freeze({
   "skin-1": Object.freeze({
     id: "skin-1",
+    code: 1,
     label: "Skin 1",
     referenceCommunityId: "SFL",
     referenceLabel: "Sailing Frog's Leap",
@@ -55,6 +58,7 @@ export const WILD_LEDGER_SKINS = Object.freeze({
   }),
   "skin-2": Object.freeze({
     id: "skin-2",
+    code: 2,
     label: "Skin 2",
     referenceCommunityId: "ZHR",
     referenceLabel: "Zach's Hot Rods",
@@ -95,4 +99,34 @@ export function availableSkins(layoutId = "") {
 
 export function defaultPresentationSelection() {
   return { layoutId: "layout-1", skinId: "skin-1" };
+}
+
+export function layoutCodeForId(layoutId) {
+  const layout = WILD_LEDGER_LAYOUTS[String(layoutId || "").trim()] || null;
+  if (!layout || !Number.isInteger(layout.code) || layout.code < 1) {
+    throw new Error(`Unknown Wild Ledger layout code for ${layoutId || "(blank)"}.`);
+  }
+  return layout.code;
+}
+
+export function layoutIdForCode(code) {
+  const number = Number(code);
+  const layout = Object.values(WILD_LEDGER_LAYOUTS).find(item => item.code === number) || null;
+  if (!layout) throw new Error(`Unknown Wild Ledger layout code: ${code}.`);
+  return layout.id;
+}
+
+export function skinCodeForId(skinId) {
+  const skin = WILD_LEDGER_SKINS[String(skinId || "").trim()] || null;
+  if (!skin || !Number.isInteger(skin.code) || skin.code < 1) {
+    throw new Error(`Unknown Wild Ledger skin code for ${skinId || "(blank)"}.`);
+  }
+  return skin.code;
+}
+
+export function skinIdForCode(code) {
+  const number = Number(code);
+  const skin = Object.values(WILD_LEDGER_SKINS).find(item => item.code === number) || null;
+  if (!skin) throw new Error(`Unknown Wild Ledger skin code: ${code}.`);
+  return skin.id;
 }

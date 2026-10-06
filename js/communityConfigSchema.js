@@ -1,14 +1,34 @@
 /*
   Wild Ledger community CONFIG schema v1.
 
-  Schema is the stable data contract. Curated layout/skin packages carry the
-  presentation treatment; raw CSS/color controls do not belong in the community
-  CONFIG itself.
+  Schema 1 has two representations:
+  - the full working object used by Wild Ledger pages;
+  - a compact fixed-position JSON payload written to XRPL.
+
+  The XRPL payload does not repeat facts Wild Ledger can derive:
+    - CONFIG schema comes from CONFIG=1 in the memo prefix;
+    - Community ID comes from the STATE namespace;
+    - LEAP namespace is always <COMMUNITY-ID>-LEAP;
+    - operator name equals manager name;
+    - operator possessive is derived from manager name;
+    - Layout and Skin use numeric codes from presentationCatalog.js;
+    - values equal to Schema 1 defaults use the numeric sentinel 0.
+
+  This is the decoder ring: the fixed position of every value is part of
+  Schema 1 and must never be silently reordered.
 */
 
-import { defaultPresentationSelection, presentationSelection } from "./presentationCatalog.js";
+import {
+  defaultPresentationSelection,
+  presentationSelection,
+  layoutCodeForId,
+  layoutIdForCode,
+  skinCodeForId,
+  skinIdForCode
+} from "./presentationCatalog.js";
 
 export const COMMUNITY_CONFIG_SCHEMA = 1;
+export const COMMUNITY_CONFIG_COMPACT_FIELD_COUNT = 15;
 
 const CONFIG_V1_KEYS = Object.freeze([
   "configSchema",
@@ -60,7 +80,7 @@ function requireString(value, label) {
   return value;
 }
 
-function possessive(name) {
+export function operatorPossessiveFromManager(name) {
   const clean = String(name || "").trim();
   if (!clean) return "Operator's";
   return /s$/i.test(clean) ? `${clean}'` : `${clean}'s`;
@@ -87,7 +107,7 @@ export function buildCommunityConfigV1Preset({
     communityName: name,
     managerName: manager,
     operatorName: manager,
-    operatorPossessive: possessive(manager),
+    operatorPossessive: operatorPossessiveFromManager(manager),
     membershipLabel: "Membership",
     memberSingular: "member",
     memberPlural: "members",
@@ -115,12 +135,13 @@ export function communityConfigV1FromLegacy(legacy, { communityId = "" } = {}) {
     skinId
   });
 
+  const managerName = String(legacy.managerName || legacy.operatorName || preset.managerName);
   return normalizeCommunityConfigV1({
     ...preset,
     communityName: String(legacy.communityName || preset.communityName),
-    managerName: String(legacy.managerName || preset.managerName),
-    operatorName: String(legacy.operatorName || legacy.managerName || preset.operatorName),
-    operatorPossessive: String(legacy.operatorPossessive || possessive(legacy.operatorName || legacy.managerName)),
+    managerName,
+    operatorName: managerName,
+    operatorPossessive: operatorPossessiveFromManager(managerName),
     membershipLabel: String(legacy.membershipLabel || preset.membershipLabel),
     memberSingular: String(legacy.memberSingular || preset.memberSingular),
     memberPlural: String(legacy.memberPlural || preset.memberPlural),
@@ -154,8 +175,8 @@ export function normalizeCommunityConfigV1(config, { communityId = "" } = {}) {
   }
 
   const stringKeys = [
-    "layoutId", "skinId", "communityName", "managerName", "operatorName",
-    "operatorPossessive", "membershipLabel", "memberSingular", "memberPlural",
+    "layoutId", "skinId", "communityName", "managerName",
+    "membershipLabel", "memberSingular", "memberPlural",
     "groupName", "recordLabel", "historyLabel", "joinLabel", "heading", "intro",
     "experienceLine"
   ];
@@ -168,16 +189,140 @@ export function normalizeCommunityConfigV1(config, { communityId = "" } = {}) {
   }
   config.experienceSteps.forEach((value, index) => requireString(value, `CONFIG experienceSteps[${index}]`));
 
-
   const normalized = {};
   for (const key of CONFIG_V1_KEYS) {
     if (key === "configSchema") normalized[key] = COMMUNITY_CONFIG_SCHEMA;
     else if (key === "communityId") normalized[key] = id;
     else if (key === "leapNamespace") normalized[key] = `${id}-LEAP`;
-    else if (key === "experienceSteps") normalized[key] = [...config[key]];
+    else if (key === "operatorName") normalized[key] = String(config.managerName).trim();
+    else if (key === "operatorPossessive") normalized[key] = operatorPossessiveFromManager(config.managerName);
+    else if (key === "experienceSteps") normalized[key] = config.experienceSteps.map(value => String(value));
     else normalized[key] = String(config[key]);
   }
   return normalized;
+}
+
+function defaultOrValue(value, defaultValue) {
+  return value === defaultValue ? 0 : value;
+}
+
+function expandDefault(value, defaultValue, label) {
+  if (value === 0) return defaultValue;
+  requireString(value, label);
+  return String(value);
+}
+
+function sameThreeStrings(a, b) {
+  return Array.isArray(a) && Array.isArray(b) && a.length === 3 && b.length === 3 && a.every((value, index) => value === b[index]);
+}
+
+/*
+  Compact Schema 1 field order (fixed forever for Schema 1):
+    0  layout code
+    1  skin code
+    2  community name
+    3  manager name
+    4  membership label, or 0 for Schema 1 default
+    5  member singular, or 0
+    6  member plural, or 0
+    7  group name, or 0
+    8  record label, or 0
+    9  history label, or 0
+    10 join label, or 0
+    11 heading, or 0
+    12 introduction
+    13 experience line, or 0
+    14 experience steps [a,b,c], or 0
+*/
+export function encodeCommunityConfigV1Compact(config, { communityId = "" } = {}) {
+  const normalized = normalizeCommunityConfigV1(config, { communityId });
+  const defaults = buildCommunityConfigV1Preset({ communityId: normalized.communityId });
+
+  const payload = [
+    layoutCodeForId(normalized.layoutId),
+    skinCodeForId(normalized.skinId),
+    normalized.communityName,
+    normalized.managerName,
+    defaultOrValue(normalized.membershipLabel, defaults.membershipLabel),
+    defaultOrValue(normalized.memberSingular, defaults.memberSingular),
+    defaultOrValue(normalized.memberPlural, defaults.memberPlural),
+    defaultOrValue(normalized.groupName, defaults.groupName),
+    defaultOrValue(normalized.recordLabel, defaults.recordLabel),
+    defaultOrValue(normalized.historyLabel, defaults.historyLabel),
+    defaultOrValue(normalized.joinLabel, defaults.joinLabel),
+    defaultOrValue(normalized.heading, defaults.heading),
+    normalized.intro,
+    defaultOrValue(normalized.experienceLine, defaults.experienceLine),
+    sameThreeStrings(normalized.experienceSteps, defaults.experienceSteps) ? 0 : [...normalized.experienceSteps]
+  ];
+
+  const text = JSON.stringify(payload);
+  return {
+    communityId: normalized.communityId,
+    schema: COMMUNITY_CONFIG_SCHEMA,
+    config: normalized,
+    payload,
+    text,
+    bytes: new TextEncoder().encode(text).length
+  };
+}
+
+export function decodeCommunityConfigV1Compact(payloadText, { communityId } = {}) {
+  const id = canonicalCommunityId(communityId);
+  const text = String(payloadText || "");
+  let payload;
+  try { payload = JSON.parse(text); }
+  catch (_) { throw new Error("CONFIG Schema 1 compact payload is not valid JSON."); }
+
+  if (!Array.isArray(payload) || payload.length !== COMMUNITY_CONFIG_COMPACT_FIELD_COUNT) {
+    throw new Error(`CONFIG Schema 1 compact payload must contain exactly ${COMMUNITY_CONFIG_COMPACT_FIELD_COUNT} fields.`);
+  }
+
+  const layoutId = layoutIdForCode(payload[0]);
+  const skinId = skinIdForCode(payload[1]);
+  presentationSelection(layoutId, skinId);
+
+  requireString(payload[2], "CONFIG community name");
+  requireString(payload[3], "CONFIG manager name");
+  requireString(payload[12], "CONFIG introduction");
+
+  const communityName = String(payload[2]);
+  const managerName = String(payload[3]);
+  const defaults = buildCommunityConfigV1Preset({ communityId: id });
+
+  let experienceSteps;
+  if (payload[14] === 0) {
+    experienceSteps = [...defaults.experienceSteps];
+  } else {
+    if (!Array.isArray(payload[14]) || payload[14].length !== 3) {
+      throw new Error("CONFIG Schema 1 experience steps must be 0 or a three-string array.");
+    }
+    payload[14].forEach((value, index) => requireString(value, `CONFIG experience step ${index + 1}`));
+    experienceSteps = payload[14].map(String);
+  }
+
+  return normalizeCommunityConfigV1({
+    configSchema: COMMUNITY_CONFIG_SCHEMA,
+    communityId: id,
+    leapNamespace: `${id}-LEAP`,
+    layoutId,
+    skinId,
+    communityName,
+    managerName,
+    operatorName: managerName,
+    operatorPossessive: operatorPossessiveFromManager(managerName),
+    membershipLabel: expandDefault(payload[4], defaults.membershipLabel, "CONFIG membership label"),
+    memberSingular: expandDefault(payload[5], defaults.memberSingular, "CONFIG member singular"),
+    memberPlural: expandDefault(payload[6], defaults.memberPlural, "CONFIG member plural"),
+    groupName: expandDefault(payload[7], defaults.groupName, "CONFIG group name"),
+    recordLabel: expandDefault(payload[8], defaults.recordLabel, "CONFIG record label"),
+    historyLabel: expandDefault(payload[9], defaults.historyLabel, "CONFIG history label"),
+    joinLabel: expandDefault(payload[10], defaults.joinLabel, "CONFIG join label"),
+    heading: expandDefault(payload[11], defaults.heading, "CONFIG heading"),
+    intro: String(payload[12]),
+    experienceLine: expandDefault(payload[13], defaults.experienceLine, "CONFIG experience line"),
+    experienceSteps
+  }, { communityId: id });
 }
 
 export function canonicalCommunityConfigText(config, options = {}) {
