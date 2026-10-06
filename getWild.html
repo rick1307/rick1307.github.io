@@ -14,6 +14,7 @@
   --accent:#243b35;
   --gold:#b68a52;
   --danger:#9b4b3c;
+  --good:#28684d;
 }
 *{box-sizing:border-box}
 html{min-height:100%}
@@ -24,48 +25,30 @@ body{
   background:radial-gradient(circle at 20% 0%,rgba(182,138,82,.14),transparent 34rem),var(--paper);
 }
 .wrap{max-width:980px;margin:auto;padding:28px 20px 64px}
-header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 44px;gap:20px}
-.brand{font-weight:850;letter-spacing:.04em;font-size:20px}
-.leap{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
 .hero{padding:44px 0 38px}
 .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:750;font-size:12px;color:var(--gold);margin-bottom:14px}
 h1{font-size:clamp(52px,10vw,92px);line-height:.92;margin:0 0 20px;letter-spacing:-.06em}
-.hero p{font-size:clamp(18px,3vw,24px);line-height:1.45;color:#475467;margin:0;max-width:720px}
+.hero p{font-size:clamp(18px,3vw,24px);line-height:1.45;color:#475467;margin:0;max-width:760px}
 .access-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.72fr);gap:18px;align-items:stretch;margin-top:18px}
 .card{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 8px 28px rgba(23,32,42,.045)}
 .card h2{margin:0 0 8px;font-size:28px;letter-spacing:-.025em}
-.card-copy{margin:0 0 24px;color:var(--muted);line-height:1.55}
-.field{margin-top:15px}
-label{display:block;margin:0 0 7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#475467}
-input{
-  width:100%;
-  min-height:50px;
-  padding:12px 14px;
-  border:1px solid var(--line);
-  border-radius:13px;
-  background:#fff;
-  color:var(--ink);
-  font:inherit;
-  outline:none;
-}
-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(182,138,82,.12)}
+.card-copy{margin:0 0 20px;color:var(--muted);line-height:1.55}
+.qr-shell{display:grid;place-items:center;min-height:294px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#fff}
+.qr-shell img{display:block;width:min(100%,270px);height:auto;border-radius:10px}
+.qr-placeholder{text-align:center;color:var(--muted);font-size:14px;line-height:1.5;max-width:260px}
 button{
-  width:100%;
-  min-height:50px;
-  margin-top:20px;
-  border:0;
-  border-radius:13px;
-  padding:12px 16px;
-  background:var(--accent);
-  color:#fff;
-  font:850 15px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  letter-spacing:.035em;
-  cursor:pointer;
+  width:100%;min-height:50px;margin-top:16px;border:0;border-radius:13px;padding:12px 16px;
+  background:var(--accent);color:#fff;font:850 15px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  letter-spacing:.035em;cursor:pointer
 }
+button.secondary{background:#fff;color:var(--accent);border:1px solid var(--line)}
 button:hover{filter:brightness(1.07)}
-button:focus-visible{outline:3px solid rgba(182,138,82,.34);outline-offset:2px}
-.status{min-height:20px;margin:12px 0 0;font-size:13px;color:var(--muted);line-height:1.45}
+button:disabled{opacity:.48;cursor:default;filter:none}
+.status{min-height:22px;margin:14px 0 0;font-size:13px;color:var(--muted);line-height:1.48}
 .status.error{color:var(--danger)}
+.status.good{color:var(--good);font-weight:750}
+.connected{margin-top:14px;padding:12px 13px;border-radius:13px;border:1px solid rgba(40,104,77,.2);background:rgba(40,104,77,.06);font-size:12px;line-height:1.5;color:#355447;overflow-wrap:anywhere}
+.connected strong{display:block;margin-bottom:4px;color:var(--good);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 .system{background:var(--accent);color:#fff;border-radius:20px;padding:28px;position:relative;overflow:hidden}
 .system::after{content:"";position:absolute;width:210px;height:210px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-90px;bottom:-110px;box-shadow:0 0 0 45px rgba(255,255,255,.025),0 0 0 90px rgba(255,255,255,.016)}
 .system > *{position:relative;z-index:1}
@@ -73,57 +56,65 @@ button:focus-visible{outline:3px solid rgba(182,138,82,.34);outline-offset:2px}
 .system p{margin:0;color:#e3e8e5;line-height:1.6}
 .route{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.16)}
 .route-label{font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.13em;color:#d6c29f;margin-bottom:9px}
-.route-row{display:flex;align-items:center;gap:10px;margin:10px 0;color:#fff;font-size:14px;line-height:1.4}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+.route-row{display:flex;align-items:flex-start;gap:10px;margin:10px 0;color:#fff;font-size:14px;line-height:1.45}
+.dot{width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+.choice-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.choice-box[hidden]{display:none}
+.choice-title{font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;color:#475467;margin-bottom:8px}
+.choice-list{display:grid;gap:8px}
+.choice-list button{margin:0;text-align:left;line-height:1.25}
+.choice-list button small{display:block;margin-top:4px;font-weight:600;opacity:.76}
 footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
 @media(max-width:720px){
-  .wrap{padding:22px 16px 48px}
-  header{padding-bottom:26px}
-  .hero{padding:30px 0 30px}
-  .access-grid{grid-template-columns:1fr}
-  .card,.system{padding:22px}
+  .wrap{padding:22px 16px 48px}.hero{padding:30px 0}.access-grid{grid-template-columns:1fr}.card,.system{padding:22px}.qr-shell{min-height:260px}
 }
 </style>
-  <link rel="stylesheet" href="wildLedgerBackend.css">
+<link rel="stylesheet" href="wildLedgerBackend.css">
 </head>
 <body>
 <div class="wrap">
   <main>
     <section class="hero">
-      <div class="eyebrow">Back-end access</div>
+      <div class="eyebrow">Wild Ledger access</div>
       <h1>Get Wild.</h1>
-      <p>One sign-in. The right Wild Ledger workspace.</p>
+      <p>Scan once. Wild Ledger reads the XRPL address returned by your wallet, checks validated authority, and opens the workspace that address operates.</p>
     </section>
 
-    <section class="access-grid" aria-label="Wild Ledger sign in">
+    <section class="access-grid" aria-label="Wild Ledger wallet entry">
       <div class="card">
-        <div class="eyebrow">Sign in</div>
-        <h2>Enter Wild Ledger</h2>
-        <p class="card-copy">Your sign-in determines where you start and what you can see.</p>
+        <div class="eyebrow">Wallet entry</div>
+        <h2>Scan the QR code</h2>
+        <p class="card-copy">No Access ID. No password. Do not type or paste an XRPL address.</p>
 
-        <form id="getWildForm" novalidate>
-          <div class="field">
-            <label for="accessId">Access ID</label>
-            <input id="accessId" name="accessId" type="text" autocomplete="username" placeholder="Your Wild Ledger access ID" />
-          </div>
-          <div class="field">
-            <label for="accessKey">Access key</label>
-            <input id="accessKey" name="accessKey" type="password" autocomplete="current-password" placeholder="Your access key" />
-          </div>
-          <button type="submit">Enter Wild Ledger →</button>
-          <p class="status" id="accessStatus" role="status" aria-live="polite"></p>
-        </form>
+        <div class="qr-shell" id="qrShell">
+          <div class="qr-placeholder" id="qrPlaceholder">Creating a fresh wallet connection QR code…</div>
+          <img id="qrImage" alt="Wild Ledger wallet connection QR code" hidden />
+        </div>
+
+        <button class="secondary" id="refreshQr" type="button">Create a Fresh QR Code</button>
+        <p class="status" id="accessStatus" role="status" aria-live="polite">Starting wallet connection…</p>
+
+        <div class="connected" id="connectedBox" hidden>
+          <strong>Address returned by wallet</strong>
+          <span id="connectedAddress"></span>
+        </div>
+
+        <div class="choice-box" id="communityChoices" hidden>
+          <div class="choice-title">Choose a community</div>
+          <div class="choice-list" id="communityChoiceList"></div>
+        </div>
       </div>
 
       <aside class="system">
-        <div class="eyebrow">One door. Two paths.</div>
-        <h2>The sign-in does the routing.</h2>
-        <p>Owner and Community Operators enter through the same door. Their roles determine the starting point. From View Community forward, the back end is shared.</p>
+        <div class="eyebrow">One QR. Ledger-routed.</div>
+        <h2>The wallet address determines the path.</h2>
+        <p>The QR connection supplies the XRPL address. Wild Ledger does not ask the user to identify a role or community.</p>
         <div class="route">
           <div class="route-label">Routing model</div>
-          <div class="route-row"><span class="dot"></span><span><strong>Owner</strong> → Owner Console → Choose Community</span></div>
-          <div class="route-row"><span class="dot"></span><span><strong>Community Operator</strong> → Assigned Community</span></div>
-          <div class="route-row"><span class="dot"></span><span><strong>Both</strong> → View Community → Shared back end</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>Current Owner Wallet</strong> → Owner Console</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>Current Operating Wallet</strong> → its community</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>Newly provisioned community</strong> → Community Setup</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>CONFIG pointer</strong> → <code>WILD-LEDGER/STATE/&lt;ID&gt;/CONFIG=&lt;VERSION&gt;</code></span></div>
         </div>
       </aside>
     </section>
@@ -132,88 +123,243 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
   <footer>Wild Ledger · Powered by LEAP</footer>
 </div>
 
-<script>
-/*
-  WILD LEDGER ROLE-ROUTING BOUNDARY
-  ---------------------------------
-  getWild.html is the single back-end entry point.
+<script src="js/wildLedgerConfig.js"></script>
+<script src="js/communityConfig.js" data-registry-only="true"></script>
+<script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+import { resolveWalletAccess } from "./js/communityAccess.js";
+import { readCommunityConfigSchema } from "./js/communityState.js";
 
-  AUTHENTICATED OWNER:
-    owner.html -> choose community -> viewCommunity.html?role=owner&community=...
+const runtime = window.WILD_LEDGER_CONFIG || {};
+const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
+const PROJECT_ID = String(runtime.walletConnectProjectId || "").trim();
 
-  AUTHENTICATED COMMUNITY OPERATOR:
-    viewCommunity.html?role=operator&community=<assigned community>
+const qrImage = document.getElementById("qrImage");
+const qrPlaceholder = document.getElementById("qrPlaceholder");
+const refreshQr = document.getElementById("refreshQr");
+const status = document.getElementById("accessStatus");
+const connectedBox = document.getElementById("connectedBox");
+const connectedAddress = document.getElementById("connectedAddress");
+const communityChoices = document.getElementById("communityChoices");
+const communityChoiceList = document.getElementById("communityChoiceList");
 
-  CONVERGENCE RULE:
-    From viewCommunity.html forward, Owner and Community Operator use the same
-    pages. Role controls visibility/authority; separate downstream page variants
-    should be avoided unless security or a technical constraint requires them.
+let signer = null;
+let activeAccount = "";
+let lastAccess = null;
+let connectRun = 0;
 
-  IMPORTANT:
-    URL/query parameters may carry authenticated context through the UI, but they
-    must never be treated as authentication or as authority to grant owner access.
-*/
+function setStatus(message, tone = "") {
+  status.textContent = message;
+  status.className = `status${tone ? ` ${tone}` : ""}`;
+}
 
-const form = document.getElementById('getWildForm');
-const status = document.getElementById('accessStatus');
+function clearAccessSession() {
+  [
+    "wildLedgerRole",
+    "wildLedgerCommunity",
+    "wildLedgerOperatorWallet",
+    "wildLedgerOperatorSession",
+    "wildLedgerOwnerSession",
+    "wildLedger.currentCommunityConfig"
+  ].forEach(key => sessionStorage.removeItem(key));
+}
 
-/*
-  TEST HARNESS ONLY
-  -----------------
-  These credentials are intentionally simple and public. They provide NO real
-  security. Their only purpose is to test Wild Ledger role routing before the
-  Cloudflare Worker authentication service is connected.
+function walletMetadata() {
+  const live = location.protocol === "http:" || location.protocol === "https:";
+  const origin = live ? location.origin : "https://example.invalid";
+  return {
+    name: "Wild Ledger",
+    description: "Open the Wild Ledger workspace associated with the connected XRPL address",
+    url: origin,
+    icons: [`${origin}/favicon.ico`]
+  };
+}
 
-  Owner Access ID: any case-insensitive prefix of "owner" with 2+ characters
-                   (ow, own, owne, owner)
-  ZHR Community Operator Access ID: any case-insensitive prefix of "operator" with 2+ characters
-                                  (op, ope, oper, ... operator)
-  Access key: ignored in test mode (blank or any value accepted)
-*/
-const TEST_USERS = {
-  owner: {
-    role: 'owner',
-    route: 'owner.html'
-  },
-  operator: {
-    role: 'operator',
-    community: 'ZHR',
-    route: 'viewCommunity.html?community=ZHR&role=operator'
+async function configStateFor(match) {
+  try {
+    const state = await readCommunityConfigSchema({ authority: match, serverUrl: XRPL_SERVER });
+    return { state };
+  } catch (error) {
+    throw new Error(`CONFIG state resolution for ${match.communityId} failed: ${error?.message || String(error)}`);
   }
-};
+}
 
-form.addEventListener('submit', event => {
-  event.preventDefault();
+function writeOperatorSession(match, configState) {
+  const establishedAt = new Date().toISOString();
+  const connectedWallet = activeAccount;
+  const session = {
+    version: 2,
+    role: "operator",
+    communityId: String(match.communityId || "").trim().toUpperCase(),
+    communityName: String(match.communityName || match.communityId || "Community"),
+    namespace: String(match.namespace || ""),
+    connectedWallet,
+    source: "wallet-connect + validated-xrpl-authority",
+    authoritySource: String(match.source || "Validated XRPL history"),
+    authorityResolvedAt: String(lastAccess?.resolvedAt || establishedAt),
+    firstOperatingWallet: String(match?.establishment?.firstWallet || match?.establishment?.operatingWallet || connectedWallet),
+    configSchema: configState?.state?.schema || null,
+    configLedger: configState?.state?.current?.ledger || null,
+    configTransactionHash: configState?.state?.current?.hash || "",
+    establishedAt
+  };
 
-  const accessId = document.getElementById('accessId').value.trim().toLowerCase();
-  // The access key is intentionally ignored by this temporary test harness.
-  // Accept only distinguishable 2+ character prefixes of the exact test IDs.
-  // Extra characters do not match: e.g. "owners" and "operators" are rejected.
-  let user = null;
-  if (accessId.length >= 2 && 'owner'.startsWith(accessId)) {
-    user = TEST_USERS.owner;
-  } else if (accessId.length >= 2 && 'operator'.startsWith(accessId)) {
-    user = TEST_USERS.operator;
-  }
+  sessionStorage.setItem("wildLedgerRole", "operator");
+  sessionStorage.setItem("wildLedgerCommunity", session.communityId);
+  sessionStorage.setItem("wildLedgerOperatorWallet", connectedWallet);
+  sessionStorage.setItem("wildLedger.activeWallet", connectedWallet);
+  sessionStorage.setItem("wildLedgerOperatorSession", JSON.stringify(session));
+  sessionStorage.removeItem("wildLedger.currentCommunityConfig");
 
-  if (!user) {
-    status.textContent = 'Access ID is not recognized.';
-    status.className = 'status error';
+  return session;
+}
+
+async function openOperator(match) {
+  setStatus(`Rechecking ${match.communityId} authority and CONFIG state…`);
+
+  const fresh = await resolveWalletAccess({ account: activeAccount, serverUrl: XRPL_SERVER, force: true });
+  const current = (fresh.operatorMatches || []).find(item =>
+    String(item.communityId || "").toUpperCase() === String(match.communityId || "").toUpperCase() &&
+    item.currentAccount === activeAccount
+  );
+  if (!current) throw new Error(`${activeAccount} is no longer the current Operating Wallet for ${match.communityId}.`);
+  lastAccess = fresh;
+
+  const configState = await configStateFor(current);
+  const session = writeOperatorSession(current, configState);
+
+  if (!current.configured) {
+    setStatus(`${session.communityId} identified. Opening Community Setup…`, "good");
+    window.location.href = `setup.html?community=${encodeURIComponent(session.communityId)}&role=operator&mode=provisioned`;
     return;
   }
 
-  sessionStorage.setItem('wildLedgerRole', user.role);
+  setStatus(`${session.communityId} identified. Opening the community workspace…`, "good");
+  window.location.href = "viewCommunity.html";
+}
 
-  if (user.community) {
-    sessionStorage.setItem('wildLedgerCommunity', user.community);
-  } else {
-    sessionStorage.removeItem('wildLedgerCommunity');
+function renderCommunityChoices(matches) {
+  communityChoiceList.replaceChildren();
+  communityChoices.hidden = false;
+
+  for (const match of matches) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.innerHTML = `${match.communityId} — ${match.communityName}<small>${match.namespace || `${match.communityId}-LEAP`}</small>`;
+    button.addEventListener("click", async () => {
+      try {
+        [...communityChoiceList.querySelectorAll("button")].forEach(item => item.disabled = true);
+        await openOperator(match);
+      } catch (error) {
+        [...communityChoiceList.querySelectorAll("button")].forEach(item => item.disabled = false);
+        setStatus(error?.message || String(error), "error");
+      }
+    });
+    communityChoiceList.appendChild(button);
+  }
+}
+
+async function routeConnectedWallet(account) {
+  activeAccount = String(account || "").trim();
+  connectedAddress.textContent = activeAccount;
+  connectedBox.hidden = false;
+  sessionStorage.setItem("wildLedger.activeWallet", activeAccount);
+
+  setStatus("XRPL address received. Reading validated Wild Ledger authority…");
+  lastAccess = await resolveWalletAccess({ account: activeAccount, serverUrl: XRPL_SERVER, force: true });
+
+  if (lastAccess.isOwner) {
+    const establishedAt = new Date().toISOString();
+    sessionStorage.setItem("wildLedgerRole", "owner");
+    sessionStorage.removeItem("wildLedgerCommunity");
+    sessionStorage.setItem("wildLedgerOwnerSession", JSON.stringify({
+      version: 1,
+      role: "owner",
+      connectedWallet: activeAccount,
+      source: "wallet-connect + validated-xrpl-owner-authority",
+      authorityResolvedAt: lastAccess.resolvedAt || establishedAt,
+      establishedAt
+    }));
+    setStatus("Current Wild Ledger Owner Wallet identified. Opening Owner Console…", "good");
+    window.location.href = "owner.html";
+    return;
   }
 
-  status.textContent = 'Access recognized. Opening Wild Ledger…';
-  status.className = 'status';
-  window.location.href = user.route;
-});
+  const matches = lastAccess.operatorMatches || [];
+  if (matches.length === 0) {
+    throw new Error("This XRPL address is not the current Wild Ledger Owner Wallet or a current Community Operating Wallet.");
+  }
+
+  if (matches.length === 1) {
+    await openOperator(matches[0]);
+    return;
+  }
+
+  setStatus(`This wallet currently operates ${matches.length} communities. Choose which one to open.`, "good");
+  renderCommunityChoices(matches);
+}
+
+async function beginWalletConnection() {
+  const run = ++connectRun;
+  refreshQr.disabled = true;
+  communityChoices.hidden = true;
+  communityChoiceList.replaceChildren();
+  connectedBox.hidden = true;
+  qrImage.hidden = true;
+  qrImage.removeAttribute("src");
+  qrPlaceholder.hidden = false;
+  qrPlaceholder.textContent = "Creating a fresh wallet connection QR code…";
+  setStatus("Starting wallet connection…");
+  clearAccessSession();
+
+  try {
+    if (!PROJECT_ID) throw new Error("WalletConnect project ID is not configured.");
+    if (!XRPL_SERVER) throw new Error("XRPL WebSocket server is not configured.");
+
+    if (signer) {
+      try { await signer.disconnect(); } catch (_) {}
+    }
+
+    signer = new WalletConnectXrplSigner({
+      projectId: PROJECT_ID,
+      metadata: walletMetadata()
+    });
+
+    const connection = await signer.connect({
+      onUri: async uri => {
+        if (run !== connectRun) return;
+        qrImage.src = await QRCode.toDataURL(uri, { width: 520, margin: 2, errorCorrectionLevel: "M" });
+        qrImage.hidden = false;
+        qrPlaceholder.hidden = true;
+        setStatus("Scan this QR code with your XRPL wallet.");
+      }
+    });
+
+    if (run !== connectRun) return;
+    qrImage.hidden = true;
+    qrPlaceholder.hidden = false;
+    qrPlaceholder.textContent = "Wallet connected. Reading XRPL authority…";
+    await routeConnectedWallet(connection.account);
+  } catch (error) {
+    if (run !== connectRun) return;
+    setStatus(error?.message || String(error), "error");
+    qrImage.hidden = true;
+    qrPlaceholder.hidden = false;
+    qrPlaceholder.textContent = "The wallet connection did not complete. Create a fresh QR code and try again.";
+  } finally {
+    if (run === connectRun) refreshQr.disabled = false;
+  }
+}
+
+refreshQr.addEventListener("click", beginWalletConnection);
+
+const params = new URLSearchParams(location.search);
+if (params.get("operatorSession") === "required") {
+  setStatus("Scan a fresh QR code to open the current Operating Wallet session.");
+}
+
+beginWalletConnection();
 </script>
 </body>
 </html>

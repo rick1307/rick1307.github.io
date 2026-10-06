@@ -1552,6 +1552,8 @@
       ownerLogout.addEventListener("click", () => {
         sessionStorage.removeItem("wildLedgerRole");
         sessionStorage.removeItem("wildLedgerCommunity");
+        sessionStorage.removeItem("wildLedgerOwnerSession");
+        sessionStorage.removeItem("wildLedger.activeWallet");
         window.location.href = "getWild.html";
       });
     }

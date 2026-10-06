@@ -125,15 +125,41 @@
       </details>
 
       <details class="job">
-        <summary>Test the full Operator sign-in</summary>
+        <summary>Legacy wallet-proof session test</summary>
         <div class="job-body">
-          <p class="purpose">Runs the complete Operator entrance path: connect wallet, prove control, identify current community authority, create the browser Operator session, and hand off into the verified community.</p>
+          <p class="purpose">Preserves the earlier proof-of-control experiment: connect wallet, sign a one-time challenge, identify current community authority, and create the older version-1 Operator session.</p>
           <div class="meta">
-            <div class="item"><b>Use it when</b>You want to debug Operator sign-in, session creation, or the final View Community handoff.</div>
-            <div class="item"><b>Successful finish</b>The verified wallet becomes the Operator session and opens the XRPL-identified community without a typed Community ID.</div>
+            <div class="item"><b>Use it when</b>You specifically want to diagnose wallet message-signing/proof behavior. Production <code>getWild.html</code> no longer requires this proof step.</div>
+            <div class="item"><b>Successful finish</b>The diagnostic proof succeeds and the legacy version-1 session opens the XRPL-identified community.</div>
           </div>
-          <div class="safe"><strong>No XRPL write.</strong> The harness reads XRPL and creates browser session state only.</div>
+          <div class="safe"><strong>No XRPL write.</strong> This is retained as a diagnostic harness, not the production QR entry model.</div>
           <a class="open" href="test-harness/operatorSessionTest.html"><span>Open Harness →</span><span class="file">test-harness/operatorSessionTest.html</span></a>
+        </div>
+      </details>
+
+      <details class="job">
+        <summary>Prove the CONFIG representation</summary>
+        <div class="job-body">
+          <p class="purpose">Loads one real complete current CONFIG off-ledger and proves the corrected state shape <code>WILD-LEDGER/STATE/&lt;COMMUNITY-ID&gt;/CONFIG=&lt;SCHEMA&gt;</code>.</p>
+          <div class="meta">
+            <div class="item"><b>Use it when</b>You want to verify the Step 2 representation before publishing any CONFIG pointer to XRPL.</div>
+            <div class="item"><b>Successful finish</b>SFL resolves one complete current CONFIG by Community ID, validates as Schema 1, and carries a valid Layout/Skin selection.</div>
+          </div>
+          <div class="safe"><strong>No XRPL write.</strong> This proves only the off-ledger artifact and pointer representation.</div>
+          <a class="open" href="test-harness/configRepresentationTest.html"><span>Open Harness →</span><span class="file">test-harness/configRepresentationTest.html</span></a>
+        </div>
+      </details>
+
+      <details class="job">
+        <summary>Prove CONFIG publishing end to end</summary>
+        <div class="job-body">
+          <p class="purpose">Publishes <code>WILD-LEDGER/STATE/&lt;COMMUNITY-ID&gt;/CONFIG=1</code> from the current Operating Wallet, waits for XRPL validation, independently reconstructs the state, reloads the current off-ledger CONFIG by Community ID, validates Schema 1 plus Layout/Skin, then creates the working Operator session.</p>
+          <div class="meta">
+            <div class="item"><b>Use it when</b>You are ready to prove the Step 3 CONFIG architecture before wiring it into <code>setup.html</code>.</div>
+            <div class="item"><b>Successful finish</b>Every gate turns green and the harness transitions directly into that community's Operator backend.</div>
+          </div>
+          <div class="warning"><strong>Writes to XRPL.</strong> The CONFIG=1 statement becomes permanent validated community state. Here 1 means CONFIG Schema 1.</div>
+          <a class="open" href="test-harness/configStateTest.html"><span>Open Harness →</span><span class="file">test-harness/configStateTest.html</span></a>
         </div>
       </details>
 

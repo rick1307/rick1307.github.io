@@ -256,14 +256,22 @@
     try {
       const session = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
       if (!session || typeof session !== "object") return null;
-      if (Number(session.version) !== 1) return null;
       if (String(session.role || "").trim().toLowerCase() !== "operator") return null;
+
+      const version = Number(session.version);
       const communityId = String(session.communityId || "").trim().toUpperCase();
-      const verifiedWallet = String(session.verifiedWallet || "").trim();
       const source = String(session.source || "").trim();
-      if (!communityId || !/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(verifiedWallet)) return null;
-      if (source !== "wallet-proof + validated-xrpl-authority") return null;
-      return { ...session, communityId, verifiedWallet, role: "operator" };
+      const wallet = String(
+        version === 2 ? session.connectedWallet : session.verifiedWallet
+      ).trim();
+
+      if (!communityId || !/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(wallet)) return null;
+
+      const legacyProofSession = version === 1 && source === "wallet-proof + validated-xrpl-authority";
+      const walletConnectSession = version === 2 && source === "wallet-connect + validated-xrpl-authority";
+      if (!legacyProofSession && !walletConnectSession) return null;
+
+      return { ...session, communityId, operatorWallet: wallet, role: "operator" };
     } catch (_) {
       return null;
     }
@@ -274,6 +282,9 @@
     sessionStorage.removeItem("wildLedgerCommunity");
     sessionStorage.removeItem("wildLedgerOperatorWallet");
     sessionStorage.removeItem("wildLedgerOperatorSession");
+    sessionStorage.removeItem("wildLedger.activeWallet");
+    sessionStorage.removeItem("wildLedger.currentCommunityConfig");
+    sessionStorage.removeItem("wildLedger.currentPublishedConfig");
   }
 
   const operatorSession = readOperatorSession();
@@ -298,10 +309,10 @@
     : (window.WILD_LEDGER_BACKEND_COMMUNITY_ID?.(community) || String(requestedCommunity || "").trim().toUpperCase());
 
   if (operatorSession) {
-    // Synchronize old downstream keys, but the verified Operator session remains authoritative here.
+    // Synchronize old downstream keys, but the wallet-connected Operator session remains authoritative here.
     sessionStorage.setItem("wildLedgerRole", "operator");
     sessionStorage.setItem("wildLedgerCommunity", operatorSession.communityId);
-    sessionStorage.setItem("wildLedgerOperatorWallet", operatorSession.verifiedWallet);
+    sessionStorage.setItem("wildLedgerOperatorWallet", operatorSession.operatorWallet);
   }
 
   const viewCommunityTitle = document.getElementById("view-community-title");

@@ -1,0 +1,16 @@
+Wild Ledger Step 3 cumulative changed files
+
+This bundle is cumulative from the user's October 6 snapshot of truth.
+
+Important if you previously uploaded the earlier Step 2 package:
+DELETE these obsolete Step 2 artifacts if they exist:
+- configs/SFL/1.json (and the now-unused configs folder if empty)
+- js/publishedCommunityConfig.js
+
+CONFIG=1 now means CONFIG Schema 1, not CONFIG snapshot version 1.
+The Step 3 harness is:
+- test-harness/configStateTest.html
+
+The SFL off-ledger CONFIG used by the harness is only a proof fixture:
+- test-harness/fixtures/SFL-current-config.json
+It is not the production CONFIG store.

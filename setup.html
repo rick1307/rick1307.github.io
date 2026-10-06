@@ -954,11 +954,44 @@
         if (mode !== "provisioned") return null;
 
         const activeWallet = String(sessionValue(ACTIVE_WALLET_KEY) || "").trim();
+        const operatorSession = readSessionJson("wildLedgerOperatorSession");
+        const requestedId = String(requestedCommunity || "").trim().toUpperCase();
+
+        // Production QR entry: the wallet connection supplies the XRPL address,
+        // validated XRPL authority supplies the Community ID, and the resulting
+        // Operator session carries both into setup. No typed/pasted address and
+        // no separate authentication credential are required.
+        if (
+          role === "operator" &&
+          Number(operatorSession?.version) === 2 &&
+          String(operatorSession?.source || "") === "wallet-connect + validated-xrpl-authority"
+        ) {
+          const communityId = String(operatorSession?.communityId || "").trim().toUpperCase();
+          const connectedWallet = String(operatorSession?.connectedWallet || "").trim();
+          const namespace = String(operatorSession?.namespace || (communityId ? `${communityId}-LEAP` : "")).trim().toUpperCase();
+          const firstOperatingWallet = String(operatorSession?.firstOperatingWallet || connectedWallet).trim();
+
+          if (
+            communityId &&
+            requestedId === communityId &&
+            connectedWallet &&
+            activeWallet === connectedWallet
+          ) {
+            return {
+              communityId,
+              namespace,
+              activeWallet,
+              operatingWallet: connectedWallet,
+              firstOperatingWallet: firstOperatingWallet || connectedWallet,
+              configSchema: Number(operatorSession?.configSchema) || null
+            };
+          }
+        }
+
         const record = readSessionJson(COMMUNITY_RECORD_KEY);
         const journey = record?.operatorJourney || null;
         const community = journey?.community || null;
         const communityId = String(community?.communityId || "").trim().toUpperCase();
-        const requestedId = String(requestedCommunity || "").trim().toUpperCase();
         const recordWallet = String(record?.wallet || "").trim();
         const operatingWallet = String(community?.operatingWallet || "").trim();
         const firstOperatingWallet = String(community?.firstOperatingWallet || operatingWallet || "").trim();
