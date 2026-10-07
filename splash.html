@@ -271,9 +271,21 @@ h1{
 }
 .live-state.error{color:#ff8a66}
 
+.bottom-links{
+  margin:18px auto 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:34px;
+}
+.bottom-links .separator{
+  color:#827d70;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;
+}
 .start-link{
   display:inline-block;
-  margin:18px auto 0;
+  margin:0;
   color:#69aefc;
   text-decoration:underline;
   text-underline-offset:3px;
@@ -357,7 +369,11 @@ h1{
 
       <div class="footer">Powered by LEAP on the XRP Ledger</div>
 
-      <a class="start-link" href="startCommunity.html">Start a Community</a>
+      <div class="bottom-links">
+        <a class="start-link" href="ourStory.html">Our Story</a>
+        <span class="separator" aria-hidden="true">•</span>
+        <a class="start-link" href="startCommunity.html">Start a Community</a>
+      </div>
     </div>
   </div>
 </main>
