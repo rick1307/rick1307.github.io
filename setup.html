@@ -308,6 +308,50 @@ function readPending(id) {
 function writePending(value) { sessionStorage.setItem(pendingKey(value.communityId), JSON.stringify(value)); }
 function clearPending(id) { sessionStorage.removeItem(pendingKey(id)); }
 
+// Working CONFIG drafts are local browser safety only. XRPL remains authoritative.
+function draftKey(id) { return `wildLedger.configDraft.${id}`; }
+function currentConfigBaseHash() { return String(schemaState?.current?.hash || "").trim().toUpperCase(); }
+function readConfigDraft(id) {
+  try {
+    const raw = localStorage.getItem(draftKey(id));
+    if (!raw) return null;
+    const value = JSON.parse(raw);
+    if (!value || Number(value.version) !== 1) return null;
+    if (String(value.communityId || "").toUpperCase() !== id) return null;
+
+    const session = operatorSession();
+    const savedWallet = String(value.connectedWallet || "");
+    if (session?.connectedWallet && savedWallet && savedWallet !== session.connectedWallet) return null;
+
+    // A draft is only valid against the exact XRPL CONFIG state it was edited from.
+    if (String(value.baseConfigHash || "").toUpperCase() !== currentConfigBaseHash()) {
+      localStorage.removeItem(draftKey(id));
+      return null;
+    }
+    if (!value.config || typeof value.config !== "object" || Array.isArray(value.config)) return null;
+    return value;
+  } catch (_) {
+    return null;
+  }
+}
+function writeConfigDraft(config = currentConfig) {
+  if (role !== "operator" || !communityId || !config) return;
+  try {
+    const session = operatorSession();
+    localStorage.setItem(draftKey(communityId), JSON.stringify({
+      version: 1,
+      communityId,
+      connectedWallet: String(session?.connectedWallet || ""),
+      baseConfigHash: currentConfigBaseHash(),
+      savedAt: new Date().toISOString(),
+      config
+    }));
+  } catch (_) {}
+}
+function clearConfigDraft(id) {
+  try { localStorage.removeItem(draftKey(id)); } catch (_) {}
+}
+
 function setStatus(message, tone = "") {
   $("publishStatus").textContent = message;
   $("publishStatus").className = `status${tone ? ` ${tone}` : ""}`;
@@ -386,15 +430,32 @@ async function resolveContext() {
 }
 
 async function loadConfig() {
-  if (schemaState.current?.config) return schemaState.current.config;
+  let baseConfig = null;
+  if (schemaState.current?.config) {
+    baseConfig = schemaState.current.config;
+  } else {
+    // One-time migration convenience only: an existing static presentation can
+    // prefill the first ledger-native CONFIG. After publication, XRPL is the
+    // authoritative source and this fallback is never used.
+    const legacy = window.WILD_LEDGER_GET_COMMUNITY?.(communityId) || null;
+    baseConfig = legacy
+      ? communityConfigV1FromLegacy(legacy, { communityId })
+      : buildCommunityConfigV1Preset({ communityId });
+  }
 
-  // One-time migration convenience only: an existing static presentation can
-  // prefill the first ledger-native CONFIG. After publication, XRPL is the
-  // authoritative source and this fallback is never used.
-  const legacy = window.WILD_LEDGER_GET_COMMUNITY?.(communityId) || null;
-  if (legacy) return communityConfigV1FromLegacy(legacy, { communityId });
+  const draft = readConfigDraft(communityId);
+  if (!draft) return baseConfig;
 
-  return buildCommunityConfigV1Preset({ communityId });
+  const restored = {
+    ...baseConfig,
+    ...draft.config,
+    communityId,
+    leapNamespace: `${communityId}-LEAP`,
+    experienceSteps: Array.isArray(draft.config.experienceSteps)
+      ? [...draft.config.experienceSteps]
+      : [...(baseConfig.experienceSteps || [])]
+  };
+  return restored;
 }
 
 function renderLayoutChoices() {
@@ -411,7 +472,7 @@ function renderLayoutChoices() {
       currentConfig.layoutId = layout.id;
       const compatible = availableSkins(layout.id);
       if (!compatible.some(skin => skin.id === currentConfig.skinId)) currentConfig.skinId = compatible[0]?.id || currentConfig.skinId;
-      renderLayoutChoices(); renderSkinChoices(); updatePublishGate(); clearPendingIfChanged();
+      renderLayoutChoices(); renderSkinChoices(); writeConfigDraft(); updatePublishGate(); clearPendingIfChanged();
     });
     wrap.appendChild(button);
   }
@@ -429,7 +490,7 @@ function renderSkinChoices() {
     button.addEventListener("click", () => {
       if (busy || role !== "operator") return;
       currentConfig.skinId = skin.id;
-      renderSkinChoices(); updatePublishGate(); clearPendingIfChanged();
+      renderSkinChoices(); writeConfigDraft(); updatePublishGate(); clearPendingIfChanged();
     });
     wrap.appendChild(button);
   }
@@ -506,7 +567,7 @@ function updatePublishGate() {
   } else if (!busy && memoInfo) {
     setStatus(preLaunch ? "Ready. One wallet signature publishes the complete Schema 1 CONFIG to XRPL." : "Ready. One wallet signature publishes the complete CONFIG changes to XRPL.", "ok");
     $("ledgerNote").hidden = false;
-    $("ledgerNote").textContent = `XRPL CONFIG size: ${memoInfo.serializedMemosBytes} / 1024 serialized memo bytes · ${memoInfo.headroomBytes} bytes headroom.`;
+    $("ledgerNote").textContent = `XRPL CONFIG size: ${memoInfo.serializedMemosBytes} / 1024 serialized memo bytes · ${memoInfo.headroomBytes} bytes headroom · Draft autosaved on this device until XRPL validates.`;
   }
 }
 
@@ -596,6 +657,7 @@ async function finishLedgerPublication(pending) {
   preLaunch = false;
   schemaState = state;
   clearPending(communityId);
+  clearConfigDraft(communityId);
   pendingPublication = null;
   $("retryReadbackButton").hidden = true;
 
@@ -624,6 +686,8 @@ async function publish() {
   try {
     setBusy(true);
     const config = validatedConfig();
+    // Preserve the exact working CONFIG before the wallet handoff.
+    writeConfigDraft(config);
     const memoInfo = communityConfigMemo(config, { communityId });
     const expectedWallet = session.connectedWallet;
 
@@ -713,7 +777,7 @@ function bind() {
   $("setupForm").addEventListener("input", event => {
     const target = event.target;
     if (target.matches("[data-field],[data-array]")) {
-      syncForm(); updatePublishGate(); clearPendingIfChanged();
+      syncForm(); writeConfigDraft(); updatePublishGate(); clearPendingIfChanged();
     }
   });
   $("publishButton").addEventListener("click", publish);
