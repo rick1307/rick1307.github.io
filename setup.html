@@ -188,6 +188,9 @@ let pendingPublication = null;
 let activeTrailStep = "";
 let trailRun = 0;
 let formBound = false;
+let draftRestoreInfo = null;
+let draftSaveInfo = null;
+let draftSaveError = "";
 
 const TRAIL_DEFAULTS = Object.freeze({
   wallet: "Waiting for working wallet context.",
@@ -309,47 +312,132 @@ function writePending(value) { sessionStorage.setItem(pendingKey(value.community
 function clearPending(id) { sessionStorage.removeItem(pendingKey(id)); }
 
 // Working CONFIG drafts are local browser safety only. XRPL remains authoritative.
+// Draft persistence is verified before Wild Ledger is allowed to hand off to the wallet.
 function draftKey(id) { return `wildLedger.configDraft.${id}`; }
 function currentConfigBaseHash() { return String(schemaState?.current?.hash || "").trim().toUpperCase(); }
+
+function draftPayload(config = currentConfig) {
+  const session = operatorSession();
+  return {
+    version: 2,
+    communityId,
+    connectedWallet: String(session?.connectedWallet || ""),
+    baseConfigHash: currentConfigBaseHash(),
+    savedAt: new Date().toISOString(),
+    config: JSON.parse(JSON.stringify(config))
+  };
+}
+
+function parseDraft(raw, source, id) {
+  if (!raw) return null;
+  let value;
+  try { value = JSON.parse(raw); }
+  catch (error) { return { invalid: true, source, reason: `Saved draft JSON is unreadable: ${error?.message || error}` }; }
+  if (!value || ![1,2].includes(Number(value.version))) return { invalid: true, source, reason: "Saved draft version is unsupported." };
+  if (String(value.communityId || "").toUpperCase() !== id) return { invalid: true, source, reason: "Saved draft belongs to a different community." };
+  if (!value.config || typeof value.config !== "object" || Array.isArray(value.config)) return { invalid: true, source, reason: "Saved draft does not contain a CONFIG object." };
+
+  const session = operatorSession();
+  const savedWallet = String(value.connectedWallet || "");
+  if (session?.connectedWallet && savedWallet && savedWallet !== session.connectedWallet) {
+    return { invalid: true, source, reason: "Saved draft belongs to a different Operating Wallet." };
+  }
+
+  return { ...value, source, invalid: false };
+}
+
 function readConfigDraft(id) {
-  try {
-    const raw = localStorage.getItem(draftKey(id));
-    if (!raw) return null;
-    const value = JSON.parse(raw);
-    if (!value || Number(value.version) !== 1) return null;
-    if (String(value.communityId || "").toUpperCase() !== id) return null;
+  const key = draftKey(id);
+  const candidates = [];
+  const problems = [];
 
-    const session = operatorSession();
-    const savedWallet = String(value.connectedWallet || "");
-    if (session?.connectedWallet && savedWallet && savedWallet !== session.connectedWallet) return null;
-
-    // A draft is only valid against the exact XRPL CONFIG state it was edited from.
-    if (String(value.baseConfigHash || "").toUpperCase() !== currentConfigBaseHash()) {
-      localStorage.removeItem(draftKey(id));
-      return null;
+  for (const [source, storage] of [["local", localStorage], ["session", sessionStorage]]) {
+    try {
+      const parsed = parseDraft(storage.getItem(key), source, id);
+      if (!parsed) continue;
+      if (parsed.invalid) problems.push(parsed.reason);
+      else candidates.push(parsed);
+    } catch (error) {
+      problems.push(`${source} browser storage could not be read: ${error?.message || error}`);
     }
-    if (!value.config || typeof value.config !== "object" || Array.isArray(value.config)) return null;
-    return value;
-  } catch (_) {
+  }
+
+  if (!candidates.length) {
+    draftRestoreInfo = problems.length ? { restored: false, problems } : null;
     return null;
   }
+
+  candidates.sort((a,b) => Date.parse(b.savedAt || 0) - Date.parse(a.savedAt || 0));
+  const value = candidates[0];
+  const currentHash = currentConfigBaseHash();
+  const savedHash = String(value.baseConfigHash || "").trim().toUpperCase();
+
+  // Before first launch there is no authoritative complete CONFIG to conflict with,
+  // so a same-community / same-wallet draft is always recoverable.
+  // After launch, never silently apply a draft created from an older ledger CONFIG.
+  if (schemaState?.current && savedHash !== currentHash) {
+    draftRestoreInfo = {
+      restored: false,
+      preserved: true,
+      source: value.source,
+      reason: "A saved draft exists, but XRPL CONFIG changed after that draft was created. The draft was preserved and not applied automatically."
+    };
+    return null;
+  }
+
+  draftRestoreInfo = { restored: true, source: value.source, savedAt: value.savedAt || "" };
+  return value;
 }
-function writeConfigDraft(config = currentConfig) {
-  if (role !== "operator" || !communityId || !config) return;
-  try {
-    const session = operatorSession();
-    localStorage.setItem(draftKey(communityId), JSON.stringify({
-      version: 1,
-      communityId,
-      connectedWallet: String(session?.connectedWallet || ""),
-      baseConfigHash: currentConfigBaseHash(),
-      savedAt: new Date().toISOString(),
-      config
-    }));
-  } catch (_) {}
+
+function writeConfigDraft(config = currentConfig, { requireVerified = false } = {}) {
+  if (role !== "operator" || !communityId || !config) {
+    if (requireVerified) throw new Error("Wild Ledger could not build a community draft to protect before wallet handoff.");
+    return null;
+  }
+
+  const key = draftKey(communityId);
+  const payload = draftPayload(config);
+  const serialized = JSON.stringify(payload);
+  const result = { local: false, session: false, savedAt: payload.savedAt };
+  const errors = [];
+
+  for (const [name, storage] of [["local", localStorage], ["session", sessionStorage]]) {
+    try {
+      storage.setItem(key, serialized);
+      const readBack = storage.getItem(key);
+      result[name] = readBack === serialized;
+      if (!result[name]) errors.push(`${name} browser storage did not return the exact draft that was written.`);
+    } catch (error) {
+      errors.push(`${name} browser storage failed: ${error?.message || error}`);
+    }
+  }
+
+  if (!result.local && !result.session) {
+    draftSaveInfo = null;
+    draftSaveError = errors.join(" ") || "Browser storage did not preserve the CONFIG draft.";
+    if (requireVerified) throw new Error(`CONFIG draft was not saved. ${draftSaveError}`);
+    return null;
+  }
+
+  draftSaveInfo = result;
+  draftSaveError = "";
+  return result;
 }
+
 function clearConfigDraft(id) {
-  try { localStorage.removeItem(draftKey(id)); } catch (_) {}
+  const key = draftKey(id);
+  for (const storage of [localStorage, sessionStorage]) {
+    try { storage.removeItem(key); } catch (_) {}
+  }
+  draftSaveInfo = null;
+  draftRestoreInfo = null;
+  draftSaveError = "";
+}
+
+function saveWorkingDraft({ requireVerified = false } = {}) {
+  if (role !== "operator" || !currentConfig || !communityId) return null;
+  syncForm();
+  return writeConfigDraft(currentConfig, { requireVerified });
 }
 
 function setStatus(message, tone = "") {
@@ -446,7 +534,7 @@ async function loadConfig() {
   const draft = readConfigDraft(communityId);
   if (!draft) return baseConfig;
 
-  const restored = {
+  return {
     ...baseConfig,
     ...draft.config,
     communityId,
@@ -455,7 +543,6 @@ async function loadConfig() {
       ? [...draft.config.experienceSteps]
       : [...(baseConfig.experienceSteps || [])]
   };
-  return restored;
 }
 
 function renderLayoutChoices() {
@@ -472,7 +559,7 @@ function renderLayoutChoices() {
       currentConfig.layoutId = layout.id;
       const compatible = availableSkins(layout.id);
       if (!compatible.some(skin => skin.id === currentConfig.skinId)) currentConfig.skinId = compatible[0]?.id || currentConfig.skinId;
-      renderLayoutChoices(); renderSkinChoices(); writeConfigDraft(); updatePublishGate(); clearPendingIfChanged();
+      renderLayoutChoices(); renderSkinChoices(); saveWorkingDraft(); updatePublishGate(); clearPendingIfChanged();
     });
     wrap.appendChild(button);
   }
@@ -490,7 +577,7 @@ function renderSkinChoices() {
     button.addEventListener("click", () => {
       if (busy || role !== "operator") return;
       currentConfig.skinId = skin.id;
-      renderSkinChoices(); writeConfigDraft(); updatePublishGate(); clearPendingIfChanged();
+      renderSkinChoices(); saveWorkingDraft(); updatePublishGate(); clearPendingIfChanged();
     });
     wrap.appendChild(button);
   }
@@ -567,7 +654,14 @@ function updatePublishGate() {
   } else if (!busy && memoInfo) {
     setStatus(preLaunch ? "Ready. One wallet signature publishes the complete Schema 1 CONFIG to XRPL." : "Ready. One wallet signature publishes the complete CONFIG changes to XRPL.", "ok");
     $("ledgerNote").hidden = false;
-    $("ledgerNote").textContent = `XRPL CONFIG size: ${memoInfo.serializedMemosBytes} / 1024 serialized memo bytes · ${memoInfo.headroomBytes} bytes headroom · Draft autosaved on this device until XRPL validates.`;
+    const draftText = draftSaveError
+      ? `Draft save problem: ${draftSaveError}`
+      : draftSaveInfo
+        ? `Draft verified ${draftSaveInfo.local ? "persistently" : "for this session"} on this device.`
+        : draftRestoreInfo?.restored
+          ? `Saved draft restored from ${draftRestoreInfo.source} browser storage.`
+          : "Draft will be verified before wallet handoff.";
+    $("ledgerNote").textContent = `XRPL CONFIG size: ${memoInfo.serializedMemosBytes} / 1024 serialized memo bytes · ${memoInfo.headroomBytes} bytes headroom · ${draftText}`;
   }
 }
 
@@ -686,8 +780,8 @@ async function publish() {
   try {
     setBusy(true);
     const config = validatedConfig();
-    // Preserve the exact working CONFIG before the wallet handoff.
-    writeConfigDraft(config);
+    // Protect and verify the exact CONFIG before Safari is allowed to hand off to the wallet.
+    writeConfigDraft(config, { requireVerified: true });
     const memoInfo = communityConfigMemo(config, { communityId });
     const expectedWallet = session.connectedWallet;
 
@@ -777,7 +871,10 @@ function bind() {
   $("setupForm").addEventListener("input", event => {
     const target = event.target;
     if (target.matches("[data-field],[data-array]")) {
-      syncForm(); writeConfigDraft(); updatePublishGate(); clearPendingIfChanged();
+      syncForm();
+      writeConfigDraft();
+      updatePublishGate();
+      clearPendingIfChanged();
     }
   });
   $("publishButton").addEventListener("click", publish);
@@ -785,7 +882,15 @@ function bind() {
   $("backLink").addEventListener("click", event => {
     if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
+    saveWorkingDraft();
     fadeNavigate($("backLink").href);
+  });
+
+  // iPhone Safari may suspend the page when the wallet app opens. Persist once more
+  // at the lifecycle boundary instead of relying only on individual input events.
+  window.addEventListener("pagehide", () => { try { saveWorkingDraft(); } catch (_) {} });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") { try { saveWorkingDraft(); } catch (_) {} }
   });
 }
 
@@ -812,6 +917,8 @@ async function init() {
     populateForm();
     if (role === "owner") document.querySelectorAll("input,textarea,.choice").forEach(el => { el.disabled = true; });
     bind();
+    // If a saved draft was restored, immediately refresh both storage copies.
+    if (role === "operator" && draftRestoreInfo?.restored) writeConfigDraft(currentConfig);
     updatePublishGate();
     setTrailStep("ready", "done", preLaunch ? "First-launch Setup is ready." : "Community Setup is ready.");
     setTrailStatus(`Trail complete. ${communityId} is ready.`, "");
