@@ -1,0 +1,1995 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta id="pageDescription" name="description" content="Wild Ledger community lounge." />
+  <meta name="theme-color" content="#efe8d8" />
+  <title>Community Lounge — Wild Ledger</title>
+
+  <style>
+    :root{
+      --paper:#efe8d8;
+      --paper2:#f8f3e8;
+      --ink:#1a252c;
+      --navy:#16384b;
+      --sea:#2f7481;
+      --foam:#dbece8;
+      --rust:#b84f32;
+      --gold:#d2a34f;
+      --line:rgba(26,37,44,.18);
+      --card:#fffaf0;
+      --max:900px;
+      --community-surface-max:900px;
+    }
+
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{min-height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        linear-gradient(rgba(22,56,75,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,56,75,.028) 1px, transparent 1px),
+        var(--paper);
+      background-size:30px 30px;
+      font-family:Georgia,"Times New Roman",serif;
+      line-height:1.5;
+    }
+
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(calc(100% - 28px),var(--max));margin:auto}
+    .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+
+    nav{
+      position:sticky;top:0;z-index:20;
+      background:rgba(239,232,216,.93);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      min-height:64px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+    }
+    .powered-by{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.82rem;font-weight:800;color:#536067;
+    }
+    .back-link{
+      text-decoration:none;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.82rem;font-weight:850;color:var(--navy);
+      border:1px solid var(--line);border-radius:999px;padding:7px 12px;
+      background:rgba(255,255,255,.35);
+    }
+
+    main{padding:46px 0 70px}
+    .kicker{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--rust);text-transform:uppercase;letter-spacing:.16em;
+      font-size:.76rem;font-weight:900;
+    }
+    h1{
+      margin:.12em 0 .12em;color:var(--navy);
+      font-size:clamp(3rem,10vw,5.6rem);line-height:.94;letter-spacing:-.055em;
+    }
+    .lede{
+      margin:0;color:#4d5d64;font-size:clamp(1.05rem,2.2vw,1.25rem);
+      max-width:700px;
+    }
+
+    .prototype-role-switch{
+      margin-top:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .prototype-role-label{
+      color:#718087;font-size:.72rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em;
+      margin-right:2px;
+    }
+    .role-toggle{
+      appearance:none;border:1px solid rgba(22,56,75,.18);border-radius:999px;padding:7px 11px;
+      background:rgba(255,255,255,.38);color:var(--navy);font-size:.72rem;font-weight:850;
+    }
+    .role-toggle[aria-pressed="true"]{
+      background:var(--navy);border-color:var(--navy);color:white;box-shadow:0 5px 14px rgba(22,56,75,.14);
+    }
+    body[data-prototype-role="member"] .recognize-btn[data-great-chat-session]{display:none}
+    body[data-prototype-role="manager"] .manager-tip{display:none}
+    body[data-prototype-role="manager"] .bolt-status{display:none}
+
+    .panel{
+      margin-top:28px;
+      border:1px solid rgba(26,37,44,.16);
+      border-radius:18px;
+      background:rgba(255,250,240,.90);
+      box-shadow:0 14px 34px rgba(26,37,44,.09);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel:before{
+      content:"";display:block;height:5px;
+      background:linear-gradient(90deg,var(--gold),var(--sea));
+    }
+
+    /* ENTRY */
+    #entryView{padding:34px}
+    .entry-card{max-width:560px;margin:auto;text-align:center;padding:20px 0 12px}
+    .entry-card h2{margin:0;color:var(--navy);font-size:2rem}
+    .entry-card p{color:#5b696f;margin:10px auto 22px;max-width:460px}
+    .entry-card .entry-intro{margin:10px auto 4px}
+    .entry-card .entry-principle{
+      margin:0 auto 22px;color:var(--navy);font-weight:800;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .nickname-row{display:grid;grid-template-columns:1fr auto;gap:10px}
+    .nickname-row input{
+      width:100%;min-width:0;padding:13px 14px;border-radius:10px;
+      border:1px solid rgba(22,56,75,.22);background:white;color:var(--ink);outline:none;
+    }
+    .nickname-row input:focus{
+      border-color:var(--gold);box-shadow:0 0 0 3px rgba(210,163,79,.17);
+    }
+    .primary{
+      border:0;border-radius:10px;padding:12px 17px;
+      background:var(--rust);color:white;font-weight:850;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      box-shadow:0 8px 20px rgba(184,79,50,.17);
+    }
+
+    /* CHAT */
+    #chatView{display:none}
+    .room-head{
+      padding:18px 20px;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      background:rgba(219,236,232,.38);
+    }
+    .room-title{display:flex;align-items:center;gap:10px}
+    .online-dot{
+      width:10px;height:10px;border-radius:50%;background:#3d8b69;
+      box-shadow:0 0 0 4px rgba(61,139,105,.12);
+    }
+    .online-dot.offline{
+      background:#9c917c;box-shadow:0 0 0 4px rgba(156,145,124,.12);
+    }
+    .online-dot.connecting{
+      background:var(--gold);box-shadow:0 0 0 4px rgba(210,163,79,.14);
+    }
+    .room-title strong{
+      color:var(--navy);font-size:1.08rem;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .room-count{
+      color:#65757b;font-size:.78rem;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .messages{
+      height:min(54vh,500px);min-height:390px;overflow-y:auto;
+      padding:22px 20px 12px;scroll-behavior:smooth;
+    }
+    .message{display:flex;gap:11px;margin-bottom:19px;align-items:flex-start}
+    .avatar{
+      flex:0 0 38px;width:38px;height:38px;border-radius:50%;
+      display:grid;place-items:center;background:var(--foam);color:var(--navy);
+      border:1px solid rgba(22,56,75,.12);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-weight:900;font-size:.83rem;
+    }
+    .bubble{min-width:0;max-width:80%}
+    .meta{
+      display:flex;align-items:center;gap:7px;margin-bottom:3px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .name{
+      appearance:none;border:0;background:none;padding:0;color:var(--navy);
+      font-weight:850;font-size:.87rem;text-align:left;
+    }
+    .rank-status{
+      position:relative;display:inline-flex;align-items:center;min-width:0;
+    }
+    .rank-trigger{
+      cursor:help;border-radius:5px;line-height:1.2;
+    }
+    .rank-trigger:focus-visible{
+      outline:2px solid rgba(47,116,129,.48);outline-offset:3px;
+    }
+    .rank-popover{
+      position:absolute;z-index:31;left:0;top:calc(100% + 8px);
+      width:max-content;max-width:min(240px,70vw);padding:9px 11px;border-radius:10px;
+      background:#fffdf8;border:1px solid rgba(22,56,75,.16);
+      box-shadow:0 12px 28px rgba(26,37,44,.16);
+      color:var(--navy);text-align:left;font-size:.76rem;line-height:1.35;
+      opacity:0;visibility:hidden;transform:translateY(-3px);
+      transition:opacity .13s ease,transform .13s ease,visibility .13s ease;
+      pointer-events:none;
+    }
+    .message.me .rank-popover{left:auto;right:0}
+    .rank-status:hover .rank-popover,
+    .rank-status:focus-within .rank-popover{
+      opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;
+    }
+    .rank-popover strong{display:block;font-size:.79rem;white-space:nowrap}
+    .manager-tip{
+      appearance:none;border:1px solid rgba(47,116,129,.24);border-radius:999px;
+      background:rgba(219,236,232,.62);color:var(--sea);padding:2px 7px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.66rem;font-weight:850;line-height:1.25;
+    }
+    .manager-tip:hover{border-color:var(--sea);background:rgba(219,236,232,.92)}
+    .bolt-status{
+      position:relative;display:inline-flex;align-items:center;
+    }
+    .bolt-trigger{
+      appearance:none;border:0;background:none;padding:0;margin:0;
+      display:inline-grid;place-items:center;cursor:help;line-height:1;
+      border-radius:5px;
+    }
+    .bolt-trigger:focus-visible{
+      outline:2px solid rgba(47,116,129,.48);outline-offset:3px;
+    }
+    .bolt{
+      color:#b37a00;font-size:.98rem;line-height:1;
+      filter:drop-shadow(0 1px 0 rgba(255,255,255,.8));
+      transition:opacity .15s ease,filter .15s ease;
+    }
+    .bolt-status[data-transfer-status="disabled"] .bolt,
+    .bolt-status[data-transfer-status="pending"] .bolt{
+      opacity:.42;filter:grayscale(1) drop-shadow(0 1px 0 rgba(255,255,255,.8));
+    }
+    .bolt-popover{
+      position:absolute;z-index:30;left:0;top:calc(100% + 8px);
+      width:min(270px,72vw);padding:11px 12px;border-radius:11px;
+      background:#fffdf8;border:1px solid rgba(22,56,75,.16);
+      box-shadow:0 12px 28px rgba(26,37,44,.16);
+      color:var(--ink);text-align:left;font-size:.76rem;line-height:1.4;
+      opacity:0;visibility:hidden;transform:translateY(-3px);
+      transition:opacity .13s ease,transform .13s ease,visibility .13s ease;
+      pointer-events:none;
+    }
+    .message.me .bolt-popover{left:auto;right:0}
+    .bolt-status:hover .bolt-popover,
+    .bolt-status:focus-within .bolt-popover{
+      opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;
+    }
+    .bolt-popover strong{display:block;color:var(--navy);font-size:.79rem;margin-bottom:0}
+    .bolt-popover p{margin:0}
+    .bolt-future-action{
+      width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px 10px;
+      background:rgba(22,56,75,.10);color:#68767d;font:inherit;font-weight:850;
+      cursor:not-allowed;
+    }
+    .bolt-construction{display:block;margin-top:4px;color:#8a9499;font-size:.66rem;text-align:center}
+    .time{color:#879298;font-size:.7rem}
+    .text{
+      display:inline-block;padding:9px 12px;border-radius:4px 13px 13px 13px;
+      background:white;border:1px solid rgba(26,37,44,.11);
+      box-shadow:0 4px 12px rgba(26,37,44,.04);
+      word-break:break-word;
+    }
+    .message.me{justify-content:flex-end}
+    .message.me .avatar{order:2;background:#e9dcc1}
+    .message.me .bubble{text-align:right}
+    .message.me .meta{justify-content:flex-end}
+    .message.me .text{text-align:left;background:#f7ead9;border-radius:13px 4px 13px 13px}
+
+    .composer{
+      border-top:1px solid var(--line);padding:14px;
+      display:grid;grid-template-columns:1fr auto;gap:9px;background:rgba(248,243,232,.72);
+    }
+    .composer input{
+      width:100%;min-width:0;padding:12px 13px;border-radius:10px;
+      border:1px solid rgba(22,56,75,.20);background:white;outline:none;
+    }
+    .composer input:focus{border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.12)}
+
+    /* TIP SHEET */
+    .scrim{
+      display:none;position:fixed;inset:0;z-index:50;background:rgba(11,32,40,.42);
+      padding:18px;align-items:flex-end;justify-content:center;
+    }
+    .scrim.open{display:flex}
+    .tip-sheet{
+      width:min(100%,480px);background:var(--paper2);border-radius:20px;
+      border:1px solid rgba(26,37,44,.15);box-shadow:0 22px 60px rgba(0,0,0,.25);
+      padding:22px;
+    }
+    .tip-sheet h3{margin:0;color:var(--navy);font-size:1.5rem}
+    .tip-sheet p{margin:6px 0 17px;color:#617077}
+    .tip-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .tip-amount{
+      border:1px solid rgba(22,56,75,.18);border-radius:10px;padding:12px 8px;
+      background:white;color:var(--navy);font-weight:850;
+    }
+    .tip-amount:hover{border-color:var(--gold)}
+    .xrp-entry{
+      display:grid;grid-template-columns:1fr auto;gap:9px;align-items:stretch;
+      margin-top:4px;
+    }
+    .xrp-entry input{
+      width:100%;min-width:0;padding:12px 13px;border-radius:10px;
+      border:1px solid rgba(22,56,75,.20);background:white;color:var(--ink);outline:none;
+    }
+    .xrp-entry input:focus{
+      border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.12);
+    }
+    .xrp-note{
+      margin:11px 0 0!important;color:#748187!important;font-size:.76rem!important;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .tip-actions{display:flex;justify-content:flex-end;margin-top:16px}
+    .secondary{
+      border:1px solid var(--line);border-radius:9px;padding:9px 13px;
+      background:transparent;color:var(--navy);font-weight:800;
+    }
+    .prototype-note{
+      margin-top:18px;padding:14px 16px;border-left:4px solid var(--gold);
+      background:rgba(255,250,240,.62);color:#5c696f;font-size:.9rem;
+    }
+
+    .toast{
+      position:fixed;left:50%;bottom:22px;z-index:80;transform:translate(-50%,20px);
+      background:#183640;color:white;border-radius:999px;padding:10px 15px;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.8rem;font-weight:750;opacity:0;pointer-events:none;transition:.2s ease;
+      box-shadow:0 8px 25px rgba(0,0,0,.18);
+    }
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+
+    /* Shared recognition celebration. In production the Worker/WebSocket will trigger
+       the same front-end handler after the XRPL recognition transaction validates. */
+    .celebration{
+      display:none;position:fixed;inset:0;z-index:75;pointer-events:none;
+      align-items:center;justify-content:center;padding:20px;overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .celebration.show{display:flex}
+    .celebration-backdrop{
+      position:absolute;inset:0;background:rgba(11,32,40,.46);
+      animation:celebrationGlow 2.10s ease-out both;
+    }
+    .celebration-card{
+      position:relative;z-index:3;width:min(91vw,440px);padding:30px 24px 28px;
+      border:2px solid rgba(210,163,79,.78);border-radius:26px;text-align:center;
+      background:rgba(255,250,240,.985);box-shadow:0 30px 86px rgba(11,32,40,.46),0 0 0 8px rgba(210,163,79,.10);
+      animation:celebrationPop 2.22s cubic-bezier(.22,.78,.2,1) both;
+      will-change:transform,opacity;
+    }
+    .celebration-icon{font-size:2.45rem;line-height:1;margin-bottom:8px;filter:drop-shadow(0 3px 8px rgba(210,163,79,.35))}
+    .celebration-kicker{
+      color:var(--rust);font-size:.78rem;font-weight:950;letter-spacing:.19em;text-transform:uppercase;
+    }
+    .celebration-name{margin-top:8px;color:var(--navy);font-size:clamp(1.8rem,7vw,2.6rem);font-weight:950;line-height:1.02}
+    .celebration-copy{margin-top:7px;color:#65757b;font-size:.92rem;font-weight:800}
+    .celebration-amount{margin-top:6px;color:var(--navy);font-size:clamp(3rem,14vw,5.1rem);font-weight:950;line-height:.92;letter-spacing:-.05em}
+    .celebration.level-2 .celebration-card{box-shadow:0 32px 92px rgba(11,32,40,.48),0 0 0 10px rgba(210,163,79,.11)}
+    .celebration.level-3 .celebration-card{box-shadow:0 35px 100px rgba(11,32,40,.52),0 0 0 12px rgba(210,163,79,.14)}
+    .celebration-sparks{position:absolute;inset:0;z-index:2;overflow:hidden}
+    .celebration-spark{
+      position:absolute;left:50%;top:50%;font-size:var(--spark-size,1rem);opacity:0;
+      transform:translate(-50%,-50%);animation:sparkBurst 1.55s ease-out var(--spark-delay,0s) both;
+    }
+    .celebration-confetti{
+      position:absolute;top:-10vh;left:var(--confetti-left,50%);z-index:1;
+      width:var(--confetti-w,8px);height:var(--confetti-h,14px);border-radius:2px;
+      background:var(--confetti-color,#d2a34f);opacity:0;
+      transform:translate3d(0,0,0) rotate(var(--confetti-rotation,0deg));
+      animation:confettiFall var(--confetti-duration,2.6s) cubic-bezier(.22,.62,.34,1) var(--confetti-delay,0s) both;
+    }
+    .system-event{display:flex;justify-content:center;margin:5px 0 18px;padding:0 8px}
+    .system-event-pill{
+      max-width:92%;padding:7px 11px;border:1px solid rgba(210,163,79,.28);border-radius:999px;
+      background:rgba(210,163,79,.10);color:#6f571f;text-align:center;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.72rem;font-weight:800;line-height:1.35;
+    }
+    .appreciation-event .system-event-pill{
+      border-color:rgba(47,116,129,.20);background:rgba(47,116,129,.08);color:#4d6570;
+    }
+    @keyframes celebrationGlow{
+      0%{opacity:0}
+      8%{opacity:1}
+      56%{opacity:1}
+      72%{opacity:.62}
+      100%{opacity:0}
+    }
+    @keyframes celebrationPop{
+      0%{opacity:0;transform:translateY(26px) scale(.34) rotate(-1.2deg)}
+      10%{opacity:1;transform:translateY(-8px) scale(1.18) rotate(.45deg)}
+      18%{opacity:1;transform:translateY(6px) scale(.96) rotate(0deg)}
+      28%{opacity:1;transform:translateY(-1px) scale(1.025)}
+      40%{opacity:1;transform:translateY(0) scale(1)}
+      58%{opacity:1;transform:translateY(-4px) scale(.995)}
+      72%{opacity:.98;transform:translateY(-22vh) scale(.95)}
+      100%{opacity:0;transform:translateY(-125vh) scale(.68)}
+    }
+    @keyframes sparkBurst{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(0deg)}
+      10%{opacity:1}
+      78%{opacity:.9}
+      100%{opacity:0;transform:translate(calc(-50% + var(--spark-x)),calc(-50% + var(--spark-y))) scale(1.25) rotate(var(--spark-rotation))}
+    }
+    @keyframes confettiFall{
+      0%{opacity:0;transform:translate3d(0,-8vh,0) rotate(var(--confetti-rotation,0deg))}
+      8%{opacity:1}
+      88%{opacity:1}
+      100%{opacity:0;transform:translate3d(var(--confetti-drift,0px),118vh,0) rotate(calc(var(--confetti-rotation,0deg) + 720deg))}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .celebration.show .celebration-backdrop{
+        animation:none!important;opacity:1!important;background:rgba(11,32,40,.46)!important;
+      }
+      .celebration.show .celebration-card{
+        animation:none!important;opacity:1!important;transform:none!important;
+      }
+      .celebration-spark,.celebration-confetti{display:none!important;animation:none!important}
+    }
+
+    .appreciation{
+      display:none;position:fixed;inset:0;z-index:74;pointer-events:none;
+      align-items:center;justify-content:center;padding:20px;overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .appreciation.show{display:flex}
+    .appreciation-backdrop{
+      position:absolute;inset:0;background:radial-gradient(circle at center,rgba(47,116,129,.16),rgba(11,32,40,0) 62%);
+      animation:appreciationGlow 1.82s ease-out both;
+    }
+    .appreciation-ripples{position:absolute;inset:0;z-index:1;overflow:hidden}
+    .appreciation-ripple{
+      position:absolute;left:50%;top:56%;width:22px;height:22px;border-radius:50%;
+      border:2px solid rgba(47,116,129,.28);opacity:0;
+      transform:translate(-50%,-50%) scale(.22);
+      animation:appreciationRipple 1.32s ease-out var(--ripple-delay,0s) both;
+    }
+    .appreciation-card{
+      position:relative;z-index:2;width:min(88vw,390px);padding:18px 20px 17px;
+      border:1px solid rgba(47,116,129,.22);border-radius:22px;text-align:center;
+      background:rgba(255,255,255,.97);box-shadow:0 20px 52px rgba(11,32,40,.18);
+      animation:appreciationFloat 1.82s cubic-bezier(.22,.78,.22,1) both;
+      will-change:transform,opacity;
+    }
+    .appreciation-icon{font-size:1.3rem;line-height:1;color:var(--sea);margin-bottom:6px}
+    .appreciation-title{color:var(--navy);font-size:clamp(1.2rem,5.8vw,1.7rem);font-weight:900;line-height:1.06}
+    .appreciation-copy{margin-top:7px;color:rgba(26,37,44,.5);font-size:.82rem;font-weight:700;line-height:1.3}
+    @keyframes appreciationGlow{
+      0%{opacity:0}
+      14%{opacity:1}
+      68%{opacity:1}
+      100%{opacity:0}
+    }
+    @keyframes appreciationRipple{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.22)}
+      12%{opacity:.42}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(14)}
+    }
+    @keyframes appreciationFloat{
+      0%{opacity:0;transform:translateY(16px) scale(.76)}
+      16%{opacity:1;transform:translateY(-4px) scale(1.02)}
+      30%{opacity:1;transform:translateY(0) scale(1)}
+      58%{opacity:1;transform:translateY(0) scale(1)}
+      100%{opacity:0;transform:translateY(-108vh) scale(.93)}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .appreciation.show .appreciation-backdrop{
+        animation:none!important;opacity:1!important;
+      }
+      .appreciation.show .appreciation-card{
+        animation:none!important;opacity:1!important;transform:none!important;
+      }
+      .appreciation-ripple{display:none!important;animation:none!important}
+    }
+
+    .recognize-btn{
+      appearance:none;border:1px solid rgba(210,163,79,.45);border-radius:999px;
+      padding:2px 7px;background:rgba(210,163,79,.11);color:#8a6417;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.64rem;font-weight:850;line-height:1.35;white-space:nowrap;
+    }
+    .recognize-btn:hover{background:rgba(210,163,79,.18);border-color:rgba(210,163,79,.7)}
+    .recognize-btn:disabled{
+      background:rgba(210,163,79,.06);border-color:rgba(210,163,79,.24);color:rgba(138,100,23,.44);
+      cursor:not-allowed;box-shadow:none;filter:saturate(.72);
+    }
+    .recognize-btn:disabled:hover{background:rgba(210,163,79,.06);border-color:rgba(210,163,79,.24)}
+    .recognize-example{
+      display:inline-block;vertical-align:middle;pointer-events:none;cursor:default;
+      opacity:.72;margin-left:2px;
+    }
+    .recognition-code{
+      margin:12px 0 14px;padding:9px 11px;border-radius:10px;
+      background:rgba(22,56,75,.06);border:1px solid rgba(22,56,75,.11);
+      color:#51636a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:.73rem;line-height:1.4;overflow-wrap:anywhere;
+    }
+    .recognition-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .recognition-amount{
+      border:1px solid rgba(22,56,75,.18);border-radius:10px;padding:12px 8px;
+      background:white;color:var(--navy);font-weight:850;
+    }
+    .recognition-amount.selected{
+      border-color:var(--gold);background:rgba(210,163,79,.15);
+      box-shadow:0 0 0 2px rgba(210,163,79,.13);
+    }
+    .recognition-wallet{width:100%;margin-top:12px}
+    .recognition-wallet:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+    .recognition-note{
+      margin:11px 0 0!important;color:#718087!important;font-size:.78rem!important;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    }
+    .recognition-private-test{margin-top:12px;padding:10px;border-radius:10px;background:rgba(22,56,75,.045);border:1px solid rgba(22,56,75,.10)}
+    .recognition-private-test label{display:block;margin-bottom:6px;color:var(--navy);font-size:.76rem;font-weight:850}
+    .recognition-private-test input{width:100%;box-sizing:border-box;border:1px solid rgba(22,56,75,.18);border-radius:9px;padding:10px 11px;font:inherit;color:var(--ink);background:white}
+    .recognition-private-test small{display:block;margin-top:6px;color:#718087;font-size:.72rem;line-height:1.35}
+
+    /* Keep iPhone Safari from auto-zooming focused text fields. */
+    .nickname-row input,
+    .composer input,
+    .xrp-entry input,
+    .recognition-private-test input{
+      font-size:16px;
+    }
+    .prepared-check{display:none;margin-top:12px;padding:10px;border-radius:10px;background:#0f2833;color:#eaf4f5;text-align:left}
+    .prepared-check.show{display:block}
+    .prepared-check strong{display:block;margin-bottom:6px;color:#fff;font-size:.78rem}
+    .prepared-check pre{margin:0;max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.68rem;line-height:1.45}
+    .signing-check{display:none;margin-top:12px;padding:11px;border-radius:10px;background:rgba(210,163,79,.10);border:1px solid rgba(210,163,79,.30);text-align:left}
+    .signing-check.show{display:block}
+    .signing-check strong{display:block;color:var(--navy);font-size:.8rem;margin-bottom:5px}
+    .signing-status{font-size:.74rem;line-height:1.4;color:#5f6f75;margin:6px 0}
+    .signing-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+    .signing-actions button{width:100%}
+    .wallet-qr{display:none;margin-top:10px;padding:10px;border-radius:10px;background:white;border:1px solid rgba(22,56,75,.12);text-align:center}
+    .wallet-qr.show{display:block}
+    .wallet-qr img{display:block;width:min(230px,100%);height:auto;margin:0 auto 8px;border-radius:8px}
+    .wallet-qr code{display:block;max-height:70px;overflow:auto;text-align:left;white-space:normal;overflow-wrap:anywhere;font-size:.62rem;color:#65747a}
+    .signature-result{margin-top:9px;padding:9px;border-radius:9px;background:white;border:1px solid rgba(22,56,75,.10);font-size:.72rem;line-height:1.4;color:#51636a}
+    .hard-stop{margin-top:9px;padding:9px;border-radius:9px;background:#fff4e6;border:1px solid #edc78f;color:#714d19;font-size:.72rem;line-height:1.4;font-weight:750}
+
+    @media(max-width:620px){
+      main{padding-top:34px}
+      #entryView{padding:25px 18px}
+      .nickname-row{grid-template-columns:1fr}
+      .nickname-row .primary{width:100%}
+      .messages{height:56vh;min-height:350px;padding-left:14px;padding-right:14px}
+      .bubble{max-width:84%}
+      .composer{padding:10px}
+      .room-head{padding:15px 14px}
+      .xrp-entry{grid-template-columns:1fr}
+      .xrp-entry .primary{width:100%}
+    }
+  </style>
+  <link rel="stylesheet" href="communitySurface.css">
+  <link rel="stylesheet" href="wildLedgerControls.css">
+</head>
+
+<body class="wl-community-surface" data-prototype-role="manager">
+  <nav>
+    <div class="wrap nav-inner wl-nav-right">
+      <a class="back-link wl-header-control" id="backLink" href="memberRecord.html">Back</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <div class="kicker" id="communityKicker">Community</div>
+      <h1 id="loungeHeading">Community Lounge</h1>
+      <p class="lede" id="loungeLede">A place for members to pull up a chair, pick a name, and join the conversation.</p>
+
+      <div class="prototype-role-switch" aria-label="Prototype view" data-test-only hidden>
+        <span class="prototype-role-label">Prototype view</span>
+        <button class="role-toggle" type="button" data-role-view="member" aria-pressed="false">Member</button>
+        <button class="role-toggle" type="button" data-role-view="manager" aria-pressed="true">Community Manager</button>
+      </div>
+
+      <section class="panel" id="loungePanel" aria-label="Community Lounge prototype">
+        <div id="entryView">
+          <div class="entry-card">
+            <h2>“Wanna ride with Batman?”</h2>
+            <p class="entry-intro">Pick an alias for the Lounge.</p>
+            <p class="entry-principle">We care that you’re here, not who you are.</p>
+
+            <form id="entryForm">
+              <div class="nickname-row">
+                <input id="nickname" maxlength="24" autocomplete="off" placeholder="Choose an alias" aria-label="Choose an alias" required />
+                <button class="primary" type="submit">Enter the Lounge</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="chatView">
+          <div class="room-head">
+            <div class="room-title">
+              <span class="online-dot offline" id="roomConnectionDot" aria-hidden="true"></span>
+              <strong id="roomTitle">Community Lounge</strong>
+            </div>
+            <span class="room-count" id="roomConnectionStatus" aria-live="polite">Local preview</span>
+          </div>
+
+          <div class="messages" id="messages" aria-live="polite">
+            <div class="message">
+              <div class="avatar" id="managerSampleAvatar">M</div>
+              <div class="bubble">
+                <div class="meta">
+                  <span class="name" id="managerSampleName">Community Manager</span>
+                  <button class="manager-tip" id="managerSampleTip" type="button" data-manager-tip-name="" data-test-only hidden>Tip Community Manager in XRP</button>
+                  <span class="bolt-status" data-transfer-status="enabled">
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats enabled</strong></span>
+                  </span>
+                  <span class="time">8:42 PM</span>
+                </div>
+                <div class="text">Welcome aboard. Make yourselves comfortable.</div>
+              </div>
+            </div>
+
+            <!-- UI marker only: these demo stars are fake presentation values.
+                 Real stars are reconstructed from ledger-derived community Earned LEAP. -->
+            <div class="message" data-demo-participant="1">
+              <div class="avatar" data-demo-avatar>1</div>
+              <div class="bubble">
+                <div class="meta">
+                  <span class="rank-status">
+                    <button class="name rank-trigger" type="button" data-demo-name data-demo-rank="★☆☆☆☆" aria-label="Member One — 1 of 5 stars">Member One</button>
+                    <span class="rank-popover" role="tooltip"><strong aria-label="1 of 5 stars">★☆☆☆☆</strong></span>
+                  </span>
+                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="1" data-test-only hidden>Great Chat</button>
+                  <span class="bolt-status" data-transfer-status="enabled">
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats enabled</strong></span>
+                  </span>
+                  <span class="time">8:43 PM</span>
+                </div>
+                <div class="text">That is a great update. Thanks for sharing it.</div>
+              </div>
+            </div>
+
+            <div class="message" data-demo-participant="2">
+              <div class="avatar" data-demo-avatar>2</div>
+              <div class="bubble">
+                <div class="meta">
+                  <span class="rank-status">
+                    <button class="name rank-trigger" type="button" data-demo-name data-demo-rank="★★★☆☆" aria-label="Member Two — 3 of 5 stars">Member Two</button>
+                    <span class="rank-popover" role="tooltip"><strong aria-label="3 of 5 stars">★★★☆☆</strong></span>
+                  </span>
+                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="2" data-test-only hidden>Great Chat</button>
+                  <span class="bolt-status" data-transfer-status="disabled">
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats not enabled yet"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats not enabled yet</strong></span>
+                  </span>
+                  <span class="time">8:44 PM</span>
+                </div>
+                <div class="text">How did you decide to do it that way?</div>
+              </div>
+            </div>
+
+            <div class="message" data-demo-participant="3">
+              <div class="avatar" data-demo-avatar>3</div>
+              <div class="bubble">
+                <div class="meta">
+                  <span class="rank-status">
+                    <button class="name rank-trigger" type="button" data-demo-name data-demo-rank="★★★★★" aria-label="Member Three — 5 of 5 stars">Member Three</button>
+                    <span class="rank-popover" role="tooltip"><strong aria-label="5 of 5 stars">★★★★★</strong></span>
+                  </span>
+                  <button class="recognize-btn" type="button" data-great-chat-session="" data-demo-great-chat="3" data-test-only hidden>Great Chat</button>
+                  <span class="bolt-status" data-transfer-status="enabled">
+                    <button class="bolt-trigger" type="button" aria-label="Great Chats enabled"><span class="bolt" aria-hidden="true">⚡</span></button>
+                    <span class="bolt-popover" role="tooltip"><strong>Great Chats enabled</strong></span>
+                  </span>
+                  <span class="time">8:45 PM</span>
+                </div>
+                <div class="text">This is exactly why I like being part of this community.</div>
+              </div>
+            </div>
+          </div>
+
+          <form class="composer" id="messageForm">
+            <input id="messageInput" maxlength="280" autocomplete="off" placeholder="Say something..." aria-label="Message" />
+            <button class="primary" id="messageSendButton" type="submit">Send</button>
+          </form>
+        </div>
+      </section>
+
+      <div class="prototype-note" data-test-only hidden>
+        <strong class="sans">Test mode — Live-room Step 1B Presence.</strong>
+        New chat messages use Supabase Realtime Broadcast for the selected community room, and the online count now comes from Supabase Presence. If Realtime is unavailable, messages fall back to this browser tab only. Private participant identity and recent-history continuity still come later. XRP-tip and Great Chat signing checkpoints remain unchanged; this page still cannot submit either XRPL transaction.
+      </div>
+    </div>
+  </main>
+
+  <div class="scrim" id="xrpTipScrim" role="dialog" aria-modal="true" aria-labelledby="xrpTipTitle">
+    <div class="tip-sheet">
+      <h3 id="xrpTipTitle">Tip <span id="xrpManagerName">Community Manager</span> in XRP</h3>
+      <p>Voluntary appreciation for <span id="xrpManagerNameSecondary">Community Manager</span>.</p>
+      <div class="xrp-entry">
+        <input id="xrpAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="XRP amount" aria-label="XRP tip amount" />
+        <button class="primary" id="prepareXrpTip" type="button" disabled>Prepare XRP Tip</button>
+      </div>
+      <div class="recognition-private-test" data-test-only hidden>
+        <label for="xrpTestSender">Private test sender</label>
+        <input id="xrpTestSender" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste the member's r... address when ready" />
+        <small>Testing bridge. This stands in for the member's private live-session / wallet identity, must match the Bifrost account used to sign, and is never saved.</small>
+      </div>
+      <p class="xrp-note" id="xrpTipStatus">The XRP destination is not manually entered. Wild Ledger resolves the current canonical Community Operating Wallet from XRPL.</p>
+      <div class="prepared-check" id="preparedXrpTipPanel" data-test-only hidden>
+        <strong>Prepared XRP Payment — not submitted</strong>
+        <pre id="preparedXrpTipJson"></pre>
+      </div>
+      <div class="signing-check" id="xrpSigningPanel" data-test-only hidden>
+        <strong>Step 2 — member Bifrost signature only</strong>
+        <div class="signing-status" id="xrpWalletStatus">Prepare the XRP tip before connecting Bifrost.</div>
+        <div class="signing-actions">
+          <button class="secondary" id="connectXrpWallet" type="button" disabled>Connect Bifrost</button>
+          <button class="primary" id="signXrpTip" type="button" disabled>Sign XRP Tip</button>
+        </div>
+        <div class="wallet-qr" id="xrpQrWrap">
+          <img id="xrpQrImage" alt="WalletConnect QR code for Bifrost" />
+          <code id="xrpQrUri"></code>
+        </div>
+        <div class="signature-result" id="signedXrpTipStatus">Not signed.</div>
+        <div class="hard-stop">Hard stop: this build has no XRPL submission function. A returned member signature stays in this browser tab and is not broadcast.</div>
+      </div>
+      <div class="tip-actions">
+        <button class="secondary" id="closeXrpTip" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrim" id="recognitionScrim" role="dialog" aria-modal="true" aria-labelledby="recognitionTitle">
+    <div class="tip-sheet">
+      <h3 id="recognitionTitle">Great Chat for <span id="recognitionName">Leaper</span></h3>
+      <p>Community Manager recognition sent as LEAP through an XRPL Check.</p>
+      <div class="recognition-code" id="recognitionCode">COMMUNITY-LEAP/BADGE = GREAT-CHAT</div>
+      <div class="recognition-amounts" role="group" aria-label="Choose LEAP amount">
+        <button class="recognition-amount" type="button" data-recognition-amount="1">1 LEAP</button>
+        <button class="recognition-amount" type="button" data-recognition-amount="2">2 LEAP</button>
+        <button class="recognition-amount" type="button" data-recognition-amount="3">3 LEAP</button>
+      </div>
+      <div class="recognition-private-test" data-test-only hidden>
+        <label for="recognitionTestDestination">Private test destination</label>
+        <input id="recognitionTestDestination" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste the member's r... address when ready" />
+        <small>Prototype bridge only. The value stays in this browser tab, is not saved, and stands in for the future private live-session lookup.</small>
+      </div>
+      <button class="primary recognition-wallet" id="prepareRecognition" type="button" disabled data-test-only hidden>Prepare Great Chat Check</button>
+      <p class="recognition-note" id="recognitionPrivateStatus">The member's XRPL address stays hidden in the Lounge. Wild Ledger targets this award by the participant's live session, not by the visible nickname.</p>
+      <div class="prepared-check" id="preparedCheckPanel" data-test-only hidden>
+        <strong>Prepared — not submitted</strong>
+        <pre id="preparedCheckJson"></pre>
+      </div>
+      <div class="signing-check" id="signingCheckPanel" data-test-only hidden>
+        <strong>Step 2B — Bifrost signature only</strong>
+        <div class="signing-status" id="recognitionWalletStatus">Prepared Check is ready. Connect the current Community Operating Wallet when you want to test signing.</div>
+        <div class="signing-actions">
+          <button class="secondary" id="connectRecognitionWallet" type="button" disabled>Connect Bifrost</button>
+          <button class="primary" id="signRecognition" type="button" disabled>Sign Great Chat Check</button>
+        </div>
+        <div class="wallet-qr" id="recognitionQrWrap">
+          <img id="recognitionQrImage" alt="WalletConnect QR code for Bifrost" />
+          <code id="recognitionQrUri"></code>
+        </div>
+        <div class="signature-result" id="signedCheckStatus">Not signed.</div>
+        <div class="hard-stop">Hard stop: this build has no XRPL submission function. A returned signature stays in this browser tab and is not broadcast.</div>
+      </div>
+      <div class="tip-actions">
+        <button class="secondary" id="closeRecognition" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="celebration" id="recognitionCelebration" aria-live="polite" aria-atomic="true">
+    <div class="celebration-backdrop" aria-hidden="true"></div>
+    <div class="celebration-sparks" id="celebrationSparks" aria-hidden="true"></div>
+    <div class="celebration-card">
+      <div class="celebration-icon" aria-hidden="true">⚡</div>
+      <div class="celebration-kicker">Great Chat</div>
+      <div class="celebration-name" id="celebrationName">Member</div>
+      <div class="celebration-copy">was awarded</div>
+      <div class="celebration-amount"><span id="celebrationAmount">1</span> LEAP</div>
+    </div>
+  </div>
+
+  <div class="appreciation" id="xrpCelebration" aria-live="polite" aria-atomic="true">
+    <div class="appreciation-backdrop" aria-hidden="true"></div>
+    <div class="appreciation-ripples" id="appreciationRipples" aria-hidden="true"></div>
+    <div class="appreciation-card">
+      <div class="appreciation-icon" aria-hidden="true">✦</div>
+      <div class="appreciation-title">Thanks, <span id="appreciationTipper">Member</span>!</div>
+      <div class="appreciation-copy"><span id="appreciationAmount">2</span> XRP sent to <span id="appreciationRecipient">Community Manager</span></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Prototype action simulated.</div>
+
+  <script src="js/wildLedgerConfig.js"></script>
+  <script src="js/communityConfig.js" data-registry-only="true"></script>
+  <script type="module">
+    import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2?bundle";
+    import { prepareTransaction, textToHex, isClassicAddress } from "./js/xrplTransport.js";
+    import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+    import { resolveCommunityAuthority, clearCommunityAuthorityCache } from "./js/communityAuthority.js";
+
+    // Deliberately session-only: nickname is never written to localStorage or sessionStorage.
+    let currentNickname = "";
+    const chatClientId = globalThis.crypto?.randomUUID?.() || `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    let supabaseClient = null;
+    let chatChannel = null;
+    let chatRealtimeReady = false;
+    let currentXrpManagerName = "";
+    let preparedXrpTipTx = null;
+    let xrpTipSigner = null;
+    let connectedXrpTipAccount = "";
+    let signedXrpTipBlob = "";
+    let currentRecognitionName = "";
+    let currentRecognitionSessionId = "";
+    let selectedRecognitionAmount = "";
+    const privateTestDestinations = new Map();
+    let preparedGreatChatTx = null;
+    let recognitionSigner = null;
+    let connectedRecognitionAccount = "";
+    let signedGreatChatBlob = "";
+
+    const runtimeConfig = window.WILD_LEDGER_CONFIG || {};
+
+    // Community Step 2: the room follows the selected Wild Ledger community.
+    // An explicit ?community= value is resolved against the shared registry and
+    // never silently falls back to another community. Without an explicit URL
+    // value, communityConfig.js may supply the community selected for this session.
+    const chatParams = new URLSearchParams(window.location.search);
+    const TEST_MODE = chatParams.get("test") === "1";
+    document.body.dataset.testMode = TEST_MODE ? "on" : "off";
+    document.querySelectorAll("[data-test-only]").forEach(element => {
+      element.hidden = !TEST_MODE;
+    });
+    const requestedCommunityToken = String(chatParams.get("community") || "").trim();
+    const community = requestedCommunityToken
+      ? (window.WILD_LEDGER_GET_COMMUNITY?.(requestedCommunityToken) || null)
+      : (window.WILD_LEDGER_COMMUNITY || null);
+    const communitySelectionError = requestedCommunityToken && !community
+      ? `Unknown Wild Ledger community: ${requestedCommunityToken}`
+      : "";
+
+    const XRPL_SERVER = String(runtimeConfig.xrplWebSocket || "").trim();
+    const FEE_CUSHION = Number(runtimeConfig.xrplFeeCushion || 1.2);
+    const LEAP_ISSUER = String(runtimeConfig.leapIssuer || "").trim();
+    const LEAP_CURRENCY = String(runtimeConfig.leapCurrency || "").trim();
+    const WALLETCONNECT_PROJECT_ID = String(runtimeConfig.walletConnectProjectId || "").trim();
+    const NAMESPACE = String(community?.leapNamespace || "").trim();
+    const GREAT_CHAT_MEMO = NAMESPACE ? `${NAMESPACE}/BADGE=GREAT-CHAT` : "";
+
+    // Live-room Step 1A. Browser-safe Supabase connection for Realtime Broadcast.
+    // Runtime configuration may override these defaults. Never place a secret/service-role key here.
+    const SUPABASE_URL = String(runtimeConfig.supabaseUrl || "https://faenazefsogaoghuclis.supabase.co").trim();
+    const SUPABASE_PUBLISHABLE_KEY = String(runtimeConfig.supabasePublishableKey || "sb_publishable_8CRe36dcXHN_QV7dsVBMLg_xu6rw55M").trim();
+    const COMMUNITY_BACKEND_ID = String(community?.backendId || "").trim().toUpperCase();
+    const COMMUNITY_NAME = String(community?.communityName || "Community").trim();
+    const MANAGER_NAME = String(community?.managerName || community?.operatorName || "Community Manager").trim();
+    const MEMBER_SINGULAR = String(community?.memberSingular || "member").trim();
+    const MEMBER_PLURAL = String(community?.memberPlural || `${MEMBER_SINGULAR}s`).trim();
+    const LOUNGE_MEMBER_LABEL = MEMBER_SINGULAR ? MEMBER_SINGULAR.charAt(0).toUpperCase() + MEMBER_SINGULAR.slice(1) : "Member";
+    const LOUNGE_NAME = `${LOUNGE_MEMBER_LABEL} Lounge`;
+    const COMMUNITY_OPERATING_WALLET_LABEL = `${COMMUNITY_BACKEND_ID} Community Operating Wallet`;
+    const OPERATING_WALLET_LABEL = `${COMMUNITY_BACKEND_ID} Operating Wallet`;
+    const CHAT_CHANNEL_TOPIC = COMMUNITY_BACKEND_ID ? `wild-ledger:${COMMUNITY_BACKEND_ID}:lounge` : "";
+
+    const entryView = document.getElementById("entryView");
+    const chatView = document.getElementById("chatView");
+    const entryForm = document.getElementById("entryForm");
+    const nicknameInput = document.getElementById("nickname");
+    const messageForm = document.getElementById("messageForm");
+    const messageInput = document.getElementById("messageInput");
+    const messageSendButton = document.getElementById("messageSendButton");
+    const messages = document.getElementById("messages");
+    const roomConnectionDot = document.getElementById("roomConnectionDot");
+    const roomConnectionStatus = document.getElementById("roomConnectionStatus");
+    const pageDescription = document.getElementById("pageDescription");
+    const backLink = document.getElementById("backLink");
+    const communityKicker = document.getElementById("communityKicker");
+    const loungeHeading = document.getElementById("loungeHeading");
+    const loungeLede = document.getElementById("loungeLede");
+    const loungePanel = document.getElementById("loungePanel");
+    const roomTitle = document.getElementById("roomTitle");
+    const managerSampleAvatar = document.getElementById("managerSampleAvatar");
+    const managerSampleName = document.getElementById("managerSampleName");
+    const managerSampleTip = document.getElementById("managerSampleTip");
+    const demoParticipantRows = Array.from(document.querySelectorAll("[data-demo-participant]"));
+    const recognitionCode = document.getElementById("recognitionCode");
+    const xrpTipScrim = document.getElementById("xrpTipScrim");
+    const xrpManagerName = document.getElementById("xrpManagerName");
+    const xrpManagerNameSecondary = document.getElementById("xrpManagerNameSecondary");
+    const xrpAmount = document.getElementById("xrpAmount");
+    const xrpTestSender = document.getElementById("xrpTestSender");
+    const prepareXrpTip = document.getElementById("prepareXrpTip");
+    const xrpTipStatus = document.getElementById("xrpTipStatus");
+    const preparedXrpTipPanel = document.getElementById("preparedXrpTipPanel");
+    const preparedXrpTipJson = document.getElementById("preparedXrpTipJson");
+    const xrpSigningPanel = document.getElementById("xrpSigningPanel");
+    const xrpWalletStatus = document.getElementById("xrpWalletStatus");
+    const connectXrpWallet = document.getElementById("connectXrpWallet");
+    const signXrpTip = document.getElementById("signXrpTip");
+    const xrpQrWrap = document.getElementById("xrpQrWrap");
+    const xrpQrImage = document.getElementById("xrpQrImage");
+    const xrpQrUri = document.getElementById("xrpQrUri");
+    const signedXrpTipStatus = document.getElementById("signedXrpTipStatus");
+    const recognitionScrim = document.getElementById("recognitionScrim");
+    const recognitionName = document.getElementById("recognitionName");
+    const recognitionPrivateStatus = document.getElementById("recognitionPrivateStatus");
+    const recognitionAmountButtons = Array.from(document.querySelectorAll("[data-recognition-amount]"));
+    const prepareRecognition = document.getElementById("prepareRecognition");
+    const recognitionTestDestination = document.getElementById("recognitionTestDestination");
+    const preparedCheckPanel = document.getElementById("preparedCheckPanel");
+    const preparedCheckJson = document.getElementById("preparedCheckJson");
+    const signingCheckPanel = document.getElementById("signingCheckPanel");
+    const recognitionWalletStatus = document.getElementById("recognitionWalletStatus");
+    const connectRecognitionWallet = document.getElementById("connectRecognitionWallet");
+    const signRecognition = document.getElementById("signRecognition");
+    const recognitionQrWrap = document.getElementById("recognitionQrWrap");
+    const recognitionQrImage = document.getElementById("recognitionQrImage");
+    const recognitionQrUri = document.getElementById("recognitionQrUri");
+    const signedCheckStatus = document.getElementById("signedCheckStatus");
+    const recognitionCelebration = document.getElementById("recognitionCelebration");
+    const celebrationName = document.getElementById("celebrationName");
+    const celebrationAmount = document.getElementById("celebrationAmount");
+    const celebrationSparks = document.getElementById("celebrationSparks");
+    const xrpCelebration = document.getElementById("xrpCelebration");
+    const appreciationRipples = document.getElementById("appreciationRipples");
+    const appreciationTipper = document.getElementById("appreciationTipper");
+    const appreciationAmount = document.getElementById("appreciationAmount");
+    const appreciationRecipient = document.getElementById("appreciationRecipient");
+    const toast = document.getElementById("toast");
+    const roleViewButtons = Array.from(document.querySelectorAll("[data-role-view]"));
+    let celebrationTimer = null;
+    let xrpCelebrationTimer = null;
+
+    function initialsFor(value) {
+      return String(value || "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(part => part.charAt(0))
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "?";
+    }
+
+    function applyDemoParticipants() {
+      if (!community || !COMMUNITY_BACKEND_ID) return;
+      const words = ["One", "Two", "Three"];
+      demoParticipantRows.forEach((row, index) => {
+        const ordinal = words[index] || String(index + 1);
+        const visibleName = `${LOUNGE_MEMBER_LABEL} ${ordinal}`;
+        const sessionId = `${COMMUNITY_BACKEND_ID.toLowerCase()}-demo-member-${index + 1}`;
+        const name = row.querySelector("[data-demo-name]");
+        const avatar = row.querySelector("[data-demo-avatar]");
+        const greatChat = row.querySelector("[data-demo-great-chat]");
+        if (name) {
+          name.textContent = visibleName;
+          const demoRank = String(name.dataset.demoRank || "").trim();
+          if (demoRank) name.setAttribute("aria-label", `${visibleName} — ${demoRank}`);
+        }
+        if (avatar) avatar.textContent = initialsFor(visibleName);
+        if (greatChat) greatChat.dataset.greatChatSession = sessionId;
+      });
+    }
+
+    function applyCommunityDisplay() {
+      if (!community) {
+        document.title = "Community unavailable — Wild Ledger";
+        if (pageDescription) pageDescription.setAttribute("content", "Wild Ledger community could not be resolved.");
+        if (communityKicker) communityKicker.textContent = "Wild Ledger";
+        if (loungeHeading) loungeHeading.textContent = "Community not found";
+        if (loungeLede) loungeLede.textContent = communitySelectionError || "This Lounge does not have a selected community.";
+        if (roomTitle) roomTitle.textContent = "Community unavailable";
+        if (roomConnectionStatus) roomConnectionStatus.textContent = "Community unavailable";
+        if (entryForm) {
+          entryForm.querySelectorAll("input, button").forEach(control => { control.disabled = true; });
+        }
+        if (backLink) backLink.href = "communities.html";
+        return;
+      }
+
+      document.title = `${LOUNGE_NAME} — ${COMMUNITY_NAME}`;
+      if (pageDescription) pageDescription.setAttribute("content", `${LOUNGE_NAME} for ${COMMUNITY_NAME}.`);
+      if (communityKicker) communityKicker.textContent = COMMUNITY_NAME;
+      if (loungeHeading) loungeHeading.textContent = LOUNGE_NAME;
+      if (loungeLede) loungeLede.textContent = `A place for ${MEMBER_PLURAL} to pull up a chair, pick an alias, and join the conversation.`;
+      if (loungePanel) loungePanel.setAttribute("aria-label", `${LOUNGE_NAME} prototype`);
+      if (roomTitle) roomTitle.textContent = LOUNGE_NAME;
+      if (backLink) backLink.href = `memberRecord.html?community=${encodeURIComponent(COMMUNITY_BACKEND_ID)}`;
+      if (managerSampleAvatar) managerSampleAvatar.textContent = initialsFor(MANAGER_NAME);
+      if (managerSampleName) managerSampleName.textContent = MANAGER_NAME;
+      if (managerSampleTip) {
+        managerSampleTip.dataset.managerTipName = MANAGER_NAME;
+        managerSampleTip.textContent = `Tip ${MANAGER_NAME} in XRP`;
+      }
+      applyDemoParticipants();
+      if (xrpManagerName) xrpManagerName.textContent = MANAGER_NAME;
+      if (xrpManagerNameSecondary) xrpManagerNameSecondary.textContent = MANAGER_NAME;
+      if (appreciationRecipient) appreciationRecipient.textContent = MANAGER_NAME;
+      if (recognitionCode) recognitionCode.textContent = `${NAMESPACE}/BADGE = GREAT-CHAT`;
+      if (celebrationName) celebrationName.textContent = LOUNGE_MEMBER_LABEL;
+      if (appreciationTipper) appreciationTipper.textContent = LOUNGE_MEMBER_LABEL;
+      xrpTipStatus.textContent = `The XRP destination is not manually entered. Wild Ledger resolves the current canonical ${COMMUNITY_OPERATING_WALLET_LABEL} from XRPL.`;
+      recognitionWalletStatus.textContent = `Prepared Check is ready. Connect the current ${OPERATING_WALLET_LABEL} when you want to test signing.`;
+    }
+
+    applyCommunityDisplay();
+
+    function applyPrototypeRole(role) {
+      const nextRole = role === "member" ? "member" : "manager";
+      document.body.dataset.prototypeRole = nextRole;
+      roleViewButtons.forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.roleView === nextRole));
+      });
+
+      // Switching perspectives should never leave an action sheet open that
+      // belongs to the other role. The room itself remains unchanged.
+      if (nextRole === "member") {
+        recognitionScrim.classList.remove("open");
+      } else {
+        xrpTipScrim.classList.remove("open");
+      }
+      xrpCelebration.classList.remove("show");
+    }
+
+    roleViewButtons.forEach(button => {
+      button.addEventListener("click", () => applyPrototypeRole(button.dataset.roleView));
+    });
+
+    applyPrototypeRole(TEST_MODE ? document.body.dataset.prototypeRole : "member");
+
+    entryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!community) {
+        showChatToast(communitySelectionError || "Choose a valid Wild Ledger community first.");
+        return;
+      }
+      const name = nicknameInput.value.trim();
+      if (!name) return;
+
+      currentNickname = name;
+      entryView.style.display = "none";
+      chatView.style.display = "block";
+      messageInput.focus();
+      messages.scrollTop = messages.scrollHeight;
+    });
+
+    function hasSupabaseRealtimeConfig() {
+      return /^https:\/\//i.test(SUPABASE_URL)
+        && !SUPABASE_URL.includes("PASTE_SUPABASE")
+        && SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_");
+    }
+
+    function setRoomConnectionState(state, label) {
+      roomConnectionDot.classList.toggle("offline", state === "offline");
+      roomConnectionDot.classList.toggle("connecting", state === "connecting");
+      roomConnectionStatus.textContent = label;
+    }
+
+    function updateRoomPresenceCount() {
+      if (!chatChannel) return;
+      const state = chatChannel.presenceState();
+      const onlineCount = Object.values(state || {}).reduce((total, presences) => {
+        return total + (Array.isArray(presences) ? presences.length : 0);
+      }, 0);
+      setRoomConnectionState("online", `${onlineCount} online`);
+    }
+
+    function showChatToast(message, milliseconds = 2200) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), milliseconds);
+    }
+
+    function normalizedIncomingChatMessage(payload) {
+      const value = payload && typeof payload === "object" ? payload : {};
+      const nickname = String(value.nickname || "").trim().slice(0, 24);
+      const text = String(value.text || "").trim().slice(0, 280);
+      const senderId = String(value.senderId || "").trim().slice(0, 100);
+      const messageId = String(value.messageId || "").trim().slice(0, 120);
+      const sentAt = String(value.sentAt || "").trim();
+      if (!nickname || !text || !senderId || !messageId) return null;
+      return { nickname, text, senderId, messageId, sentAt };
+    }
+
+    function createTransferStatusNode(status, { isMe = false } = {}) {
+      const wrapper = document.createElement("span");
+      wrapper.className = "bolt-status";
+      wrapper.dataset.transferStatus = status;
+
+      const trigger = document.createElement("button");
+      trigger.className = "bolt-trigger";
+      trigger.type = "button";
+
+      const bolt = document.createElement("span");
+      bolt.className = "bolt";
+      bolt.setAttribute("aria-hidden", "true");
+      bolt.textContent = "⚡";
+      trigger.appendChild(bolt);
+
+      const popover = document.createElement("span");
+      popover.className = "bolt-popover";
+      popover.setAttribute("role", "tooltip");
+
+      const title = document.createElement("strong");
+      const copy = document.createElement("p");
+
+      if (status === "enabled") {
+        trigger.setAttribute("aria-label", "Great Chats enabled");
+        title.textContent = "Great Chats enabled";
+      } else if (status === "disabled") {
+        trigger.setAttribute("aria-label", "Great Chats not enabled yet");
+        title.textContent = "Great Chats not enabled yet";
+      } else {
+        trigger.setAttribute("aria-label", "Great Chats not enabled yet");
+        title.textContent = "Great Chats not enabled yet";
+      }
+
+      popover.append(title);
+
+      if (isMe && status !== "enabled") {
+        const futureButton = document.createElement("button");
+        futureButton.className = "bolt-future-action";
+        futureButton.type = "button";
+        futureButton.disabled = true;
+        futureButton.textContent = "Enable LEAP Transfers";
+        const construction = document.createElement("small");
+        construction.className = "bolt-construction";
+        construction.textContent = "Under construction";
+        popover.append(futureButton, construction);
+      }
+
+      wrapper.append(trigger, popover);
+      return wrapper;
+    }
+
+    function renderChatMessage({ nickname, text, sentAt, isMe = false }) {
+      const row = document.createElement("div");
+      row.className = isMe ? "message me" : "message";
+
+      const initials = String(nickname || "?")
+        .split(/\s+/)
+        .map(part => part.charAt(0))
+        .join("")
+        .slice(0,2)
+        .toUpperCase() || "?";
+
+      const parsedTime = sentAt ? new Date(sentAt) : new Date();
+      const displayTime = Number.isNaN(parsedTime.getTime())
+        ? new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"})
+        : parsedTime.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+
+      row.innerHTML = `
+        <div class="avatar"></div>
+        <div class="bubble">
+          <div class="meta">
+            <span class="name"></span>
+            <span class="transfer-status-slot"></span>
+            <span class="time"></span>
+          </div>
+          <div class="text"></div>
+        </div>`;
+
+      row.querySelector(".avatar").textContent = initials;
+      row.querySelector(".name").textContent = nickname;
+      const transferStatusSlot = row.querySelector(".transfer-status-slot");
+      if (isMe && transferStatusSlot) {
+        transferStatusSlot.replaceWith(createTransferStatusNode("pending", { isMe: true }));
+      } else if (transferStatusSlot) {
+        transferStatusSlot.remove();
+      }
+      row.querySelector(".time").textContent = displayTime;
+      row.querySelector(".text").textContent = text;
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function handleRealtimeChatMessage(payload) {
+      const message = normalizedIncomingChatMessage(payload);
+      if (!message || message.senderId === chatClientId) return;
+      renderChatMessage({ ...message, isMe: false });
+    }
+
+    async function initializeRealtimeChat() {
+      if (!community || !CHAT_CHANNEL_TOPIC) {
+        chatRealtimeReady = false;
+        setRoomConnectionState("offline", "Community unavailable");
+        return;
+      }
+      if (!hasSupabaseRealtimeConfig()) {
+        chatRealtimeReady = false;
+        setRoomConnectionState("offline", "Local preview — Supabase pending");
+        return;
+      }
+
+      setRoomConnectionState("connecting", "Connecting live room…");
+      try {
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+        });
+
+        chatChannel = supabaseClient.channel(CHAT_CHANNEL_TOPIC, {
+          config: {
+            broadcast: { self: false, ack: true },
+            presence: { key: chatClientId }
+          }
+        });
+
+        chatChannel
+          .on("broadcast", { event: "chat-message" }, ({ payload }) => handleRealtimeChatMessage(payload))
+          .on("presence", { event: "sync" }, () => updateRoomPresenceCount())
+          .subscribe(async (status, error) => {
+            if (status === "SUBSCRIBED") {
+              chatRealtimeReady = true;
+              setRoomConnectionState("online", "Live room connected");
+              try {
+                const trackStatus = await chatChannel.track({
+                  online_at: new Date().toISOString()
+                });
+                if (trackStatus !== "ok") {
+                  console.error("Supabase Presence track returned", trackStatus);
+                }
+              } catch (presenceError) {
+                console.error("Supabase Presence tracking failed", presenceError);
+              }
+              return;
+            }
+            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+              console.error("Supabase Realtime channel status", status, error || "");
+              chatRealtimeReady = false;
+              setRoomConnectionState("offline", "Live room disconnected");
+            }
+          });
+      } catch (error) {
+        console.error("Supabase Realtime initialization failed", error);
+        chatRealtimeReady = false;
+        setRoomConnectionState("offline", "Live room unavailable");
+      }
+    }
+
+    messageForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const text = messageInput.value.trim();
+      if (!text || !currentNickname) return;
+
+      const message = {
+        messageId: globalThis.crypto?.randomUUID?.() || `msg-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        senderId: chatClientId,
+        nickname: currentNickname.slice(0, 24),
+        text: text.slice(0, 280),
+        sentAt: new Date().toISOString()
+      };
+
+      if (!chatRealtimeReady || !chatChannel) {
+        renderChatMessage({ ...message, isMe: true });
+        messageInput.value = "";
+        showChatToast("Supabase is not connected yet — this message is only in this browser.");
+        return;
+      }
+
+      messageSendButton.disabled = true;
+      try {
+        const result = await chatChannel.send({
+          type: "broadcast",
+          event: "chat-message",
+          payload: message
+        });
+        if (result !== "ok") throw new Error(`Realtime send returned ${result || "an unknown result"}.`);
+
+        renderChatMessage({ ...message, isMe: true });
+        messageInput.value = "";
+      } catch (error) {
+        console.error("Realtime chat send failed", error);
+        setRoomConnectionState("offline", "Live room send failed");
+        showChatToast("Message was not sent to the live room. Your text is still here so you can try again.");
+      } finally {
+        messageSendButton.disabled = false;
+        messageInput.focus();
+      }
+    });
+
+    void initializeRealtimeChat();
+
+    window.addEventListener("pagehide", () => {
+      if (chatChannel) {
+        void chatChannel.untrack().catch(() => {});
+      }
+    });
+
+    document.querySelectorAll("[data-manager-tip-name]").forEach(button => {
+      button.addEventListener("click", () => {
+        currentXrpManagerName = button.dataset.managerTipName || MANAGER_NAME;
+        xrpManagerName.textContent = currentXrpManagerName;
+        xrpManagerNameSecondary.textContent = currentXrpManagerName;
+        xrpAmount.value = "";
+        xrpTestSender.value = "";
+        preparedXrpTipTx = null;
+        preparedXrpTipPanel.classList.remove("show");
+        preparedXrpTipJson.textContent = "";
+        resetXrpTipSigningState({ hidePanel: true, disconnect: true });
+        xrpTipStatus.textContent = `The XRP destination is not manually entered. Wild Ledger resolves the current canonical ${COMMUNITY_OPERATING_WALLET_LABEL} from XRPL.`;
+        prepareXrpTip.disabled = true;
+        xrpTipScrim.classList.add("open");
+        setTimeout(() => xrpAmount.focus(), 0);
+      });
+    });
+
+    document.getElementById("closeXrpTip").addEventListener("click", () => {
+      xrpTipScrim.classList.remove("open");
+      void disconnectXrpTipSigner();
+    });
+
+    xrpTipScrim.addEventListener("click", (event) => {
+      if (event.target === xrpTipScrim) {
+        xrpTipScrim.classList.remove("open");
+        void disconnectXrpTipSigner();
+      }
+    });
+
+    function xrpTextToDrops(value) {
+      const text = String(value || "").trim();
+      if (!/^(?:0|[1-9]\d*)(?:\.\d{1,6})?$/.test(text)) {
+        throw new Error("Enter a positive XRP amount with no more than 6 decimal places.");
+      }
+      const [wholePart, fractionPart = ""] = text.split(".");
+      const drops = (BigInt(wholePart) * 1000000n) + BigInt((fractionPart + "000000").slice(0, 6));
+      if (drops <= 0n) throw new Error("XRP tip amount must be greater than zero.");
+      return drops.toString();
+    }
+
+    function buildXrpTipPayment({ account, destination, amountText }) {
+      if (!isClassicAddress(account)) throw new Error("The member test sender is not a valid XRPL classic address.");
+      if (!isClassicAddress(destination)) throw new Error(`The canonical ${COMMUNITY_OPERATING_WALLET_LABEL} could not be resolved.`);
+      return {
+        TransactionType: "Payment",
+        Account: account,
+        Destination: destination,
+        Amount: xrpTextToDrops(amountText)
+      };
+    }
+
+    function assertPreparedXrpTip(tx, expected) {
+      if (!tx || tx.TransactionType !== "Payment") throw new Error("XRPL returned an unexpected transaction type.");
+      if (tx.Account !== expected.Account) throw new Error("Prepared XRP Payment sender changed unexpectedly.");
+      if (tx.Destination !== expected.Destination) throw new Error("Prepared XRP Payment destination changed unexpectedly.");
+      if (String(tx.Amount || "") !== String(expected.Amount || "")) throw new Error("Prepared XRP Payment amount changed unexpectedly.");
+    }
+
+    async function disconnectXrpTipSigner() {
+      const activeSigner = xrpTipSigner;
+      xrpTipSigner = null;
+      connectedXrpTipAccount = "";
+      if (activeSigner) {
+        try { await activeSigner.disconnect(); } catch (_) {}
+      }
+    }
+
+    function resetXrpTipSigningState({ hidePanel = true, disconnect = false } = {}) {
+      signedXrpTipBlob = "";
+      connectXrpWallet.disabled = true;
+      signXrpTip.disabled = true;
+      xrpQrWrap.classList.remove("show");
+      xrpQrImage.removeAttribute("src");
+      xrpQrUri.textContent = "";
+      xrpWalletStatus.textContent = "Prepare the XRP tip before connecting Bifrost.";
+      signedXrpTipStatus.textContent = "Not signed.";
+      if (hidePanel) xrpSigningPanel.classList.remove("show");
+      if (disconnect) void disconnectXrpTipSigner();
+    }
+
+    function invalidatePreparedXrpTip() {
+      preparedXrpTipTx = null;
+      preparedXrpTipPanel.classList.remove("show");
+      preparedXrpTipJson.textContent = "";
+      resetXrpTipSigningState({ hidePanel: true, disconnect: true });
+    }
+
+    async function connectXrpTipSigner() {
+      if (!preparedXrpTipTx) throw new Error("Prepare the XRP tip first.");
+      if (!WALLETCONNECT_PROJECT_ID) throw new Error("WalletConnect is not configured for Wild Ledger.");
+
+      const memberSender = xrpTestSender.value.trim();
+      if (!isClassicAddress(memberSender) || preparedXrpTipTx.Account !== memberSender) {
+        throw new Error("The member sender changed after preparation. Prepare the XRP tip again.");
+      }
+
+      const currentOperatingWallet = await resolveCurrentOperatingWallet();
+      if (preparedXrpTipTx.Destination !== currentOperatingWallet) {
+        throw new Error(`The ${COMMUNITY_OPERATING_WALLET_LABEL} changed after preparation. Prepare the XRP tip again.`);
+      }
+
+      await disconnectXrpTipSigner();
+      xrpTipSigner = new WalletConnectXrplSigner({
+        projectId: WALLETCONNECT_PROJECT_ID,
+        metadata: {
+          name: "Wild Ledger XRP Tip",
+          description: `Sign a prepared member-to-${COMMUNITY_BACKEND_ID} XRP tip`,
+          url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+          icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+        }
+      });
+
+      xrpWalletStatus.textContent = "Initializing WalletConnect…";
+      const connection = await xrpTipSigner.connect({
+        onUri: async uri => {
+          const qrData = await QRCode.toDataURL(uri, { width: 480, margin: 2, errorCorrectionLevel: "M" });
+          xrpQrImage.src = qrData;
+          xrpQrUri.textContent = uri;
+          xrpQrWrap.classList.add("show");
+          xrpWalletStatus.textContent = "QR ready. Approve the connection in the member's Bifrost.";
+        }
+      });
+
+      xrpQrWrap.classList.remove("show");
+      connectedXrpTipAccount = connection.account;
+      if (connectedXrpTipAccount !== memberSender) {
+        const wrongAccount = connectedXrpTipAccount;
+        await disconnectXrpTipSigner();
+        throw new Error(`Wrong wallet connected: ${wrongAccount}. This tip was prepared from ${memberSender}.`);
+      }
+
+      xrpWalletStatus.textContent = `${connection.walletName} connected as the member sender.`;
+      signXrpTip.disabled = false;
+    }
+
+    async function signPreparedXrpTip() {
+      if (!preparedXrpTipTx || !xrpTipSigner || !connectedXrpTipAccount) {
+        throw new Error("Prepare the XRP tip and connect the member's Bifrost first.");
+      }
+
+      const memberSender = xrpTestSender.value.trim();
+      const currentOperatingWallet = await resolveCurrentOperatingWallet();
+      if (preparedXrpTipTx.Account !== memberSender || connectedXrpTipAccount !== memberSender) {
+        throw new Error("The member sender changed before signing. Prepare the XRP tip again.");
+      }
+      if (preparedXrpTipTx.Destination !== currentOperatingWallet) {
+        throw new Error(`The ${COMMUNITY_OPERATING_WALLET_LABEL} changed before signing. Prepare the XRP tip again.`);
+      }
+
+      signXrpTip.disabled = true;
+      signedXrpTipStatus.textContent = "Waiting for the member's Bifrost approval…";
+      const result = await xrpTipSigner.signTransaction(preparedXrpTipTx);
+      signedXrpTipBlob = result.signedBlob;
+      if (!signedXrpTipBlob) throw new Error("Bifrost did not return a signed XRP Payment.");
+      signedXrpTipStatus.textContent = `Signed XRP Payment returned by Bifrost (${result.signatureType}; ${signedXrpTipBlob.length} hex characters). Nothing was submitted.`;
+      xrpWalletStatus.textContent = "Signature complete. This XRP-tip Step 2 build stops here.";
+    }
+
+    function updateXrpPrepareReady() {
+      let amountValid = false;
+      try { xrpTextToDrops(xrpAmount.value); amountValid = true; } catch (_) {}
+      prepareXrpTip.disabled = !(amountValid && isClassicAddress(xrpTestSender.value.trim()));
+    }
+
+    xrpAmount.addEventListener("input", () => {
+      invalidatePreparedXrpTip();
+      updateXrpPrepareReady();
+    });
+    xrpTestSender.addEventListener("input", () => {
+      invalidatePreparedXrpTip();
+      updateXrpPrepareReady();
+    });
+
+    prepareXrpTip.addEventListener("click", async () => {
+      prepareXrpTip.disabled = true;
+      preparedXrpTipTx = null;
+      preparedXrpTipPanel.classList.remove("show");
+      preparedXrpTipJson.textContent = "";
+      resetXrpTipSigningState({ hidePanel: true, disconnect: true });
+      xrpTipStatus.textContent = `Resolving the canonical ${COMMUNITY_OPERATING_WALLET_LABEL} and asking XRPL to prepare the XRP Payment…`;
+
+      try {
+        const sender = xrpTestSender.value.trim();
+        const destination = await resolveCurrentOperatingWallet();
+        const template = buildXrpTipPayment({
+          account: sender,
+          destination,
+          amountText: xrpAmount.value
+        });
+        const result = await prepareTransaction({
+          serverUrl: XRPL_SERVER,
+          txJson: template,
+          feeCushion: FEE_CUSHION
+        });
+        assertPreparedXrpTip(result.preparedTx, template);
+        preparedXrpTipTx = result.preparedTx;
+        preparedXrpTipJson.textContent = JSON.stringify(preparedXrpTipTx, null, 2);
+        preparedXrpTipPanel.classList.add("show");
+        xrpSigningPanel.classList.add("show");
+        connectXrpWallet.disabled = !WALLETCONNECT_PROJECT_ID;
+        xrpWalletStatus.textContent = WALLETCONNECT_PROJECT_ID
+          ? "Prepared XRP Payment is ready. Connect the member's Bifrost when you want to test the signature."
+          : "Prepared XRP Payment is ready, but WalletConnect is not configured.";
+        xrpTipStatus.textContent = `Prepared for ${currentNickname || MEMBER_SINGULAR} → current canonical ${OPERATING_WALLET_LABEL} ${destination}. Nothing has been signed or submitted.`;
+        toast.textContent = "XRP tip Payment prepared — ready for the separate Bifrost signing test.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+      } catch (error) {
+        resetXrpTipSigningState({ hidePanel: true, disconnect: true });
+        xrpTipStatus.textContent = error?.message || String(error);
+        toast.textContent = "XRP tip Payment was not prepared.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+      } finally {
+        updateXrpPrepareReady();
+      }
+    });
+
+    connectXrpWallet.addEventListener("click", async () => {
+      connectXrpWallet.disabled = true;
+      signXrpTip.disabled = true;
+      signedXrpTipStatus.textContent = "Not signed.";
+      try {
+        await connectXrpTipSigner();
+        toast.textContent = "Member Bifrost connected for the XRP tip.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2000);
+      } catch (error) {
+        xrpWalletStatus.textContent = error?.message || String(error);
+        toast.textContent = "Member Bifrost was not connected for XRP-tip signing.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+        connectXrpWallet.disabled = !preparedXrpTipTx || !WALLETCONNECT_PROJECT_ID;
+      }
+    });
+
+    signXrpTip.addEventListener("click", async () => {
+      signXrpTip.disabled = true;
+      try {
+        await signPreparedXrpTip();
+        toast.textContent = "XRP tip signed — hard stop reached, nothing submitted.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2400);
+      } catch (error) {
+        signedXrpTipStatus.textContent = error?.message || String(error);
+        toast.textContent = "XRP tip was not signed.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+        signXrpTip.disabled = !(preparedXrpTipTx && xrpTipSigner && connectedXrpTipAccount);
+      }
+    });
+
+    // The public room carries only an opaque live-session ID. A real XRPL destination
+    // must never be embedded in chat.html. For this prepare-only prototype, the Manager
+    // can paste a destination into an in-memory map for the current tab. Production will
+    // replace this with the private Worker/WebSocket session lookup.
+    function resolvePrivateRecognitionDestination(participantSessionId) {
+      if (!participantSessionId) return null;
+      const destination = privateTestDestinations.get(participantSessionId) || "";
+      return {
+        participantSessionId,
+        destination,
+        destinationStatus: destination ? "private-destination-ready" : "private-session-ready"
+      };
+    }
+
+    function validWholeLeap(value) {
+      return /^[1-9]\d{0,14}$/.test(String(value || "").trim());
+    }
+
+    function buildGreatChatCheck({ account, destination, amount }) {
+      if (!community) throw new Error("Community configuration is unavailable.");
+      if (!NAMESPACE) throw new Error("Community LEAP namespace is unavailable.");
+      if (!isClassicAddress(account)) throw new Error("Canonical Community Operating Wallet could not be resolved.");
+      if (!isClassicAddress(destination)) throw new Error("The private Great Chat destination is not a valid XRPL classic address.");
+      if (!validWholeLeap(amount)) throw new Error("LEAP amount must be a positive whole number.");
+      if (!LEAP_ISSUER || !LEAP_CURRENCY) throw new Error("Canonical LEAP asset configuration is unavailable.");
+
+      return {
+        TransactionType: "CheckCreate",
+        Account: account,
+        Destination: destination,
+        SendMax: {
+          currency: LEAP_CURRENCY,
+          issuer: LEAP_ISSUER,
+          value: String(amount)
+        },
+        Memos: [{ Memo: { MemoData: textToHex(GREAT_CHAT_MEMO) } }]
+      };
+    }
+
+    function assertPreparedGreatChat(tx, expected) {
+      if (!tx || tx.TransactionType !== "CheckCreate") throw new Error("XRPL returned an unexpected transaction type.");
+      if (tx.Account !== expected.Account) throw new Error("Prepared Check account changed unexpectedly.");
+      if (tx.Destination !== expected.Destination) throw new Error("Prepared Check destination changed unexpectedly.");
+      if (String(tx.SendMax?.currency || "") !== LEAP_CURRENCY || String(tx.SendMax?.issuer || "") !== LEAP_ISSUER || String(tx.SendMax?.value || "") !== String(expected.SendMax.value)) {
+        throw new Error("Prepared Check LEAP amount or asset identity changed unexpectedly.");
+      }
+      if (String(tx.Memos?.[0]?.Memo?.MemoData || "") !== String(expected.Memos?.[0]?.Memo?.MemoData || "")) {
+        throw new Error("Prepared Check memo changed unexpectedly.");
+      }
+      if (tx.Expiration !== undefined) throw new Error("Prepared Great Chat Check unexpectedly contains an on-ledger expiration.");
+    }
+
+    async function resolveCurrentOperatingWallet() {
+      if (!community) throw new Error("Community configuration is unavailable.");
+      if (!XRPL_SERVER) throw new Error("XRPL WebSocket configuration is unavailable.");
+      clearCommunityAuthorityCache();
+      const authority = await resolveCommunityAuthority({ community, serverUrl: XRPL_SERVER, force: true });
+      if (!authority?.authorityEstablished || !isClassicAddress(authority.currentAccount)) {
+        throw new Error("Canonical Community Operating Wallet authority is not established on XRPL.");
+      }
+      return authority.currentAccount;
+    }
+
+    async function disconnectRecognitionSigner() {
+      const activeSigner = recognitionSigner;
+      recognitionSigner = null;
+      connectedRecognitionAccount = "";
+      if (activeSigner) {
+        try { await activeSigner.disconnect(); } catch (_) {}
+      }
+    }
+
+    function resetGreatChatSigningState({ hidePanel = true, disconnect = false } = {}) {
+      preparedGreatChatTx = null;
+      signedGreatChatBlob = "";
+      signRecognition.disabled = true;
+      connectRecognitionWallet.disabled = true;
+      recognitionQrWrap.classList.remove("show");
+      recognitionQrImage.removeAttribute("src");
+      recognitionQrUri.textContent = "";
+      recognitionWalletStatus.textContent = "Prepare a Great Chat Check before connecting Bifrost.";
+      signedCheckStatus.textContent = "Not signed.";
+      if (hidePanel) signingCheckPanel.classList.remove("show");
+      if (disconnect) void disconnectRecognitionSigner();
+    }
+
+    async function connectGreatChatSigner() {
+      if (!preparedGreatChatTx) throw new Error("Prepare the Great Chat Check first.");
+      if (!WALLETCONNECT_PROJECT_ID) throw new Error("WalletConnect is not configured for Wild Ledger.");
+
+      const currentOperatingWallet = await resolveCurrentOperatingWallet();
+      if (preparedGreatChatTx.Account !== currentOperatingWallet) {
+        throw new Error(`The ${OPERATING_WALLET_LABEL} changed after preparation. Prepare the Great Chat Check again.`);
+      }
+
+      await disconnectRecognitionSigner();
+      recognitionSigner = new WalletConnectXrplSigner({
+        projectId: WALLETCONNECT_PROJECT_ID,
+        metadata: {
+          name: "Wild Ledger Great Chat",
+          description: `Sign a prepared ${COMMUNITY_BACKEND_ID} GREAT-CHAT recognition Check`,
+          url: location.protocol.startsWith("http") ? location.origin : "https://example.invalid",
+          icons: [location.protocol.startsWith("http") ? `${location.origin}/favicon.ico` : "https://example.invalid/favicon.ico"]
+        }
+      });
+
+      recognitionWalletStatus.textContent = "Initializing WalletConnect…";
+      const connection = await recognitionSigner.connect({
+        onUri: async uri => {
+          const qrData = await QRCode.toDataURL(uri, { width: 480, margin: 2, errorCorrectionLevel: "M" });
+          recognitionQrImage.src = qrData;
+          recognitionQrUri.textContent = uri;
+          recognitionQrWrap.classList.add("show");
+          recognitionWalletStatus.textContent = "QR ready. Approve the connection in Bifrost.";
+        }
+      });
+
+      recognitionQrWrap.classList.remove("show");
+      connectedRecognitionAccount = connection.account;
+      if (connectedRecognitionAccount !== currentOperatingWallet) {
+        const wrongAccount = connectedRecognitionAccount;
+        await disconnectRecognitionSigner();
+        throw new Error(`Wrong wallet connected: ${wrongAccount}. The current ${OPERATING_WALLET_LABEL} is ${currentOperatingWallet}.`);
+      }
+
+      recognitionWalletStatus.textContent = `${connection.walletName} connected as the current ${OPERATING_WALLET_LABEL}.`;
+      signRecognition.disabled = false;
+    }
+
+    async function signGreatChatPreparedCheck() {
+      if (!preparedGreatChatTx || !recognitionSigner || !connectedRecognitionAccount) {
+        throw new Error("Prepare the Check and connect Bifrost first.");
+      }
+
+      const currentOperatingWallet = await resolveCurrentOperatingWallet();
+      if (connectedRecognitionAccount !== currentOperatingWallet || preparedGreatChatTx.Account !== currentOperatingWallet) {
+        throw new Error(`${OPERATING_WALLET_LABEL} authority changed before signing. Prepare the Check again.`);
+      }
+
+      signRecognition.disabled = true;
+      signedCheckStatus.textContent = "Waiting for Bifrost approval…";
+      const result = await recognitionSigner.signTransaction(preparedGreatChatTx);
+      signedGreatChatBlob = result.signedBlob;
+      if (!signedGreatChatBlob) throw new Error("Bifrost did not return a signed transaction.");
+      signedCheckStatus.textContent = `Signed transaction returned by Bifrost (${result.signatureType}; ${signedGreatChatBlob.length} hex characters). Nothing was submitted.`;
+      recognitionWalletStatus.textContent = "Signature complete. This Step 2B build stops here.";
+    }
+
+    document.querySelectorAll(".meta").forEach(meta => {
+      const recognizeButton = meta.querySelector(".recognize-btn[data-great-chat-session]");
+      if (!recognizeButton) return;
+      const hasLeapTransfersEnabled = meta.querySelector('.bolt-status')?.dataset.transferStatus === "enabled";
+      if (!hasLeapTransfersEnabled) {
+        recognizeButton.disabled = true;
+        recognizeButton.setAttribute("aria-disabled", "true");
+        recognizeButton.title = "LEAP transfers not enabled";
+      }
+    });
+
+    document.querySelectorAll("[data-great-chat-session]").forEach(button => {
+      button.addEventListener("click", () => {
+        if (button.disabled) return;
+
+        const meta = button.closest(".meta");
+        const visibleName = meta?.querySelector(".name")?.textContent?.trim() || "Leaper";
+        const participantSessionId = button.dataset.greatChatSession || "";
+        const privateDestination = resolvePrivateRecognitionDestination(participantSessionId);
+        if (!privateDestination) {
+          toast.textContent = `Private Great Chat destination is unavailable for ${visibleName}.`;
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 1800);
+          return;
+        }
+
+        currentRecognitionName = visibleName;
+        currentRecognitionSessionId = privateDestination.participantSessionId;
+        selectedRecognitionAmount = "";
+        recognitionName.textContent = currentRecognitionName;
+        recognitionPrivateStatus.textContent = `${currentRecognitionName} is targeted by a private live-session ID. Paste a test destination when you are ready to prepare a real Check.`;
+        recognitionTestDestination.value = privateTestDestinations.get(currentRecognitionSessionId) || "";
+        recognitionAmountButtons.forEach(amountButton => amountButton.classList.remove("selected"));
+        preparedCheckPanel.classList.remove("show");
+        preparedCheckJson.textContent = "";
+        resetGreatChatSigningState({ hidePanel: true, disconnect: true });
+        prepareRecognition.disabled = true;
+        recognitionScrim.classList.add("open");
+      });
+    });
+
+    recognitionAmountButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        selectedRecognitionAmount = button.dataset.recognitionAmount || "";
+        recognitionAmountButtons.forEach(amountButton => {
+          amountButton.classList.toggle("selected", amountButton === button);
+        });
+        preparedCheckPanel.classList.remove("show");
+        preparedCheckJson.textContent = "";
+        resetGreatChatSigningState({ hidePanel: true, disconnect: true });
+        prepareRecognition.disabled = !(selectedRecognitionAmount && isClassicAddress(recognitionTestDestination.value.trim()));
+      });
+    });
+
+    recognitionTestDestination.addEventListener("input", () => {
+      const destination = recognitionTestDestination.value.trim();
+      if (currentRecognitionSessionId && isClassicAddress(destination)) {
+        privateTestDestinations.set(currentRecognitionSessionId, destination);
+        recognitionPrivateStatus.textContent = `${currentRecognitionName} has a private test destination in this tab. It has not been saved or published.`;
+      } else if (currentRecognitionSessionId) {
+        privateTestDestinations.delete(currentRecognitionSessionId);
+        recognitionPrivateStatus.textContent = `${currentRecognitionName} is targeted by a private live-session ID. Paste a valid r... address to prepare the Check.`;
+      }
+      preparedCheckPanel.classList.remove("show");
+      preparedCheckJson.textContent = "";
+      resetGreatChatSigningState({ hidePanel: true, disconnect: true });
+      prepareRecognition.disabled = !(selectedRecognitionAmount && isClassicAddress(destination));
+    });
+
+    document.getElementById("closeRecognition").addEventListener("click", () => {
+      recognitionScrim.classList.remove("open");
+      void disconnectRecognitionSigner();
+    });
+
+    recognitionScrim.addEventListener("click", (event) => {
+      if (event.target === recognitionScrim) {
+        recognitionScrim.classList.remove("open");
+        void disconnectRecognitionSigner();
+      }
+    });
+
+    function formatXrpAmount(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return String(value);
+      if (Number.isInteger(numeric)) return String(numeric);
+      return numeric.toLocaleString([], { maximumFractionDigits: 6 });
+    }
+
+    function addXrpSystemEvent({ tipper, amount, recipient }) {
+      const row = document.createElement("div");
+      row.className = "system-event appreciation-event";
+
+      const pill = document.createElement("div");
+      pill.className = "system-event-pill";
+      pill.textContent = `✦ ${tipper} sent ${formatXrpAmount(amount)} XRP to ${recipient}.`;
+
+      row.appendChild(pill);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function playXrpCelebration({ tipper, amount, recipient }) {
+      appreciationTipper.textContent = tipper;
+      appreciationAmount.textContent = formatXrpAmount(amount);
+      appreciationRecipient.textContent = recipient;
+      appreciationRipples.textContent = "";
+
+      for (let i = 0; i < 3; i += 1) {
+        const ripple = document.createElement("span");
+        ripple.className = "appreciation-ripple";
+        ripple.style.setProperty("--ripple-delay", `${i * 0.15}s`);
+        appreciationRipples.appendChild(ripple);
+      }
+
+      if (xrpCelebrationTimer) clearTimeout(xrpCelebrationTimer);
+      xrpCelebration.classList.remove("show");
+      void xrpCelebration.offsetWidth;
+      xrpCelebration.classList.add("show");
+      xrpCelebrationTimer = setTimeout(() => {
+        xrpCelebration.classList.remove("show");
+      }, 1820);
+    }
+
+    function handleXrpTipCelebrated(event) {
+      playXrpCelebration(event);
+      addXrpSystemEvent(event);
+    }
+
+    function addRecognitionSystemEvent({ nickname, amount }) {
+      const row = document.createElement("div");
+      row.className = "system-event";
+
+      const pill = document.createElement("div");
+      pill.className = "system-event-pill";
+      pill.textContent = `⚡ ${nickname} was awarded ${amount} LEAP — Great Chat!`;
+
+      row.appendChild(pill);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function playRecognitionCelebration({ nickname, amount }) {
+      const level = Math.max(1, Math.min(3, Number(amount) || 1));
+      celebrationName.textContent = nickname;
+      celebrationAmount.textContent = String(level);
+      recognitionCelebration.className = `celebration level-${level}`;
+      celebrationSparks.textContent = "";
+
+      // More LEAP = a slightly bigger burst, while every award is still unmistakable.
+      const sparkCountByLevel = {1: 18, 2: 28, 3: 40};
+      const sparkCount = sparkCountByLevel[level] || 18;
+      for (let i = 0; i < sparkCount; i += 1) {
+        const angle = (Math.PI * 2 * i / sparkCount) + ((i % 2) * 0.12);
+        const baseSparkDistanceByLevel = {1: 138, 2: 172, 3: 212};
+        const distance = (baseSparkDistanceByLevel[level] || 138) + ((i % 4) * 16);
+        const spark = document.createElement("span");
+        spark.className = "celebration-spark";
+        spark.textContent = i % 3 === 0 ? "⚡" : "✦";
+        spark.style.setProperty("--spark-x", `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty("--spark-y", `${Math.sin(angle) * distance}px`);
+        spark.style.setProperty("--spark-rotation", `${(i * 41) - 140}deg`);
+        spark.style.setProperty("--spark-delay", `${(i % 6) * 0.03}s`);
+        spark.style.setProperty("--spark-size", `${0.88 + (level * 0.09) + ((i % 3) * 0.13)}rem`);
+        celebrationSparks.appendChild(spark);
+      }
+
+      // Full-screen confetti makes the shared-room moment obvious even on a phone.
+      const confettiColors = ["#d2a34f", "#2f7481", "#b84f32", "#dbece8", "#16384b"];
+      const confettiCountByLevel = {1: 28, 2: 44, 3: 64};
+      const confettiCount = confettiCountByLevel[level] || 28;
+      for (let i = 0; i < confettiCount; i += 1) {
+        const confetti = document.createElement("span");
+        confetti.className = "celebration-confetti";
+        confetti.style.setProperty("--confetti-left", `${(i * 23 + (i % 5) * 7) % 100}%`);
+        const confettiDriftBaseByLevel = {1: 26, 2: 32, 3: 40};
+        confetti.style.setProperty("--confetti-drift", `${((i % 7) - 3) * (confettiDriftBaseByLevel[level] || 26)}px`);
+        confetti.style.setProperty("--confetti-delay", `${(i % 9) * 0.055}s`);
+        const confettiDurationBaseByLevel = {1: 2.10, 2: 2.28, 3: 2.48};
+        confetti.style.setProperty("--confetti-duration", `${(confettiDurationBaseByLevel[level] || 2.10) + ((i % 5) * 0.16)}s`);
+        confetti.style.setProperty("--confetti-rotation", `${(i * 47) % 180}deg`);
+        confetti.style.setProperty("--confetti-w", `${6 + (i % 4) * 2}px`);
+        confetti.style.setProperty("--confetti-h", `${10 + (i % 3) * 4}px`);
+        confetti.style.setProperty("--confetti-color", confettiColors[i % confettiColors.length]);
+        celebrationSparks.appendChild(confetti);
+      }
+
+      if (celebrationTimer) clearTimeout(celebrationTimer);
+      recognitionCelebration.classList.remove("show");
+      void recognitionCelebration.offsetWidth;
+      recognitionCelebration.classList.add("show");
+      celebrationTimer = setTimeout(() => {
+        recognitionCelebration.classList.remove("show");
+      }, 2220);
+    }
+
+    // This is the important seam: today the prototype calls this locally.
+    // Later the Cloudflare Worker/WebSocket can send the same event to every
+    // connected browser after it verifies XRPL validation.
+    function handleRecognitionAwarded(event) {
+      playRecognitionCelebration(event);
+      addRecognitionSystemEvent(event);
+    }
+
+    prepareRecognition.addEventListener("click", async () => {
+      if (!selectedRecognitionAmount || !currentRecognitionName || !currentRecognitionSessionId) return;
+
+      const privateDestination = resolvePrivateRecognitionDestination(currentRecognitionSessionId);
+      if (!privateDestination?.destination || !isClassicAddress(privateDestination.destination)) {
+        toast.textContent = `Private Great Chat destination is unavailable for ${currentRecognitionName}.`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1800);
+        return;
+      }
+
+      prepareRecognition.disabled = true;
+      preparedCheckPanel.classList.remove("show");
+      preparedCheckJson.textContent = "";
+      resetGreatChatSigningState({ hidePanel: true, disconnect: true });
+      recognitionPrivateStatus.textContent = `Resolving ${COMMUNITY_BACKEND_ID} authority and asking XRPL to prepare ${currentRecognitionName}'s Great Chat Check…`;
+
+      try {
+        const operatingWallet = await resolveCurrentOperatingWallet();
+        const transactionTemplate = buildGreatChatCheck({
+          account: operatingWallet,
+          destination: privateDestination.destination,
+          amount: selectedRecognitionAmount
+        });
+        const result = await prepareTransaction({
+          serverUrl: XRPL_SERVER,
+          txJson: transactionTemplate,
+          feeCushion: FEE_CUSHION
+        });
+        assertPreparedGreatChat(result.preparedTx, transactionTemplate);
+        preparedGreatChatTx = result.preparedTx;
+
+        preparedCheckJson.textContent = JSON.stringify(preparedGreatChatTx, null, 2);
+        preparedCheckPanel.classList.add("show");
+        signingCheckPanel.classList.add("show");
+        connectRecognitionWallet.disabled = !WALLETCONNECT_PROJECT_ID;
+        recognitionWalletStatus.textContent = WALLETCONNECT_PROJECT_ID
+          ? "Prepared Check is ready. Connect Bifrost when you want to test the signature."
+          : "Prepared Check is ready, but WalletConnect is not configured.";
+        recognitionPrivateStatus.textContent = `Prepared successfully for ${currentRecognitionName}. Nothing has been signed or submitted.`;
+        toast.textContent = "Great Chat Check prepared — ready for the separate Bifrost signing test.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+      } catch (error) {
+        resetGreatChatSigningState({ hidePanel: true, disconnect: true });
+        recognitionPrivateStatus.textContent = error?.message || String(error);
+        toast.textContent = "Great Chat Check was not prepared.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+      } finally {
+        prepareRecognition.disabled = !(selectedRecognitionAmount && isClassicAddress(recognitionTestDestination.value.trim()));
+      }
+    });
+
+    connectRecognitionWallet.addEventListener("click", async () => {
+      connectRecognitionWallet.disabled = true;
+      signRecognition.disabled = true;
+      signedCheckStatus.textContent = "Not signed.";
+      try {
+        await connectGreatChatSigner();
+        toast.textContent = `Bifrost connected to the current ${OPERATING_WALLET_LABEL}.`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2000);
+      } catch (error) {
+        recognitionWalletStatus.textContent = error?.message || String(error);
+        toast.textContent = "Bifrost was not connected for Great Chat signing.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+        connectRecognitionWallet.disabled = !preparedGreatChatTx || !WALLETCONNECT_PROJECT_ID;
+      }
+    });
+
+    signRecognition.addEventListener("click", async () => {
+      signRecognition.disabled = true;
+      try {
+        await signGreatChatPreparedCheck();
+        toast.textContent = "Great Chat Check signed — hard stop reached, nothing submitted.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2400);
+      } catch (error) {
+        signedCheckStatus.textContent = error?.message || String(error);
+        toast.textContent = "Great Chat Check was not signed.";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+        signRecognition.disabled = !(preparedGreatChatTx && recognitionSigner && connectedRecognitionAccount);
+      }
+    });
+
+  </script>
+</body>
+</html>
