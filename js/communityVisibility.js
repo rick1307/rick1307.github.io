@@ -363,7 +363,8 @@ export async function submitCommunityVisibility({
   expectedOwner,
   communityId,
   hidden,
-  onSubmitted = null
+  onSubmitted = null,
+  onValidated = null
 } = {}) {
   const server = String(serverUrl || "").trim();
   const id = normalizeCommunityId(communityId);
@@ -427,6 +428,13 @@ export async function submitCommunityVisibility({
     });
 
     if (recovered.record) {
+      if (typeof onValidated === "function") {
+        onValidated({
+          txHash: acceptedSubmission?.txHash || error?.txHash || recovered.record.hash || "",
+          ledgerIndex: recovered.record.ledger ?? null,
+          recovered: true
+        });
+      }
       return {
         result: {
           txHash: acceptedSubmission?.txHash || error?.txHash || recovered.record.hash || "",
@@ -452,6 +460,14 @@ export async function submitCommunityVisibility({
 
   if (result.finalResult !== "tesSUCCESS") {
     throw new Error(`Validated visibility transaction returned ${result.finalResult}.`);
+  }
+
+  if (typeof onValidated === "function") {
+    onValidated({
+      txHash: result.txHash || "",
+      ledgerIndex: result.ledgerIndex ?? null,
+      recovered: false
+    });
   }
 
   CACHE.delete(server);
