@@ -6,71 +6,180 @@
   <meta name="theme-color" content="#031c29">
   <title>Create a New Community — Wild Ledger</title>
   <style>
-    :root{--deep:#031c29;--lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;--coral:#ef735f;--ink:#f4fbfa;--muted:rgba(236,249,247,.68);--good:#9fe0b0;--bad:#ffb7aa;--panel:rgba(7,43,57,.74)}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}
+    :root{
+      --deep:#031c29;--lagoon:#2fa8a0;--sea-glass:#86d7c9;--mango:#f3b64a;
+      --coral:#ef735f;--ink:#f4fbfa;--muted:rgba(236,249,247,.68);
+      --good:#9fe0b0;--bad:#ffb7aa;--panel:rgba(7,43,57,.74)
+    }
+    *{box-sizing:border-box}
     body{margin:0;min-height:100vh;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(47,168,160,.26),transparent 31%),radial-gradient(circle at 88% 8%,rgba(239,115,95,.13),transparent 25%),radial-gradient(circle at 72% 82%,rgba(243,182,74,.12),transparent 28%),linear-gradient(145deg,#021720 0%,var(--deep) 42%,#062f3d 100%)}
     body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:36px 36px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent 88%)}
-    .shell{width:min(930px,100%);margin:0 auto;padding:28px 16px 52px}.console{overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:30px;background:linear-gradient(155deg,rgba(8,56,70,.88),rgba(4,31,43,.86));box-shadow:0 30px 90px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-    header{padding:30px;border-bottom:1px solid rgba(255,255,255,.08)}.back{display:block;width:max-content;margin:0 0 32px;color:#9fddff;text-decoration:none;font-weight:800;font-size:.78rem}.eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}h1{margin:8px 0 0;font-size:clamp(2.35rem,8vw,4.6rem);line-height:.96;letter-spacing:-.055em}.intro{max-width:760px;margin:16px 0 0;color:var(--muted);line-height:1.62}
-    .progress{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:24px}.progress-item{padding:9px 8px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(1,21,30,.28);text-align:center}.progress-num{display:block;color:var(--sea-glass);font-size:.65rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase}.progress-label{display:block;margin-top:3px;color:rgba(236,249,247,.57);font-size:.64rem;font-weight:800}
-    .body{padding:22px;display:grid;gap:16px}.card{position:relative;padding:22px;border:1px solid rgba(255,255,255,.09);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),rgba(5,34,46,.42)}
-    .step-head{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:start;margin-bottom:16px}.step-number{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;border:1px solid rgba(134,215,201,.28);background:rgba(47,168,160,.1);color:#e5fff9;font-size:.82rem;font-weight:950}.step-kicker{color:var(--sea-glass);font-size:.64rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}h2{margin:4px 0 0;font-size:1.2rem;letter-spacing:-.02em}.step-summary{margin:7px 0 0;color:rgba(236,249,247,.58);font-size:.8rem;line-height:1.5}
-    .instruction{margin:0 0 15px;padding:13px 14px;border-radius:15px;border:1px solid rgba(243,182,74,.16);background:rgba(243,182,74,.055)}.instruction strong{display:block;color:#f7deb0;font-size:.75rem}.instruction span{display:block;margin-top:4px;color:rgba(247,222,176,.78);font-size:.76rem;line-height:1.5}.auto{border-color:rgba(134,215,201,.16);background:rgba(47,168,160,.055)}.auto strong{color:#c9f1e9}.auto span{color:rgba(201,241,233,.7)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}label{display:block;margin-bottom:7px;color:rgba(236,249,247,.62);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}input,select{width:100%;min-height:46px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(1,18,27,.54);color:var(--ink);padding:10px 12px;font:inherit;outline:none}input:focus,select:focus{border-color:rgba(134,215,201,.58);box-shadow:0 0 0 3px rgba(47,168,160,.12)}input[readonly]{color:#bfeee4}
-    .buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}button,.button{appearance:none;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 14px;background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-size:.78rem;font-weight:900;cursor:pointer;text-decoration:none}button.primary{background:rgba(47,168,160,.18);border-color:rgba(134,215,201,.34);color:#e8fffa}button.secondary{color:#b9e5ff;background:rgba(77,167,235,.08)}button:disabled{opacity:.38;cursor:not-allowed}
+    .shell{width:min(900px,100%);margin:0 auto;padding:28px 16px 48px}
+    .console{overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:28px;background:linear-gradient(155deg,rgba(8,56,70,.86),rgba(4,31,43,.84));box-shadow:0 28px 80px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    header{padding:28px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .back{display:block;width:max-content;margin:0 0 30px;color:#9fddff;text-decoration:none;font-weight:800;font-size:.78rem}
+    .eyebrow{color:var(--sea-glass);font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+    h1{margin:8px 0 0;font-size:clamp(2.15rem,8vw,4.15rem);line-height:.98;letter-spacing:-.05em}
+    .intro{max-width:720px;margin:16px 0 0;color:var(--muted);line-height:1.6}
+    .body{padding:22px;display:grid;gap:16px}
+    .card{padding:20px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.012)),rgba(5,34,46,.42)}
+    h2{margin:0 0 14px;font-size:1.02rem}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
+    label{display:block;margin-bottom:7px;color:rgba(236,249,247,.62);font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    input,select{width:100%;min-height:46px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(1,18,27,.54);color:var(--ink);padding:10px 12px;font:inherit;outline:none}
+    input:focus,select:focus{border-color:rgba(134,215,201,.58);box-shadow:0 0 0 3px rgba(47,168,160,.12)}
+    input[readonly]{color:#bfeee4}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    button,.button{appearance:none;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 14px;background:rgba(255,255,255,.06);color:var(--ink);font:inherit;font-size:.78rem;font-weight:900;cursor:pointer;text-decoration:none}
+    button.primary{background:rgba(47,168,160,.18);border-color:rgba(134,215,201,.34);color:#e8fffa}button.secondary{color:#b9e5ff;background:rgba(77,167,235,.08)}
+    button:disabled{opacity:.38;cursor:not-allowed}
     .status{display:grid;gap:8px}.row{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.055)}.row:last-child{border-bottom:0}.key{color:rgba(236,249,247,.48);font-size:.72rem;font-weight:800}.value{overflow-wrap:anywhere;font-size:.78rem}.good{color:var(--good)}.bad{color:var(--bad)}.wait{color:#f5d38f}
     .notice,.safety{margin-top:14px;padding:13px 14px;border-radius:14px;font-size:.78rem;line-height:1.5}.notice{border:1px solid rgba(134,215,201,.16);background:rgba(47,168,160,.07);color:rgba(236,249,247,.72)}.safety{border:1px solid rgba(243,182,74,.18);background:rgba(243,182,74,.07);color:#f7deb0}
-    .click-path{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}.click-path span{padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:rgba(236,249,247,.56);font-size:.64rem;font-weight:850;transition:background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}.click-path .next{color:#bfeee4;border-color:rgba(134,215,201,.14)}.click-path span.done{color:#eaffef;border-color:rgba(159,224,176,.52);background:rgba(159,224,176,.16);box-shadow:inset 0 0 0 1px rgba(159,224,176,.06)}.click-path span.done:before{content:"✓";margin-right:5px;font-weight:950}.click-path span.active{color:#ffe7ae;border-color:rgba(243,182,74,.46);background:rgba(243,182,74,.12);box-shadow:0 0 0 2px rgba(243,182,74,.045)}.click-path span.failed{color:#ffd5cc;border-color:rgba(255,183,170,.48);background:rgba(255,183,170,.1)}.click-path span.failed:before{content:"!";margin-right:5px;font-weight:950}
-    pre{margin:12px 0 0;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,11,18,.48);color:#cae9e5;white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}.qr-wrap{display:none;margin-top:14px;padding:16px;border-radius:16px;background:#fff;text-align:center}.qr-wrap.show{display:grid;place-items:center}.qr-wrap img{width:min(280px,75vw);height:auto}.uri{margin-top:10px;color:var(--muted);font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;overflow-wrap:anywhere}.success{display:none}.success.show{display:block}.success strong{color:var(--good)}footer{padding:0 22px 26px;color:rgba(236,249,247,.42);font-size:.70rem;text-align:center}
-    @media(max-width:680px){.shell{padding:18px 10px 34px}.console{border-radius:22px}header{padding:24px 18px}.body{padding:14px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.row{grid-template-columns:125px minmax(0,1fr)}.progress{grid-template-columns:1fr}.progress-item{display:grid;grid-template-columns:46px 1fr;text-align:left;align-items:center}.progress-label{margin:0}.step-head{grid-template-columns:42px minmax(0,1fr)}.step-number{width:38px;height:38px;border-radius:12px}}
+    pre{margin:12px 0 0;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(0,11,18,.48);color:#cae9e5;white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .qr-wrap{display:none;margin-top:14px;padding:16px;border-radius:16px;background:#fff;text-align:center}.qr-wrap.show{display:grid;place-items:center}.qr-wrap img{width:min(280px,75vw);height:auto}.uri{margin-top:10px;color:var(--muted);font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;overflow-wrap:anywhere}
+    .success{display:none}.success.show{display:block}.success strong{color:var(--good)}
+    footer{padding:0 22px 24px;color:rgba(236,249,247,.42);font-size:.70rem;text-align:center}
+    .ledger-trail{position:fixed;inset:0;width:100vw;height:100dvh;z-index:40;display:flex;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:rgba(0,12,19,.80);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .34s ease,visibility 0s linear .34s}
+    .ledger-trail.show{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+    .ledger-trail-panel{width:min(470px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:24px 22px 22px;border:1px solid rgba(134,215,201,.24);border-radius:26px;background:linear-gradient(155deg,rgba(14,60,72,.98),rgba(5,30,42,.99));box-shadow:0 34px 90px rgba(0,0,0,.58);opacity:0;transform:translateY(10px) scale(.985);transition:opacity .34s ease,transform .38s cubic-bezier(.2,.8,.2,1)}
+    .ledger-trail.show .ledger-trail-panel{opacity:1;transform:none}
+    .ledger-trail-panel:before{content:"";display:block;height:3px;margin:-24px -22px 21px;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
+    .trail-kicker{color:var(--mango);font-size:.64rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+    .ledger-trail h2{margin:7px 0 6px;font-size:clamp(1.8rem,8vw,2.8rem);letter-spacing:-.045em}
+    .trail-lede{margin:0 0 18px;color:var(--muted);font-size:.78rem;line-height:1.5}
+    .trail-action{display:none;margin:0 0 18px;padding:16px;border:1px solid rgba(243,182,74,.30);border-radius:17px;background:linear-gradient(145deg,rgba(243,182,74,.10),rgba(47,168,160,.06))}
+    .trail-action.show{display:block}.trail-action strong{display:block;color:#ffe2a7;font-size:1.05rem}.trail-action p{margin:6px 0 0;color:rgba(255,244,214,.80);font-size:.76rem;line-height:1.45}.trail-action img{display:block;width:min(220px,72vw);margin:14px auto 0;padding:7px;border-radius:13px;background:white}.trail-action .trail-uri{margin-top:8px;color:rgba(236,249,247,.42);font-size:.52rem;line-height:1.35;overflow-wrap:anywhere}
+    .trail-route{display:grid;gap:0;margin:4px 0 18px}.trail-step{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:11px;min-height:58px;align-items:start}.trail-marker{position:relative;display:grid;place-items:center;width:28px;height:28px;margin-top:1px;border:1px solid rgba(236,249,247,.22);border-radius:50%;background:#082936;color:rgba(236,249,247,.40);font-size:.76rem;font-weight:950;z-index:1}.trail-step:not(:last-child) .trail-marker:after{content:"";position:absolute;top:27px;left:50%;width:2px;height:32px;transform:translateX(-50%);background:linear-gradient(to bottom,rgba(134,215,201,.18),rgba(134,215,201,.05))}.trail-copy strong{display:block;padding-top:1px;font-size:.82rem}.trail-copy span{display:block;margin-top:3px;color:rgba(236,249,247,.43);font-size:.66rem;line-height:1.35}.trail-step.done .trail-marker{border-color:rgba(159,224,176,.48);background:rgba(159,224,176,.12);color:#bdf2c8}.trail-step.done:not(:last-child) .trail-marker:after{background:linear-gradient(to bottom,rgba(134,215,201,.75),rgba(134,215,201,.25))}.trail-step.done .trail-copy span{color:rgba(189,242,200,.66)}.trail-step.active .trail-marker{border-color:rgba(243,182,74,.70);background:rgba(243,182,74,.12);color:#ffe2a7;box-shadow:0 0 0 6px rgba(243,182,74,.055)}.trail-step.active .trail-marker:before{content:"";position:absolute;inset:-7px;border:1px solid rgba(243,182,74,.22);border-radius:50%;animation:trailPulse 1.6s ease-out infinite}.trail-step.active .trail-copy strong{color:#ffe2a7}.trail-step.active .trail-copy span{color:rgba(255,226,167,.72)}.trail-step.failed .trail-marker{border-color:rgba(255,183,170,.58);background:rgba(239,115,95,.12);color:var(--bad)}.trail-step.failed .trail-copy strong,.trail-step.failed .trail-copy span{color:var(--bad)}
+    .trail-status{margin:2px 0 0;padding:12px 13px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(0,13,21,.28);color:rgba(236,249,247,.72);font-size:.7rem;line-height:1.45}.trail-status.busy{color:#ffe2a7;border-color:rgba(243,182,74,.20);background:rgba(243,182,74,.05)}.trail-status.error{color:var(--bad);border-color:rgba(239,115,95,.22);background:rgba(239,115,95,.06)}.trail-retry{width:100%;margin-top:11px;border:1px solid rgba(134,215,201,.24);border-radius:12px;padding:11px 13px;background:rgba(134,215,201,.08);color:#dffff8;font-weight:900}.trail-complete{display:none;margin-top:13px;text-align:center;color:#bdf2c8;font-weight:950}.trail-complete.show{display:block}.trail-complete .trail-complete-check{display:grid;place-items:center;width:50px;height:50px;margin:0 auto 8px;border:2px solid rgba(159,224,176,.58);border-radius:50%;background:rgba(159,224,176,.10);font-size:1.55rem}
+    @keyframes trailPulse{0%{transform:scale(.84);opacity:.85}75%,100%{transform:scale(1.32);opacity:0}}
+    @media(prefers-reduced-motion:reduce){.ledger-trail,.ledger-trail-panel{transition:none}.trail-step.active .trail-marker:before{animation:none}}
+    @media(max-width:680px){.shell{padding:18px 10px 32px}.console{border-radius:22px}header{padding:24px 18px}.body{padding:14px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.row{grid-template-columns:125px minmax(0,1fr)}}
   </style>
   <link rel="stylesheet" href="wildLedgerControls.css">
 </head>
 <body>
-<main class="shell"><section class="console">
-  <header>
-    <a class="back wl-header-control" href="addCommunity.html">← Provisioning Overview</a>
-    <div class="eyebrow">Wild Ledger Owner · New Community</div><h1>Create a New Community</h1>
-    <p class="intro">Work straight down the page. Each step tells you what to do, what Wild Ledger is checking, and what has to be true before the next action unlocks.</p>
-    <div class="progress" aria-label="Provisioning steps"><div class="progress-item"><span class="progress-num">Step 1</span><span class="progress-label">Owner authority</span></div><div class="progress-item"><span class="progress-num">Step 2</span><span class="progress-label">Community identity</span></div><div class="progress-item"><span class="progress-num">Step 3</span><span class="progress-label">Connect Bifrost</span></div><div class="progress-item"><span class="progress-num">Step 4</span><span class="progress-label">Prepare + sign</span></div><div class="progress-item"><span class="progress-num">Step 5</span><span class="progress-label">Submit + confirm</span></div></div>
-  </header>
-  <div class="body">
-    <section class="card"><div class="step-head"><div class="step-number">1</div><div><div class="step-kicker">Automatic lock</div><h2>Confirm Wild Ledger Owner authority</h2><p class="step-summary">Before a new community can be created, Wild Ledger has to know which Owner Wallet is currently authorized to create it.</p></div></div>
-      <div class="instruction auto"><strong>You normally do nothing here.</strong><span>Wild Ledger reads validated XRPL history automatically. If the check succeeds, continue to Step 2. Use Recheck XRPL only if you need to refresh the result.</span></div>
-      <div class="status"><div class="row"><div class="key">Initial Owner</div><div class="value" id="initialOwner">—</div></div><div class="row"><div class="key">XRPL authority</div><div class="value wait" id="ownerStatus">Checking XRPL…</div></div><div class="row"><div class="key">Current Owner</div><div class="value" id="currentOwner">—</div></div><div class="row"><div class="key">Communities found</div><div class="value" id="provisionCount">—</div></div></div>
-      <div class="buttons"><button class="secondary" id="refreshOwnerButton" type="button">Recheck XRPL</button></div><div class="click-path"><span id="path1Open">Page opens</span><span id="path1Read">XRPL history is read</span><span class="next" id="path1Owner">Owner confirmed → Step 2</span></div>
-    </section>
-    <section class="card"><div class="step-head"><div class="step-number">2</div><div><div class="step-kicker">Community birth details</div><h2>Generate the ID and verify the first Operating Wallet</h2><p class="step-summary">Wild Ledger generates the permanent 3-character Community ID. You provide the XRPL wallet that will operate the community from day one.</p></div></div>
-      <div class="instruction"><strong>Your action: paste the first Community Operating Wallet, then press Verify XRPL Address.</strong><span>The generated ID is only proposed until Step 5 validates on XRPL. If you want a different generated ID, press Generate Another ID before proceeding.</span></div>
-      <div class="grid"><div><label for="communityId">Generated 3-character Community ID</label><input id="communityId" readonly></div><div><label for="namespace">Matching LEAP namespace</label><input id="namespace" readonly></div><div class="full"><label for="operatingWallet">First Community Operating Wallet</label><input id="operatingWallet" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste XRPL address beginning with r"></div></div>
-      <div class="buttons"><button class="secondary" id="newIdButton" type="button">Generate Another ID</button><button class="primary" id="verifyWalletButton" type="button">Verify XRPL Address</button></div>
-      <div class="status" style="margin-top:12px"><div class="row"><div class="key">ID availability</div><div class="value wait" id="idStatus">Generating…</div></div><div class="row"><div class="key">Operating Wallet</div><div class="value wait" id="walletStatus">Not verified.</div></div><div class="row"><div class="key">Authority statement</div><div class="value" id="memoStatus">—</div></div></div>
-      <div class="click-path"><span id="path2Id">ID appears automatically</span><span id="path2Wallet">Paste wallet</span><span id="path2Verify">Verify XRPL Address</span><span class="next" id="path2Next">Wallet verified → Step 3</span></div>
-    </section>
-    <section class="card"><div class="step-head"><div class="step-number">3</div><div><div class="step-kicker">Owner signature connection</div><h2>Connect the current Owner Wallet in Bifrost</h2><p class="step-summary">The wallet that signs the birth transaction must be the same Owner Wallet Wild Ledger resolved from XRPL in Step 1.</p></div></div>
-      <div class="instruction"><strong>Your action: press Connect Bifrost and approve the pairing in Bifrost.</strong><span>If a QR code appears, scan it with Bifrost. Wild Ledger will reject the connection if the XRPL account is not the current canonical Owner Wallet.</span></div>
-      <div class="grid"><div class="full"><label for="connectedAccount">Connected XRPL Account</label><input id="connectedAccount" readonly placeholder="No wallet connected"></div></div>
-      <div class="buttons"><button class="primary" id="connectButton" type="button" disabled>Connect Bifrost</button><button class="secondary" id="disconnectButton" type="button" disabled>Disconnect</button></div>
-      <div class="status" style="margin-top:12px"><div class="row"><div class="key">WalletConnect</div><div class="value wait" id="wcStatus">Waiting for canonical Owner authority.</div></div><div class="row"><div class="key">Signer check</div><div class="value wait" id="signerStatus">Not connected.</div></div></div><div class="qr-wrap" id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"></div><div class="uri" id="uriText"></div>
-      <div class="click-path"><span id="path3Connect">Connect Bifrost</span><span id="path3Approve">Approve pairing</span><span id="path3Signer">Signer is checked</span><span class="next" id="path3Next">Owner Wallet confirmed → Step 4</span></div>
-    </section>
-    <section class="card"><div class="step-head"><div class="step-number">4</div><div><div class="step-kicker">Prepare and approve</div><h2>Build the exact XRPL transaction, review it, and sign</h2><p class="step-summary">Wild Ledger builds the canonical no-op AccountSet. Bifrost signs the prepared transaction; it does not invent the transaction for you.</p></div></div>
-      <div class="instruction"><strong>Your action: press Prepare Provisioning Transaction, review the preview, then press Send to Bifrost for Signature.</strong><span>Approve the signature in Bifrost only after the Community ID, Operating Wallet, and authority statement shown here are the ones you intend to establish.</span></div>
-      <div class="safety"><strong>What this transaction does:</strong> no LEAP moves and no XRPL account setting changes. The normal XRP network fee applies. The Community ID and first Operating Wallet become canonical together only after Step 5 validates.</div>
-      <div class="buttons"><button class="primary" id="prepareButton" type="button" disabled>Prepare Provisioning Transaction</button><button class="primary" id="signButton" type="button" disabled>Send to Bifrost for Signature</button></div>
-      <div class="status" style="margin-top:12px"><div class="row"><div class="key">Preparation</div><div class="value wait" id="prepareStatus">Not prepared.</div></div><div class="row"><div class="key">Signature</div><div class="value wait" id="signatureStatus">Not signed.</div></div></div><pre id="transactionPreview">No prepared transaction yet.</pre>
-      <div class="click-path"><span id="path4Prepare">Prepare</span><span id="path4Review">Review</span><span id="path4Bifrost">Send to Bifrost</span><span id="path4Approve">Approve signature</span><span class="next" id="path4Next">Signed → Step 5</span></div>
-    </section>
-    <section class="card"><div class="step-head"><div class="step-number">5</div><div><div class="step-kicker">Canonical birth</div><h2>Submit to XRPL and wait for confirmation</h2><p class="step-summary">This is the moment that matters. Wild Ledger submits the signed transaction, waits for validation, and then reconstructs the new community from validated XRPL history.</p></div></div>
-      <div class="instruction"><strong>Your action: press Submit Signed Transaction to XRPL once.</strong><span>Then wait. Do not treat the community as established until the Validation and Canonical community rows below both confirm success.</span></div>
-      <div class="buttons"><button class="primary" id="submitButton" type="button" disabled>Submit Signed Transaction to XRPL</button></div>
-      <div class="status" style="margin-top:12px"><div class="row"><div class="key">Submission</div><div class="value wait" id="submitStatus">Not submitted.</div></div><div class="row"><div class="key">Transaction hash</div><div class="value" id="hashStatus">—</div></div><div class="row"><div class="key">Validation</div><div class="value wait" id="validationStatus">Not validated.</div></div><div class="row"><div class="key">Canonical community</div><div class="value wait" id="canonicalStatus">Not established.</div></div></div><pre id="submitPreview">No XRPL submission yet.</pre>
-      <div class="notice success" id="successBox"><strong>Community established on XRPL.</strong> The Community ID and first Operating Wallet are now canonical XRPL history. Community setup and presentation come next; they do not create the community.</div>
-      <div class="click-path"><span id="path5Submit">Submit once</span><span id="path5Validate">Wait for validation</span><span id="path5Read">Wild Ledger reads XRPL again</span><span class="next" id="path5Canonical">Canonical community confirmed</span></div>
-    </section>
+<main class="shell">
+  <section class="console">
+    <header>
+      <a class="back wl-header-control" href="addCommunity.html">← Add Community</a>
+      <div class="eyebrow">Wild Ledger Owner</div>
+      <h1>Create a New Community</h1>
+      <p class="intro">Move from top to bottom. Each step clears the next one. Wild Ledger generates the permanent Community ID, verifies the first Operating Wallet, prepares the canonical authority transaction, and confirms the result from validated XRPL history.</p>
+    </header>
+
+    <div class="body">
+      <section class="card">
+        <h2>Step 1 · Verify Wild Ledger Authority</h2>
+        <div class="status">
+          <div class="row"><div class="key">Initial Owner</div><div class="value" id="initialOwner">—</div></div>
+          <div class="row"><div class="key">XRPL authority</div><div class="value wait" id="ownerStatus">Checking XRPL…</div></div>
+          <div class="row"><div class="key">Current Owner</div><div class="value" id="currentOwner">—</div></div>
+          <div class="row"><div class="key">Provisioned IDs</div><div class="value" id="provisionCount">—</div></div>
+        </div>
+        <div class="notice"><strong>This step clears automatically.</strong> Wild Ledger reads validated XRPL history to determine the current Owner Wallet. New-community provisioning stays locked until canonical Owner authority is established.</div>
+        <div class="buttons"><button class="secondary" id="refreshOwnerButton" type="button">Recheck XRPL</button></div>
+      </section>
+
+      <section class="card">
+        <h2>Step 2 · Create Community Identity</h2>
+        <div class="grid">
+          <div>
+            <label for="communityId">Generated 3-character Community ID</label>
+            <input id="communityId" readonly>
+          </div>
+          <div>
+            <label for="namespace">Permanent namespace</label>
+            <input id="namespace" readonly>
+          </div>
+          <div class="full">
+            <label for="operatingWallet">First Community Operating Wallet</label>
+            <input id="operatingWallet" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="r...">
+          </div>
+        </div>
+        <div class="notice"><strong>Wild Ledger provisioning policy:</strong> new communities receive an automatically generated 3-character Community ID. The ID becomes permanent only when the authority transaction validates on XRPL.</div>
+        <div class="buttons">
+          <button class="secondary" id="newIdButton" type="button">Generate Another ID</button>
+          <button class="primary" id="verifyWalletButton" type="button">Verify XRPL Address</button>
+        </div>
+        <div class="status" style="margin-top:12px">
+          <div class="row"><div class="key">ID availability</div><div class="value wait" id="idStatus">Generating…</div></div>
+          <div class="row"><div class="key">Wallet</div><div class="value wait" id="walletStatus">Not verified.</div></div>
+          <div class="row"><div class="key">Canonical memo</div><div class="value" id="memoStatus">—</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Step 3 · Provision Community</h2>
+        <div class="grid">
+          <div class="full">
+            <label for="connectedAccount">Connected XRPL Account</label>
+            <input id="connectedAccount" readonly placeholder="Connect Bifrost">
+          </div>
+        </div>
+        <div class="buttons">
+          <button class="primary" id="provisionButton" type="button" disabled>Provision Community</button>
+        </div>
+        <div hidden>
+          <button id="connectButton" type="button" disabled>Connect Bifrost</button>
+          <button id="disconnectButton" type="button" disabled>Disconnect</button>
+        </div>
+        <div class="notice"><strong>One continuous Ledger Trail.</strong> Wild Ledger will recheck authority, prepare the transaction, tell you exactly when Bifrost needs you, submit to XRPL, and independently confirm the new community.</div>
+        <div class="status" style="margin-top:12px">
+          <div class="row"><div class="key">WalletConnect</div><div class="value wait" id="wcStatus">Waiting for canonical Owner authority.</div></div>
+          <div class="row"><div class="key">Signer check</div><div class="value wait" id="signerStatus">Not connected.</div></div>
+        </div>
+        <div class="qr-wrap" id="qrWrap"><img id="qrImage" alt="WalletConnect QR code"></div>
+        <div class="uri" id="uriText"></div>
+      </section>
+
+      <section class="card">
+        <h2>Step 4 · Prepare + Sign</h2>
+        <div class="safety"><strong>Real protocol transaction.</strong> This is a no-op <code>AccountSet</code>. No LEAP moves and no XRPL account setting changes. The normal XRP transaction fee applies and the Community ID becomes permanently established when the transaction validates.</div>
+        <div class="buttons" hidden>
+          <button class="primary" id="prepareButton" type="button" disabled>Prepare Provisioning Transaction</button>
+          <button class="primary" id="signButton" type="button" disabled>Send to Bifrost for Signature</button>
+        </div>
+        <div class="status" style="margin-top:12px">
+          <div class="row"><div class="key">Preparation</div><div class="value wait" id="prepareStatus">Not prepared.</div></div>
+          <div class="row"><div class="key">Signature</div><div class="value wait" id="signatureStatus">Not signed.</div></div>
+        </div>
+        <pre id="transactionPreview">No prepared transaction yet.</pre>
+      </section>
+
+      <section class="card">
+        <h2>Step 5 · Record + Confirm</h2>
+        <div class="buttons" hidden><button class="primary" id="submitButton" type="button" disabled>Submit Signed Transaction to XRPL</button></div>
+        <div class="status" style="margin-top:12px">
+          <div class="row"><div class="key">Submission</div><div class="value wait" id="submitStatus">Not submitted.</div></div>
+          <div class="row"><div class="key">Transaction hash</div><div class="value" id="hashStatus">—</div></div>
+          <div class="row"><div class="key">Validation</div><div class="value wait" id="validationStatus">Not validated.</div></div>
+          <div class="row"><div class="key">Canonical community</div><div class="value wait" id="canonicalStatus">Not established.</div></div>
+        </div>
+        <pre id="submitPreview">No XRPL submission yet.</pre>
+        <div class="notice success" id="successBox"><strong>Community established on XRPL.</strong> The Community ID and first Operating Wallet are now canonical XRPL history. Community setup and presentation come next; they do not create the community.</div>
+      </section>
+    </div>
+    <footer>Provisioning creates the community on XRPL. Setup creates its Wild Ledger experience.</footer>
+  </section>
+</main>
+
+<div class="ledger-trail" id="ledgerTrail" role="dialog" aria-modal="true" aria-labelledby="ledgerTrailTitle" aria-live="polite">
+  <div class="ledger-trail-panel">
+    <div class="trail-kicker">Wild Ledger · community birth</div>
+    <h2 id="ledgerTrailTitle">The Ledger Trail</h2>
+    <p class="trail-lede">One Owner-authorized path from an unused Community ID to canonical XRPL community authority.</p>
+    <div class="trail-action" id="trailAction">
+      <strong id="trailActionTitle">GO TO BIFROST NOW</strong>
+      <p id="trailActionCopy"></p>
+      <img id="trailQrImage" alt="Wallet connection QR code" hidden>
+      <div class="trail-uri" id="trailUri" hidden></div>
+    </div>
+    <div class="trail-route" id="trailRoute"></div>
+    <p class="trail-status" id="ledgerTrailStatus">Ready when you are.</p>
+    <div class="trail-complete" id="trailComplete"><div class="trail-complete-check">✓</div><div id="trailCompleteText">Community established.</div></div>
+    <button class="trail-retry" id="ledgerTrailRetry" type="button" hidden>Follow the Trail Again</button>
   </div>
-  <footer>Provisioning creates the community on XRPL. Setup creates its Wild Ledger experience.</footer>
-</section></main>
+</div>
 
 <script src="js/wildLedgerConfig.js"></script>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
@@ -109,6 +218,7 @@
   const walletStatus = $("walletStatus");
   const memoStatus = $("memoStatus");
   const connectedAccount = $("connectedAccount");
+  const provisionButton = $("provisionButton");
   const connectButton = $("connectButton");
   const disconnectButton = $("disconnectButton");
   const wcStatus = $("wcStatus");
@@ -141,26 +251,54 @@
   let preparedId = "";
   let preparedWallet = "";
   let signedBlob = "";
+  let trailBusy = false;
+  let trailActiveStep = "";
+  let trailRetryHandler = null;
+  let walletHandoffActive = false;
+  let trailSubmittedHash = "";
+
+  const TRAIL_STEPS = Object.freeze([
+    ["owner", "Owner authority", "Waiting to recheck the current Wild Ledger Owner."],
+    ["identity", "Community identity", "Waiting to confirm the Community ID and first Operating Wallet."],
+    ["connect", "Connect Bifrost", "Waiting for the Owner Wallet connection."],
+    ["prepared", "Transaction prepared", "Waiting to build the canonical authority transaction."],
+    ["signature", "Sign provisioning", "Waiting for the Owner Wallet signature."],
+    ["xrpl", "XRPL", "Waiting to submit and validate the transaction."],
+    ["canonical", "Canonical authority", "Waiting to reconstruct the new community from XRPL history."],
+    ["ready", "Community established", "Waiting for the final proof." ]
+  ]);
+
+  function trailElement(step) { return document.querySelector(`[data-trail-step="${step}"]`); }
+  function renderTrail() {
+    $("trailRoute").innerHTML = TRAIL_STEPS.map(([id,label,detail]) => `<div class="trail-step" data-trail-step="${id}"><div class="trail-marker">○</div><div class="trail-copy"><strong>${label}</strong><span>${detail}</span></div></div>`).join("");
+  }
+  function resetTrail() {
+    trailActiveStep = ""; trailRetryHandler = null; walletHandoffActive = false;
+    renderTrail(); $("ledgerTrailRetry").hidden = true; $("trailComplete").classList.remove("show"); hideTrailAction();
+    const status = $("ledgerTrailStatus"); status.className = "trail-status"; status.textContent = "Starting the trail…";
+  }
+  function showTrail() { resetTrail(); $("ledgerTrail").classList.add("show"); }
+  function hideTrail() { walletHandoffActive = false; $("ledgerTrail").classList.remove("show"); }
+  function setTrailStep(step, state, detail = "") {
+    const row = trailElement(step); if (!row) return; row.className = `trail-step ${state}`;
+    const marker = row.querySelector(".trail-marker"); marker.textContent = state === "done" ? "✓" : state === "failed" ? "×" : state === "active" ? "•" : "○";
+    if (detail) row.querySelector(".trail-copy span").textContent = detail; if (state === "active") trailActiveStep = step;
+  }
+  function setTrailStatus(message, toneName = "") { const el=$("ledgerTrailStatus"); el.className=`trail-status${toneName ? ` ${toneName}` : ""}`; el.textContent=message; }
+  function showTrailAction(title, copy, { qr = false } = {}) { walletHandoffActive=true; $("trailActionTitle").textContent=title; $("trailActionCopy").textContent=copy; $("trailQrImage").hidden=true; $("trailUri").hidden=true; $("trailAction").classList.add("show"); }
+  function hideTrailAction() { walletHandoffActive=false; $("trailAction").classList.remove("show"); $("trailQrImage").hidden=true; $("trailUri").hidden=true; $("trailUri").textContent=""; }
+  function failTrail(error, retryHandler = null, retryLabel = "Follow the Trail Again") {
+    if (trailActiveStep) setTrailStep(trailActiveStep,"failed",error?.message||String(error)); setTrailStatus(error?.message||String(error),"error");
+    trailRetryHandler = typeof retryHandler === "function" ? retryHandler : null; $("ledgerTrailRetry").textContent=retryLabel; $("ledgerTrailRetry").hidden=!trailRetryHandler;
+  }
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  async function trailCompletion(text) { await wait(500); $("trailCompleteText").textContent=text; $("trailComplete").classList.add("show"); await wait(650); }
 
   function tone(element, className, text) {
     element.classList.remove("good", "bad", "wait");
     if (className) element.classList.add(className);
     element.textContent = text;
   }
-
-  function trail(id, state = "") {
-    const element = $(id);
-    if (!element) return;
-    element.classList.remove("done", "active", "failed");
-    if (state) element.classList.add(state);
-  }
-
-  function resetTrail(ids) {
-    ids.forEach(id => trail(id));
-  }
-
-  // Immediate visual confirmation: the page itself has successfully loaded.
-  trail("path1Open", "done");
 
   function configuredIds() {
     const ids = new Set();
@@ -194,7 +332,6 @@
     communityId.value = candidate;
     namespace.value = `${candidate}-LEAP`;
     tone(idStatus, "good", `${candidate} is unused in the current canonical/configured history.`);
-    trail("path2Id", "done");
     updateMemo();
     clearPrepared();
   }
@@ -223,7 +360,6 @@
     tone(canonicalStatus, "wait", "Not established.");
     submitPreview.textContent = "No XRPL submission yet.";
     successBox.classList.remove("show");
-    resetTrail(["path4Prepare", "path4Review", "path4Bifrost", "path4Approve", "path4Next", "path5Submit", "path5Validate", "path5Read", "path5Canonical"]);
     refreshButtons();
   }
 
@@ -232,12 +368,11 @@
     connectButton.disabled = !ownerReady || !PROJECT_ID || Boolean(signer);
     const signerReady = ownerReady && signerAccount === ownerState?.currentAccount;
     prepareButton.disabled = !(signerReady && walletVerified && communityId.value && !reservedIds.has(communityId.value));
+    provisionButton.disabled = trailBusy || !ownerReady || !PROJECT_ID || !walletVerified || !communityId.value || reservedIds.has(communityId.value);
   }
 
-  async function refreshOwner({ force = true, preserveCandidate = false } = {}) {
+  async function refreshOwner({ force = true } = {}) {
     tone(ownerStatus, "wait", "Checking validated XRPL history…");
-    trail("path1Read", "active");
-    trail("path1Owner");
     currentOwner.textContent = "—";
     provisionCount.textContent = "—";
     try {
@@ -245,31 +380,23 @@
       ownerState = await resolveOwnerAuthority({ serverUrl: SERVER, force });
       rebuildReservedIds();
       provisionCount.textContent = String(ownerState.provisionedCommunities.length);
-      trail("path1Read", "done");
       if (!ownerState.authorityEstablished) {
         currentOwner.textContent = PROTOCOL_INITIAL_OWNER_WALLET;
         tone(ownerStatus, "wait", "Initial Owner birth statement not yet found. Provisioning remains locked.");
         tone(wcStatus, "wait", "Waiting for canonical Owner authority.");
-        trail("path1Owner", "failed");
       } else {
         currentOwner.textContent = ownerState.currentAccount;
         tone(ownerStatus, "good", `Canonical Owner authority established in ledger ${ownerState.initialStatement?.ledger ?? "?"}.`);
-        trail("path1Owner", "done");
         if (!signer) tone(wcStatus, "wait", "Ready to connect the current Owner Wallet in Bifrost.");
       }
-      if (!communityId.value) generateUnusedId();
-      else if (reservedIds.has(communityId.value)) {
-        if (!preserveCandidate) generateUnusedId();
-        else tone(idStatus, "wait", `${communityId.value} is now present in canonical/configured history.`);
-      } else tone(idStatus, "good", `${communityId.value} is unused in the current canonical/configured history.`);
+      if (!communityId.value || reservedIds.has(communityId.value)) generateUnusedId();
+      else tone(idStatus, "good", `${communityId.value} is unused in the current canonical/configured history.`);
       if (signerAccount) validateConnectedSigner();
       refreshButtons();
     } catch (error) {
       ownerState = null;
       tone(ownerStatus, "bad", error?.message || String(error));
       tone(wcStatus, "bad", "Owner authority could not be resolved.");
-      trail("path1Read", "failed");
-      trail("path1Owner");
       refreshButtons();
     }
   }
@@ -279,11 +406,8 @@
     clearPrepared();
     const account = operatingWallet.value.trim();
     updateMemo();
-    trail("path2Verify", "active");
-    trail("path2Next");
     if (!isClassicAddress(account)) {
       tone(walletStatus, "bad", "Enter a valid XRPL classic address.");
-      trail("path2Verify", "failed");
       refreshButtons();
       return;
     }
@@ -296,12 +420,8 @@
       if (!data || data.Account !== account) throw new Error("XRPL did not return the requested account.");
       walletVerified = true;
       tone(walletStatus, "good", "XRPL account exists and is validated.");
-      trail("path2Verify", "done");
-      trail("path2Next", "done");
     } catch (error) {
       tone(walletStatus, "bad", error?.message || String(error));
-      trail("path2Verify", "failed");
-      trail("path2Next");
     } finally {
       client.close();
       refreshButtons();
@@ -311,26 +431,17 @@
   function validateConnectedSigner() {
     if (!signerAccount) {
       tone(signerStatus, "wait", "Not connected.");
-      trail("path3Signer");
-      trail("path3Next");
       return false;
     }
-    trail("path3Signer", "active");
     if (!ownerState?.authorityEstablished) {
       tone(signerStatus, "bad", "Owner authority is not established.");
-      trail("path3Signer", "failed");
-      trail("path3Next");
       return false;
     }
     if (signerAccount !== ownerState.currentAccount) {
       tone(signerStatus, "bad", `Wrong wallet. Current Owner is ${ownerState.currentAccount}.`);
-      trail("path3Signer", "failed");
-      trail("path3Next");
       return false;
     }
     tone(signerStatus, "good", "Correct current Owner Wallet connected.");
-    trail("path3Signer", "done");
-    trail("path3Next", "done");
     return true;
   }
 
@@ -340,10 +451,6 @@
       if (!PROJECT_ID) throw new Error("WalletConnect Project ID is not configured.");
       connectButton.disabled = true;
       tone(wcStatus, "wait", "Initializing WalletConnect…");
-      trail("path3Connect", "active");
-      trail("path3Approve");
-      trail("path3Signer");
-      trail("path3Next");
       signer = new WalletConnectXrplSigner({
         projectId: PROJECT_ID,
         metadata: {
@@ -359,8 +466,6 @@
           qrWrap.classList.add("show");
           uriText.textContent = uri;
           tone(wcStatus, "wait", "QR ready. Approve the connection in Bifrost.");
-          trail("path3Connect", "done");
-          trail("path3Approve", "active");
         }
       });
       qrWrap.classList.remove("show");
@@ -368,8 +473,6 @@
       signerAccount = connection.account;
       connectedAccount.value = signerAccount;
       tone(wcStatus, "good", `${connection.walletName} connected.`);
-      trail("path3Connect", "done");
-      trail("path3Approve", "done");
       disconnectButton.disabled = false;
       validateConnectedSigner();
       clearPrepared();
@@ -378,10 +481,6 @@
       signerAccount = "";
       connectedAccount.value = "";
       tone(wcStatus, "bad", error?.message || String(error));
-      if ($("path3Approve")?.classList.contains("active")) trail("path3Approve", "failed");
-      else trail("path3Connect", "failed");
-      trail("path3Signer");
-      trail("path3Next");
       disconnectButton.disabled = true;
       refreshButtons();
     }
@@ -395,12 +494,11 @@
     disconnectButton.disabled = true;
     tone(wcStatus, ownerState?.authorityEstablished ? "wait" : "wait", ownerState?.authorityEstablished ? "Ready to connect the current Owner Wallet in Bifrost." : "Waiting for canonical Owner authority.");
     tone(signerStatus, "wait", "Not connected.");
-    resetTrail(["path3Connect", "path3Approve", "path3Signer", "path3Next"]);
     clearPrepared();
   }
 
   async function recheckBeforeProtocolAct() {
-    await refreshOwner({ force: true, preserveCandidate: true });
+    await refreshOwner({ force: true });
     const id = communityId.value.trim();
     rebuildReservedIds();
     if (!ownerState?.authorityEstablished) throw new Error("Owner authority is not established.");
@@ -414,8 +512,6 @@
     try {
       prepareButton.disabled = true;
       tone(prepareStatus, "wait", "Rechecking Owner authority and Community ID…");
-      trail("path4Prepare", "active");
-      resetTrail(["path4Review", "path4Bifrost", "path4Approve", "path4Next"]);
       const owner = await recheckBeforeProtocolAct();
       const id = communityId.value.trim();
       const wallet = operatingWallet.value.trim();
@@ -429,15 +525,11 @@
       transactionPreview.textContent = JSON.stringify(preparedTx, null, 2);
       tone(prepareStatus, "good", `tesSUCCESS simulation. Fee prepared at ${preparedTx.Fee} drops.`);
       tone(signatureStatus, "wait", "Prepared; not signed.");
-      trail("path4Prepare", "done");
-      trail("path4Review", "active");
       signButton.disabled = false;
       submitButton.disabled = true;
     } catch (error) {
       preparedTx = null;
       tone(prepareStatus, "bad", error?.message || String(error));
-      trail("path4Prepare", "failed");
-      resetTrail(["path4Review", "path4Bifrost", "path4Approve", "path4Next"]);
       signButton.disabled = true;
     } finally {
       refreshButtons();
@@ -451,20 +543,13 @@
       if (signerAccount !== preparedOwner || preparedTx.Account !== preparedOwner) throw new Error("Signer/account mismatch.");
       signButton.disabled = true;
       tone(signatureStatus, "wait", "Waiting for Bifrost approval…");
-      trail("path4Review", "done");
-      trail("path4Bifrost", "done");
-      trail("path4Approve", "active");
       const result = await signer.signTransaction(preparedTx);
       signedBlob = result.signedBlob;
       tone(signatureStatus, "good", "Signed transaction returned by Bifrost. Not submitted yet.");
-      trail("path4Approve", "done");
-      trail("path4Next", "done");
       submitButton.disabled = false;
     } catch (error) {
       signedBlob = "";
       tone(signatureStatus, "bad", error?.message || String(error));
-      trail("path4Approve", "failed");
-      trail("path4Next");
       submitButton.disabled = true;
     } finally {
       if (preparedTx) signButton.disabled = false;
@@ -476,9 +561,7 @@
       if (!signedBlob || !preparedTx) throw new Error("Sign the provisioning transaction first.");
       submitButton.disabled = true;
       tone(submitStatus, "wait", "Final authority and ID check…");
-      trail("path5Submit", "active");
-      resetTrail(["path5Validate", "path5Read", "path5Canonical"]);
-      await refreshOwner({ force: true, preserveCandidate: true });
+      await refreshOwner({ force: true });
       rebuildReservedIds();
       if (!ownerState?.authorityEstablished || ownerState.currentAccount !== preparedOwner) throw new Error("Owner authority changed after preparation. Prepare a new transaction.");
       if (reservedIds.has(preparedId)) throw new Error(`Community ID ${preparedId} was established before this transaction was submitted. Do not submit.`);
@@ -491,8 +574,6 @@
         signedBlob,
         onSubmitted: ({ txHash, submitResponse }) => {
           tone(submitStatus, "good", "tesSUCCESS — accepted and broadcast.");
-          trail("path5Submit", "done");
-          trail("path5Validate", "active");
           hashStatus.textContent = txHash;
           submitPreview.textContent = JSON.stringify({ step: "submit", response: submitResponse }, null, 2);
         }
@@ -500,17 +581,13 @@
 
       if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated result was ${result.finalResult}.`);
       tone(validationStatus, "good", `Validated in ledger ${result.ledgerIndex ?? "?"}.`);
-      trail("path5Validate", "done");
-      trail("path5Read", "active");
       submitPreview.textContent = JSON.stringify({ step: "validated", submit: result.submitResponse, tx: result.txLookup }, null, 2);
 
-      await refreshOwner({ force: true, preserveCandidate: true });
+      await refreshOwner({ force: true });
       const canonical = ownerState?.provisionedCommunities?.find(item => item.communityId === preparedId);
       if (!canonical || canonical.operatingWallet !== preparedWallet) throw new Error("Transaction validated, but canonical community establishment was not reconstructed as expected.");
 
       tone(canonicalStatus, "good", `${preparedId} → ${preparedWallet}`);
-      trail("path5Read", "done");
-      trail("path5Canonical", "done");
       successBox.classList.add("show");
       operatingWallet.disabled = true;
       newIdButton.disabled = true;
@@ -520,13 +597,186 @@
       submitButton.disabled = true;
     } catch (error) {
       tone(submitStatus, "bad", error?.message || String(error));
-      if ($("path5Read")?.classList.contains("active")) trail("path5Read", "failed");
-      else if ($("path5Validate")?.classList.contains("active")) trail("path5Validate", "failed");
-      else trail("path5Submit", "failed");
       submitPreview.textContent = JSON.stringify({ error: error?.message || String(error) }, null, 2);
       if (signedBlob) submitButton.disabled = false;
     }
   }
+
+  async function verifyOperatingWalletForTrail(account) {
+    const client = new DirectXRPLClient(SERVER);
+    try {
+      await client.connect();
+      const response = await client.request("account_info", { account, ledger_index: "validated", strict: true }, 15000);
+      const data = response?.result?.account_data;
+      if (!data || data.Account !== account) throw new Error("XRPL did not return the requested Operating Wallet.");
+      return true;
+    } finally {
+      client.close();
+    }
+  }
+
+  async function reconstructProvisionedCommunity(id, wallet, { attempts = 8 } = {}) {
+    let last = null;
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+        clearOwnerAuthorityCache();
+        ownerState = await resolveOwnerAuthority({ serverUrl: SERVER, force: true });
+        rebuildReservedIds();
+        const canonical = ownerState?.provisionedCommunities?.find(item => item.communityId === id);
+        if (canonical?.operatingWallet === wallet) return canonical;
+        last = new Error(`${id} is not yet reconstructed with the expected Operating Wallet.`);
+      } catch (error) { last = error; }
+      setTrailStatus(`XRPL is validated. Reconstructing canonical authority · check ${attempt} of ${attempts}…`, "busy");
+      await wait(1100 + attempt * 250);
+    }
+    throw last || new Error("Canonical community authority could not yet be reconstructed.");
+  }
+
+  async function resumeCanonicalCheck() {
+    if (!preparedId || !preparedWallet) return;
+    if (!$("ledgerTrail").classList.contains("show")) showTrail();
+    setTrailStep("owner","done","Owner authority was confirmed before submission.");
+    setTrailStep("identity","done",`${preparedId} and the first Operating Wallet were confirmed.`);
+    setTrailStep("connect","done","Current Owner Wallet connection completed.");
+    setTrailStep("prepared","done","Canonical authority transaction was prepared.");
+    setTrailStep("signature","done","Owner signature was returned by Bifrost.");
+    setTrailStep("xrpl","done",trailSubmittedHash ? `Transaction submitted · ${trailSubmittedHash.slice(0,12)}…` : "Signed transaction was submitted to XRPL.");
+    setTrailStep("canonical","active","Reading Owner history until the new community is canonical.");
+    try {
+      trailBusy = true; refreshButtons();
+      const canonical = await reconstructProvisionedCommunity(preparedId, preparedWallet);
+      tone(canonicalStatus,"good",`${preparedId} → ${preparedWallet}`);
+      successBox.classList.add("show");
+      setTrailStep("canonical","done",`${preparedId} → ${preparedWallet} reconstructed from validated XRPL history.`);
+      setTrailStep("ready","active","Final proof is complete.");
+      await wait(180);
+      setTrailStep("ready","done",`${preparedId} is established on XRPL.`);
+      setTrailStatus("Community authority is canonical. Provisioning is complete.");
+      await trailCompletion("Community established");
+      hideTrail();
+    } catch (error) {
+      failTrail(error, () => resumeCanonicalCheck(), "Retry canonical readback");
+    } finally {
+      trailBusy = false; refreshButtons();
+    }
+  }
+
+  async function provisionViaTrail() {
+    if (trailBusy) return;
+    trailBusy = true; refreshButtons(); showTrail();
+    trailSubmittedHash = "";
+    try {
+      const id = communityId.value.trim();
+      const wallet = operatingWallet.value.trim();
+      if (!id) throw new Error("Generate a Community ID first.");
+      if (!isClassicAddress(wallet) || !walletVerified) throw new Error("Verify the first Community Operating Wallet first.");
+      if (!PROJECT_ID) throw new Error("WalletConnect Project ID is not configured.");
+
+      setTrailStep("owner","active","Rechecking the current Owner Wallet from validated XRPL history.");
+      clearOwnerAuthorityCache();
+      ownerState = await resolveOwnerAuthority({ serverUrl: SERVER, force: true });
+      rebuildReservedIds();
+      if (!ownerState?.authorityEstablished || !isClassicAddress(ownerState.currentAccount)) throw new Error("Canonical Owner authority is not established.");
+      currentOwner.textContent = ownerState.currentAccount;
+      provisionCount.textContent = String(ownerState.provisionedCommunities.length);
+      tone(ownerStatus,"good",`Current Owner confirmed: ${ownerState.currentAccount}`);
+      setTrailStep("owner","done","Current Wild Ledger Owner authority confirmed.");
+
+      setTrailStep("identity","active","Confirming the unused Community ID and first Operating Wallet.");
+      if (reservedIds.has(id)) throw new Error(`Community ID ${id} is already reserved.`);
+      await verifyOperatingWalletForTrail(wallet);
+      walletVerified = true;
+      tone(walletStatus,"good","XRPL account exists and is validated.");
+      updateMemo();
+      setTrailStep("identity","done",`${id} is available and the first Operating Wallet exists on XRPL.`);
+
+      setTrailStep("connect","active","Bifrost needs the current Owner Wallet connection.");
+      showTrailAction("GO TO BIFROST NOW","First handoff: approve the Wild Ledger Owner wallet connection in Bifrost, then return here. Wild Ledger will verify the connected account before continuing.",{qr:true});
+      setTrailStatus("Waiting for the Owner Wallet connection…","busy");
+      if (signer) { try { await signer.disconnect(); } catch (_) {} }
+      signer = new WalletConnectXrplSigner({
+        projectId: PROJECT_ID,
+        metadata: { name:"Wild Ledger Community Provisioning", description:"Provision a new Wild Ledger community", url:location.protocol.startsWith("http")?location.origin:"https://example.invalid", icons:[location.protocol.startsWith("http")?`${location.origin}/favicon.ico`:"https://example.invalid/favicon.ico"] }
+      });
+      const connection = await signer.connect({ onUri: async uri => {
+        $("trailQrImage").src = await QRCode.toDataURL(uri,{width:560,margin:2,errorCorrectionLevel:"M"});
+        $("trailQrImage").hidden = false; $("trailUri").textContent = uri; $("trailUri").hidden = false;
+        setTrailStatus("Bifrost has the helm. Approve the Owner Wallet connection, then return here.","busy");
+      }});
+      signerAccount = connection.account;
+      connectedAccount.value = signerAccount;
+      if (signerAccount !== ownerState.currentAccount) throw new Error(`Wrong wallet. Current Owner is ${ownerState.currentAccount}.`);
+      tone(wcStatus,"good",`${connection.walletName} connected.`); tone(signerStatus,"good","Correct current Owner Wallet connected.");
+      hideTrailAction();
+      setTrailStep("connect","done","Correct current Owner Wallet connected.");
+
+      setTrailStep("prepared","active","Rechecking authority and building the canonical provisioning AccountSet.");
+      clearOwnerAuthorityCache();
+      ownerState = await resolveOwnerAuthority({ serverUrl: SERVER, force: true });
+      rebuildReservedIds();
+      if (ownerState.currentAccount !== signerAccount) throw new Error("Owner authority changed after wallet connection.");
+      if (reservedIds.has(id)) throw new Error(`Community ID ${id} became reserved before preparation.`);
+      const memo = communityOperatingWalletMemo(id,wallet);
+      const prep = await prepareNoOpAccountSet({ serverUrl:SERVER, account:signerAccount, memoText:memo, feeCushion:FEE_CUSHION });
+      preparedTx=prep.preparedTx; preparedOwner=signerAccount; preparedId=id; preparedWallet=wallet; signedBlob="";
+      transactionPreview.textContent=JSON.stringify(preparedTx,null,2);
+      tone(prepareStatus,"good",`Prepared at ${preparedTx.Fee} drops.`);
+      setTrailStep("prepared","done",`Canonical ${id}-LEAP authority transaction prepared and checked.`);
+
+      setTrailStep("signature","active","The Owner Wallet must authorize community birth.");
+      showTrailAction("GO TO BIFROST NOW","Second handoff: approve and sign the provisioning transaction in Bifrost, then return here. Wild Ledger will not submit until the signed transaction comes back.");
+      setTrailStatus("Waiting for the Owner signature…","busy");
+      const signed = await signer.signTransaction(preparedTx);
+      signedBlob = String(signed?.signedBlob || "");
+      if (!signedBlob) throw new Error("Bifrost did not return a signed transaction.");
+      tone(signatureStatus,"good","Signed transaction returned by Bifrost.");
+      hideTrailAction();
+      setTrailStep("signature","done","Owner signature received from Bifrost.");
+
+      setTrailStep("xrpl","active","Final authority and Community ID check before submission.");
+      clearOwnerAuthorityCache();
+      ownerState = await resolveOwnerAuthority({ serverUrl: SERVER, force: true });
+      rebuildReservedIds();
+      if (ownerState.currentAccount !== preparedOwner) throw new Error("Owner authority changed after preparation. Nothing was submitted.");
+      if (reservedIds.has(preparedId)) throw new Error(`Community ID ${preparedId} was established before this transaction was submitted.`);
+      if (operatingWallet.value.trim() !== preparedWallet || communityId.value.trim() !== preparedId) throw new Error("Community data changed after preparation. Nothing was submitted.");
+      tone(submitStatus,"wait","Submitting signed transaction directly to XRPL…"); tone(validationStatus,"wait","Waiting for validation…");
+      setTrailStatus("Submitting to XRPL and waiting for validated consensus…","busy");
+      const result = await submitSignedTransaction({ serverUrl:SERVER, signedBlob, onSubmitted:({txHash,submitResponse})=>{
+        trailSubmittedHash=String(txHash||"").toUpperCase(); hashStatus.textContent=trailSubmittedHash||"—"; tone(submitStatus,"good","tesSUCCESS — accepted and broadcast."); submitPreview.textContent=JSON.stringify({step:"submit",response:submitResponse},null,2);
+      }});
+      if (result.finalResult !== "tesSUCCESS") throw new Error(`Validated result was ${result.finalResult}.`);
+      trailSubmittedHash = String(result.txHash || trailSubmittedHash || "").toUpperCase();
+      tone(validationStatus,"good",`Validated in ledger ${result.ledgerIndex ?? "?"}.`);
+      submitPreview.textContent=JSON.stringify({step:"validated",submit:result.submitResponse,tx:result.txLookup},null,2);
+      setTrailStep("xrpl","done",`Provisioning transaction validated${result.ledgerIndex ? ` · ledger ${result.ledgerIndex}` : ""}.`);
+
+      setTrailStep("canonical","active","Independently reconstructing the new community from Owner history.");
+      const canonical = await reconstructProvisionedCommunity(preparedId,preparedWallet);
+      tone(canonicalStatus,"good",`${preparedId} → ${preparedWallet}`); successBox.classList.add("show");
+      setTrailStep("canonical","done",`${preparedId} → ${preparedWallet} reconstructed from validated XRPL history.`);
+      operatingWallet.disabled=true; newIdButton.disabled=true; verifyWalletButton.disabled=true;
+
+      setTrailStep("ready","active","Final proof is complete."); await wait(180); setTrailStep("ready","done",`${preparedId} is established on XRPL.`);
+      setTrailStatus("Community authority is canonical. Provisioning is complete.");
+      await trailCompletion("Community established");
+      hideTrail();
+    } catch (error) {
+      hideTrailAction();
+      if (trailSubmittedHash) {
+        failTrail(error, () => resumeCanonicalCheck(), "Retry canonical readback");
+      } else {
+        failTrail(error, () => { hideTrail(); setTimeout(() => provisionViaTrail(),220); }, "Try Provisioning Again");
+      }
+    } finally {
+      trailBusy=false; refreshButtons();
+    }
+  }
+
+  provisionButton.addEventListener("click", provisionViaTrail);
+  $("ledgerTrailRetry").addEventListener("click",()=>{ const handler=trailRetryHandler; trailRetryHandler=null; $("ledgerTrailRetry").hidden=true; if(handler) handler(); });
+  document.addEventListener("visibilitychange",()=>{ if(!walletHandoffActive || !$("ledgerTrail").classList.contains("show")) return; if(document.visibilityState==="hidden") setTrailStatus("Bifrost has the helm. Wild Ledger will be here when you return.","busy"); else setTrailStatus("Back in Wild Ledger. Checking Bifrost for proof before continuing…","busy"); });
+  window.addEventListener("focus",()=>{ if(walletHandoffActive && $("ledgerTrail").classList.contains("show")) setTrailStatus("Checking the wallet handoff…","busy"); });
 
   refreshOwnerButton.addEventListener("click", () => refreshOwner({ force: true }));
   newIdButton.addEventListener("click", () => {
@@ -535,10 +785,6 @@
   operatingWallet.addEventListener("input", () => {
     walletVerified = false;
     tone(walletStatus, "wait", "Not verified.");
-    trail("path2Wallet", operatingWallet.value.trim() ? "done" : "");
-    trail("path2Verify");
-    trail("path2Next");
-    resetTrail(["path3Connect", "path3Approve", "path3Signer", "path3Next", "path4Prepare", "path4Review", "path4Bifrost", "path4Approve", "path4Next", "path5Submit", "path5Validate", "path5Read", "path5Canonical"]);
     updateMemo();
     clearPrepared();
   });

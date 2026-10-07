@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Get Wild · Wild Ledger</title>
 <style>
 :root{
@@ -68,6 +68,55 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
 @media(max-width:720px){
   .wrap{padding:22px 16px 48px}.hero{padding:30px 0}.access-grid{grid-template-columns:1fr}.card,.system{padding:22px}.qr-shell{min-height:260px}
 }
+
+
+/* Ledger Trail: human-facing execution state for wallet/XRPL routing. */
+body{animation:wildViewIn .34s ease both}
+body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
+@keyframes wildViewIn{from{opacity:0}to{opacity:1}}
+.ledger-trail{position:fixed;inset:0;width:100vw;height:100dvh;z-index:40;display:flex;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:rgba(0,12,19,.80);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .34s ease,visibility 0s linear .34s}
+.ledger-trail.show{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+.ledger-trail-panel{width:min(470px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:24px 22px 22px;border:1px solid rgba(121,213,194,.24);border-radius:26px;background:linear-gradient(155deg,rgba(14,60,72,.98),rgba(5,30,42,.99));color:#f5fbfa;box-shadow:0 34px 90px rgba(0,0,0,.58);opacity:0;transform:translateY(10px) scale(.985);transition:opacity .34s ease,transform .38s cubic-bezier(.2,.8,.2,1)}
+.ledger-trail.show .ledger-trail-panel{opacity:1;transform:none}
+.ledger-trail-panel:before{content:"";display:block;height:3px;margin:-24px -22px 21px;background:linear-gradient(90deg,#29b8b1,#79d5c2,#f4bd58,#ef765d)}
+.trail-kicker{color:#f4bd58;font-size:.64rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+.ledger-trail h2{margin:7px 0 6px;font-size:clamp(1.8rem,8vw,2.8rem);letter-spacing:-.045em}
+.trail-lede{margin:0 0 20px;color:rgba(236,249,247,.64);font-size:.78rem;line-height:1.5}
+.trail-route{display:grid;gap:0;margin:4px 0 18px}
+.trail-step{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:11px;min-height:58px;align-items:start}
+.trail-marker{position:relative;display:grid;place-items:center;width:28px;height:28px;margin-top:1px;border:1px solid rgba(236,249,247,.22);border-radius:50%;background:#082936;color:rgba(236,249,247,.40);font-size:.76rem;font-weight:950;z-index:1}
+.trail-step:not(:last-child) .trail-marker:after{content:"";position:absolute;top:27px;left:50%;width:2px;height:32px;transform:translateX(-50%);background:linear-gradient(to bottom,rgba(121,213,194,.18),rgba(121,213,194,.05))}
+.trail-copy strong{display:block;padding-top:1px;font-size:.82rem}
+.trail-copy span{display:block;margin-top:3px;color:rgba(236,249,247,.43);font-size:.66rem;line-height:1.35}
+.trail-step.done .trail-marker{border-color:rgba(159,224,176,.48);background:rgba(159,224,176,.12);color:#bdf2c8}
+.trail-step.done:not(:last-child) .trail-marker:after{background:linear-gradient(to bottom,rgba(121,213,194,.75),rgba(121,213,194,.25))}
+.trail-step.done .trail-copy span{color:rgba(189,242,200,.66)}
+.trail-step.active .trail-marker{border-color:rgba(244,189,88,.70);background:rgba(244,189,88,.12);color:#ffe2a7;box-shadow:0 0 0 6px rgba(244,189,88,.055)}
+.trail-step.active .trail-marker:before{content:"";position:absolute;inset:-7px;border:1px solid rgba(244,189,88,.22);border-radius:50%;animation:trailPulse 1.6s ease-out infinite}
+.trail-step.active .trail-copy strong{color:#ffe2a7}
+.trail-step.active .trail-copy span{color:rgba(255,226,167,.72)}
+.trail-step.failed .trail-marker{border-color:rgba(255,183,170,.58);background:rgba(239,118,93,.12);color:#ffb7aa}
+.trail-step.failed .trail-copy strong,.trail-step.failed .trail-copy span{color:#ffb7aa}
+@keyframes trailPulse{0%{transform:scale(.9);opacity:.8}100%{transform:scale(1.42);opacity:0}}
+.trail-status{margin:5px 0 0;padding:10px 12px;border:1px solid rgba(121,213,194,.12);border-radius:12px;background:rgba(2,24,34,.34);color:rgba(236,249,247,.62);font-size:.68rem;line-height:1.42}
+.trail-status.busy{color:#ffe2a7;border-color:rgba(244,189,88,.18)}
+.trail-status.error{color:#ffb7aa;border-color:rgba(239,118,93,.24)}
+.trail-action{display:none;margin:0 0 18px;padding:16px;border:1px solid rgba(244,189,88,.30);border-radius:17px;background:linear-gradient(145deg,rgba(244,189,88,.10),rgba(41,184,177,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.trail-action.show{display:block}
+.trail-action strong{display:block;color:#ffe2a7;font-size:1.12rem;letter-spacing:.01em}
+.trail-action p{margin:6px 0 0;color:rgba(255,244,214,.80);font-size:.76rem;line-height:1.45}
+.trail-action img{display:block;width:min(220px,72vw);margin:14px auto 0;padding:7px;border-radius:13px;background:white}
+.trail-action .trail-uri{margin-top:8px;color:rgba(236,249,247,.42);font-size:.52rem;line-height:1.35;overflow-wrap:anywhere}
+.trail-choice-list{display:grid;gap:8px;margin-top:12px}
+.trail-choice-list button{margin:0;width:100%;min-height:46px;text-align:left;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#f5fbfa}
+.trail-choice-list button small{display:block;margin-top:4px;font-weight:600;opacity:.68}
+.trail-complete{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;max-height:0;margin-top:0;opacity:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease,margin .25s ease}
+.trail-complete.show{max-height:70px;margin-top:12px;opacity:1}
+.trail-complete-check{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(159,224,176,.48);border-radius:50%;background:rgba(159,224,176,.12);color:#bdf2c8;font-size:1rem;font-weight:950}
+.trail-complete-text{color:#bdf2c8;font-size:.8rem;font-weight:850}
+.trail-retry{width:100%;min-height:44px;margin-top:12px;border:1px solid rgba(255,183,170,.26);border-radius:12px;background:rgba(239,118,93,.08);color:#ffd0c8;font-weight:850}
+@media(prefers-reduced-motion:reduce){body{animation:none}.ledger-trail,.ledger-trail-panel,body.wl-view-leaving{transition:none}.trail-step.active .trail-marker:before{animation:none}}
+
 </style>
 <link rel="stylesheet" href="wildLedgerBackend.css">
 </head>
@@ -114,7 +163,7 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
           <div class="route-row"><span class="dot"></span><span><strong>Current Owner Wallet</strong> → Owner Console</span></div>
           <div class="route-row"><span class="dot"></span><span><strong>Current Operating Wallet</strong> → its community</span></div>
           <div class="route-row"><span class="dot"></span><span><strong>Newly provisioned community</strong> → Community Setup</span></div>
-          <div class="route-row"><span class="dot"></span><span><strong>Complete CONFIG</strong> → reconstructed directly from validated XRPL history</span></div>
+          <div class="route-row"><span class="dot"></span><span><strong>CONFIG pointer</strong> → <code>WILD-LEDGER/STATE/&lt;ID&gt;/CONFIG=&lt;VERSION&gt;</code></span></div>
         </div>
       </aside>
     </section>
@@ -123,13 +172,43 @@ footer{padding-top:34px;text-align:center;color:var(--muted);font-size:13px}
   <footer>Wild Ledger · Powered by LEAP</footer>
 </div>
 
+
+<div class="ledger-trail" id="ledgerTrail" role="dialog" aria-modal="true" aria-labelledby="ledgerTrailTitle" aria-live="polite">
+  <div class="ledger-trail-panel">
+    <div class="trail-kicker">Wild Ledger · live XRPL path</div>
+    <h2 id="ledgerTrailTitle">The Ledger Trail</h2>
+    <p class="trail-lede">Stay on the Trail while Wild Ledger hands off to your wallet, reads validated XRPL state, and opens the right workspace.</p>
+    <div class="trail-action" id="trailAction">
+      <strong id="trailActionTitle">GO TO BIFROST NOW</strong>
+      <p id="trailActionCopy"></p>
+      <img id="trailQrImage" alt="Wallet connection QR code" hidden>
+      <div class="trail-uri" id="trailUri" hidden></div>
+      <div class="trail-choice-list" id="trailChoiceList" hidden></div>
+    </div>
+    <div class="trail-route" id="trailRoute">
+      <div class="trail-step" data-trail-step="wallet"><div class="trail-marker">○</div><div class="trail-copy"><strong>Wallet connection</strong><span>Waiting for the XRPL wallet connection.</span></div></div>
+      <div class="trail-step" data-trail-step="discover"><div class="trail-marker">○</div><div class="trail-copy"><strong>Discover authority</strong><span>Waiting to read validated Wild Ledger authority.</span></div></div>
+      <div class="trail-step" data-trail-step="route"><div class="trail-marker">○</div><div class="trail-copy"><strong>Route</strong><span>Waiting to determine the Owner or community path.</span></div></div>
+      <div class="trail-step" data-trail-step="confirm"><div class="trail-marker">○</div><div class="trail-copy"><strong>Confirm authority</strong><span>Waiting to confirm the current authority before entry.</span></div></div>
+      <div class="trail-step" data-trail-step="config"><div class="trail-marker">○</div><div class="trail-copy"><strong>CONFIG</strong><span>Waiting to read the current community CONFIG state.</span></div></div>
+      <div class="trail-step" data-trail-step="session"><div class="trail-marker">○</div><div class="trail-copy"><strong>Session</strong><span>Waiting to establish the working Wild Ledger session.</span></div></div>
+      <div class="trail-step" data-trail-step="ready"><div class="trail-marker">○</div><div class="trail-copy"><strong>Ready</strong><span>Waiting to open the destination.</span></div></div>
+    </div>
+    <p class="trail-status" id="ledgerTrailStatus">Starting the trail…</p>
+    <div class="trail-complete" id="trailComplete"><div class="trail-complete-check">✓</div><div class="trail-complete-text" id="trailCompleteText">Ledger Trail complete.</div></div>
+    <button class="trail-retry" id="ledgerTrailRetry" type="button" hidden>Follow the Trail Again</button>
+  </div>
+</div>
+
 <script src="js/wildLedgerConfig.js"></script>
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script type="module">
 import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
 import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
 import { resolveWalletAccess } from "./js/communityAccess.js";
-import { readCommunityConfig } from "./js/communityState.js";
+import { readCommunityConfigSchema } from "./js/communityState.js";
+import { communityConfigStoreConfigured, loadCurrentCommunityConfig } from "./js/communityConfigStore.js";
+import { communityConfigV1FromLegacy } from "./js/communityConfigSchema.js";
 
 const runtime = window.WILD_LEDGER_CONFIG || {};
 const XRPL_SERVER = String(runtime.xrplWebSocket || "").trim();
@@ -143,11 +222,193 @@ const connectedBox = document.getElementById("connectedBox");
 const connectedAddress = document.getElementById("connectedAddress");
 const communityChoices = document.getElementById("communityChoices");
 const communityChoiceList = document.getElementById("communityChoiceList");
+const ledgerTrail = document.getElementById("ledgerTrail");
+const ledgerTrailStatus = document.getElementById("ledgerTrailStatus");
+const ledgerTrailRetry = document.getElementById("ledgerTrailRetry");
+const trailAction = document.getElementById("trailAction");
+const trailActionTitle = document.getElementById("trailActionTitle");
+const trailActionCopy = document.getElementById("trailActionCopy");
+const trailQrImage = document.getElementById("trailQrImage");
+const trailUri = document.getElementById("trailUri");
+const trailChoiceList = document.getElementById("trailChoiceList");
+const trailComplete = document.getElementById("trailComplete");
+const trailCompleteText = document.getElementById("trailCompleteText");
 
 let signer = null;
 let activeAccount = "";
 let lastAccess = null;
 let connectRun = 0;
+let activeTrailStep = "";
+let trailRetryHandler = null;
+let walletHandoffActive = false;
+let walletHandoffUri = "";
+let viewIsLeaving = false;
+
+function trailElement(step) {
+  return document.querySelector(`[data-trail-step="${step}"]`);
+}
+
+function resetLedgerTrail() {
+  activeTrailStep = "";
+  document.querySelectorAll("#trailRoute .trail-step").forEach(row => {
+    row.className = "trail-step";
+    row.querySelector(".trail-marker").textContent = "○";
+  });
+  ledgerTrailStatus.className = "trail-status";
+  ledgerTrailStatus.textContent = "Starting the trail…";
+  ledgerTrailRetry.hidden = true;
+  trailRetryHandler = null;
+  trailComplete.classList.remove("show");
+  hideTrailAction();
+}
+
+function showLedgerTrail() {
+  resetLedgerTrail();
+  ledgerTrail.classList.add("show");
+}
+
+function hideLedgerTrail() {
+  walletHandoffActive = false;
+  ledgerTrail.classList.remove("show");
+}
+
+function setTrailStep(step, state, detail = "") {
+  const row = trailElement(step);
+  if (!row) return;
+  row.className = `trail-step ${state}`;
+  const marker = row.querySelector(".trail-marker");
+  marker.textContent = state === "done" ? "✓" : state === "failed" ? "×" : state === "active" ? "•" : "○";
+  if (detail) row.querySelector(".trail-copy span").textContent = detail;
+  if (state === "active") activeTrailStep = step;
+}
+
+function setTrailStatus(message, tone = "") {
+  ledgerTrailStatus.className = `trail-status${tone ? ` ${tone}` : ""}`;
+  ledgerTrailStatus.textContent = message;
+}
+
+function showTrailAction(title, copy, { qrDataUrl = "", uri = "" } = {}) {
+  walletHandoffActive = Boolean(qrDataUrl || uri);
+  walletHandoffUri = uri || "";
+  trailActionTitle.textContent = title;
+  trailActionCopy.textContent = copy || "";
+  trailChoiceList.hidden = true;
+  trailChoiceList.replaceChildren();
+  if (qrDataUrl) {
+    trailQrImage.src = qrDataUrl;
+    trailQrImage.hidden = false;
+  } else {
+    trailQrImage.hidden = true;
+    trailQrImage.removeAttribute("src");
+  }
+  if (uri) {
+    trailUri.textContent = uri;
+    trailUri.hidden = false;
+  } else {
+    trailUri.textContent = "";
+    trailUri.hidden = true;
+  }
+  trailAction.classList.add("show");
+}
+
+function showTrailChoices(matches) {
+  walletHandoffActive = false;
+  walletHandoffUri = "";
+  trailActionTitle.textContent = "CHOOSE A COMMUNITY";
+  trailActionCopy.textContent = `This wallet currently operates ${matches.length} communities. Choose the one you want Wild Ledger to open.`;
+  trailQrImage.hidden = true;
+  trailQrImage.removeAttribute("src");
+  trailUri.hidden = true;
+  trailChoiceList.replaceChildren();
+  for (const match of matches) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.innerHTML = `${match.communityId} — ${match.communityName}<small>${match.namespace || `${match.communityId}-LEAP`}</small>`;
+    button.addEventListener("click", async () => {
+      [...trailChoiceList.querySelectorAll("button")].forEach(item => item.disabled = true);
+      hideTrailAction();
+      setTrailStep("route", "done", `${match.communityId} selected.`);
+      try {
+        await openOperator(match);
+      } catch (error) {
+        failTrail(error, () => openOperator(match));
+      }
+    });
+    trailChoiceList.appendChild(button);
+  }
+  trailChoiceList.hidden = false;
+  trailAction.classList.add("show");
+}
+
+function hideTrailAction() {
+  walletHandoffActive = false;
+  walletHandoffUri = "";
+  trailAction.classList.remove("show");
+  trailQrImage.hidden = true;
+  trailQrImage.removeAttribute("src");
+  trailUri.hidden = true;
+  trailUri.textContent = "";
+  trailChoiceList.hidden = true;
+  trailChoiceList.replaceChildren();
+}
+
+function transientLedgerError(error) {
+  return /too busy|server busy|temporar|timeout|timed out|connection|closed|network|unavailable|try again|websocket/i.test(String(error?.message || error || ""));
+}
+
+function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+async function followWithRetry(step, label, fn, { attempts = 4 } = {}) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      if (attempt > 1) {
+        setTrailStep(step, "active", `${label} · retry ${attempt} of ${attempts}.`);
+        setTrailStatus(`XRPL did not answer cleanly. Retrying ${label.toLowerCase()} — attempt ${attempt} of ${attempts}.`, "busy");
+      }
+      const value = await fn();
+      return { value, attemptsUsed: attempt };
+    } catch (error) {
+      lastError = error;
+      if (!transientLedgerError(error) || attempt === attempts) throw error;
+      setTrailStep(step, "active", `${label} · attempt ${attempt} did not complete. Retrying automatically.`);
+      await wait(700 + attempt * 650);
+    }
+  }
+  throw lastError || new Error(`${label} did not complete.`);
+}
+
+function failTrail(error, retryHandler = null) {
+  const message = error?.message || String(error);
+  if (activeTrailStep) setTrailStep(activeTrailStep, "failed", message);
+  setTrailStatus(message, "error");
+  trailRetryHandler = retryHandler;
+  ledgerTrailRetry.hidden = !retryHandler;
+}
+
+async function showTrailCompletion(text) {
+  await wait(500);
+  trailCompleteText.textContent = text || "Ledger Trail complete.";
+  trailComplete.classList.add("show");
+  await wait(650);
+}
+
+function fadeNavigate(url, { replace = false } = {}) {
+  if (viewIsLeaving) return;
+  viewIsLeaving = true;
+  document.body.classList.add("wl-view-leaving");
+  const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  setTimeout(() => {
+    if (replace) location.replace(url);
+    else location.href = url;
+  }, reduced ? 0 : 280);
+}
+
+function handleWalletReturn() {
+  if (!walletHandoffActive || document.visibilityState === "hidden") return;
+  trailActionCopy.textContent = "Back in Wild Ledger. Checking Bifrost for the wallet connection now; the Trail will continue automatically when the connection is confirmed.";
+  setTrailStatus("Back from Bifrost. Checking the wallet connection…", "busy");
+}
 
 function setStatus(message, tone = "") {
   status.textContent = message;
@@ -178,14 +439,31 @@ function walletMetadata() {
 
 async function configStateFor(match) {
   try {
-    return await readCommunityConfig({ authority: match, serverUrl: XRPL_SERVER });
+    const state = await readCommunityConfigSchema({ authority: match, serverUrl: XRPL_SERVER });
+    return { state };
   } catch (error) {
-    throw new Error(`CONFIG resolution for ${match.communityId} failed: ${error?.message || String(error)}`);
+    throw new Error(`CONFIG state resolution for ${match.communityId} failed: ${error?.message || String(error)}`);
   }
 }
 
-function currentConfigFor(configState) {
-  return configState?.current?.config || null;
+async function currentConfigFor(match, configState) {
+  if (!configState?.state?.current || !configState?.state?.schema) return null;
+  const id = String(match.communityId || "").trim().toUpperCase();
+
+  if (communityConfigStoreConfigured()) {
+    try {
+      const loaded = await loadCurrentCommunityConfig({ communityId: id, cache: "no-store" });
+      if (loaded.config.configSchema === configState.state.schema) return loaded.config;
+    } catch (_) {}
+  }
+
+  // Migration bridge for communities whose presentation still lives in the
+  // original registry. The production CONFIG store replaces this fallback.
+  const legacy = window.WILD_LEDGER_GET_COMMUNITY?.(id) || null;
+  if (legacy) {
+    try { return communityConfigV1FromLegacy(legacy, { communityId: id }); } catch (_) {}
+  }
+  return null;
 }
 
 function writeOperatorSession(match, configState, config = null) {
@@ -202,9 +480,9 @@ function writeOperatorSession(match, configState, config = null) {
     authoritySource: String(match.source || "Validated XRPL history"),
     authorityResolvedAt: String(lastAccess?.resolvedAt || establishedAt),
     firstOperatingWallet: String(match?.establishment?.firstWallet || match?.establishment?.operatingWallet || connectedWallet),
-    configSchema: configState?.schema || null,
-    configLedger: configState?.current?.ledger || null,
-    configTransactionHash: configState?.current?.hash || "",
+    configSchema: configState?.state?.schema || null,
+    configLedger: configState?.state?.current?.ledger || null,
+    configTransactionHash: configState?.state?.current?.hash || "",
     layoutId: String(config?.layoutId || ""),
     skinId: String(config?.skinId || ""),
     establishedAt
@@ -225,30 +503,47 @@ function writeOperatorSession(match, configState, config = null) {
 }
 
 async function openOperator(match) {
+  setTrailStep("confirm", "active", `Rechecking ${match.communityId} against current validated XRPL authority.`);
   setStatus(`Rechecking ${match.communityId} authority and CONFIG state…`);
 
-  const fresh = await resolveWalletAccess({ account: activeAccount, serverUrl: XRPL_SERVER, force: true });
+  const authorityResult = await followWithRetry("confirm", `${match.communityId} authority check`, () =>
+    resolveWalletAccess({ account: activeAccount, serverUrl: XRPL_SERVER, force: true })
+  );
+  const fresh = authorityResult.value;
   const current = (fresh.operatorMatches || []).find(item =>
     String(item.communityId || "").toUpperCase() === String(match.communityId || "").toUpperCase() &&
     item.currentAccount === activeAccount
   );
   if (!current) throw new Error(`${activeAccount} is no longer the current Operating Wallet for ${match.communityId}.`);
   lastAccess = fresh;
+  setTrailStep("confirm", "done", `Current Operating Wallet confirmed${authorityResult.attemptsUsed > 1 ? ` after ${authorityResult.attemptsUsed} attempts` : ""}.`);
 
-  const configState = await configStateFor(current);
-  const config = currentConfigFor(configState);
+  setTrailStep("config", "active", `Reading ${match.communityId} CONFIG state from validated XRPL history.`);
+  const configResult = await followWithRetry("config", `${match.communityId} CONFIG read`, () => configStateFor(current));
+  const configState = configResult.value;
+  const config = await currentConfigFor(current, configState);
+  setTrailStep("config", "done", configState?.state?.current
+    ? `Community CONFIG state confirmed${configResult.attemptsUsed > 1 ? ` after ${configResult.attemptsUsed} attempts` : ""}.`
+    : "No complete community CONFIG yet; first-launch Setup is required.");
+
+  setTrailStep("session", "active", "Establishing the verified Operator session for this browser tab.");
   const session = writeOperatorSession(current, configState, config);
+  setTrailStep("session", "done", `${session.communityId} Operator session established.`);
 
-  // CONFIG state, not the old presentation registry, decides whether the
-  // community has completed its first setup publication.
-  if (!configState?.current) {
+  setTrailStep("ready", "active", configState?.state?.current ? "Opening the community workspace." : "Opening first-launch Community Setup.");
+  await wait(180);
+  setTrailStep("ready", "done", configState?.state?.current ? `${session.communityId} is ready.` : `${session.communityId} is ready for Setup.`);
+  setTrailStatus("Ledger route verified. Wild Ledger is opening the destination.");
+  await showTrailCompletion("Ledger Trail complete");
+
+  if (!configState?.state?.current) {
     setStatus(`${session.communityId} identified. Opening Community Setup…`, "good");
-    window.location.href = `setup.html?community=${encodeURIComponent(session.communityId)}&role=operator&mode=provisioned`;
+    fadeNavigate(`setup.html?community=${encodeURIComponent(session.communityId)}&role=operator&mode=provisioned`);
     return;
   }
 
   setStatus(`${session.communityId} identified. Opening the community workspace…`, "good");
-  window.location.href = `viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
+  fadeNavigate(`viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`);
 }
 
 function renderCommunityChoices(matches) {
@@ -262,14 +557,18 @@ function renderCommunityChoices(matches) {
     button.addEventListener("click", async () => {
       try {
         [...communityChoiceList.querySelectorAll("button")].forEach(item => item.disabled = true);
+        setTrailStep("route", "done", `${match.communityId} selected.`);
         await openOperator(match);
       } catch (error) {
         [...communityChoiceList.querySelectorAll("button")].forEach(item => item.disabled = false);
         setStatus(error?.message || String(error), "error");
+        failTrail(error, () => openOperator(match));
       }
     });
     communityChoiceList.appendChild(button);
   }
+
+  showTrailChoices(matches);
 }
 
 async function routeConnectedWallet(account) {
@@ -278,10 +577,24 @@ async function routeConnectedWallet(account) {
   connectedBox.hidden = false;
   sessionStorage.setItem("wildLedger.activeWallet", activeAccount);
 
+  hideTrailAction();
+  setTrailStep("wallet", "done", "Wallet connection confirmed by WalletConnect.");
+  setTrailStep("discover", "active", "Reading validated Wild Ledger authority for the connected XRPL address.");
   setStatus("XRPL address received. Reading validated Wild Ledger authority…");
-  lastAccess = await resolveWalletAccess({ account: activeAccount, serverUrl: XRPL_SERVER, force: true });
 
+  const accessResult = await followWithRetry("discover", "Wild Ledger authority read", () =>
+    resolveWalletAccess({ account: activeAccount, serverUrl: XRPL_SERVER, force: true })
+  );
+  lastAccess = accessResult.value;
+  setTrailStep("discover", "done", `Validated authority read complete${accessResult.attemptsUsed > 1 ? ` after ${accessResult.attemptsUsed} attempts` : ""}.`);
+
+  setTrailStep("route", "active", "Determining which Wild Ledger workspace this address controls.");
   if (lastAccess.isOwner) {
+    setTrailStep("route", "done", "Current Wild Ledger Owner Wallet identified.");
+    setTrailStep("confirm", "done", "Owner authority was confirmed in the validated authority read.");
+    setTrailStep("config", "done", "Owner Console entry does not require a community CONFIG read.");
+
+    setTrailStep("session", "active", "Establishing the verified Owner session for this browser tab.");
     const establishedAt = new Date().toISOString();
     sessionStorage.setItem("wildLedgerRole", "owner");
     sessionStorage.removeItem("wildLedgerCommunity");
@@ -293,8 +606,14 @@ async function routeConnectedWallet(account) {
       authorityResolvedAt: lastAccess.resolvedAt || establishedAt,
       establishedAt
     }));
+    setTrailStep("session", "done", "Owner session established.");
+    setTrailStep("ready", "active", "Opening the Owner Console.");
+    await wait(180);
+    setTrailStep("ready", "done", "Owner Console is ready.");
+    setTrailStatus("Ledger route verified. Wild Ledger is opening the Owner Console.");
+    await showTrailCompletion("Ledger Trail complete");
     setStatus("Current Wild Ledger Owner Wallet identified. Opening Owner Console…", "good");
-    window.location.href = "owner.html";
+    fadeNavigate("owner.html");
     return;
   }
 
@@ -304,16 +623,21 @@ async function routeConnectedWallet(account) {
   }
 
   if (matches.length === 1) {
+    setTrailStep("route", "done", `${matches[0].communityId} Operating Wallet path identified.`);
     await openOperator(matches[0]);
     return;
   }
 
+  setTrailStep("route", "active", `This wallet operates ${matches.length} communities. Human choice required.`);
   setStatus(`This wallet currently operates ${matches.length} communities. Choose which one to open.`, "good");
   renderCommunityChoices(matches);
 }
 
 async function beginWalletConnection() {
   const run = ++connectRun;
+  activeAccount = "";
+  viewIsLeaving = false;
+  document.body.classList.remove("wl-view-leaving");
   refreshQr.disabled = true;
   communityChoices.hidden = true;
   communityChoiceList.replaceChildren();
@@ -324,6 +648,7 @@ async function beginWalletConnection() {
   qrPlaceholder.textContent = "Creating a fresh wallet connection QR code…";
   setStatus("Starting wallet connection…");
   clearAccessSession();
+  hideLedgerTrail();
 
   try {
     if (!PROJECT_ID) throw new Error("WalletConnect project ID is not configured.");
@@ -341,30 +666,62 @@ async function beginWalletConnection() {
     const connection = await signer.connect({
       onUri: async uri => {
         if (run !== connectRun) return;
-        qrImage.src = await QRCode.toDataURL(uri, { width: 520, margin: 2, errorCorrectionLevel: "M" });
+        const qrDataUrl = await QRCode.toDataURL(uri, { width: 520, margin: 2, errorCorrectionLevel: "M" });
+        qrImage.src = qrDataUrl;
         qrImage.hidden = false;
         qrPlaceholder.hidden = true;
-        setStatus("Scan this QR code with your XRPL wallet.");
+        setStatus("Open Bifrost and approve the Wild Ledger wallet connection.");
+
+        showLedgerTrail();
+        setTrailStep("wallet", "active", "Bifrost needs the XRPL wallet connection before Wild Ledger can read authority.");
+        showTrailAction(
+          "GO TO BIFROST NOW",
+          "Open Bifrost, approve the Wild Ledger wallet connection, then return here. Wild Ledger will check the connection and continue automatically.",
+          { qrDataUrl, uri }
+        );
+        setTrailStatus("Waiting for the wallet connection. You can leave Safari; the Trail will still be here when you return.", "busy");
       }
     });
 
     if (run !== connectRun) return;
     qrImage.hidden = true;
     qrPlaceholder.hidden = false;
-    qrPlaceholder.textContent = "Wallet connected. Reading XRPL authority…";
+    qrPlaceholder.textContent = "Wallet connected. Following the Ledger Trail…";
     await routeConnectedWallet(connection.account);
   } catch (error) {
     if (run !== connectRun) return;
     setStatus(error?.message || String(error), "error");
     qrImage.hidden = true;
     qrPlaceholder.hidden = false;
-    qrPlaceholder.textContent = "The wallet connection did not complete. Create a fresh QR code and try again.";
+    if (!ledgerTrail.classList.contains("show")) showLedgerTrail();
+    if (activeAccount) {
+      qrPlaceholder.textContent = "Wallet connected. A ledger read needs another try.";
+      failTrail(error, () => routeConnectedWallet(activeAccount));
+    } else {
+      qrPlaceholder.textContent = "The wallet connection did not complete. Create a fresh QR code and try again.";
+      failTrail(error, beginWalletConnection);
+    }
   } finally {
-    if (run === connectRun) refreshQr.disabled = false;
+    if (run === connectRun && !viewIsLeaving) refreshQr.disabled = false;
   }
 }
 
 refreshQr.addEventListener("click", beginWalletConnection);
+ledgerTrailRetry.addEventListener("click", async () => {
+  if (!trailRetryHandler) return;
+  ledgerTrailRetry.hidden = true;
+  const retry = trailRetryHandler;
+  trailRetryHandler = null;
+  if (activeTrailStep) setTrailStep(activeTrailStep, "active", "Retrying this checkpoint now.");
+  setTrailStatus("Following the Trail again…", "busy");
+  try {
+    await retry();
+  } catch (error) {
+    failTrail(error, retry);
+  }
+});
+window.addEventListener("focus", handleWalletReturn);
+document.addEventListener("visibilitychange", handleWalletReturn);
 
 const params = new URLSearchParams(location.search);
 if (params.get("operatorSession") === "required") {
