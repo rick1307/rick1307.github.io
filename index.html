@@ -1115,6 +1115,22 @@
       }
     }
 
+
+
+    /* Gentle handoff into Member Record. */
+    @keyframes wlMemberRecordExit {
+      from { opacity:1; }
+      to { opacity:0; }
+    }
+
+    body.wl-member-record-exit {
+      animation:wlMemberRecordExit 280ms ease forwards;
+      pointer-events:none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.wl-member-record-exit { animation-duration:1ms; }
+    }
 </style>
 <link rel="stylesheet" href="communityTypography.css">
 <link rel="stylesheet" href="communitySurface.css">
@@ -1495,6 +1511,9 @@
         sessionStorage.setItem("wildLedger.activeWallet", account);
 
         setStatus("Wallet connected. Opening your Member Record…");
+        sessionStorage.setItem("wildLedger.memberRecordTransition", "1");
+        document.body.classList.add("wl-member-record-exit");
+        await new Promise(resolve => setTimeout(resolve, 280));
         window.location.href = `memberRecord.html?community=${encodeURIComponent(communityId)}`;
       } catch (error) {
         if (run !== connectRun) return;
