@@ -3,92 +3,186 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wild Ledger — Operations Manual</title>
+<title>Operations Manual | Wild Ledger</title>
 <style>
-:root{--bg:#080a09;--panel:#111512;--panel2:#151a16;--text:#f2ead8;--muted:#b8b2a5;--mint:#9de3c2;--orange:#f0a35b;--line:#2b332d}
+:root{--bg:#0b1220;--panel:#111b2e;--panel2:#16233a;--text:#eef4ff;--muted:#a9b7cc;--line:#2a3a55;--accent:#8fd3ff;--good:#8ee6b0}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
-.wrap{width:min(920px,calc(100% - 32px));margin:auto}
-header{padding:64px 0 34px;border-bottom:1px solid var(--line)}
-.eyebrow{color:var(--mint);font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-h1{font-size:clamp(2.2rem,7vw,4.4rem);line-height:.98;margin:.35rem 0 1rem}
-.lede{max-width:680px;color:var(--muted);font-size:1.08rem}
-main{padding:34px 0 80px}
-.phase{margin:0 0 26px;padding:22px;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:0 18px 50px rgba(0,0,0,.22)}
-.phase-head{margin-bottom:16px}.phase-kicker{color:var(--orange);font-weight:800;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase}
-h2{margin:.25rem 0 .25rem;font-size:1.65rem}.phase-intro{margin:0;color:var(--muted)}
-details{border:1px solid var(--line);border-radius:14px;background:var(--panel2);margin:12px 0;overflow:hidden}
-summary{cursor:pointer;padding:17px 18px;font-weight:750;list-style:none;display:flex;align-items:center;gap:12px}
-summary::-webkit-details-marker{display:none}
-summary:after{content:"＋";margin-left:auto;color:var(--mint);font-size:1.2rem}details[open] summary:after{content:"−"}
-.card-body{padding:0 18px 18px;color:var(--muted);border-top:1px solid var(--line)}
-.card-body p{margin:15px 0 0}.empty{font-style:italic;color:#888f88}
-footer{padding:24px 0 44px;color:#858b85;font-size:.9rem}
+main{max-width:900px;margin:0 auto;padding:40px 20px 72px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem}h1{font-size:clamp(2rem,6vw,3.7rem);line-height:1.02;margin:.35rem 0 .8rem}.intro{color:var(--muted);max-width:680px;margin-bottom:32px}.section{margin:28px 0 36px}.section h2{font-size:1.35rem;margin:0 0 12px}.section-note{color:var(--muted);margin:-4px 0 14px}.card{border:1px solid var(--line);border-radius:14px;background:var(--panel);margin:10px 0;overflow:hidden}.card summary{cursor:pointer;list-style:none;padding:18px 20px;font-weight:750;display:flex;gap:12px;align-items:center}.card summary::-webkit-details-marker{display:none}.num{width:28px;height:28px;border-radius:999px;background:var(--panel2);display:inline-grid;place-items:center;color:var(--accent);font-size:.85rem;flex:0 0 auto}.body{padding:0 20px 20px 60px;color:var(--muted)}.body strong{color:var(--text)}.northstar{font-size:1.08rem;color:var(--text)}.northstar p{margin:.45rem 0}.placeholder{opacity:.7}.placeholder .body{font-style:italic}footer{margin-top:48px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:18px}
 </style>
 </head>
-<body>
-<header>
-  <div class="wrap">
-    <div class="eyebrow">Wild Ledger</div>
-    <h1>Operations Manual</h1>
-    <p class="lede">A practical guide for the human operating a Wild Ledger community. Start with what you need now. Go deeper when you want to.</p>
-  </div>
-</header>
+<body><main>
+<div class="eyebrow">Wild Ledger</div>
+<h1>Operations Manual</h1>
+<p class="intro">A practical guide for operating a Wild Ledger community. Start with the job in front of you. Open the deeper pieces only when they help.</p>
 
-<main class="wrap">
-  <section class="phase">
-    <div class="phase-head">
-      <div class="phase-kicker">Phase One</div>
-      <h2>Onboarding</h2>
-      <p class="phase-intro">You just created your community. Let’s get you oriented, get you doing something real, and show you the result.</p>
-    </div>
+<section class="section">
+<h2>Onboarding</h2>
+<p class="section-note">Get around the block once. Then make it yours.</p>
 
-    <details>
-      <summary>1. Understand What You Just Created</summary>
-      <div class="card-body">
-        <p>You now operate a Wild Ledger community. You recognize. Wild Ledger distributes. XRPL remembers.</p>
-      </div>
-    </details>
+<details class="card">
+<summary><span class="num">1</span>Understand What You Just Created</summary>
+<div class="body">
+<p>You now operate a Wild Ledger community. Your Community Operating Wallet is the wallet that runs it. Wild Ledger helps you recognize participation and distribute LEAP; XRPL preserves the durable record.</p>
+</div>
+</details>
 
-    <details>
-      <summary>2. Recognize Your First Person</summary>
-      <div class="card-body">
-        <p>Your first real action is recognition. This card will walk you through that workflow from beginning to end.</p>
-      </div>
-    </details>
+<details class="card">
+<summary><span class="num">2</span>Recognize Your First Person</summary>
+<div class="body">
+<p>Do one real recognition from beginning to end. Pick a person, recognize something they did, distribute LEAP, approve the transaction, and let the ledger preserve the result.</p>
+</div>
+</details>
 
-    <details>
-      <summary>3. See What You Just Did</summary>
-      <div class="card-body">
-        <p>See the recognition, see that your community history changed, and—when you want to—look deeper at the XRPL evidence underneath it.</p>
-      </div>
-    </details>
-  </section>
+<details class="card">
+<summary><span class="num">3</span>See What You Just Did</summary>
+<div class="body">
+<p>Look at the result. Find the person, see the recognition, and confirm that the durable record exists. Go deeper into the ledger evidence only if you want to.</p>
+</div>
+</details>
 
-  <section class="phase">
-    <div class="phase-head">
-      <div class="phase-kicker">Phase Two</div>
-      <h2>Continuing Operations</h2>
-      <p class="phase-intro">Your community is running. This is where the recurring work will live.</p>
-    </div>
-    <details>
-      <summary>Continuing Operations — Next Card</summary>
-      <div class="card-body"><p class="empty">Intentionally left open. We’ll decide together what belongs here next.</p></div>
-    </details>
-  </section>
+<details class="card">
+<summary><span class="num">4</span>North Star</summary>
+<div class="body northstar">
+<p><strong>The mission is to distribute LEAP through engagement.</strong></p>
+<p><strong>Variation is leadership.</strong></p>
+<p><strong>Good luck.</strong></p>
+</div>
+</details>
+</section>
 
-  <section class="phase">
-    <div class="phase-head">
-      <div class="phase-kicker">Phase Three</div>
-      <h2>Tax Reporting</h2>
-      <p class="phase-intro">Ledger facts and transaction history belong here. Valuation and tax treatment remain with the Operator and their tax professional.</p>
-    </div>
-    <details>
-      <summary>Tax Reporting — First Card</summary>
-      <div class="card-body"><p class="empty">Intentionally left open. We’ll design the reporting workflow before filling this in.</p></div>
-    </details>
-  </section>
-</main>
+<section class="section">
+<h2>Continuing Operations</h2>
+<p class="section-note">These are operating jobs, not a required sequence. Open the one you need.</p>
 
-<footer><div class="wrap">Wild Ledger · Operations Manual</div></footer>
-</body>
-</html>
+<details class="card">
+<summary><span class="num">1</span>Recognition &amp; Distribution</summary>
+<div class="body">
+<p><strong>Your job is to recognize people and get LEAP out.</strong> The Operator decides what deserves recognition. Wild Ledger helps prepare the distribution. The authorized wallet approves it. XRPL preserves the result.</p>
+<p>Use the recognition type that matches the human story:</p>
+<ul>
+<li><strong>Badge</strong> — recognition that may be earned repeatedly while it is active. Great Chat is the standard repeatable Badge available to established LEAP communities.</li>
+<li><strong>Event</strong> — recognition for participation in a particular event. A particular Event ID counts once for a member.</li>
+<li><strong>Challenge</strong> — recognition for completing a defined objective. A particular Challenge ID counts once for a member.</li>
+</ul>
+<p><strong>One award has one reason.</strong> A recognition award records one Badge, Event, or Challenge and a positive whole-number amount of LEAP.</p>
+<p><strong>Know when it counts.</strong> A direct Payment counts when LEAP is delivered. A Check does not add Earned LEAP merely because it was created; it counts when the member successfully cashes the Check and LEAP is delivered.</p>
+<p>The Operator may recognize participation wherever the community actually lives: chat, a video, a comment thread, an event, a direct interaction, or an in-person meeting. Software can organize the opportunity and prepare the transaction. It does not decide whether a human contribution was worthy.</p>
+<p><strong>Recognition is not the same thing as ordinary distribution.</strong> Protocol-valid recognition adds Earned LEAP and recognition history. An ordinary LEAP transfer may move LEAP without creating a Badge, Event, Challenge, Great Chat, Earned LEAP, or rank credit.</p>
+</div>
+</details>
+
+<details class="card">
+<summary><span class="num">2</span>Participation</summary>
+<div class="body">
+<p><strong>Create reasons for people to engage, then recognize what happens.</strong> Wild Ledger does not prescribe the campaign, venue, channel, or style.</p>
+<p>A public opportunity answers <strong>“What can I do?”</strong> A member record answers <strong>“What have I done?”</strong> Keep those two jobs separate.</p>
+<p>Community-defined Badges, Events, and Challenges have a lifecycle. <strong>CREATE</strong> puts a legitimate opportunity into use. <strong>END</strong> retires it without erasing recognition already earned. <strong>IGNORE</strong> quarantines an erroneous, test, invalid, or otherwise non-operational definition. These lifecycle actions manage the opportunity; they do not award LEAP to a member.</p>
+<p>Conversation itself does not have to become permanent ledger state. A live room can be temporary while recognition earned there survives as durable XRPL history.</p>
+<p>Where a community accepts voluntary XRP support, keep the two flows distinct: <strong>appreciation can flow inward in XRP; recognition flows outward in LEAP.</strong> Wild Ledger does not take custody of either participant's private keys or funds.</p>
+<p>Keep the interaction moving. A good recognition workflow lets the Operator notice somebody, recognize the contribution, approve the wallet action, and return to the community.</p>
+</div>
+</details>
+
+<details class="card">
+<summary><span class="num">3</span>LEAP Inventory &amp; Replenishment</summary>
+<div class="body">
+<p><strong>Spread LEAP to earn more operating inventory.</strong> A new community begins with 1,000 LEAP of operating inventory.</p>
+<p>Wild Ledger measures qualifying outward distribution with <strong>Spread Score</strong>. Each qualifying outside wallet can contribute no more than <strong>20 lifetime Spread Score points</strong> to a community. That cap does not reset because the community changes Operating Wallets.</p>
+<p>When the community reaches <strong>500 Spread Score points</strong>, it qualifies for another <strong>1,000 LEAP</strong> of operating inventory.</p>
+<p>Real outward distribution counts. Controlled wallets, circular movement, and manufactured spread do not. Returns reduce net spread rather than creating new reach.</p>
+<p><strong>Recognition and Spread Score answer different questions.</strong> Recognition asks, “What did this member earn?” Spread Score asks, “How broadly did this community distribute LEAP?” A transaction can affect both, but the records do not mean the same thing.</p>
+<details class="card">
+<summary>Show me the math</summary>
+<div class="body">
+<p>For each qualifying outside wallet, count the community's net qualifying outward LEAP, capped at 20 lifetime points for that wallet. Add those wallet contributions to produce the community's Spread Score.</p>
+<p>Example: 10 qualifying outside wallets that each receive 20 net qualifying LEAP contribute 200 Spread Score points. Twenty-five such wallets can contribute 500 points. Sending more than 20 qualifying LEAP to one wallet may be useful recognition or distribution, but that wallet cannot contribute more than 20 lifetime Spread Score points.</p>
+<p>The ledger is the history. Changing the Community Operating Wallet does not restart the community's Spread Score or erase prior qualifying distribution.</p>
+</div>
+</details>
+</div>
+</details>
+
+<details class="card">
+<summary><span class="num">4</span>Authority &amp; Wallet Changes</summary>
+<div class="body">
+<p><strong>The Community Operating Wallet is the community's operating authority.</strong> The wallet app is only the signing interface. Bifrost, Xaman, Tangem, or another compatible wallet does not become the authority merely because it is used to sign.</p>
+<p>The Operating Wallet can distribute recognition and publish the community's canonical protocol state. Wild Ledger verifies which wallet was authorized at the ledger position being interpreted.</p>
+<p><strong>Routine replacement is self-service.</strong> Once a community has an established Operating Wallet, the currently authorized Operating Wallet may publish a new Operating Wallet. From that validated transaction forward, the new value is authoritative.</p>
+<p>The ledger itself preserves the history. Changing authority does not erase earlier recognition, allocation, Spread Score, or other valid community history. Historical duties tied to the old wallet remain historical facts; the new wallet becomes the forward operating authority.</p>
+<p><strong>Change authority while the current wallet can still sign.</strong> Wild Ledger does not custody private keys and cannot recover a lost wallet.</p>
+<p>The Wild Ledger Owner Wallet and a Community Operating Wallet have different authority. Owner authority does not become community authority and cannot simply seize an established community's operating role.</p>
+<p>Hiding a community changes directory visibility. It does not erase the community or alter its ledger history.</p>
+</div>
+</details>
+</section>
+
+<section class="section">
+<h2>How Wild Ledger Works</h2>
+<p class="section-note">Reference material for people who want to understand the machinery. You do not need to master this section to operate your community.</p>
+
+<details class="card">
+<summary>Ledger as Authority</summary>
+<div class="body">
+<p><strong>Canonical state exists on XRPL.</strong> Wild Ledger interprets canonical state; it does not become its keeper.</p>
+<p>A useful test is simple: if the Wild Ledger website disappeared, the ledger should still contain the durable facts Wild Ledger committed to the ledger.</p>
+<p>Wild Ledger can reconstruct what happened by reading validated XRPL history in order and applying the protocol rules. The website is an interface and interpreter, not a second source of truth.</p>
+</div>
+</details>
+
+<details class="card">
+<summary>Human Recognition &amp; Privacy</summary>
+<div class="body">
+<p><strong>The Operator recognizes. Wild Ledger distributes. XRPL remembers.</strong></p>
+<p>Automate the scaffolding, not the humanity. Wild Ledger can present opportunities, prepare transactions, verify results, and reconstruct history. The human Operator decides when human participation deserves recognition.</p>
+<p><strong>We'd like to know less about you.</strong> Wild Ledger should ask for no more information than it needs for the immediate function. It does not need to build a permanent private profile merely because software can collect one.</p>
+<p>Wild Ledger does not maintain its own database as a competing keeper of canonical community history. Where permanent record matters, the ledger carries the durable fact.</p>
+</div>
+</details>
+
+<details class="card">
+<summary>Wallet Roles &amp; Provenance</summary>
+<div class="body">
+<p>Different wallets do different jobs. The <strong>Issuer</strong> defines and issues LEAP. The <strong>Distributor</strong> handles protocol-authorized distribution functions such as community allocations. The <strong>Wild Ledger Owner Wallet</strong> carries Wild Ledger owner authority. Each <strong>Community Operating Wallet</strong> speaks and acts for its own community.</p>
+<p>Signer identity matters. Two transactions can use the same XRPL mechanism and still have different protocol meaning because they were signed by different authorized roles for different purposes.</p>
+<p>That is why Wild Ledger verifies who signed, what asset is involved, where it is going, what the memo says, and which protocol rules apply instead of classifying a transaction by transaction type alone.</p>
+</div>
+</details>
+
+<details class="card">
+<summary>Protocol Statements &amp; Community State</summary>
+<div class="body">
+<p>Not every community action transfers LEAP. The Community Operating Wallet can publish canonical state through successful validated XRPL transactions whose public memo carries the protocol statement.</p>
+<p>Recognition lifecycle, authority state, CONFIG, and other protocol state are interpreted from validated ledger evidence according to their applicable rules. A state statement changes what Wild Ledger should understand about the community; it does not automatically mean that a member earned recognition or that LEAP moved.</p>
+<p>When a state value changes, validated ledger order determines which valid value is current. Wild Ledger does not need a parallel private history database to remember the sequence.</p>
+</div>
+</details>
+
+<details class="card">
+<summary>Progressive Disclosure &amp; Ledger Trails</summary>
+<div class="body">
+<p><strong>Wild Ledger does not hide Web3 from the human. It makes Web3 understandable to the human.</strong></p>
+<p>Ledger Trails make consequential operations observable: connect the wallet, verify the connection, prepare the action, ask the human to review and sign, submit it, wait for network validation, independently verify the result, and show completion.</p>
+<p>The normal view can stay simple. The underlying evidence remains available when somebody wants to inspect it. This is <strong>progressive disclosure rather than concealment</strong>.</p>
+<p>Wild Ledger does not remove complexity. It organizes access to it. A newcomer can follow plain-language checkpoints; an experienced Operator can move quickly; a learner or troubleshooter can open the evidence underneath.</p>
+<p>The more consequential and permanent an action is, the less willing Wild Ledger should be to hide that action behind abstraction.</p>
+</div>
+</details>
+</section>
+
+<section class="section">
+<h2>Tax Reporting</h2>
+<p class="section-note">Wild Ledger can surface ledger facts. Valuation and tax treatment remain your responsibility.</p>
+
+<details class="card">
+<summary><span class="num">1</span>Transaction History &amp; Timestamps</summary>
+<div class="body">
+<p>Use the validated XRPL record as the factual starting point. Wild Ledger can surface the transaction, asset and amount, relevant wallets, validated ledger timestamp, and the community context that Wild Ledger can reconstruct from the ledger.</p>
+<p>Where XRP was received, the ledger can establish how much XRP moved and when the validated transaction occurred.</p>
+<p><strong>Wild Ledger does not determine the market value of XRP at that timestamp.</strong> It is not an exchange or a tax authority. The Operator or taxpayer can use the validated timestamp with the valuation source appropriate to their own reporting process.</p>
+<p>Wild Ledger also does not decide whether a transaction is taxable, determine cost basis, or provide tax advice. Its job is to make the underlying ledger facts usable and exportable so the person responsible for the return—or their tax professional—can apply the appropriate rules.</p>
+</div>
+</details>
+</section>
+
+<footer>Wild Ledger Operations Manual</footer>
+</main></body></html>
