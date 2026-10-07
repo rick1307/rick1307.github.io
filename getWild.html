@@ -106,7 +106,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
 .trail-action strong{display:block;color:#ffe2a7;font-size:1.12rem;letter-spacing:.01em}
 .trail-action p{margin:6px 0 0;color:rgba(255,244,214,.80);font-size:.76rem;line-height:1.45}
 .trail-action img{display:block;width:min(220px,72vw);margin:14px auto 0;padding:7px;border-radius:13px;background:white}
-.trail-action .trail-uri{margin-top:8px;color:rgba(236,249,247,.42);font-size:.52rem;line-height:1.35;overflow-wrap:anywhere}
+.trail-action .trail-uri{display:none!important} /* Debug-only WalletConnect URI: intentionally hidden from the user. */
 .trail-choice-list{display:grid;gap:8px;margin-top:12px}
 .trail-choice-list button{margin:0;width:100%;min-height:46px;text-align:left;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#f5fbfa}
 .trail-choice-list button small{display:block;margin-top:4px;font-weight:600;opacity:.68}
@@ -115,6 +115,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
 .trail-complete-check{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(159,224,176,.48);border-radius:50%;background:rgba(159,224,176,.12);color:#bdf2c8;font-size:1rem;font-weight:950}
 .trail-complete-text{color:#bdf2c8;font-size:.8rem;font-weight:850}
 .trail-retry{width:100%;min-height:44px;margin-top:12px;border:1px solid rgba(255,183,170,.26);border-radius:12px;background:rgba(239,118,93,.08);color:#ffd0c8;font-weight:850}
+.trail-retry.qr-retry{min-height:58px;font-size:1.08rem;letter-spacing:.02em;border-color:rgba(255,183,170,.52);background:rgba(239,118,93,.14);color:#ffb7aa}
 @media(prefers-reduced-motion:reduce){body{animation:none}.ledger-trail,.ledger-trail-panel,body.wl-view-leaving{transition:none}.trail-step.active .trail-marker:before{animation:none}}
 
 </style>
@@ -254,8 +255,15 @@ function resetLedgerTrail() {
     row.className = "trail-step";
     row.querySelector(".trail-marker").textContent = "○";
   });
+  const walletRow = trailElement("wallet");
+  if (walletRow) {
+    walletRow.querySelector(".trail-copy strong").textContent = "Wallet connection";
+    walletRow.querySelector(".trail-copy span").textContent = "Waiting for the XRPL wallet connection.";
+  }
   ledgerTrailStatus.className = "trail-status";
   ledgerTrailStatus.textContent = "Starting the trail…";
+  ledgerTrailRetry.textContent = "Follow the Trail Again";
+  ledgerTrailRetry.classList.remove("qr-retry");
   ledgerTrailRetry.hidden = true;
   trailRetryHandler = null;
   trailComplete.classList.remove("show");
@@ -301,13 +309,11 @@ function showTrailAction(title, copy, { qrDataUrl = "", uri = "" } = {}) {
     trailQrImage.hidden = true;
     trailQrImage.removeAttribute("src");
   }
-  if (uri) {
-    trailUri.textContent = uri;
-    trailUri.hidden = false;
-  } else {
-    trailUri.textContent = "";
-    trailUri.hidden = true;
-  }
+  // Debug-only: keep the encoded WalletConnect URI internal. It is intentionally
+  // not rendered in Ledger Trail because it adds noise on a phone.
+  // trailUri.textContent = uri || "";
+  trailUri.textContent = "";
+  trailUri.hidden = true;
   trailAction.classList.add("show");
 }
 
@@ -386,6 +392,28 @@ function failTrail(error, retryHandler = null) {
   ledgerTrailRetry.hidden = !retryHandler;
 }
 
+function failWalletConnection(error) {
+  const message = error?.message || String(error);
+  console.warn("Wild Ledger wallet connection failed:", message);
+
+  hideTrailAction();
+  activeTrailStep = "wallet";
+  const row = trailElement("wallet");
+  if (row) {
+    row.className = "trail-step failed";
+    row.querySelector(".trail-marker").textContent = "×";
+    row.querySelector(".trail-copy strong").textContent = "Wallet Connection Failed";
+    row.querySelector(".trail-copy span").textContent = "Try QR code.";
+  }
+
+  // Keep the human message short; the technical error remains in the console.
+  setTrailStatus("Try QR code.", "error");
+  trailRetryHandler = beginWalletConnection;
+  ledgerTrailRetry.textContent = "TRY QR CODE";
+  ledgerTrailRetry.classList.add("qr-retry");
+  ledgerTrailRetry.hidden = false;
+}
+
 async function showTrailCompletion(text) {
   await wait(500);
   trailCompleteText.textContent = text || "Ledger Trail complete.";
@@ -406,8 +434,11 @@ function fadeNavigate(url, { replace = false } = {}) {
 
 function handleWalletReturn() {
   if (!walletHandoffActive || document.visibilityState === "hidden") return;
-  trailActionCopy.textContent = "Back in Wild Ledger. Checking Bifrost for the wallet connection now; the Trail will continue automatically when the connection is confirmed.";
-  setTrailStatus("Back from Bifrost. Checking the wallet connection…", "busy");
+  // Deliberately quiet. Returning to Safari is not proof that Bifrost completed
+  // the connection, and the existing Ledger Trail checkpoint already shows
+  // what Wild Ledger is waiting for. Keep transient status/debug chatter hidden.
+  // trailActionCopy.textContent = "Back in Wild Ledger. Checking Bifrost…";
+  // setTrailStatus("Back from Bifrost. Checking the wallet connection…", "busy");
 }
 
 function setStatus(message, tone = "") {
@@ -698,8 +729,9 @@ async function beginWalletConnection() {
       qrPlaceholder.textContent = "Wallet connected. A ledger read needs another try.";
       failTrail(error, () => routeConnectedWallet(activeAccount));
     } else {
-      qrPlaceholder.textContent = "The wallet connection did not complete. Create a fresh QR code and try again.";
-      failTrail(error, beginWalletConnection);
+      qrPlaceholder.textContent = "Wallet connection failed. Try QR code.";
+      setStatus("Wallet connection failed. Try QR code.", "error");
+      failWalletConnection(error);
     }
   } finally {
     if (run === connectRun && !viewIsLeaving) refreshQr.disabled = false;
