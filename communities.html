@@ -15,6 +15,8 @@
       --ink:#f4fbfa;
       --muted:rgba(236,249,247,.68);
       --panel:rgba(7,43,57,.74);
+      --good:#9fe0b0;
+      --bad:#ffb7aa;
     }
     *{box-sizing:border-box}
     body{
@@ -89,15 +91,24 @@
     .visibility-switch:disabled{cursor:not-allowed;opacity:.42}
     .visibility-note{margin:0 2px;color:rgba(236,249,247,.48);font-size:.74rem;line-height:1.45}
     .visibility-note.error{color:#ffb2a7}
-    .modal-scrim{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,10,16,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-    .modal-scrim.show{display:flex}
-    .modal{width:min(680px,100%);max-height:92vh;overflow:auto;border:1px solid rgba(134,215,201,.22);border-radius:24px;background:linear-gradient(155deg,#083847,#041f2b);box-shadow:0 30px 100px rgba(0,0,0,.48);padding:22px}
-    .modal h2{margin:0 0 8px;font-size:1.55rem}.modal p{color:var(--muted);line-height:1.5}.modal-grid{display:grid;gap:9px;margin:16px 0}.modal-row{padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035)}
-    .modal-key{display:block;margin-bottom:4px;color:rgba(236,249,247,.48);font-size:.65rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.modal-value{font-size:.78rem;line-height:1.45;overflow-wrap:anywhere}
-    .modal-buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.modal button{appearance:none;border:1px solid rgba(134,215,201,.24);border-radius:12px;background:rgba(47,168,160,.12);color:#dffbf4;padding:11px 13px;font-weight:900}.modal button.primary{background:rgba(47,168,160,.24)}.modal button.danger{background:rgba(239,115,95,.16);border-color:rgba(239,115,95,.28)}.modal button:disabled{opacity:.4}
-    .modal-status{margin-top:12px;color:rgba(236,249,247,.62);font-size:.78rem;line-height:1.5}.modal-status.good{color:#a8f0d7}.modal-status.bad{color:#ffb2a7}
-    .qr-wrap{display:none;margin-top:12px}.qr-wrap.show{display:block}.qr-wrap img{display:block;width:min(280px,100%);margin:auto;border-radius:12px;background:#fff;padding:8px}.uri{margin-top:8px;color:rgba(236,249,247,.45);font-size:.62rem;overflow-wrap:anywhere}
-    pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0 0;padding:12px;border-radius:12px;background:rgba(0,0,0,.22);color:rgba(236,249,247,.72);font-size:.68rem;line-height:1.45}
+    .ledger-trail{position:fixed;inset:0;width:100vw;height:100dvh;z-index:40;display:flex;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:rgba(0,12,19,.80);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .34s ease,visibility 0s linear .34s}
+    .ledger-trail.show{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+    .ledger-trail-panel{position:relative;width:min(470px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:24px 22px 22px;border:1px solid rgba(134,215,201,.24);border-radius:26px;background:linear-gradient(155deg,rgba(14,60,72,.98),rgba(5,30,42,.99));box-shadow:0 34px 90px rgba(0,0,0,.58);opacity:0;transform:translateY(10px) scale(.985);transition:opacity .34s ease,transform .38s cubic-bezier(.2,.8,.2,1)}
+    .ledger-trail.show .ledger-trail-panel{opacity:1;transform:none}
+    .ledger-trail-panel:before{content:"";display:block;height:3px;margin:-24px -22px 21px;background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral))}
+    .trail-topline{display:flex;align-items:center;gap:10px;margin:0 0 6px}
+    .trail-close{flex:0 0 28px;width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;margin:0!important;padding:0!important;display:grid!important;place-items:center;border:1px solid rgba(236,249,247,.20)!important;border-radius:50%!important;background:rgba(255,255,255,.035)!important;color:rgba(245,251,250,.72)!important;font:500 1.05rem/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;cursor:pointer;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;box-shadow:none!important;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+    .trail-close:hover,.trail-close:focus-visible{background:rgba(255,255,255,.08)!important;border-color:rgba(134,215,201,.42)!important;color:#fff!important;outline:none}
+    .trail-close:active{transform:scale(.94)}
+    .trail-kicker{padding-left:0;color:var(--mango);font-size:.64rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+    .ledger-trail h2{margin:7px 0 6px;font-size:clamp(1.8rem,8vw,2.8rem);letter-spacing:-.045em}
+    .trail-lede{margin:0 0 18px;color:var(--muted);font-size:.78rem;line-height:1.5}
+    .trail-action{display:none;margin:0 0 18px;padding:16px;border:1px solid rgba(243,182,74,.30);border-radius:17px;background:linear-gradient(145deg,rgba(243,182,74,.10),rgba(47,168,160,.06))}
+    .trail-action.show{display:block}.trail-action strong{display:block;color:#ffe2a7;font-size:1.05rem}.trail-action p{margin:6px 0 0;color:rgba(255,244,214,.80);font-size:.76rem;line-height:1.45}.trail-action img{display:block;width:min(220px,72vw);margin:14px auto 0;padding:7px;border-radius:13px;background:white}.trail-action .trail-uri{margin-top:8px;color:rgba(236,249,247,.42);font-size:.52rem;line-height:1.35;overflow-wrap:anywhere}
+    .trail-route{display:grid;gap:0;margin:4px 0 18px}.trail-step{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:11px;min-height:58px;align-items:start}.trail-marker{position:relative;display:grid;place-items:center;width:28px;height:28px;margin-top:1px;border:1px solid rgba(236,249,247,.22);border-radius:50%;background:#082936;color:rgba(236,249,247,.40);font-size:.76rem;font-weight:950;z-index:1}.trail-step:not(:last-child) .trail-marker:after{content:"";position:absolute;top:27px;left:50%;width:2px;height:32px;transform:translateX(-50%);background:linear-gradient(to bottom,rgba(134,215,201,.18),rgba(134,215,201,.05))}.trail-copy strong{display:block;padding-top:1px;font-size:.82rem}.trail-copy span{display:block;margin-top:3px;color:rgba(236,249,247,.43);font-size:.66rem;line-height:1.35}.trail-step.done .trail-marker{border-color:rgba(159,224,176,.48);background:rgba(159,224,176,.12);color:#bdf2c8}.trail-step.done:not(:last-child) .trail-marker:after{background:linear-gradient(to bottom,rgba(134,215,201,.75),rgba(134,215,201,.25))}.trail-step.done .trail-copy span{color:rgba(189,242,200,.66)}.trail-step.active .trail-marker{border-color:rgba(243,182,74,.70);background:rgba(243,182,74,.12);color:#ffe2a7;box-shadow:0 0 0 6px rgba(243,182,74,.055)}.trail-step.active .trail-marker:before{content:"";position:absolute;inset:-7px;border:1px solid rgba(243,182,74,.22);border-radius:50%;animation:trailPulse 1.6s ease-out infinite}.trail-step.active .trail-copy strong{color:#ffe2a7}.trail-step.active .trail-copy span{color:rgba(255,226,167,.72)}.trail-step.failed .trail-marker{border-color:rgba(255,183,170,.58);background:rgba(239,115,95,.12);color:var(--bad)}.trail-step.failed .trail-copy strong,.trail-step.failed .trail-copy span{color:var(--bad)}
+    .trail-status{margin:2px 0 0;padding:12px 13px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(0,13,21,.28);color:rgba(236,249,247,.72);font-size:.7rem;line-height:1.45}.trail-status.busy{color:#ffe2a7;border-color:rgba(243,182,74,.20);background:rgba(243,182,74,.05)}.trail-status.error{color:var(--bad);border-color:rgba(239,115,95,.22);background:rgba(239,115,95,.06)}.trail-retry{width:100%;margin-top:11px;border:1px solid rgba(134,215,201,.24);border-radius:12px;padding:11px 13px;background:rgba(134,215,201,.08);color:#dffff8;font-weight:900}.trail-complete{display:none;margin-top:13px;text-align:center;color:#bdf2c8;font-weight:950}.trail-complete.show{display:block}.trail-complete .trail-complete-check{display:grid;place-items:center;width:50px;height:50px;margin:0 auto 8px;border:2px solid rgba(159,224,176,.58);border-radius:50%;background:rgba(159,224,176,.10);font-size:1.55rem}
+    @keyframes trailPulse{0%{transform:scale(.84);opacity:.85}75%,100%{transform:scale(1.32);opacity:0}}
+    @media(prefers-reduced-motion:reduce){.ledger-trail,.ledger-trail-panel{transition:none}.trail-step.active .trail-marker:before{animation:none}}
     .future{
       margin:2px 22px 24px;padding:16px 18px;border:1px dashed rgba(134,215,201,.2);border-radius:18px;
       color:rgba(236,249,247,.58);font-size:.82rem;line-height:1.5;
@@ -135,28 +146,25 @@
     </section>
   </main>
 
-  <div class="modal-scrim" id="visibilityScrim" role="dialog" aria-modal="true" aria-labelledby="visibilityTitle">
-    <section class="modal">
-      <h2 id="visibilityTitle">Change public visibility</h2>
-      <p id="visibilityIntro">This creates a Wild Ledger application statement on XRPL. It does not move LEAP or change the community's canonical authority.</p>
-      <div class="modal-grid">
-        <div class="modal-row"><span class="modal-key">Community</span><span class="modal-value" id="visibilityCommunity">—</span></div>
-        <div class="modal-row"><span class="modal-key">New public state</span><span class="modal-value" id="visibilityState">—</span></div>
-        <div class="modal-row"><span class="modal-key">Current Owner Wallet</span><span class="modal-value" id="visibilityOwner">—</span></div>
-        <div class="modal-row"><span class="modal-key">Signed XRPL memo</span><span class="modal-value" id="visibilityMemo">—</span></div>
+  <div class="ledger-trail" id="ledgerTrail" role="dialog" aria-modal="true" aria-labelledby="ledgerTrailTitle" aria-live="polite">
+    <div class="ledger-trail-panel">
+      <div class="trail-topline">
+        <button class="trail-close" id="ledgerTrailClose" type="button" aria-label="Close Ledger Trail">×</button>
+        <div class="trail-kicker">Wild Ledger · Owner visibility</div>
       </div>
-      <div class="modal-buttons">
-        <button class="primary" id="visibilityConnect" type="button">Connect Bifrost</button>
-        <button id="visibilityPrepare" type="button" disabled>Prepare Transaction</button>
-        <button id="visibilitySign" type="button" disabled>Send to Bifrost for Signature</button>
-        <button class="danger" id="visibilitySubmit" type="button" disabled>Submit to XRPL</button>
-        <button id="visibilityClose" type="button">Close</button>
+      <h2 id="ledgerTrailTitle">The Ledger Trail</h2>
+      <p class="trail-lede" id="ledgerTrailLede">One Owner-authorized path from the current public state to a newly verified visibility state.</p>
+      <div class="trail-action" id="trailAction">
+        <strong id="trailActionTitle">GO TO BIFROST NOW</strong>
+        <p id="trailActionCopy"></p>
+        <img id="trailQrImage" alt="Wallet connection QR code" hidden>
+        <div class="trail-uri" id="trailUri" hidden></div>
       </div>
-      <div class="modal-status" id="visibilityStatus">Connect the current Owner Wallet to continue.</div>
-      <div class="qr-wrap" id="visibilityQrWrap"><img id="visibilityQrImage" alt="WalletConnect QR code"></div>
-      <div class="uri" id="visibilityUri"></div>
-      <pre id="visibilityPreview">No transaction prepared.</pre>
-    </section>
+      <div class="trail-route" id="trailRoute"></div>
+      <p class="trail-status" id="ledgerTrailStatus">Ready when you are.</p>
+      <div class="trail-complete" id="trailComplete"><div class="trail-complete-check">✓</div><div id="trailCompleteText">Visibility updated.</div></div>
+      <button class="trail-retry" id="ledgerTrailRetry" type="button" hidden>Follow the Trail Again</button>
+    </div>
   </div>
 
   <script src="js/wildLedgerConfig.js"></script>
@@ -167,7 +175,6 @@
     import {
       readCommunityVisibility,
       communityIsHidden,
-      communityVisibilityMemo,
       prepareCommunityVisibility,
       submitCommunityVisibility
     } from "./js/communityVisibility.js?wl=20261004xrpl2";
@@ -180,22 +187,7 @@
     const PROJECT_ID = String(config.walletConnectProjectId || "").trim();
     const FEE_CUSHION = Number(config.xrplFeeCushion || 1.2);
 
-    const scrim = document.getElementById("visibilityScrim");
-    const modalTitle = document.getElementById("visibilityTitle");
-    const modalCommunity = document.getElementById("visibilityCommunity");
-    const modalState = document.getElementById("visibilityState");
-    const modalOwner = document.getElementById("visibilityOwner");
-    const modalMemo = document.getElementById("visibilityMemo");
-    const connectButton = document.getElementById("visibilityConnect");
-    const prepareButton = document.getElementById("visibilityPrepare");
-    const signButton = document.getElementById("visibilitySign");
-    const submitButton = document.getElementById("visibilitySubmit");
-    const closeButton = document.getElementById("visibilityClose");
-    const modalStatus = document.getElementById("visibilityStatus");
-    const qrWrap = document.getElementById("visibilityQrWrap");
-    const qrImage = document.getElementById("visibilityQrImage");
-    const uriText = document.getElementById("visibilityUri");
-    const preview = document.getElementById("visibilityPreview");
+    const $ = id => document.getElementById(id);
 
     let latestCommunities = [];
     let visibilityState = null;
@@ -206,16 +198,111 @@
     let pendingHidden = false;
     let prepared = null;
     let signedBlob = "";
-    let submissionAttempted = false;
+    let visibilityTrailBusy = false;
+    let trailActiveStep = "";
+    let trailRetryHandler = null;
+    let walletHandoffActive = false;
+    let trailSubmittedHash = "";
 
-    function setModalStatus(text, tone = "") {
-      modalStatus.classList.remove("good", "bad");
-      if (tone) modalStatus.classList.add(tone);
-      modalStatus.textContent = text;
-    }
+    const TRAIL_STEPS = Object.freeze([
+      ["owner", "Owner authority", "Waiting to recheck the current Wild Ledger Owner."],
+      ["choice", "Visibility choice", "Waiting to confirm the community and requested public state."],
+      ["connect", "Connect Bifrost", "Waiting for the Owner Wallet connection."],
+      ["prepared", "Transaction prepared", "Waiting to build the canonical visibility transaction."],
+      ["signature", "Sign visibility", "Waiting for the Owner Wallet signature."],
+      ["xrpl", "XRPL", "Waiting to submit and validate the transaction."],
+      ["verify", "Verify visibility", "Waiting for independent XRPL reconstruction."],
+      ["ready", "Visibility updated", "Waiting for the final proof."]
+    ]);
 
     function currentOwner() {
       return String(visibilityState?.ownerState?.currentAccount || "").trim();
+    }
+
+    function trailElement(step) {
+      return document.querySelector(`[data-trail-step="${step}"]`);
+    }
+
+    function renderTrail() {
+      $("trailRoute").innerHTML = TRAIL_STEPS.map(([id, label, detail]) =>
+        `<div class="trail-step" data-trail-step="${id}"><div class="trail-marker">○</div><div class="trail-copy"><strong>${label}</strong><span>${detail}</span></div></div>`
+      ).join("");
+    }
+
+    function resetTrail() {
+      trailActiveStep = "";
+      trailRetryHandler = null;
+      walletHandoffActive = false;
+      renderTrail();
+      $("ledgerTrailRetry").hidden = true;
+      $("trailComplete").classList.remove("show");
+      hideTrailAction();
+      const status = $("ledgerTrailStatus");
+      status.className = "trail-status";
+      status.textContent = "Starting the trail…";
+    }
+
+    function showTrail() {
+      resetTrail();
+      $("ledgerTrail").classList.add("show");
+    }
+
+    function hideTrail() {
+      walletHandoffActive = false;
+      $("ledgerTrail").classList.remove("show");
+    }
+
+    function setTrailStep(step, stateName, detail = "") {
+      const row = trailElement(step);
+      if (!row) return;
+      row.className = `trail-step ${stateName}`;
+      const marker = row.querySelector(".trail-marker");
+      marker.textContent = stateName === "done" ? "✓" : stateName === "failed" ? "×" : stateName === "active" ? "•" : "○";
+      if (detail) row.querySelector(".trail-copy span").textContent = detail;
+      if (stateName === "active") trailActiveStep = step;
+    }
+
+    function setTrailStatus(message, tone = "") {
+      const el = $("ledgerTrailStatus");
+      el.className = `trail-status${tone ? ` ${tone}` : ""}`;
+      el.textContent = message;
+    }
+
+    function showTrailAction(title, copy, { qrDataUrl = "", uri = "" } = {}) {
+      walletHandoffActive = true;
+      $("trailActionTitle").textContent = title;
+      $("trailActionCopy").textContent = copy;
+      $("trailQrImage").hidden = !qrDataUrl;
+      $("trailQrImage").src = qrDataUrl || "";
+      $("trailUri").hidden = !uri;
+      $("trailUri").textContent = uri || "";
+      $("trailAction").classList.add("show");
+    }
+
+    function hideTrailAction() {
+      walletHandoffActive = false;
+      $("trailAction").classList.remove("show");
+      $("trailQrImage").hidden = true;
+      $("trailQrImage").src = "";
+      $("trailUri").hidden = true;
+      $("trailUri").textContent = "";
+    }
+
+    function failTrail(error, retryHandler = null, retryLabel = "Follow the Trail Again") {
+      if (trailActiveStep) setTrailStep(trailActiveStep, "failed", error?.message || String(error));
+      setTrailStatus(error?.message || String(error), "error");
+      trailRetryHandler = typeof retryHandler === "function" ? retryHandler : null;
+      $("ledgerTrailRetry").textContent = retryLabel;
+      $("ledgerTrailRetry").hidden = !trailRetryHandler;
+    }
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function trailCompletion(text) {
+      await wait(500);
+      $("trailCompleteText").textContent = text;
+      $("trailComplete").classList.add("show");
+      await wait(650);
     }
 
     function addChip(meta, text, reference = false, hidden = false) {
@@ -281,8 +368,8 @@
       toggle.setAttribute("role", "switch");
       toggle.setAttribute("aria-checked", hidden ? "false" : "true");
       toggle.setAttribute("aria-label", `Public visibility for ${community.communityName || community.communityId}`);
-      toggle.disabled = !visibilityReady;
-      toggle.addEventListener("click", () => openVisibilityDialog(community, !hidden));
+      toggle.disabled = !visibilityReady || visibilityTrailBusy;
+      toggle.addEventListener("click", () => runVisibilityTrail(community, !hidden));
       control.append(label, toggle);
       actions.appendChild(control);
 
@@ -299,56 +386,131 @@
     function clearPrepared() {
       prepared = null;
       signedBlob = "";
-      submissionAttempted = false;
-      signButton.disabled = true;
-      submitButton.disabled = true;
-      submitButton.textContent = "Submit to XRPL";
-      prepareButton.textContent = "Prepare Transaction";
-      preview.textContent = "No transaction prepared.";
+      trailSubmittedHash = "";
     }
 
-    function refreshModalButtons() {
-      const owner = currentOwner();
-      const signerReady = Boolean(signerAccount && owner && signerAccount === owner);
-      connectButton.disabled = !visibilityReady || !owner || !PROJECT_ID || Boolean(signerReady);
-      prepareButton.disabled = !signerReady || !pendingCommunity || Boolean(prepared);
-      if (!prepared) signButton.disabled = true;
-      submitButton.disabled = submissionAttempted || !signedBlob;
+    async function disconnectSigner() {
+      if (!signer) return;
+      try { await signer.disconnect(); } catch (_) {}
+      signer = null;
+      signerAccount = "";
     }
 
-    function openVisibilityDialog(community, nextHidden) {
+    async function reconstructExpectedVisibility(communityId, hidden, { attempts = 8 } = {}) {
+      let lastError = null;
+      for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+          const stateResult = await readCommunityVisibility({ serverUrl: SERVER, force: true });
+          const record = stateResult.visibility.get(communityId) || null;
+          if (record && record.hidden === Boolean(hidden)) return { state: stateResult, record };
+          lastError = new Error(`${communityId} is not yet reconstructed as ${hidden ? "HIDDEN" : "VISIBLE"}.`);
+        } catch (error) {
+          lastError = error;
+        }
+        setTrailStatus(`XRPL submission is already behind us. Reconstructing visibility · check ${attempt} of ${attempts}…`, "busy");
+        await wait(1100 + attempt * 250);
+      }
+      throw lastError || new Error("Canonical visibility could not yet be reconstructed.");
+    }
+
+    function applyPublishedVisibility(stateResult, record, { recovered = false } = {}) {
+      visibilityState = stateResult;
+      visibilityReady = true;
+      renderList();
+      const ledger = record?.ledger ?? "?";
+      visibilityNote.classList.remove("error");
+      visibilityNote.textContent = `${record.communityId} is now ${record.hidden ? "hidden from" : "visible on"} the public Wild Ledger page. Owner-signed XRPL state validated in ledger ${ledger}.`;
+      return ledger;
+    }
+
+    async function finishVisibilityTrail(stateResult, record, { recovered = false, alreadyCanonical = false } = {}) {
+      const ledger = applyPublishedVisibility(stateResult, record, { recovered });
+      setTrailStep("verify", "done", `${record.communityId} reconstructed as ${record.hidden ? "HIDDEN" : "VISIBLE"} from validated Owner history${ledger !== "?" ? ` · ledger ${ledger}` : ""}.`);
+      setTrailStep("ready", "active", "Final proof is complete.");
+      await wait(180);
+      setTrailStep("ready", "done", `${record.communityId} is ${record.hidden ? "hidden from" : "visible on"} the public Wild Ledger page.`);
+      setTrailStatus(alreadyCanonical ? "The requested visibility was already canonical. No second transaction was submitted." : "Owner visibility is canonical. The change is complete.");
+      await trailCompletion(record.hidden ? "Community hidden" : "Community visible");
+      hideTrail();
+      pendingCommunity = null;
+      prepared = null;
+      signedBlob = "";
+      trailSubmittedHash = "";
+    }
+
+    async function resumeVisibilityReadback() {
+      if (!pendingCommunity) return;
+      if (!$("ledgerTrail").classList.contains("show")) $("ledgerTrail").classList.add("show");
+      visibilityTrailBusy = true;
+      renderList();
+      const id = pendingCommunity.communityId;
+      const target = pendingHidden ? "HIDDEN" : "VISIBLE";
+      setTrailStep("owner", "done", "Owner authority was confirmed before submission.");
+      setTrailStep("choice", "done", `${id} target state confirmed as ${target}.`);
+      setTrailStep("connect", "done", "Current Owner Wallet connection completed.");
+      setTrailStep("prepared", "done", "Canonical visibility transaction was prepared.");
+      setTrailStep("signature", "done", "Owner signature was returned by Bifrost.");
+      setTrailStep("xrpl", "done", trailSubmittedHash ? `Transaction submitted · ${trailSubmittedHash.slice(0, 12)}…` : "Signed transaction was submitted once; Wild Ledger will not resubmit it.");
+      setTrailStep("verify", "active", "Reading validated Owner visibility history until the requested state is canonical.");
+      try {
+        const recovered = await reconstructExpectedVisibility(id, pendingHidden);
+        await finishVisibilityTrail(recovered.state, recovered.record, { recovered: true });
+      } catch (error) {
+        failTrail(error, () => resumeVisibilityReadback(), "Retry XRPL readback");
+      } finally {
+        visibilityTrailBusy = false;
+        renderList();
+      }
+    }
+
+    async function runVisibilityTrail(community, nextHidden) {
+      if (visibilityTrailBusy) return;
+      visibilityTrailBusy = true;
       pendingCommunity = community;
       pendingHidden = Boolean(nextHidden);
       clearPrepared();
-      modalTitle.textContent = `${pendingHidden ? "Hide" : "Show"} ${community.communityName || community.communityId}`;
-      modalCommunity.textContent = `${community.communityName || community.communityId} (${community.communityId})`;
-      modalState.textContent = pendingHidden ? "HIDDEN — remove from splash.html" : "VISIBLE — show on splash.html";
-      modalOwner.textContent = currentOwner() || "Resolving…";
-      modalMemo.textContent = communityVisibilityMemo(community.communityId, pendingHidden);
-      setModalStatus(
-        signerAccount === currentOwner() && signerAccount
-          ? "Current Owner Wallet is already connected. Prepare the transaction."
-          : "Connect the current Owner Wallet in Bifrost to continue."
-      );
-      qrWrap.classList.remove("show");
-      uriText.textContent = "";
-      scrim.classList.add("show");
-      refreshModalButtons();
-    }
+      renderList();
+      showTrail();
+      $("ledgerTrailLede").textContent = `One Owner-authorized path to make ${community.communityName || community.communityId} ${pendingHidden ? "hidden from" : "visible on"} the public Wild Ledger page. Each breadcrumb lights only when that step is real.`;
 
-    async function closeVisibilityDialog() {
-      scrim.classList.remove("show");
-      pendingCommunity = null;
-      clearPrepared();
-      refreshModalButtons();
-    }
-
-    async function connectOwner() {
       try {
         if (!PROJECT_ID) throw new Error("WalletConnect Project ID is not configured.");
-        if (!currentOwner()) throw new Error("Current Owner Wallet could not be resolved from XRPL.");
-        connectButton.disabled = true;
-        setModalStatus("Initializing WalletConnect…");
+
+        setTrailStep("owner", "active", "Rechecking the current Wild Ledger Owner from validated XRPL history.");
+        visibilityState = await readCommunityVisibility({ serverUrl: SERVER, force: true });
+        visibilityReady = true;
+        const owner = currentOwner();
+        if (!owner) throw new Error("Current Wild Ledger Owner authority could not be resolved from XRPL.");
+        setTrailStep("owner", "done", `Current Wild Ledger Owner confirmed: ${owner}`);
+
+        setTrailStep("choice", "active", "Confirming the selected community and requested public state against current XRPL visibility history.");
+        const liveCommunity = latestCommunities.find(item => item.communityId === community.communityId);
+        if (!liveCommunity) throw new Error("That community is no longer in the live Wild Ledger directory.");
+        const defaultHidden = liveCommunity?.source === "owner-xrpl";
+        const currentHidden = communityIsHidden(visibilityState, liveCommunity.communityId, defaultHidden);
+        const target = pendingHidden ? "HIDDEN" : "VISIBLE";
+        setTrailStep("choice", "done", `${liveCommunity.communityId}: ${currentHidden ? "HIDDEN" : "VISIBLE"} → ${target}`);
+
+        if (currentHidden === pendingHidden) {
+          const existing = visibilityState.visibility.get(liveCommunity.communityId) || null;
+          if (existing) {
+            setTrailStep("connect", "done", "No wallet handoff needed; the requested state is already canonical.");
+            setTrailStep("prepared", "done", "No new transaction required.");
+            setTrailStep("signature", "done", "No new signature required.");
+            setTrailStep("xrpl", "done", "No new XRPL submission required.");
+            setTrailStep("verify", "active", "Confirming the existing canonical visibility record.");
+            await finishVisibilityTrail(visibilityState, existing, { alreadyCanonical: true });
+            return;
+          }
+        }
+
+        setTrailStep("connect", "active", "Bifrost needs the current Owner Wallet connection.");
+        setTrailStatus("Waiting for the Owner Wallet connection…", "busy");
+        await disconnectSigner();
+        showTrailAction(
+          "GO TO BIFROST NOW",
+          "First handoff: approve the Wild Ledger Owner wallet connection in Bifrost, then return here. Wild Ledger will verify the connected account before continuing."
+        );
         signer = new WalletConnectXrplSigner({
           projectId: PROJECT_ID,
           metadata: {
@@ -360,97 +522,45 @@
         });
         const connection = await signer.connect({
           onUri: async uri => {
-            qrImage.src = await QRCode.toDataURL(uri, { width: 560, margin: 2, errorCorrectionLevel: "M" });
-            qrWrap.classList.add("show");
-            uriText.textContent = uri;
-            setModalStatus("QR ready. Approve the connection in Bifrost.");
+            const qrDataUrl = await QRCode.toDataURL(uri, { width: 560, margin: 2, errorCorrectionLevel: "M" });
+            showTrailAction(
+              "GO TO BIFROST NOW",
+              "First handoff: approve the Wild Ledger Owner wallet connection in Bifrost, then return here. Wild Ledger will verify the connected account before continuing.",
+              { qrDataUrl, uri }
+            );
+            setTrailStatus("Bifrost has the helm. Approve the Owner Wallet connection, then return here.", "busy");
           }
         });
-        qrWrap.classList.remove("show");
-        uriText.textContent = "";
         signerAccount = connection.account;
-        if (signerAccount !== currentOwner()) {
-          const wrong = signerAccount;
-          try { await signer.disconnect(); } catch (_) {}
-          signer = null;
-          signerAccount = "";
-          throw new Error(`Wrong wallet connected: ${wrong}. Current Owner is ${currentOwner()}.`);
-        }
-        setModalStatus(`${connection.walletName} connected as the current Owner Wallet.`, "good");
-        clearPrepared();
-      } catch (error) {
-        setModalStatus(error?.message || String(error), "bad");
-      } finally {
-        refreshModalButtons();
-      }
-    }
+        if (signerAccount !== currentOwner()) throw new Error(`Wrong wallet connected: ${signerAccount}. Current Owner is ${currentOwner()}.`);
+        hideTrailAction();
+        setTrailStep("connect", "done", "Correct current Owner Wallet connected.");
 
-    async function prepareVisibility() {
-      try {
-        if (!pendingCommunity) throw new Error("No community is selected.");
-        if (!latestCommunities.some(item => item.communityId === pendingCommunity.communityId)) {
-          throw new Error("That community is no longer in the live Wild Ledger directory.");
-        }
-        if (!signerAccount || signerAccount !== currentOwner()) throw new Error("Connect the current Owner Wallet first.");
-        prepareButton.disabled = true;
-        setModalStatus("Rechecking Owner authority and simulating the XRPL transaction…");
+        setTrailStep("prepared", "active", "Rechecking Owner authority and building the exact visibility AccountSet.");
         prepared = await prepareCommunityVisibility({
           serverUrl: SERVER,
-          communityId: pendingCommunity.communityId,
+          communityId: liveCommunity.communityId,
           hidden: pendingHidden,
           feeCushion: FEE_CUSHION
         });
-        if (prepared.ownerAccount !== signerAccount) {
-          clearPrepared();
-          throw new Error("Owner authority changed. Reconnect the current Owner Wallet.");
-        }
+        if (prepared.ownerAccount !== signerAccount) throw new Error("Owner authority changed after wallet connection. Nothing was signed or submitted.");
         signedBlob = "";
-        preview.textContent = JSON.stringify(prepared.preparedTx, null, 2);
-        prepareButton.textContent = "Prepared";
-        setModalStatus(`Prepared successfully. Network fee: ${prepared.preparedTx.Fee} drops. Nothing has been signed or submitted yet.`, "good");
-        signButton.disabled = false;
-      } catch (error) {
-        clearPrepared();
-        setModalStatus(error?.message || String(error), "bad");
-      } finally {
-        refreshModalButtons();
-        if (prepared) signButton.disabled = false;
-      }
-    }
+        setTrailStep("prepared", "done", `${prepared.memoText} · fee ${prepared.preparedTx.Fee} drops.`);
 
-    async function signVisibility() {
-      try {
-        if (!prepared || !signer) throw new Error("Prepare the visibility transaction first.");
-        if (signerAccount !== prepared.ownerAccount) throw new Error("Connected signer does not match the prepared Owner Wallet.");
-        signButton.disabled = true;
-        setModalStatus("Waiting for Bifrost signature…");
-        const result = await signer.signTransaction(prepared.preparedTx);
-        signedBlob = String(result.signedBlob || "");
+        setTrailStep("signature", "active", "The current Owner Wallet must authorize this visibility statement.");
+        showTrailAction(
+          "GO TO BIFROST NOW",
+          `Second handoff: approve and sign the ${target} visibility transaction in Bifrost, then return here. Wild Ledger will not submit until the signed transaction comes back.`
+        );
+        setTrailStatus("Waiting for the Owner signature…", "busy");
+        const signed = await signer.signTransaction(prepared.preparedTx);
+        signedBlob = String(signed?.signedBlob || "");
         if (!signedBlob) throw new Error("Bifrost did not return a signed transaction.");
-        setModalStatus("Signed transaction returned by Bifrost. It has not been submitted yet. Press Submit once; after that Wild Ledger will handle confirmation.", "good");
-        submitButton.disabled = false;
-      } catch (error) {
-        signedBlob = "";
-        setModalStatus(error?.message || String(error), "bad");
-      } finally {
-        refreshModalButtons();
-        if (prepared && !signedBlob) signButton.disabled = false;
-        if (signedBlob) submitButton.disabled = false;
-      }
-    }
+        hideTrailAction();
+        setTrailStep("signature", "done", "Owner signature received from Bifrost.");
 
-    async function submitVisibility() {
-      try {
-        if (!prepared || !signedBlob || !pendingCommunity) throw new Error("Sign the visibility transaction first.");
-        if (submissionAttempted) throw new Error("This signed transaction has already been submitted or is being checked. Do not submit it again.");
-
-        // From this point forward the Submit button never becomes available for
-        // this signed blob again. Wild Ledger owns confirmation/recovery.
-        submissionAttempted = true;
-        submitButton.disabled = true;
-        submitButton.textContent = "Checking XRPL…";
-        setModalStatus("Submitting this signed transaction once. After broadcast, Wild Ledger will keep checking XRPL; do not submit it again.");
-
+        setTrailStep("xrpl", "active", "Rechecking Owner authority, submitting once, and waiting for validated XRPL consensus.");
+        setTrailStatus("Submitting to XRPL and waiting for validated consensus…", "busy");
         const published = await submitCommunityVisibility({
           serverUrl: SERVER,
           signedBlob,
@@ -458,52 +568,63 @@
           communityId: prepared.communityId,
           hidden: prepared.hidden,
           onSubmitted: ({ txHash }) => {
-            submitButton.textContent = "Submitted — checking XRPL…";
-            setModalStatus(`Accepted by XRPL (${txHash}). Waiting for validation and canonical visibility reconstruction…`);
+            trailSubmittedHash = String(txHash || "").toUpperCase();
+            setTrailStatus(`Accepted by XRPL${trailSubmittedHash ? ` · ${trailSubmittedHash.slice(0, 12)}…` : ""}. Waiting for validation…`, "busy");
+          },
+          onValidated: ({ txHash, ledgerIndex, recovered }) => {
+            trailSubmittedHash = String(txHash || trailSubmittedHash || "").toUpperCase();
+            setTrailStep("xrpl", "done", `${recovered ? "Validated visibility recovered" : "Visibility transaction validated"}${ledgerIndex ? ` · ledger ${ledgerIndex}` : ""}.`);
+            setTrailStep("verify", "active", "Independently reconstructing the canonical visibility state from validated Owner history.");
+            setTrailStatus("XRPL validation is real. Wild Ledger is now proving the resulting visibility state from ledger history…", "busy");
           }
         });
 
-        visibilityState = published.visibilityState;
-        visibilityReady = true;
-        renderList();
-        const ledger = published.result.ledgerIndex ?? "?";
-        visibilityNote.classList.remove("error");
-        visibilityNote.textContent = `${prepared.communityId} is now ${prepared.hidden ? "hidden from" : "visible on"} the public Wild Ledger page. Owner-signed XRPL state validated in ledger ${ledger}.`;
-        setModalStatus(
-          `${published.recovered ? "Confirmed from validated XRPL history" : "Validated"} in ledger ${ledger}. Wild Ledger reconstructed ${prepared.communityId} as ${prepared.hidden ? "HIDDEN" : "VISIBLE"}.`,
-          "good"
-        );
-        preview.textContent = JSON.stringify({
-          hash: published.result.txHash,
-          ledger: published.result.ledgerIndex,
-          memo: published.record.memo,
-          state: published.record.state,
-          recovered: Boolean(published.recovered)
-        }, null, 2);
-        signedBlob = "";
-        prepared = null;
-        signButton.disabled = true;
-        submitButton.disabled = true;
-        submitButton.textContent = "Confirmed on XRPL";
-        modalOwner.textContent = currentOwner();
+        if (published.alreadyCanonical) {
+          setTrailStep("xrpl", "done", "The requested visibility became canonical before submission. The signed transaction was not broadcast again.");
+        } else {
+          trailSubmittedHash = String(published.result?.txHash || trailSubmittedHash || "").toUpperCase();
+          setTrailStep("xrpl", "done", `Visibility transaction validated${published.result?.ledgerIndex ? ` · ledger ${published.result.ledgerIndex}` : ""}.`);
+        }
+
+        setTrailStep("verify", "active", "Independently confirming the canonical visibility state from validated Owner history.");
+        if (!published.record || published.record.hidden !== pendingHidden) throw new Error("XRPL validated, but the expected visibility state was not reconstructed.");
+        await finishVisibilityTrail(published.visibilityState, published.record, {
+          recovered: Boolean(published.recovered),
+          alreadyCanonical: Boolean(published.alreadyCanonical)
+        });
       } catch (error) {
-        setModalStatus(error?.message || String(error), "bad");
-        // Never re-enable Submit after an attempt. If confirmation is uncertain,
-        // the safe next action is Close + refresh, not a second broadcast.
-        submitButton.disabled = true;
-        submitButton.textContent = error?.doNotResubmit ? "Do not resubmit" : "Submission stopped";
+        hideTrailAction();
+        if (error?.doNotResubmit || trailSubmittedHash) {
+          if (trailActiveStep === "xrpl") setTrailStep("xrpl", "done", trailSubmittedHash ? `Transaction submitted · ${trailSubmittedHash.slice(0, 12)}… · do not resubmit.` : "The signed transaction may already be on XRPL. Do not resubmit it.");
+          setTrailStep("verify", "active", "The safe next action is canonical XRPL readback, not another transaction.");
+          failTrail(error, () => resumeVisibilityReadback(), "Retry XRPL readback");
+        } else {
+          failTrail(error, () => {
+            hideTrail();
+            setTimeout(() => runVisibilityTrail(pendingCommunity, pendingHidden), 220);
+          }, "Try Visibility Change Again");
+        }
       } finally {
-        refreshModalButtons();
+        visibilityTrailBusy = false;
+        renderList();
       }
     }
 
-    connectButton.addEventListener("click", connectOwner);
-    prepareButton.addEventListener("click", prepareVisibility);
-    signButton.addEventListener("click", signVisibility);
-    submitButton.addEventListener("click", submitVisibility);
-    closeButton.addEventListener("click", closeVisibilityDialog);
-    scrim.addEventListener("click", event => { if (event.target === scrim) void closeVisibilityDialog(); });
-    document.addEventListener("keydown", event => { if (event.key === "Escape" && scrim.classList.contains("show")) void closeVisibilityDialog(); });
+    $("ledgerTrailClose").addEventListener("click", hideTrail);
+    $("ledgerTrailRetry").addEventListener("click", () => {
+      const handler = trailRetryHandler;
+      trailRetryHandler = null;
+      $("ledgerTrailRetry").hidden = true;
+      if (handler) handler();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (!walletHandoffActive || !$("ledgerTrail").classList.contains("show")) return;
+      if (document.visibilityState === "hidden") setTrailStatus("Bifrost has the helm. Wild Ledger will be here when you return.", "busy");
+      else setTrailStatus("Back in Wild Ledger. Checking Bifrost for proof before continuing…", "busy");
+    });
+    window.addEventListener("focus", () => {
+      if (walletHandoffActive && $("ledgerTrail").classList.contains("show")) setTrailStatus("Checking the wallet handoff…", "busy");
+    });
 
     try {
       state.textContent = "Loading Wild Ledger community discovery…";
@@ -516,7 +637,6 @@
           visibilityNote.classList.remove("error");
           visibilityNote.textContent = "Public visibility comes from Owner-signed XRPL statements. Newly provisioned communities default hidden until explicitly made visible; legacy communities keep their existing visible default.";
           renderList();
-          refreshModalButtons();
         })
         .catch(error => {
           visibilityReady = false;
