@@ -115,7 +115,14 @@
 
     /* ENTRY */
     #entryView{padding:34px}
-    .entry-card{max-width:560px;margin:auto;text-align:center;padding:20px 0 12px}
+    @keyframes wlChatEntryCardEnter {
+      from { opacity:0; }
+      to { opacity:1; }
+    }
+    .entry-card{
+      max-width:560px;margin:auto;text-align:center;padding:20px 0 12px;
+      animation:wlChatEntryCardEnter 360ms ease-out both;
+    }
     .entry-card h2{margin:0;color:var(--navy);font-size:2rem}
     .entry-card p{color:#5b696f;margin:10px auto 22px;max-width:460px}
     .entry-card .entry-intro{margin:10px auto 4px}
@@ -597,7 +604,8 @@
 
     @media (prefers-reduced-motion: reduce) {
       html.wl-chat-enter body,
-      body.wl-chat-exit { animation-duration:1ms; }
+      body.wl-chat-exit,
+      .entry-card { animation-duration:1ms; }
     }
   </style>
   <script>
