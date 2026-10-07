@@ -1452,7 +1452,6 @@
 
     async function beginRecordWalletConnection() {
       const run = ++connectRun;
-      refreshButton.disabled = true;
       qrImage.hidden = true;
       qrImage.removeAttribute("src");
       qrPlaceholder.hidden = false;
@@ -1505,8 +1504,6 @@
         qrPlaceholder.hidden = false;
         qrPlaceholder.textContent = "Try again";
         setStatus("Wallet connection failed. Tap Fresh QR and try again.", "error");
-      } finally {
-        if (run === connectRun) refreshButton.disabled = false;
       }
     }
 
