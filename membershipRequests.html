@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071f2c">
+<title>Membership Requests | Wild Ledger</title>
+<style>
+  :root {
+    --ink: #f5fbfa;
+    --lagoon: #29b8b1;
+    --sea-glass: #79d5c2;
+    --mango: #f4bd58;
+    --coral: #ef765d;
+    --muted: rgba(236,249,247,.68);
+    --panel: rgba(10,45,58,.70);
+    --line: rgba(219,248,244,.14);
+    --shadow: 0 28px 78px rgba(0,16,24,.38);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { min-height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(41,184,177,.34) 0, rgba(41,184,177,.12) 22%, transparent 44%),
+      radial-gradient(circle at 87% 15%, rgba(244,189,88,.24) 0, rgba(244,189,88,.07) 21%, transparent 42%),
+      radial-gradient(circle at 88% 86%, rgba(239,118,93,.24) 0, rgba(239,118,93,.07) 23%, transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(121,213,194,.19) 0, transparent 42%),
+      linear-gradient(145deg,#06202e 0%,#0a3444 48%,#071d2a 100%);
+  }
+  .shell { width: min(100% - 28px, 920px); margin: 34px auto 50px; }
+  .console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: clamp(22px,5vw,38px);
+  }
+  .console::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral));
+  }
+  .nav { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-bottom: 38px; }
+  .back-link, .action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 16px;
+    border: 1px solid rgba(121,213,194,.34);
+    border-radius: 999px;
+    background: rgba(121,213,194,.09);
+    color: #dbfff4;
+    text-decoration: none;
+    font-size: .84rem;
+    font-weight: 800;
+    cursor:pointer;
+  }
+  .back-link:hover,.back-link:focus-visible,.action:hover,.action:focus-visible {
+    background: rgba(121,213,194,.17);
+    border-color: rgba(121,213,194,.6);
+  }
+  .eyebrow { color:var(--mango); font-size:.68rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
+  h1 { margin: 10px 0 15px; font-size:clamp(2.3rem,7vw,4.25rem); line-height:1; letter-spacing:-.055em; }
+  .lede { max-width: 660px; margin:0 0 25px; color:var(--muted); line-height:1.55; }
+  .panel { padding:21px; border:1px solid var(--line); border-radius:20px; background:rgba(5,34,46,.49); }
+  .panel + .panel { margin-top:16px; }
+  .row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .panel h2 { margin:0 0 13px; font-size:1.22rem; letter-spacing:-.02em; }
+  .label { color:var(--muted); font-size:.75rem; font-weight:700; margin-bottom:6px; }
+  .value { margin:0; font-weight:800; font-size:1.04rem; }
+  .wallet { overflow-wrap:anywhere; font-size:.84rem; line-height:1.5; font-variant-ligatures:none; }
+  .status { color:#ffe6af; line-height:1.5; }
+  .status.error { color:#ffb7aa; }
+  .check { display:inline-flex; gap:7px; align-items:center; color:#bdf2c8; font-size:.85rem; font-weight:850; }
+  .check::before { content:"✓"; font-weight:900; }
+  .grid { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:14px; margin-top:18px; }
+  .empty { padding:30px 16px; text-align:center; color:var(--muted); line-height:1.55; border:1px dashed rgba(121,213,194,.24); border-radius:15px; }
+  .notice { max-width:640px; color:var(--muted); line-height:1.5; }
+  .error-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:17px; }
+  @media (max-width:600px) {
+    .shell { margin-top:14px; }
+    .console { border-radius:22px; }
+    .nav { margin-bottom:30px; }
+    .grid { grid-template-columns:1fr; }
+  }
+</style>
+<link rel="stylesheet" href="wildLedgerBackend.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="console" aria-labelledby="pageTitle">
+      <nav class="nav" aria-label="Operator navigation">
+        <a id="backLink" class="back-link" href="viewCommunity.html" hidden>← View Community</a>
+      </nav>
+      <div class="eyebrow">Wild Ledger · Operator</div>
+      <h1 id="pageTitle">Membership Requests</h1>
+
+      <section id="checkingPanel" class="panel" role="status" aria-live="polite">
+        <h2>Checking access</h2>
+        <p id="checkingText" class="status">Reading the Operator session…</p>
+      </section>
+
+      <section id="deniedPanel" class="panel" hidden aria-live="polite">
+        <h2>Access not verified</h2>
+        <p id="deniedText" class="status error"></p>
+        <div class="error-actions">
+          <a class="action" href="getWild.html">Sign in through Get Wild</a>
+          <button id="retryButton" class="action" type="button" hidden>Retry authority check</button>
+        </div>
+      </section>
+
+      <div id="authorizedContent" hidden>
+        <p class="lede">This workspace will show requests to join your community. For now, it confirms the signed-in Operator and the community they are authorized to operate.</p>
+        <section class="panel" aria-label="Verified community">
+          <div class="row">
+            <div>
+              <div class="label">Community</div>
+              <h2 id="communityName">Community</h2>
+            </div>
+            <div class="check">Current authority verified on XRPL</div>
+          </div>
+          <div class="grid">
+            <div>
+              <div class="label">Community ID</div>
+              <p class="value" id="communityId"></p>
+            </div>
+            <div>
+              <div class="label">Operating Wallet</div>
+              <p class="value wallet" id="operatorWallet"></p>
+            </div>
+          </div>
+        </section>
+        <section class="panel" aria-label="Membership requests placeholder">
+          <h2>Membership Requests</h2>
+          <div class="empty">Membership requests will appear here.<br>XRPL request reading is the next development step.</div>
+        </section>
+      </div>
+    </section>
+  </main>
+<script src="js/communityConfig.js" data-registry-only="true"></script>
+<script src="js/wildLedgerConfig.js"></script>
+<script type="module">
+import { isClassicAddress } from "./js/xrplTransport.js";
+import { resolveWalletAccess } from "./js/communityAccess.js";
+
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(window.location.search);
+const xrplServer = String(window.WILD_LEDGER_CONFIG?.xrplWebSocket || "").trim();
+let checking = false;
+
+// Match the session shapes already accepted by viewCommunity.html.
+// A role or community written into a URL is never proof of Operator authority.
+function readOperatorSession() {
+  try {
+    const session = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
+    if (!session || typeof session !== "object") return null;
+    if (String(session.role || "").trim().toLowerCase() !== "operator") return null;
+    const version = Number(session.version);
+    const source = String(session.source || "").trim();
+    const communityId = String(session.communityId || "").trim().toUpperCase();
+    const wallet = String(version === 2 ? session.connectedWallet : session.verifiedWallet || "").trim();
+    const validV1 = version === 1 && source === "wallet-proof + validated-xrpl-authority";
+    const validV2 = version === 2 && source === "wallet-connect + validated-xrpl-authority";
+    if (!validV1 && !validV2) return null;
+    if (!communityId || !isClassicAddress(wallet)) return null;
+    return { communityId, wallet, communityName: String(session.communityName || "").trim() };
+  } catch (_) {
+    return null;
+  }
+}
+
+function showDenied(message, retry = false) {
+  $("checkingPanel").hidden = true;
+  $("authorizedContent").hidden = true;
+  $("backLink").hidden = true;
+  $("deniedPanel").hidden = false;
+  $("deniedText").textContent = message;
+  $("retryButton").hidden = !retry;
+}
+
+async function checkAccess() {
+  if (checking) return;
+  checking = true;
+  $("deniedPanel").hidden = true;
+  $("authorizedContent").hidden = true;
+  $("checkingPanel").hidden = false;
+  $("checkingText").textContent = "Reading the Operator session…";
+  const session = readOperatorSession();
+  if (!session) {
+    showDenied("There is no verified Operator session in this tab. Sign in through Get Wild.");
+    checking = false;
+    return;
+  }
+
+  // Reject a hand-typed link to another community or another role.
+  const requestedId = String(params.get("community") || "").trim().toUpperCase();
+  const requestedRole = String(params.get("role") || "").trim().toLowerCase();
+  if ((requestedId && requestedId !== session.communityId) || (requestedRole && requestedRole !== "operator")) {
+    showDenied("This link does not match the signed-in Operator's community. Return through Get Wild.");
+    checking = false;
+    return;
+  }
+
+  // Catch stale or inconsistent downstream wallet keys without treating them as proof.
+  const downstreamWallet = String(sessionStorage.getItem("wildLedgerOperatorWallet") || "").trim();
+  if (downstreamWallet && downstreamWallet !== session.wallet) {
+    showDenied("The Operator wallet in this tab does not match the current session. Sign in through Get Wild again.");
+    checking = false;
+    return;
+  }
+  if (!xrplServer) {
+    showDenied("Wild Ledger has no configured XRPL server. Current authority could not be checked.");
+    checking = false;
+    return;
+  }
+
+  $("checkingText").textContent = "Reading current Operating Wallet authority from XRPL…";
+  try {
+    const access = await resolveWalletAccess({ account: session.wallet, serverUrl: xrplServer, force: true });
+    const matched = (access?.operatorMatches || []).find(item =>
+      String(item.communityId || "").trim().toUpperCase() === session.communityId &&
+      String(item.currentAccount || "").trim() === session.wallet &&
+      item.authorityEstablished === true
+    );
+    if (!matched) {
+      showDenied("This wallet is not the current authorized Operating Wallet for this community. Sign in through Get Wild again.");
+      return;
+    }
+    // Reconfirm that the session has not changed while XRPL was being read.
+    const stillCurrent = readOperatorSession();
+    if (!stillCurrent || stillCurrent.wallet !== session.wallet || stillCurrent.communityId !== session.communityId) {
+      showDenied("The Operator session changed during verification. Sign in through Get Wild again.");
+      return;
+    }
+    const cachedName = (() => {
+      try {
+        const cached = JSON.parse(sessionStorage.getItem("wildLedger.currentCommunityConfig") || "null");
+        return String(cached?.communityId || "").trim().toUpperCase() === session.communityId
+          ? String(cached?.config?.communityName || "").trim() : "";
+      } catch (_) { return ""; }
+    })();
+    const communityName = cachedName || session.communityName || String(matched.communityName || "").trim() || session.communityId;
+    $("communityName").textContent = communityName;
+    $("communityId").textContent = session.communityId;
+    $("operatorWallet").textContent = session.wallet;
+    $("backLink").href = `viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
+    $("backLink").hidden = false;
+    document.title = `Membership Requests · ${communityName} | Wild Ledger`;
+    $("checkingPanel").hidden = true;
+    $("authorizedContent").hidden = false;
+  } catch (error) {
+    showDenied(`Current XRPL authority could not be checked: ${error?.message || String(error)}`, true);
+  } finally {
+    checking = false;
+  }
+}
+
+$("retryButton").addEventListener("click", checkAccess);
+checkAccess();
+</script>
+</body>
+</html>
