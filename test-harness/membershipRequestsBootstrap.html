@@ -540,6 +540,8 @@ function resetTrail() {
   $("signinLink").hidden = true;
   $("authorizedContent").hidden = true;
   $("backLink").hidden = true;
+  // A new trail must never reuse evidence from an earlier run.
+  try { sessionStorage.removeItem("wildLedger.membershipRequestsHandoff"); } catch (_) { /* Step 1 will explain an unavailable Operator session. */ }
   runContext.session = null; runContext.matched = null; runContext.requests = null;
   runContext.scanned = 0; runContext.pages = 0; runContext.excluded = 0; runContext.priceStatements = 0;
   for (let n = 1; n <= 4; n++) {
@@ -652,6 +654,34 @@ async function performStep(number) {
     const current = assertSessionUnchanged();
     const requests = runContext.requests;
     if (!Array.isArray(requests)) throw new Error("The search has not finished. Return to the previous step.");
+    // The report is a destination, not another Ledger Trail. Carry only the
+    // verified result rows in this tab; never require the report to rescan XRPL.
+    const handoff = {
+      version: 1,
+      source: "membershipRequestsBootstrap",
+      communityId: current.communityId,
+      operatorWallet: current.wallet,
+      communityName: $("communityName").textContent,
+      verifiedAt: Date.now(),
+      requests: requests.map(row => ({
+        applicant: row.applicant,
+        destination: row.destination,
+        drops: row.drops,
+        expectedDrops: row.expectedDrops,
+        ledger: row.ledger,
+        txIndex: row.txIndex,
+        hash: row.hash,
+        priceStatement: row.priceStatement ? {
+          ledger: row.priceStatement.ledger,
+          txIndex: row.priceStatement.txIndex
+        } : null
+      }))
+    };
+    try {
+      sessionStorage.setItem("wildLedger.membershipRequestsHandoff", JSON.stringify(handoff));
+    } catch (_) {
+      throw new Error("The verified results could not be carried to the report in this browser tab. No ledger transaction was sent. Please free some browser storage and try this step again.");
+    }
     $("authorizedContent").hidden = false;
     $("backLink").hidden = false;
     $("requestStatus").textContent = `${requests.length} membership ${requests.length === 1 ? "request" : "requests"} verified from XRPL.`;
