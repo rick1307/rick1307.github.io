@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061b25">
+<title>CONFIG History Inspector — Wild Ledger</title>
+<style>
+:root{color-scheme:dark;--bg:#061b25;--card:#0b2b38;--ink:#ecf9f7;--muted:#b0c9c8;--line:rgba(143,222,213,.2);--good:#a5f2ba;--warn:#ffdd99;--bad:#ffa9a0}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 0,#103f4c,transparent 44%),linear-gradient(135deg,#041821,#061b25 70%,#082831);color:var(--ink);font:15px/1.52 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:950px;margin:auto;padding:18px 12px 48px}.panel{background:linear-gradient(160deg,rgba(11,44,56,.98),rgba(5,26,36,.99));border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 18px 56px rgba(0,0,0,.24)}
+header{padding:24px 22px;border-bottom:1px solid var(--line)}.eyebrow{font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;color:#86d7c9}h1{font-size:clamp(27px,6vw,42px);line-height:1.06;letter-spacing:-.025em;margin:8px 0 12px}.lead{max-width:720px;color:var(--muted);margin:0 0 12px}.safe{border:1px solid rgba(165,242,186,.34);background:rgba(43,108,82,.15);border-radius:12px;padding:12px;color:#d5fbe0;font-weight:750}section{padding:17px 20px;border-bottom:1px solid rgba(143,222,213,.13)}section:last-of-type{border-bottom:none}h2{font-size:18px;margin:0 0 9px}p{margin:5px 0 11px}button{border:0;background:#2fa8a0;color:#fff;border-radius:12px;padding:13px 16px;font:inherit;font-weight:800;min-height:44px;cursor:pointer}button:disabled{cursor:wait;opacity:.6}.status{padding:13px 14px;background:rgba(255,255,255,.05);border-radius:11px;margin-top:12px;white-space:pre-wrap}ul{padding-left:20px;margin:10px 0;color:var(--muted)}.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 12px;font-size:14px}.kv strong{color:#e2fff5}.mono{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere;word-break:break-word}.muted{color:var(--muted)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.count{font-weight:900;font-size:21px}.item{border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;background:rgba(0,0,0,.12)}.item-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}.tag{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900}.item h3{font-size:15px;margin:0}.reason{margin-top:9px;font-weight:650}.item details{margin-top:9px;color:var(--muted)}.item summary{cursor:pointer;font-size:13px;font-weight:800}.item pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-size:11px;max-height:240px;overflow:auto;background:rgba(0,0,0,.24);padding:10px;border-radius:8px}.note{font-size:13px;color:var(--muted)}.empty{padding:16px 2px;color:var(--muted)}[hidden]{display:none!important}a{color:#98efe2}footer{font-size:12px;color:var(--muted);padding:17px 22px;border-top:1px solid var(--line)}@media(max-width:620px){header{padding:21px 15px}section{padding:17px 14px}.kv{grid-template-columns:1fr;gap:2px}.kv strong:not(:first-child){margin-top:5px}}
+</style>
+<script src="../js/wildLedgerConfig.js"></script>
+<script src="../js/communityConfig.js" data-registry-only="true"></script>
+</head>
+<body>
+<main><div class="panel">
+<header>
+<div class="eyebrow">Wild Ledger · Test Harness · SFL</div>
+<h1>CONFIG History Inspector</h1>
+<p class="lead">Did Sailing Frog's Leap publish CONFIG on XRPL? This inspector shows older and newer CONFIG records and explains why the current Get Wild reader accepts or ignores each one.</p>
+<div class="safe">Read-only inspection. No wallet connection, no signatures, no transactions, and no XRP spent.</div>
+</header>
+<section>
+<h2>1. Inspect SFL history</h2>
+<p class="muted">The inspector discovers SFL's Operating Wallet history from the same authority system used by Get Wild. It searches current and former Operating Wallets.</p>
+<button type="button" id="run">Read CONFIG history</button>
+<div class="status" role="status" aria-live="polite" id="status">Ready to inspect. Nothing has been submitted to XRPL.</div>
+</section>
+<section id="authoritySection" hidden>
+<h2>2. Community authority</h2>
+<div id="authority" class="kv"></div>
+<p class="note">An Operating Wallet can publish CONFIG only while it has authority. Earlier records remain visible for inspection.</p>
+</section>
+<section id="summarySection" hidden>
+<h2>3. What the current reader finds</h2>
+<div id="summary"></div>
+</section>
+<section id="historySection" hidden>
+<h2>4. CONFIG publications found</h2>
+<div id="history"></div>
+<p class="note">This view includes CONFIG-like statements that the current reader ignores. Records are shown from newest to oldest. A zero result means none appeared in the XRPL history returned by this server; it does not prove the wallet never published one if the server lacks older ledger data.</p>
+</section>
+<footer>Independent history inspection only. This page does not alter SFL or fix CONFIG. Do not republish based on this report alone.</footer>
+</div></main>
+<script type="module">
+import { DirectXRPLClient, isClassicAddress } from "../js/xrplTransport.js";
+import { resolveWalletAccess } from "../js/communityAccess.js";
+import { isCanonicalNoOpAccountSet, isAuthorizedAtLedger } from "../js/communityAuthority.js";
+import { readCommunityConfig, communityConfigMemo } from "../js/communityState.js";
+import { decodeCommunityConfigV1Compact, COMMUNITY_CONFIG_SCHEMA } from "../js/communityConfigSchema.js";
+
+const COMMUNITY_ID = "SFL";
+const PREFIX = `WILD-LEDGER/STATE/${COMMUNITY_ID}/CONFIG`;
+const serverUrl = String(window.WILD_LEDGER_CONFIG?.xrplWebSocket || "").trim();
+const $ = id => document.getElementById(id);
+const runButton = $("run");
+function status(message, type = "") { $("status").textContent = message; $("status").className = `status ${type}`; }
+function show(id) { $(id).hidden = false; }
+function line(parent, label, value, mono = false) {
+  const a=document.createElement("strong"), b=document.createElement("span");
+  a.textContent=label; b.textContent=String(value ?? "Not available");
+  if (mono) b.className="mono";
+  parent.append(a,b);
+}
+function normalizeTx(entry) { return entry?.tx_json || entry?.tx || entry?.transaction || entry || {}; }
+function hexToText(hex) {
+  if (typeof hex !== "string" || !hex || !/^(?:[0-9a-fA-F]{2})+$/.test(hex)) return "";
+  try { return new TextDecoder("utf-8",{fatal:true}).decode(Uint8Array.from(hex.match(/../g),h=>parseInt(h,16))).replace(/\0+$/g, ""); }
+  catch (_) { return ""; }
+}
+function allMemoStrings(tx) {
+  return (Array.isArray(tx.Memos) ? tx.Memos : []).flatMap(x => {
+    const memo=x?.Memo||{};
+    return [memo.MemoData,memo.MemoType,memo.MemoFormat].map(hexToText).filter(Boolean);
+  });
+}
+function memoDataText(tx) {
+  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+  if (memos.length!==1) return "";
+  const memo=memos[0]?.Memo||{};
+  return memo.MemoType || memo.MemoFormat ? "" : hexToText(memo.MemoData);
+}
+function resemblesConfig(text) {
+  return String(text || "").startsWith(PREFIX);
+}
+function txOrder(entry,tx) {
+  const ledger=Number(entry?.ledger_index ?? entry?.ledgerIndex ?? tx?.ledger_index ?? tx?.inLedger);
+  const meta=entry?.meta||entry?.metaData||entry?.metadata||{};
+  const index=Number(meta?.TransactionIndex ?? meta?.transaction_index ?? entry?.tx_index ?? entry?.transaction_index);
+  return { ledger:Number.isFinite(ledger)&&ledger>0?ledger:null, txIndex:Number.isFinite(index)&&index>=0?index:null };
+}
+function xrplDate(tx) {
+  if (!Number.isFinite(Number(tx?.date))) return "Date unavailable";
+  const date=new Date((Number(tx.date)+946684800)*1000);
+  return Number.isFinite(date.valueOf()) ? date.toISOString().replace("T"," ").replace(".000Z"," UTC") : "Date unavailable";
+}
+function classification(entry,authority) {
+  const tx=normalizeTx(entry);
+  const memo=memoDataText(tx);
+  const strings=allMemoStrings(tx);
+  const text=strings.find(resemblesConfig)||"";
+  if (!text) return null;
+  const {ledger,txIndex}=txOrder(entry,tx);
+  const meta=entry?.meta||entry?.metaData||entry?.metadata||{};
+  const result=meta.TransactionResult ?? meta.transaction_result;
+  const record={
+    account:String(tx.Account||""), ledger, txIndex,
+    hash:String(entry?.hash||entry?.tx_hash||tx.hash||"").toUpperCase(),
+    date:xrplDate(tx), memo:text,
+    state:"ignored",reason:"", qualified:false
+  };
+  if (entry?.validated===false || (result && result!=="tesSUCCESS")) {
+    record.reason=`Transaction was not a validated success (${result||"validation not confirmed"}).`;
+  } else if (!isCanonicalNoOpAccountSet(tx)) {
+    record.reason="Not a canonical no-op AccountSet. The current reader requires an AccountSet with no setting changes.";
+  } else if (!isClassicAddress(tx.Account)) {
+    record.reason="The transaction sender is not a valid classic XRP address.";
+  } else if (!memo || memo!==text) {
+    record.reason="CONFIG must appear as the only MemoData field of a single memo (without MemoType or MemoFormat).";
+  } else if (!memo.startsWith(PREFIX+"=")) {
+    record.reason="CONFIG namespace is incomplete or uses a different separator.";
+  } else {
+    const value=memo.slice((PREFIX+"=").length);
+    const separator=value.indexOf("|");
+    if (separator<0) record.reason="Legacy pointer-only CONFIG: the current reader requires the full compact CONFIG payload after |.";
+    else if (separator===0 || !/^[1-9][0-9]*$/.test(value.slice(0,separator))) record.reason="CONFIG schema number is invalid.";
+    else if (Number(value.slice(0,separator)) !== COMMUNITY_CONFIG_SCHEMA) record.reason=`Unsupported CONFIG schema ${value.slice(0,separator)} (current schema is ${COMMUNITY_CONFIG_SCHEMA}).`;
+    else if (!value.slice(separator+1)) record.reason="Complete CONFIG payload is missing after the | separator.";
+    else {
+      try {
+        const config=decodeCommunityConfigV1Compact(value.slice(separator+1),{communityId:COMMUNITY_ID});
+        const canonical=communityConfigMemo(config,{communityId:COMMUNITY_ID});
+        if (canonical.memoText!==memo) record.reason="Payload can be decoded but its encoding is not canonical.";
+        else if (!Number.isFinite(ledger)) record.reason="Transaction ledger position is missing; authority cannot be verified.";
+        else if (!isAuthorizedAtLedger(authority,record.account,ledger,txIndex)) record.reason="The sender was not the authoritative SFL Operating Wallet at this ledger position.";
+        else { record.qualified=true; record.state="candidate"; record.reason="Complete Schema 1 CONFIG, canonical encoding, and valid Operating Wallet authority."; }
+      } catch (error) { record.reason=`Complete CONFIG payload is invalid: ${error?.message||error}`; }
+    }
+  }
+  return record;
+}
+async function accountHistory(client,account,onPage) {
+  const rows=[];let marker, page=0;
+  do {
+    const fields={account,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};
+    if (marker!==undefined) fields.marker=marker;
+    const response=await client.request("account_tx",fields,30000);
+    const result=response?.result||{};
+    if (!Array.isArray(result.transactions)) throw new Error(`XRPL returned no transaction list for ${account}.`);
+    rows.push(...result.transactions);marker=result.marker;page++;
+    onPage({page,total:rows.length});
+    if (page>2000) throw new Error(`Safety stop after 2,000 history pages for ${account}; results would be incomplete.`);
+  } while (marker!==undefined&&marker!==null);
+  return rows;
+}
+function renderRecord(row, accepted, readerFailed=false) {
+  const box=document.createElement("div");box.className="item";
+  const header=document.createElement("div");header.className="item-head";
+  const title=document.createElement("h3"),tag=document.createElement("span");
+  title.textContent=`Ledger ${row.ledger??"unknown"} · ${row.date}`;
+  const good=accepted.has(row.hash);
+  const candidate=row.qualified;
+  tag.className=`tag ${good?"good":candidate?"warn":"bad"}`;
+  tag.textContent=good?"Accepted by current reader":candidate?"Potentially valid — not confirmed":readerFailed?"Does not match current rules":"Ignored by current reader";
+  header.append(title,tag);box.append(header);
+  const reason=document.createElement("div");reason.className="reason";
+  reason.textContent=good?"Validated complete CONFIG. This record qualifies under today's Wild Ledger reader.":row.reason;
+  box.append(reason);
+  const details=document.createElement("div");details.className="kv";
+  line(details,"Published by",row.account,true);
+  line(details,"Ledger transaction",row.hash||"Hash unavailable",true);
+  line(details,"Transaction index",row.txIndex??"Unknown");
+  box.append(details);
+  const disclosure=document.createElement("details"),label=document.createElement("summary"),memo=document.createElement("pre");
+  label.textContent="Show exact memo";memo.textContent=row.memo;
+  disclosure.append(label,memo);box.append(disclosure);
+  return box;
+}
+async function inspect() {
+  runButton.disabled=true;
+  for(const id of ["authoritySection","summarySection","historySection"]) $(id).hidden=true;
+  for(const id of ["authority","summary","history"]) $(id).replaceChildren();
+  try {
+    if (!serverUrl) throw new Error("The site's XRPL server is not configured.");
+    const community=window.WILD_LEDGER_GET_COMMUNITY?.(COMMUNITY_ID);
+    if (!community || !isClassicAddress(community.operatingWallet)) throw new Error("SFL's original Operating Wallet anchor is unavailable in the community registry.");
+    status("Finding SFL's authority history from XRPL…");
+    // This is the same resolver Get Wild uses. Its evaluated records retain historical authority intervals.
+    const access=await resolveWalletAccess({account:community.operatingWallet,serverUrl,force:true});
+    const authority=(access.evaluated||[]).find(item=>String(item.communityId||"").toUpperCase()===COMMUNITY_ID);
+    if (!authority) throw new Error("SFL does not appear in the authority records resolved by Get Wild. Inspection stopped; no conclusions drawn about CONFIG.");
+    const historicalAccounts=[...new Set((authority.authorityIntervals||[]).map(i=>i.account).filter(isClassicAddress))];
+    if (!historicalAccounts.length) throw new Error("No Operating Wallet intervals were returned by the authority reader.");
+    const summaryAuthority=$("authority");
+    line(summaryAuthority,"Community",COMMUNITY_ID);
+    line(summaryAuthority,"Current Operator",authority.currentAccount,true);
+    line(summaryAuthority,"Wallets to inspect",String(historicalAccounts.length));
+    historicalAccounts.forEach((account,index)=>line(summaryAuthority,`Wallet ${index+1}`,account,true));
+    show("authoritySection");
+    const client=new DirectXRPLClient(serverUrl);
+    let records=[];
+    try {
+      await client.connect();
+      for (let i=0;i<historicalAccounts.length;i++) {
+        const wallet=historicalAccounts[i];
+        status(`Reading ${i+1} of ${historicalAccounts.length} Operating Wallet histories…`);
+        const rows=await accountHistory(client,wallet,({page,total})=>status(`Reading ${i+1}/${historicalAccounts.length} wallets: page ${page}, ${total} transactions returned…`));
+        records.push(...rows.map(row=>classification(row,authority)).filter(Boolean));
+      }
+    } finally {client.close();}
+    // Use the actual reader Get Wild uses as the final decision, not merely our diagnostic approximation.
+    status(`Found ${records.length} CONFIG-like transaction(s). Rechecking against the exact CONFIG reader used by Get Wild…`);
+    let live=null, readerError="";
+    try { live=await readCommunityConfig({authority,serverUrl}); }
+    catch(error) { readerError=String(error?.message||error); }
+    const accepted=new Set((live?.records||[]).map(row=>String(row.hash||"").toUpperCase()));
+    const current=live?.current||null;
+    const report=$("summary");
+    const banner=document.createElement("div");banner.className="status";
+    banner.textContent=readerError
+      ? `The current CONFIG reader could not finish: ${readerError}. Transaction history is shown below, but acceptance is unconfirmed.`
+      : current
+        ? `Get Wild currently recognizes a complete CONFIG for ${COMMUNITY_ID}. Latest qualifying publication: ledger ${current.ledger}.`
+        : `Get Wild currently recognizes NO complete CONFIG for ${COMMUNITY_ID}. That explains why an authorized Operator would be sent to Setup.`;
+    report.append(banner);
+    const facts=document.createElement("div");facts.className="kv";
+    line(facts,"CONFIG records found",records.length);
+    line(facts,"Accepted by reader",readerError?"Unknown — reader failed":accepted.size);
+    line(facts,"Old / ignored",readerError?"Unknown":records.filter(row=>!accepted.has(row.hash)).length);
+    line(facts,"Current CONFIG hash",current?.hash||"None",true);
+    report.append(facts);
+    show("summarySection");
+    const history=$("history");
+    records.sort((a,b)=>(b.ledger??0)-(a.ledger??0)||(b.txIndex??-1)-(a.txIndex??-1));
+    if(!records.length){const empty=document.createElement("p");empty.className="empty";empty.textContent="No SFL CONFIG statements were found in the histories returned by this XRPL server.";history.append(empty);}
+    else records.forEach(record=>history.append(renderRecord(record,accepted,Boolean(readerError))));
+    show("historySection");
+    status(readerError
+      ? `Inspection partially finished. ${records.length} CONFIG-like record(s) found, but current-reader verification failed: ${readerError}. No XRPL transactions sent.`
+      : `Inspection finished. ${records.length} CONFIG-like record(s) found; ${accepted.size} accepted by the current reader. No XRPL transactions sent.`,readerError?"warn":"good");
+  } catch(error) {
+    status(`Inspection could not finish: ${error?.message||error}. No writes were made. An incomplete inspection cannot establish whether CONFIG was ever published.`,"bad");
+  } finally {runButton.disabled=false;}
+}
+runButton.addEventListener("click",inspect);
+</script>
+</body>
+</html>
