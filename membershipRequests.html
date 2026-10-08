@@ -86,6 +86,13 @@
   .check::before { content:"✓"; font-weight:900; }
   .grid { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:14px; margin-top:18px; }
   .empty { padding:30px 16px; text-align:center; color:var(--muted); line-height:1.55; border:1px dashed rgba(121,213,194,.24); border-radius:15px; }
+  .request-card { padding:15px; border:1px solid rgba(121,213,194,.22); border-radius:15px; background:rgba(121,213,194,.055); }
+  .request-card + .request-card { margin-top:12px; }
+  .request-title { font-weight:850; color:#bdf2c8; margin-bottom:12px; }
+  .request-detail { margin:8px 0 0; color:var(--muted); font-size:.80rem; line-height:1.5; }
+  .request-detail strong { color:var(--ink); font-weight:700; overflow-wrap:anywhere; }
+  .request-status { color:var(--muted); line-height:1.5; }
+  .request-status.error { color:#ffb7aa; }
   .notice { max-width:640px; color:var(--muted); line-height:1.5; }
   .error-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:17px; }
   @media (max-width:600px) {
@@ -121,7 +128,7 @@
       </section>
 
       <div id="authorizedContent" hidden>
-        <p class="lede">This workspace will show requests to join your community. For now, it confirms the signed-in Operator and the community they are authorized to operate.</p>
+        <p class="lede">Requests to join your community, discovered from XRPL. This page only reads ledger history; no XRP is spent.</p>
         <section class="panel" aria-label="Verified community">
           <div class="row">
             <div>
@@ -141,9 +148,11 @@
             </div>
           </div>
         </section>
-        <section class="panel" aria-label="Membership requests placeholder">
+        <section class="panel" aria-label="Membership requests discovered on XRPL">
           <h2>Membership Requests</h2>
-          <div class="empty">Membership requests will appear here.<br>XRPL request reading is the next development step.</div>
+          <p id="requestStatus" class="request-status" role="status" aria-live="polite">Ready to read XRPL history.</p>
+          <div id="requestList" hidden></div>
+          <p id="requestNotice" class="notice" hidden>These are matching payments found in XRPL history. Full protocol checks of the historical price and Operating Wallet are reserved for the next development step.</p>
         </section>
       </div>
     </section>
@@ -151,7 +160,7 @@
 <script src="js/communityConfig.js" data-registry-only="true"></script>
 <script src="js/wildLedgerConfig.js"></script>
 <script type="module">
-import { isClassicAddress } from "./js/xrplTransport.js";
+import { DirectXRPLClient, isClassicAddress } from "./js/xrplTransport.js";
 import { resolveWalletAccess } from "./js/communityAccess.js";
 
 const $ = id => document.getElementById(id);
@@ -180,9 +189,103 @@ function readOperatorSession() {
   }
 }
 
+// Step 3: Discover memo-matched payments in the current Operating Wallet's
+// validated account history. Price and historical authority checks follow in Step 4.
+function memoText(hex) {
+  const value = String(hex || "");
+  if (!value || !/^(?:[0-9a-fA-F]{2})+$/.test(value)) return "";
+  try {
+    const bytes = Uint8Array.from(value.match(/../g), pair => Number.parseInt(pair, 16));
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch (_) { return ""; }
+}
+
+function matchingPayment(entry, destination, communityId) {
+  if (entry?.validated !== true) return null;
+  const tx = entry?.tx_json || entry?.tx || entry?.transaction || {};
+  const meta = entry?.meta || entry?.metaData || {};
+  if (meta.TransactionResult !== "tesSUCCESS" || tx.TransactionType !== "Payment" || tx.Destination !== destination || !isClassicAddress(tx.Account)) return null;
+  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+  if (memos.length !== 1 || !memos[0]?.Memo || memos[0].Memo.MemoType || memos[0].Memo.MemoFormat ||
+      memoText(memos[0].Memo.MemoData) !== `WILD-LEDGER/MEMBERSHIP-REQUEST/${communityId}`) return null;
+  const amount = tx.Amount ?? tx.DeliverMax;
+  const ledger = Number(entry.ledger_index ?? tx.ledger_index);
+  const hash = String(entry.hash || tx.hash || "").toUpperCase();
+  if (typeof amount !== "string" || !/^[1-9][0-9]*$/.test(amount) || !Number.isInteger(ledger) || ledger < 1 || !/^[0-9A-F]{64}$/.test(hash)) return null;
+  return { applicant: tx.Account, drops: amount, ledger, hash };
+}
+
+async function discoverMatchingPayments(destination, communityId) {
+  const client = new DirectXRPLClient(xrplServer);
+  const found = new Map();
+  let scanned = 0;
+  try {
+    await client.connect();
+    let marker;
+    do {
+      const fields = { account: destination, ledger_index_min: -1, ledger_index_max: -1, binary: false, forward: true, limit: 400 };
+      if (marker !== undefined) fields.marker = marker;
+      const response = await client.request("account_tx", fields, 30000);
+      const entries = response?.result?.transactions;
+      if (!Array.isArray(entries)) throw new Error("XRPL returned no readable transaction list.");
+      for (const entry of entries) {
+        scanned += 1;
+        const request = matchingPayment(entry, destination, communityId);
+        if (request) found.set(request.hash, request);
+      }
+      $("requestStatus").textContent = `Reading XRPL history… ${scanned} transactions checked.`;
+      marker = response.result.marker;
+    } while (marker !== undefined && marker !== null);
+  } finally {
+    client.close();
+  }
+  return [...found.values()].sort((a, b) => b.ledger - a.ledger || a.hash.localeCompare(b.hash));
+}
+
+function requestDetail(label, value) {
+  const line = document.createElement("p");
+  line.className = "request-detail";
+  line.textContent = `${label}: `;
+  const strong = document.createElement("strong");
+  strong.textContent = value;
+  line.append(strong);
+  return line;
+}
+
+function showMatchingPayments(requests) {
+  const list = $("requestList");
+  list.replaceChildren();
+  list.hidden = false;
+  $("requestNotice").hidden = false;
+  if (!requests.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "No matching membership-request payments were found in the available Operating Wallet history.";
+    list.append(empty);
+    $("requestStatus").textContent = "Search complete. No matching payments found.";
+    return;
+  }
+  for (const request of requests) {
+    const card = document.createElement("article");
+    card.className = "request-card";
+    const title = document.createElement("div");
+    title.className = "request-title";
+    title.textContent = "Request found on XRPL";
+    card.append(title,
+      requestDetail("Applicant", request.applicant),
+      requestDetail("XRP sent", `${request.drops} ${request.drops === "1" ? "drop" : "drops"}`),
+      requestDetail("Validated ledger", String(request.ledger)),
+      requestDetail("Transaction hash", request.hash));
+    list.append(card);
+  }
+  $("requestStatus").textContent = `${requests.length} matching ${requests.length === 1 ? "payment" : "payments"} found in XRPL history.`;
+}
+
 function showDenied(message, retry = false) {
   $("checkingPanel").hidden = true;
   $("authorizedContent").hidden = true;
+  $("requestList").hidden = true;
+  $("requestNotice").hidden = true;
   $("backLink").hidden = true;
   $("deniedPanel").hidden = false;
   $("deniedText").textContent = message;
@@ -259,6 +362,22 @@ async function checkAccess() {
     document.title = `Membership Requests · ${communityName} | Wild Ledger`;
     $("checkingPanel").hidden = true;
     $("authorizedContent").hidden = false;
+    $("requestList").hidden = true;
+    $("requestNotice").hidden = true;
+    $("requestStatus").classList.remove("error");
+    $("requestStatus").textContent = "Reading membership-request payments from XRPL…";
+    try {
+      const requests = await discoverMatchingPayments(session.wallet, session.communityId);
+      const afterRead = readOperatorSession();
+      if (!afterRead || afterRead.wallet !== session.wallet || afterRead.communityId !== session.communityId) {
+        showDenied("The Operator session changed during the XRPL search. Sign in through Get Wild again.");
+        return;
+      }
+      showMatchingPayments(requests);
+    } catch (readError) {
+      $("requestStatus").classList.add("error");
+      $("requestStatus").textContent = `XRPL request search could not finish: ${readError?.message || String(readError)}. No result is claimed.`;
+    }
   } catch (error) {
     showDenied(`Current XRPL authority could not be checked: ${error?.message || String(error)}`, true);
   } finally {
