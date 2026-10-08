@@ -245,7 +245,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
           <a class="community-link" id="communityTokenomicsLink" href="viewCommunityTokenomics.html">Tokenomics</a>
           <a class="community-link" id="communityRecognitionLink" href="viewCommunityRecognition.html">Recognition</a>
           <a class="community-link" id="communityCheckbookLink" href="operatorCheckbook.html">Checkbook</a>
-          <a class="community-link" id="communityMembershipRequestsLink" href="membershipRequests.html">Membership Requests</a>
+          <a class="community-link" id="communityMembershipRequestsLink" href="test-harness/membershipRequestsBootstrap.html">Membership Requests</a>
           <a class="community-link" id="communityLibraryLink" href="viewCommunityLibrary.html">Library</a>
         </div>
       </header>
@@ -372,7 +372,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
 
   if (communityMembershipRequestsLink) {
     if (role === "operator") {
-      communityMembershipRequestsLink.href = `membershipRequests.html?community=${encodeURIComponent(requestedId)}&role=operator`;
+      communityMembershipRequestsLink.href = `test-harness/membershipRequestsBootstrap.html?community=${encodeURIComponent(requestedId)}&role=operator`;
     } else {
       communityMembershipRequestsLink.remove();
     }
