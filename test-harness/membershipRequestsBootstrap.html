@@ -645,6 +645,42 @@ function openGuide() {
   if (!busy) void runNext();
 }
 
+// Network congestion should never make a human restart a read-only Ledger Trail.
+// Retry only transient XRPL read failures, and only inside the current step.
+function isTemporaryXRPLReadFailure(error) {
+  const message = String(error?.message || error || "");
+  return /(?:server.{0,25}busy|too busy|overload|slow.?down|rate.?limit|too many requests|\b429\b|\b503\b|timed? out|timeout|temporarily unavailable|connection (?:closed|lost))/i.test(message);
+}
+
+async function performWithAutomaticReadRetry(number) {
+  // Step 3 only: this is a read-only wallet-history search, never a transaction.
+  if (number !== 3) return performStep(number);
+  const delays = [1500, 3000, 6000]; // Three retries after the initial attempt.
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    assertSessionUnchanged();
+    try {
+      return await performStep(number);
+    } catch (error) {
+      if (!isTemporaryXRPLReadFailure(error) || attempt === delays.length) throw error;
+      // Keep Step 3 actively working. The preceding proven steps stay complete.
+      assertSessionUnchanged();
+      const nextAttempt = attempt + 2;
+      const totalAttempts = delays.length + 1;
+      const waitMs = delays[attempt];
+      const message = `The XRPL server is busy. Trying again automatically (attempt ${nextAttempt} of ${totalAttempts})…`;
+      $("trailMessage3").textContent = message;
+      $("trailProof3").textContent = `Temporary XRPL read error: ${String(error?.message || error)}\nNext read attempt: ${nextAttempt} of ${totalAttempts}\nWaiting: ${waitMs / 1000} seconds\nNo transaction is sent. No XRP is spent. Previous checkpoints remain complete.`;
+      $("requestStatus").textContent = message;
+      updateGuideStatus(message);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+      assertSessionUnchanged();
+      const tryingMessage = `Reading XRPL again (attempt ${nextAttempt} of ${totalAttempts})…`;
+      $("trailMessage3").textContent = tryingMessage;
+      updateGuideStatus(tryingMessage);
+    }
+  }
+}
+
 async function runNext() {
   if (busy || completed) return;
   const number = nextStep();
@@ -660,7 +696,7 @@ async function runNext() {
   updateGuideStatus(workingMessage);
   let succeeded = false;
   try {
-    const result = await performStep(number);
+    const result = await performWithAutomaticReadRetry(number);
     setTrailStep(number,"done",result.message,result.evidence);
     $("trailOverall").textContent = result.message;
     updateGuideStatus(result.message);
