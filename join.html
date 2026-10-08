@@ -227,31 +227,10 @@
     .leap-request-form{margin-top:16px}
     .leap-request-row{display:flex;gap:10px;align-items:stretch}
     .wallet-input-wrap{position:relative;flex:1;min-width:0}
-    .leap-request-form .wallet-address-input,
-    .member-record-open .wallet-address-input{
-      flex:1;min-width:0;padding:13px 14px;border-radius:8px;
-      border:1px solid rgba(26,37,44,.22);background:#fff;color:var(--ink);
-      font-family:var(--community-ui-font);
-      font-size:1rem;outline:none;padding-right:46px;
-    }
-    .wallet-visibility-toggle{
-      position:absolute;right:7px;top:50%;transform:translateY(-50%);
-      width:36px;height:36px;padding:0;border:0;border-radius:8px;
-      background:transparent;color:var(--navy);display:grid;place-items:center;cursor:pointer;
-    }
-    .wallet-visibility-toggle:hover{background:rgba(26,37,44,.06)}
-    .wallet-visibility-toggle:focus-visible{outline:2px solid var(--sea);outline-offset:1px}
-    .wallet-visibility-toggle svg{width:20px;height:20px;display:block}
-    .leap-request-form .wallet-address-input:focus,
-    .member-record-open .wallet-address-input:focus{
-      border-color:var(--sea);box-shadow:0 0 0 3px rgba(47,116,129,.14);
-    }
-    .leap-request-form .button,
-    .member-record-open .button{
+    .leap-request-form .button{
       margin-top:0;border:0;cursor:pointer;white-space:nowrap;
     }
-    .leap-request-form .button:disabled,
-    .member-record-open .button:disabled{opacity:.68;cursor:wait}
+    .leap-request-form .button:disabled{opacity:.68;cursor:wait}
     .leap-request-message{
       margin-top:10px;color:#356a53;
       font-family:var(--community-ui-font);
@@ -304,21 +283,9 @@
     .request-result p{margin:0;color:#4f6066}
     .request-result p+p{margin-top:8px}
 
-    .member-record-open{
-      max-width:720px;margin:22px auto 0;padding-top:20px;border-top:1px solid rgba(47,116,129,.20);
-    }
-    .member-record-open p{margin:0 auto 12px}
-    .member-record-open-row{display:flex;gap:10px;align-items:stretch}
-    .member-record-status{
-      min-height:1.45em;margin:10px auto 0 !important;color:var(--muted) !important;
-      font-family:var(--community-ui-font);
-      font-size:.92rem;text-align:left;
-    }
-    .member-record-status.error{color:var(--rust) !important}
-
     @media(max-width:650px){
-      .leap-request-row,.member-record-open-row{flex-direction:column}
-      .leap-request-form .button,.member-record-open .button{width:100%}
+      .leap-request-row{flex-direction:column}
+      .leap-request-form .button{width:100%}
     }
 
     .invite{
@@ -457,7 +424,7 @@
     .join-gateway{padding-top:12px;padding-bottom:20px}
     .gateway-title{margin-bottom:16px}
     .join-divider{height:1px;background:var(--line);margin-top:24px}
-    .gateway-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:18px;align-items:stretch}
+    .gateway-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:stretch}
     .gateway-card{
       background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;
       box-shadow:0 12px 30px rgba(11,45,54,.07)
@@ -471,9 +438,7 @@
     .gateway-card > p{margin:0;color:var(--muted)}
     .gateway-note{margin-top:10px;color:#5a686e;font-size:.9rem}
     .gateway-card .leap-request-form{margin-top:0}
-    .gateway-card .member-record-open{max-width:none;margin:0;padding-top:0;border-top:0}
-    .gateway-card .member-record-open p{font-size:.98rem;color:var(--muted)}
-    #request-first-leap,#returning-member{scroll-margin-top:84px}
+    #request-first-leap{scroll-margin-top:84px}
 
     .compact-title{margin-bottom:16px}
     .prep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -516,46 +481,13 @@
 
     @media(max-width:650px){
       .wrap{width:min(calc(100% - 24px),var(--max))}
-      .leap-request-form .wallet-address-input,.member-record-open .wallet-address-input{min-height:50px}
-      .leap-request-form .button,.member-record-open .button{min-height:50px}
+      .leap-request-form .button{min-height:50px}
       .section-title p{font-size:1rem}
       .nav-inner{min-height:58px}
       .brand img{width:36px;height:36px}
     }
 
-    /* Public XRPL addresses stay ordinary text fields.
-       A visual overlay obscures the typed address without using password-field styling. */
-    .wallet-input-wrap.wallet-mask-wrap .wallet-address-input{
-      position:relative;
-      z-index:1;
-    }
-    .wallet-input-wrap.wallet-mask-wrap.is-masked .wallet-address-input:not(:placeholder-shown){
-      color:transparent;
-      caret-color:var(--ink);
-    }
-    .wallet-mask-display{
-      position:absolute;
-      z-index:2;
-      left:0;
-      right:46px;
-      top:0;
-      bottom:0;
-      display:flex;
-      align-items:center;
-      overflow:hidden;
-      white-space:nowrap;
-      pointer-events:none;
-      padding:13px 14px;
-      color:var(--ink);
-      font-family:var(--community-ui-font);
-      font-size:1rem;
-      letter-spacing:.08em;
-    }
-    .wallet-input-wrap.wallet-mask-wrap:not(.is-masked) .wallet-mask-display{
-      display:none;
-    }
-
-    /* Keep the two gateway cards compact and visually balanced. */
+    /* Keep the join gateway card compact. */
     .gateway-card{
       display:flex;
       flex-direction:column;
@@ -565,14 +497,10 @@
       margin:0 0 16px;
       font-size:.82rem;
     }
-    .gateway-card .leap-request-form,
-    .gateway-card .member-record-open{
+    .gateway-card .leap-request-form{
       margin:0;
       padding:0;
       border-top:0;
-    }
-    .gateway-card .member-record-status:empty{
-      display:none;
     }
 
 </style>
@@ -628,19 +556,6 @@
 </div><div class="leap-request-message error" id="firstLeapError" role="alert" style="display:none;">
                 Could not send request. Please try again.
               </div></div>
-<div class="gateway-card" id="returning-member">
-<div class="gateway-label gateway-title-only">Already cashed your first LEAP?</div>
-<div class="member-record-open">
-<div class="member-record-open-row">
-<div class="wallet-input-wrap wallet-mask-wrap is-masked">
-<input aria-label="XRP Ledger address for Member Record" autocapitalize="off" autocomplete="off" data-1p-ignore="true" data-lpignore="true" data-form-type="other" class="wallet-address-input" id="memberRecordWallet" inputmode="text" placeholder="XRPL address" spellcheck="false" type="text"/>
-<span class="wallet-mask-display" aria-hidden="true"></span>
-<button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="memberRecordWallet" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-</div>
-<button class="button" id="openMemberRecordButton" type="button">Open My Member Record →</button>
-</div>
-<p aria-live="polite" class="member-record-status" id="memberRecordStatus" role="status"></p>
-</div></div>
 </div>
 <div class="join-divider" aria-hidden="true"></div>
 </div>
@@ -784,7 +699,7 @@
       const historyLabel = community.historyLabel || "community history";
       const firstStarDisplay = "★☆☆☆☆";
 
-      // Community-specific wallet identity for the request and Member Record handoff.
+      // Community-specific wallet identity for the request.
       const walletStorageKey = community.walletStorageKey || `${communityId}.xrpl.wallet`;
       const activeWalletKey = community.activeWalletKey || `${communityId}.xrpl.activeWallet`;
       const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
@@ -795,31 +710,6 @@
       const firstLeapCommunityId = document.getElementById("firstLeapCommunityId");
       const firstLeapCommunityName = document.getElementById("firstLeapCommunityName");
       const firstLeapOperatorName = document.getElementById("firstLeapOperatorName");
-      const memberRecordWallet = document.getElementById("memberRecordWallet");
-      const openMemberRecordButton = document.getElementById("openMemberRecordButton");
-      const memberRecordStatus = document.getElementById("memberRecordStatus");
-
-      document.querySelectorAll("[data-wallet-toggle]").forEach(toggle => {
-        const input = document.getElementById(toggle.dataset.walletToggle || "");
-        const wrap = input ? input.closest(".wallet-mask-wrap") : null;
-        const mask = wrap ? wrap.querySelector(".wallet-mask-display") : null;
-        if (!input || !wrap || !mask) return;
-
-        const refreshMask = () => {
-          mask.textContent = input.value ? "•".repeat(input.value.length) : "";
-        };
-        refreshMask();
-        input.addEventListener("input", refreshMask);
-
-        toggle.addEventListener("click", () => {
-          const revealing = wrap.classList.contains("is-masked");
-          wrap.classList.toggle("is-masked", !revealing);
-          toggle.setAttribute("aria-pressed", revealing ? "true" : "false");
-          toggle.setAttribute("aria-label", revealing ? "Hide XRPL address" : "Show XRPL address");
-          input.focus();
-        });
-      });
-
       if (firstLeapCommunityId) firstLeapCommunityId.value = communityId;
       if (firstLeapCommunityName) firstLeapCommunityName.value = communityName;
       if (firstLeapOperatorName) firstLeapOperatorName.value = operatorName;
@@ -827,10 +717,6 @@
       try {
         localStorage.removeItem(walletStorageKey);
         sessionStorage.removeItem(activeWalletKey);
-        const rememberedWallet = sessionStorage.getItem(walletStorageKey) || "";
-        if (rememberedWallet && classicAddressPattern.test(rememberedWallet) && memberRecordWallet) {
-          memberRecordWallet.value = rememberedWallet;
-        }
       } catch (_) {}
 
       if (firstLeapForm && firstLeapInput) {
@@ -848,35 +734,6 @@
 
           // Remember only the public address. This does not mark the member as joined.
           try { sessionStorage.setItem(walletStorageKey, account); } catch (_) {}
-          if (memberRecordWallet && !memberRecordWallet.value.trim()) memberRecordWallet.value = account;
-        });
-      }
-
-      function openMemberRecord() {
-        if (!memberRecordWallet) return;
-        const account = memberRecordWallet.value.trim();
-
-        if (!classicAddressPattern.test(account)) {
-          if (memberRecordStatus) {
-            memberRecordStatus.textContent = "Enter a valid XRP Ledger address beginning with r.";
-            memberRecordStatus.className = "member-record-status error";
-          }
-          memberRecordWallet.focus();
-          return;
-        }
-
-        try {
-          sessionStorage.setItem(walletStorageKey, account);
-          sessionStorage.setItem(activeWalletKey, account);
-        } catch (_) {}
-
-        window.location.href = `memberRecord.html?community=${encodeURIComponent(communityId)}`;
-      }
-
-      if (openMemberRecordButton) openMemberRecordButton.addEventListener("click", openMemberRecord);
-      if (memberRecordWallet) {
-        memberRecordWallet.addEventListener("keydown", event => {
-          if (event.key === "Enter") openMemberRecord();
         });
       }
 
@@ -976,10 +833,6 @@
 
       const safetyCopy = document.getElementById("safetyCommunityCopy");
       if (safetyCopy) safetyCopy.textContent = `${communityName} only needs your public Xaman wallet address.`;
-
-      if (openMemberRecordButton) {
-        openMemberRecordButton.textContent = `Open My ${community.recordLabel || "Member Record"} →`;
-      }
 
       const footer = document.getElementById("footerLabel");
       if (footer) footer.textContent = `${communityName} • Join LEAP`;
