@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>LEAP Protocol 0.23</title>
+<title>LEAP Protocol 0.24</title>
 <style>
     :root{
       --ink:#10243a;
@@ -295,7 +295,7 @@
 <div class="shell">
 <header class="hero">
 <div class="eyebrow">Wild Ledger</div>
-<h1>LEAP Protocol 0.23</h1>
+<h1>LEAP Protocol 0.24</h1>
 <p>
       This is LEAP. Sections 1–6 are the authoritative Protocol Core. If you cannot accurately explain Sections 1–6, do not modify Wild Ledger protocol behavior.
     </p>
@@ -303,7 +303,7 @@
 <span class="pill">XRPL Mainnet</span>
 <span class="pill">Protocol Core + Implementation Guide</span>
 <span class="pill">Authoritative current protocol</span>
-<span class="pill">Last revised: 2026-10-06</span>
+<span class="pill">Last revised: 2026-10-08</span>
 </div>
 </header>
 <div class="layout">
@@ -342,7 +342,7 @@
 <div class="decision">
 <div class="tag">Authoritative Current Protocol</div>
 <div>
-            Protocol 0.23 is the current authoritative LEAP Protocol for Wild Ledger. It preserves Protocol 0.22 and replaces community-specific named ranks with one universal five-star standing derived from each community's cumulative Earned LEAP. The five thresholds are protocol constants: 1, 10, 20, 50, and 100 Earned LEAP. Community CONFIG does not define star names or thresholds. All other Protocol 0.22 authority, recognition, allocation, visibility, setup-fee, and community-request rules remain in force. It remains authoritative until changed by an explicit protocol revision under Section 15.
+            Protocol 0.24 is the current authoritative LEAP Protocol for Wild Ledger. It preserves Protocol 0.23 and adds a community-specific Join Request Price published by the authorized Community Operating Wallet on XRPL. A prospective member requests membership through a native-XRP Payment directly to that wallet with a canonical Wild Ledger membership-request memo. This payment is a request, not LEAP recognition or a guarantee of membership. All existing Protocol 0.23 authority, recognition, allocation, visibility, community setup-fee, community-creation request, and universal star rules remain in force. It remains authoritative until changed by an explicit protocol revision under Section 15.
           </div>
 </div>
 <section id="purpose">
@@ -596,6 +596,8 @@ LEAP-002</code></pre>
 <tr><td>Wild Ledger public visibility state</td><td><code>WILD-LEDGER/VISIBILITY/&lt;COMMUNITY-ID&gt;=&lt;STATE&gt;</code></td><td>No</td></tr>
 <tr><td>Wild Ledger community setup-fee state</td><td><code>WILD-LEDGER/COMMUNITY-SETUP-FEE-DROPS=&lt;DROPS&gt;</code></td><td>No</td></tr>
 <tr><td>Wild Ledger community request payment</td><td><code>WILD-LEDGER/COMMUNITY-REQUEST</code></td><td>No; native XRP moves</td></tr>
+<tr><td>Wild Ledger Join Request Price state</td><td><code>WILD-LEDGER/JOIN-REQUEST-PRICE-DROPS/&lt;COMMUNITY-ID&gt;=&lt;DROPS&gt;</code></td><td>No</td></tr>
+<tr><td>Wild Ledger membership request payment</td><td><code>WILD-LEDGER/MEMBERSHIP-REQUEST/&lt;COMMUNITY-ID&gt;</code></td><td>No; native XRP moves</td></tr>
 <tr><td>Community allocation</td><td><code>&lt;COMMUNITY&gt;-LEAP/ALLOCATION=&lt;AMOUNT&gt;</code></td><td>Yes, when the allocation Check is cashed</td></tr>
 </table>
 <div class="rule">
@@ -622,6 +624,16 @@ LEAP-002</code></pre>
             The latest valid Owner-authorized setup-fee statement in canonical XRPL order is the current fee.
             A prospective Operator may satisfy that business condition with a successful validated native-XRP <code>Payment</code> from the requesting wallet to the Owner Wallet authorized at that ledger position, containing exactly one <code>WILD-LEDGER/COMMUNITY-REQUEST</code> memo and an amount exactly equal to the setup fee in force immediately before that payment.
             Later fee changes do not retroactively change whether an earlier request payment was valid. The request payment does not establish a Community ID or Community Operating Wallet authority; only the later valid Owner provisioning act creates the community.
+          </div>
+</div>
+<div class="rule">
+<div class="tag">Wild Ledger Membership Requests and Join Request Price</div>
+<div>
+            Each established community has a <strong>Join Request Price</strong> expressed as a positive whole number of native-XRP drops. If no valid Operator-authorized price statement exists for that Community ID, the price defaults to <strong>1 drop</strong>. The current Community Operating Wallet may publish a new price in a successful validated no-op <code>AccountSet</code> with exactly one canonical memo:
+            <code>WILD-LEDGER/JOIN-REQUEST-PRICE-DROPS/&lt;COMMUNITY-ID&gt;=&lt;DROPS&gt;</code>.
+            The latest valid statement for that community in canonical XRPL order sets its price. The fee-setting authority follows the community's canonical Operating Wallet authority, not Wild Ledger Owner Wallet authority.
+            A membership request is a successful validated native-XRP <code>Payment</code> made by the prospective member to the Community Operating Wallet authorized immediately before that Payment. It contains exactly one canonical memo <code>WILD-LEDGER/MEMBERSHIP-REQUEST/&lt;COMMUNITY-ID&gt;</code> and transfers exactly the Join Request Price in force immediately before the Payment. The sender's <code>Account</code> is the requesting wallet; no duplicate sender address is required in the memo.
+            A membership-request payment is a Wild Ledger business/application record. <strong>It does not deliver LEAP, establish membership, guarantee acceptance, authorize recognition, create Earned LEAP, or change stars.</strong> Membership continues to require a subsequent protocol-valid LEAP recognition. Later changes of price or Operating Wallet do not rewrite previously valid requests.
           </div>
 </div>
 <div class="rule">
@@ -709,6 +721,8 @@ WILD-LEDGER/COMMUNITY-REQUEST</code></pre>
 <tr><td>Wild Ledger public visibility state</td><td>No-op <code>AccountSet</code></td><td>Publishes whether an established community is shown or hidden on Wild Ledger public surfaces without changing community protocol state.</td></tr>
 <tr><td>Wild Ledger community setup-fee state</td><td>No-op <code>AccountSet</code></td><td>Publishes the current Owner-controlled community setup fee in native-XRP drops without changing LEAP or community authority.</td></tr>
 <tr><td>Wild Ledger community request payment</td><td>Native-XRP <code>Payment</code></td><td>Records that a requesting wallet satisfied the setup-fee business condition in force at that ledger position. It does not create the community.</td></tr>
+<tr><td>Wild Ledger Join Request Price</td><td>No-op <code>AccountSet</code></td><td>Publishes the Operator-controlled membership-request price for an established community.</td></tr>
+<tr><td>Wild Ledger membership request</td><td>Native-XRP <code>Payment</code></td><td>Applicant requests to join an established community by paying its current Operating Wallet; not member recognition.</td></tr>
 <tr><td>Check cancellation</td><td><code>CheckCancel</code></td><td>Removes an unredeemed Check; no LEAP is earned from that canceled Check.</td></tr>
 </table>
 <h3>7.0 Community allocation Checks</h3>
@@ -928,6 +942,35 @@ WILD-LEDGER/COMMUNITY-REQUEST</code></pre>
           </div>
 </div>
 
+<h3>7.11 Community Join Request Price — no-op <code>AccountSet</code></h3>
+<ul class="checklist">
+<li><code>TransactionType = AccountSet</code>, with no AccountSet-specific setting mutation.</li>
+<li>The Community ID was established before this transaction.</li>
+<li><code>Account</code> is the Community Operating Wallet authorized immediately before the transaction.</li>
+<li>Exactly one decoded memo is present: <code>WILD-LEDGER/JOIN-REQUEST-PRICE-DROPS/&lt;COMMUNITY-ID&gt;=&lt;DROPS&gt;</code>.</li>
+<li><code>&lt;DROPS&gt;</code> is a positive whole number; a price below 1 drop is invalid.</li>
+<li>The transaction succeeds in validated XRPL history.</li>
+</ul>
+<p>
+          Community Setup should present this as an Operator choice, with a default of 1 drop if no valid price has been published. The canonical price is the on-ledger statement, not an unsent Setup draft or a Community CONFIG field. The Operator may publish a new price later without republishing CONFIG. Price state stays associated with the Community ID across Operating Wallet changes; a former Operator cannot publish a valid new price after relinquishing authority.
+        </p>
+<h3>7.12 Community membership request — native-XRP <code>Payment</code></h3>
+<ul class="checklist">
+<li><code>TransactionType = Payment</code>, as a direct native-XRP Payment (no paths, <code>SendMax</code>, or partial-payment flag).</li>
+<li><code>Account</code> is the prospective member's XRPL account.</li>
+<li><code>Destination</code> is the Community Operating Wallet authorized immediately before the payment.</li>
+<li>The Community ID in the memo was already established.</li>
+<li>The native-XRP amount, in drops, exactly equals the latest valid Join Request Price before the payment, or 1 drop if there is no valid earlier price statement.</li>
+<li>Exactly one decoded memo is present: <code>WILD-LEDGER/MEMBERSHIP-REQUEST/&lt;COMMUNITY-ID&gt;</code>.</li>
+<li>The Payment succeeds in validated XRPL history.</li>
+</ul>
+<div class="rule">
+<div class="tag">Request Is Not Membership</div>
+<div>
+            Wild Ledger must show the exact XRP amount and receiving wallet before requesting the applicant's signature, and must not present the payment as a LEAP purchase or guaranteed membership. The requesting wallet is identified by <code>Account</code>; the receiving wallet is identified by <code>Destination</code>. A valid request is discoverable from the authorized destination wallet's transaction history. A separate protocol-valid LEAP recognition transaction from the authorized Community Operating Wallet is required for Earned LEAP and membership. Repeated requests remain payment events; they do not, by themselves, create additional membership or standing.
+          </div>
+</div>
+
 <section id="membership">
 <h2>8. Membership &amp; Star Rules</h2>
 <div class="rule">
@@ -1092,7 +1135,11 @@ SFL-CAMEO</code></pre>
           Reconstruct setup-fee history from validated Owner Wallet history in canonical XRPL order, following Owner authority transitions over time. The current fee is the latest valid <code>WILD-LEDGER/COMMUNITY-SETUP-FEE-DROPS=&lt;DROPS&gt;</code> statement. To evaluate a community request payment, resolve both the Owner Wallet and the setup fee that were authoritative immediately before that payment, then require the exact destination, native-XRP amount, canonical request memo, and successful validated result.
           A later fee change does not alter the historical validity of an earlier request payment.
         </p>
-<h3>11.8 Query output map</h3>
+<h3>11.8 Wild Ledger Join Request Price and membership requests</h3>
+<p>
+          For each established Community ID, reconstruct price statements from the validated transaction histories of the wallets that were authorized Community Operating Wallets at the relevant ledger positions. The current price is the latest valid price statement, or 1 drop when none exists. Scan the same historical Operating Wallet accounts for candidate native-XRP Payments carrying the canonical membership-request memo. A request is valid only if the destination was the authorized Operating Wallet and the exact amount matched the price immediately preceding that Payment. Take the applicant's address from the transaction's <code>Account</code>. Requests validly delivered to a previous Operating Wallet remain part of that community's history after authority transfers. An Operator-facing report may distinguish unfulfilled requests by correlating this history with later validated recognition activity; a request alone never counts as membership.
+        </p>
+<h3>11.9 Query output map</h3>
 <table>
 <tr><th>Question</th><th>Authoritative derivation</th></tr>
 <tr><td>What LEAP does this wallet hold now?</td><td>Validated <code>account_lines</code></td></tr>
@@ -1106,6 +1153,8 @@ SFL-CAMEO</code></pre>
 <tr><td>Is this community shown publicly by Wild Ledger?</td><td>No valid visibility statement means <code>VISIBLE</code>; otherwise latest valid Owner-authorized <code>WILD-LEDGER/VISIBILITY/&lt;COMMUNITY-ID&gt;=&lt;STATE&gt;</code> value</td></tr>
 <tr><td>What is the current Wild Ledger community setup fee?</td><td>Latest valid Owner-authorized <code>WILD-LEDGER/COMMUNITY-SETUP-FEE-DROPS=&lt;DROPS&gt;</code> value</td></tr>
 <tr><td>Did this wallet make a valid Wild Ledger community request?</td><td>Successful validated native-XRP Payment to the historical Owner Wallet, with exact <code>WILD-LEDGER/COMMUNITY-REQUEST</code> memo and amount equal to the setup fee immediately preceding that payment</td></tr>
+<tr><td>What is this community's Join Request Price?</td><td>Latest valid Operator-authorized <code>WILD-LEDGER/JOIN-REQUEST-PRICE-DROPS/&lt;COMMUNITY-ID&gt;=&lt;DROPS&gt;</code> statement, or 1 drop by default</td></tr>
+<tr><td>Who requested membership in this community?</td><td>Validated native-XRP Payments to the Operating Wallet authorized at each historical payment position, with the exact community membership-request memo and price at that position; applicant identified by <code>Account</code></td></tr>
 <tr><td>What is the current Operating Wallet?</td><td>Latest valid <code>OPERATING-WALLET</code> authority-state value</td></tr>
 <tr><td>Which Operating Wallet was authoritative historically?</td><td>Latest valid authority-state value preceding the transaction in canonical XRPL order</td></tr>
 <tr><td>Which community owns an allocation?</td><td>Community namespace in the valid Distributor allocation memo</td></tr>
@@ -1136,13 +1185,15 @@ SFL-CAMEO</code></pre>
 <li>A Wild Ledger community setup-fee record is a no-op <code>AccountSet</code> from the Owner Wallet resolved immediately before the transaction, contains exactly one canonical <code>WILD-LEDGER/COMMUNITY-SETUP-FEE-DROPS=&lt;DROPS&gt;</code> memo, uses a positive whole-number drops value, and changes no AccountSet-specific setting.</li>
 <li>A Wild Ledger community request record is a successful validated native-XRP <code>Payment</code> from the requesting wallet to the Owner Wallet resolved immediately before the payment, contains exactly one <code>WILD-LEDGER/COMMUNITY-REQUEST</code> memo, and pays exactly the setup fee that was authoritative immediately before that payment.</li>
 <li>A valid setup-fee payment is a Wild Ledger business/application fact only. It does not create a Community ID, establish Community Operating Wallet authority, award LEAP, create Earned LEAP, or affect stars.</li>
+<li>A Join Request Price record is a validated no-op <code>AccountSet</code> from the historical authorized Operating Wallet, for an already-established Community ID, with one exact <code>WILD-LEDGER/JOIN-REQUEST-PRICE-DROPS/&lt;COMMUNITY-ID&gt;=&lt;DROPS&gt;</code> memo and a positive whole-number drops value. With no valid price record, use a default price of 1 drop.</li>
+<li>A valid membership request is a successful validated direct native-XRP <code>Payment</code> from the applicant to the historically authorized Operating Wallet, with one exact <code>WILD-LEDGER/MEMBERSHIP-REQUEST/&lt;COMMUNITY-ID&gt;</code> memo and an amount equal to the price that was in force immediately before the payment. It cannot by itself establish membership, create recognition, or change Earned LEAP or stars.</li>
 <li>For a previously unestablished Community ID, the initial <code>OPERATING-WALLET</code> statement is published by the current Owner Wallet and names the community's first Operating Wallet.</li>
 <li>For later <code>OPERATING-WALLET</code> replacements, the sender equals the Operating Wallet resolved immediately before the transaction.</li>
 </ul>
 <div class="rule">
 <div class="tag">Fail Closed</div>
 <div>
-            If required provenance or meaning cannot be established, software may display the transaction as raw/audit history, but it must not convert it into official recognition, Earned LEAP, stars, allocation, lifecycle state, authority state, Wild Ledger public visibility state, Wild Ledger setup-fee state, or a valid Wild Ledger community request.
+            If required provenance or meaning cannot be established, software may display the transaction as raw/audit history, but it must not convert it into official recognition, Earned LEAP, stars, allocation, lifecycle state, authority state, Wild Ledger public visibility state, Wild Ledger setup-fee state, or a valid Wild Ledger community request, Join Request Price statement, or membership request.
           </div>
 </div>
 </section>
@@ -1248,6 +1299,7 @@ SFL-CAMEO</code></pre>
 <tr><td>0.21</td><td>2026-10-04</td><td>Added Owner-signed Wild Ledger public visibility state for established communities using validated no-op <code>AccountSet</code> statements in the separate <code>WILD-LEDGER/VISIBILITY</code> namespace. Defined <code>HIDDEN</code> and <code>VISIBLE</code>, defaulted communities with no valid visibility statement to <code>VISIBLE</code>, made the latest valid Owner-authorized value authoritative for Wild Ledger public presentation, and clarified that visibility never changes canonical community existence, Community Operating Wallet authority, recognition, allocations, Earned LEAP, or rank.</td></tr>
 <tr><td>0.22</td><td>2026-10-04</td><td>Clarified the boundary between community LEAP records and separate Wild Ledger application/business records on XRPL. Added canonical Wild Ledger setup-fee state <code>WILD-LEDGER/COMMUNITY-SETUP-FEE-DROPS=&lt;DROPS&gt;</code> as Owner-signed no-op <code>AccountSet</code> state and canonical community-request payment memo <code>WILD-LEDGER/COMMUNITY-REQUEST</code> on native-XRP <code>Payment</code>. Defined historical fee interpretation so a request is judged against the valid setup fee and Owner Wallet in force immediately before the payment, with later fee changes non-retroactive. Clarified that setup-fee state and request payments are Wild Ledger business/application records only and do not create a community, establish Operating Wallet authority, award LEAP, create Earned LEAP, or change rank.</td></tr>
 <tr><td>0.23</td><td>2026-10-06</td><td>Replaced the five named community ranks with one universal five-star standing system. Star standing remains community-specific because it is derived from that community's cumulative Earned LEAP, but the names and thresholds are no longer configurable. Standardized thresholds at 1, 10, 20, 50, and 100 Earned LEAP for one through five stars; zero Earned LEAP has zero earned stars. Community CONFIG no longer carries rank names or rank thresholds.</td></tr>
+<tr><td>0.24</td><td>2026-10-08</td><td>Added an Operator-controlled, community-specific Join Request Price with a one-drop default, published on XRPL through a validated no-op <code>AccountSet</code> separate from CONFIG Schema 1. Added a direct native-XRP membership-request <code>Payment</code> from the applicant to the authorized Community Operating Wallet, identified by canonical Wild Ledger memo and evaluated against historical authority and price. Distinguished a paid request from LEAP recognition, Earned LEAP, and membership.</td></tr>
 </table>
 <div class="note">
           The change log records the evolution of earlier drafts. Superseded rules described in older rows are historical context, not current protocol requirements.
