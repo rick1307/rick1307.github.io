@@ -324,6 +324,7 @@ import { DirectXRPLClient, isClassicAddress } from "../js/xrplTransport.js";
 import { resolveWalletAccess } from "../js/communityAccess.js";
 import { isAuthorizedAtLedger } from "../js/communityAuthority.js";
 import { readCommunityJoinRequestPrice, DEFAULT_JOIN_REQUEST_DROPS } from "../js/communityJoinPrice.js";
+import { loadRecognitionCatalog, recognitionAvailabilityFromCatalog, PERMANENT_LEAP_DISTRIBUTOR } from "../js/recognitionCatalog.js";
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(window.location.search);
@@ -447,6 +448,156 @@ async function discoverMatchingPayments(communityId, authority, priceHistory, on
     requests: [...found.values()].sort((a, b) => b.ledger - a.ledger || b.txIndex - a.txIndex || a.hash.localeCompare(b.hash)),
     excluded, scanned, pages, walletCount:accounts.length
   };
+}
+
+// LEAP Protocol 0.24: a request is not membership. Only a successful,
+// authorized LEAP recognition Payment or an actually cashed recognition Check
+// proves a member. Read the applicant's complete validated history; an open
+// Check, CheckCancel, account_lines balance or memo alone is insufficient.
+function recognitionTx(entry) {
+  return entry?.tx_json || entry?.tx || entry?.transaction || {};
+}
+function successfulRecognitionEntry(entry) {
+  const meta = entry?.meta || entry?.metaData || {};
+  return entry?.validated === true && meta.TransactionResult === "tesSUCCESS" &&
+    Number.isSafeInteger(Number(entry.ledger_index ?? recognitionTx(entry).ledger_index)) &&
+    Number.isSafeInteger(Number(meta.TransactionIndex));
+}
+function canonicalRecognitionAmount(amount, issuer, currency) {
+  if (!amount || typeof amount !== "object" || amount.issuer !== issuer ||
+      String(amount.currency || "").toUpperCase() !== currency.toUpperCase()) return null;
+  const value = Number(amount.value);
+  return Number.isSafeInteger(value) && value > 0 ? value : null;
+}
+function recognitionReason(tx, namespace, isLegacy = false) {
+  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
+  if (memos.length !== 1 || !memos[0]?.Memo) return null;
+  const memo = memos[0].Memo;
+  const type = memoText(memo.MemoType);
+  const format = memoText(memo.MemoFormat);
+  const data = memoText(memo.MemoData);
+  let value = "";
+  if (!type && !format) value = data;
+  // Pre-authority community records may use the original Type/Data form.
+  else if (isLegacy && !format && type === namespace && /^(BADGE|EVENT|CHALLENGE)=/.test(data)) value = `${namespace}/${data}`;
+  else if (isLegacy && !format && type.startsWith(`${namespace}/`) && !type.includes("=")) {
+    const category = type.slice(namespace.length + 1);
+    if (category === "NEW-MEMBER") value = `${namespace}/BADGE=NEW-MEMBER`;
+    else if (["BADGE","EVENT","CHALLENGE"].includes(category)) value = `${namespace}/${category}=${data}`;
+  }
+  const prefix = `${namespace}/`;
+  if (!value.startsWith(prefix)) return null;
+  const match = /^(BADGE|EVENT|CHALLENGE)=([A-Z0-9]+(?:-[A-Z0-9]+)*)$/.exec(value.slice(prefix.length));
+  if (!match || (match[1] === "CHALLENGE" && !/^LEAP-\d{3,}$/.test(match[2]))) return null;
+  return {category:match[1], id:match[2]};
+}
+function checkCreatedId(meta) {
+  for (const wrap of meta?.AffectedNodes || []) {
+    const node = wrap?.CreatedNode;
+    if (node?.LedgerEntryType === "Check" && /^[A-Fa-f0-9]{64}$/.test(node.LedgerIndex || "")) return node.LedgerIndex.toUpperCase();
+  }
+  return "";
+}
+function recognitionFromHistory(entries, applicant, communityId, authority, catalog, issuer, currency, legacyDistributors) {
+  const namespace = `${communityId}-LEAP`;
+  const firstLedger = Number(authority?.establishment?.ledger);
+  const firstIndex = Number(authority?.establishment?.txIndex);
+  const cashes = new Map();
+  for (const entry of entries) {
+    if (!successfulRecognitionEntry(entry)) continue;
+    const tx = recognitionTx(entry), meta = entry.meta || entry.metaData || {};
+    if (tx.TransactionType !== "CheckCash" || tx.Account !== applicant ||
+        !/^[A-Fa-f0-9]{64}$/.test(tx.CheckID || "")) continue;
+    // Actual received LEAP is authoritative, not the Check's offered SendMax.
+    const actualDelivery = meta.delivered_amount ?? meta.DeliveredAmount;
+    const delivered = canonicalRecognitionAmount(actualDelivery, issuer, currency);
+    // Only when XRPL omits delivery metadata may exact Amount-style cashing
+    // prove the amount. Never override an explicit incompatible delivery record.
+    const exact = actualDelivery !== undefined && actualDelivery !== null ? delivered :
+      (tx.DeliverMin === undefined ? canonicalRecognitionAmount(tx.Amount, issuer, currency) : null);
+    if (exact === null) continue;
+    cashes.set(tx.CheckID.toUpperCase(), {amount:exact,
+      hash:String(entry.hash || tx.hash || "").toUpperCase(), ledger:Number(entry.ledger_index ?? tx.ledger_index)});
+  }
+  const proofs = [];
+  for (const entry of entries) {
+    if (!successfulRecognitionEntry(entry)) continue;
+    const tx = recognitionTx(entry), meta = entry.meta || entry.metaData || {};
+    if (!(["CheckCreate","Payment"].includes(tx.TransactionType)) || tx.Destination !== applicant) continue;
+    const ledger = Number(entry.ledger_index ?? tx.ledger_index), txIndex = Number(meta.TransactionIndex);
+    const legacy = legacyDistributors.has(tx.Account) && Number.isFinite(firstLedger) && firstLedger > 0 &&
+      (ledger < firstLedger || (ledger === firstLedger && Number.isSafeInteger(firstIndex) && txIndex < firstIndex));
+    if (!isAuthorizedAtLedger(authority, tx.Account, ledger, txIndex) && !legacy) continue;
+    const reason = recognitionReason(tx, namespace, legacy);
+    if (!reason || recognitionAvailabilityFromCatalog({catalog,category:reason.category,id:reason.id,
+      ledgerIndex:ledger,transactionIndex:txIndex}).available !== true) continue;
+    let amount = null, confirmed = null;
+    if (tx.TransactionType === "CheckCreate") {
+      if (tx.Expiration !== undefined || canonicalRecognitionAmount(tx.SendMax, issuer, currency) === null) continue;
+      const checkId = checkCreatedId(meta);
+      confirmed = cashes.get(checkId);
+      if (!checkId || !confirmed) continue; // Check offered, not earned.
+      amount = confirmed.amount;
+    } else {
+      const flags = Number(tx.Flags ?? 0);
+      if (!Number.isSafeInteger(flags) || flags < 0) continue;
+      const actualDelivery = meta.delivered_amount ?? meta.DeliveredAmount;
+      const delivered = canonicalRecognitionAmount(actualDelivery, issuer, currency);
+      // Without DeliveredAmount only a non-partial, direct LEAP Payment is provable from Amount.
+      // Explicit delivery metadata must agree with the canonical asset.
+      amount = actualDelivery !== undefined && actualDelivery !== null ? delivered :
+        (((flags & 0x00020000) === 0 && tx.Paths === undefined && tx.SendMax === undefined)
+          ? canonicalRecognitionAmount(tx.Amount, issuer, currency) : null);
+      if (amount === null) continue;
+    }
+    const hash = String(entry.hash || tx.hash || "").toUpperCase();
+    if (!/^[A-F0-9]{64}$/.test(hash)) continue;
+    if (confirmed && !/^[A-F0-9]{64}$/.test(confirmed.hash)) continue;
+    proofs.push({type:tx.TransactionType === "CheckCreate" ? "CheckCash" : "Payment",
+      reason:`${reason.category}=${reason.id}`, amount, awardLedger:ledger, awardHash:hash,
+      ledger:confirmed ? confirmed.ledger : ledger,
+      hash:confirmed ? confirmed.hash : hash});
+  }
+  proofs.sort((a,b) => a.ledger - b.ledger || a.awardLedger - b.awardLedger);
+  return proofs[0] || null;
+}
+async function verifyApplicantsRecognition(requests, communityId, authority, onProgress = () => {}) {
+  const applicants = [...new Set(requests.map(request => request.applicant))];
+  if (!applicants.length) return requests;
+  const cfg = window.WILD_LEDGER_CONFIG || {};
+  const issuer = String(cfg.leapIssuer || "");
+  const currency = String(cfg.leapCurrency || "");
+  const initialWallet = String(authority?.establishment?.operatingWallet || authority?.establishment?.firstWallet || "");
+  if (!isClassicAddress(issuer) || !currency || !isClassicAddress(initialWallet))
+    throw new Error("Canonical LEAP identity or original community wallet is unavailable. Membership status cannot be verified.");
+  onProgress({stage:"catalog", index:0, total:applicants.length});
+  const community = {id:communityId.toLowerCase(),backendId:communityId,
+    communityName:$("communityName").textContent, leapNamespace:`${communityId}-LEAP`, operatingWallet:initialWallet};
+  const catalog = await loadRecognitionCatalog({community,serverUrl:xrplServer,issuer,currency,includeIgnored:true});
+  const legacyDistributors = new Set([PERMANENT_LEAP_DISTRIBUTOR,
+    ...(Array.isArray(cfg.leapDistributors) ? cfg.leapDistributors : [])]);
+  const proofByApplicant = new Map();
+  const client = new DirectXRPLClient(xrplServer);
+  try {
+    await client.connect();
+    for (const [index, applicant] of applicants.entries()) {
+      let marker;
+      const entries = [];
+      do {
+        const fields = {account:applicant,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};
+        if (marker !== undefined && marker !== null) fields.marker = marker;
+        const response = await client.request("account_tx",fields,30000);
+        if (!Array.isArray(response?.result?.transactions)) throw new Error("XRPL did not provide the complete applicant history.");
+        entries.push(...response.result.transactions);
+        marker = response.result.marker;
+      } while (marker !== undefined && marker !== null);
+      proofByApplicant.set(applicant,recognitionFromHistory(entries,applicant,communityId,authority,catalog,issuer,currency,legacyDistributors));
+      onProgress({stage:"member", index:index+1,total:applicants.length});
+    }
+  } finally { client.close(); }
+  return requests.map(request => ({...request,recognition:proofByApplicant.get(request.applicant)
+    ? {status:"fulfilled",proof:proofByApplicant.get(request.applicant)}
+    : {status:"awaiting",proof:null}}));
 }
 
 // One operation, two views: guided Ledger Trail or hands-on workbench.
@@ -640,14 +791,23 @@ async function performStep(number) {
       updateGuideStatus(message);
     });
     assertSessionUnchanged();
-    runContext.requests = result.requests;
+    // Reuse the completed ledger request scan; the member-status verification is
+    // still part of this same guided step, never a second destination scan.
+    const withRecognition = await verifyApplicantsRecognition(result.requests, session.communityId, matched, p => {
+      const message = p.stage === "catalog" ? "Checking the community's recognition history…" :
+        `Checking member ${p.index} of ${p.total} for delivered LEAP…`;
+      $("trailMessage3").textContent = message;
+      updateGuideStatus(message);
+    });
+    assertSessionUnchanged();
+    runContext.requests = withRecognition;
     runContext.excluded = result.excluded;
     const proofs = result.requests.slice(0, 5).map(r =>
       `Validated ledger: ${r.ledger}, transaction: ${r.txIndex}\nApplicant: ${r.applicant}\nAuthorized recipient: ${r.destination}\nXRP paid: ${r.drops} drops\nRequired price at that time: ${r.expectedDrops} drops\nPrice source: ${r.priceStatement ? `ledger ${r.priceStatement.ledger}, transaction ${r.priceStatement.txIndex}` : "1-drop protocol default"}\nMemo: WILD-LEDGER/MEMBERSHIP-REQUEST/${session.communityId}\nResult: tesSUCCESS\nHash: ${r.hash}`
     ).join("\n\n");
     return {
       message:`${result.requests.length} ${result.requests.length === 1 ? "membership request" : "membership requests"} found and verified.`,
-      evidence:`Community: ${session.communityId}\nOperating Wallet histories searched: ${result.walletCount}\nTransactions read: ${result.scanned}\nHistory pages: ${result.pages}\nHistorical price statements: ${price.history.length}\nVerified: ${result.requests.length}\nCandidates that did not qualify: ${result.excluded}\nChecked: Community ID and exact memo; validated successful native-XRP Payment without paths or partial payment; authorized Operating Wallet and Join Request Price immediately before payment.${proofs ? `\n\nSample verified transaction evidence (up to 5):\n${proofs}` : ""}`
+      evidence:`Community: ${session.communityId}\nOperating Wallet histories searched: ${result.walletCount}\nTransactions read: ${result.scanned}\nHistory pages: ${result.pages}\nHistorical price statements: ${price.history.length}\nVerified requests: ${result.requests.length}\nMembers confirmed: ${withRecognition.filter(r=>r.recognition.status === "fulfilled").length}\nAwaiting LEAP: ${withRecognition.filter(r=>r.recognition.status === "awaiting").length}\nCandidates that did not qualify: ${result.excluded}\nChecked: Community ID and exact memo; validated successful native-XRP Payment without paths or partial payment; authorized Operating Wallet and Join Request Price immediately before payment.${proofs ? `\n\nSample verified transaction evidence (up to 5):\n${proofs}` : ""}`
     };
   }
   if (number === 4) {
@@ -657,13 +817,14 @@ async function performStep(number) {
     // The report is a destination, not another Ledger Trail. Carry only the
     // verified result rows in this tab; never require the report to rescan XRPL.
     const handoff = {
-      version: 1,
+      version: 2,
       source: "membershipRequestsBootstrap",
       communityId: current.communityId,
       operatorWallet: current.wallet,
       communityName: $("communityName").textContent,
       verifiedAt: Date.now(),
       requests: requests.map(row => ({
+        recognition: row.recognition,
         applicant: row.applicant,
         destination: row.destination,
         drops: row.drops,
