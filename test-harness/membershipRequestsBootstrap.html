@@ -223,7 +223,7 @@
       <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
         <div class="success-mark" aria-hidden="true">✓</div>
         <p class="success-heading">Checks passed</p>
-        <div style="text-align:center"><a class="success-action" id="guideContinue" href="../viewCommunity.html" hidden>View Community</a></div>
+        <div style="text-align:center"><a class="success-action" id="guideContinue" href="../membershipRequests.html" hidden>View Membership Requests</a></div>
       </div>
       <div id="guideRecovery" class="guide-recovery" hidden>
         <button type="button" class="step-action is-next" id="guideRetry" hidden>Try again</button>
@@ -279,7 +279,7 @@
               <summary><span class="trail-index" id="trailIndex4">4</span><span class="trail-step-title">Prove report readiness</span><span class="trail-step-state" id="trailState4">WAITING</span></summary>
               <div class="trail-step-body">
                 <p class="trail-message" id="trailMessage4">Waiting for the search to finish.</p>
-                <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof4">The bootstrap rechecks your Operator session and confirms the verified request data is ready. The report handoff is not connected in this move.</div></details>
+                <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof4">The bootstrap rechecks your Operator session and confirms the verified request data is ready. The Membership Requests report is ready to open when checks finish.</div></details>
                 <div class="step-actions" id="stepActions4"><button type="button" class="step-action" id="stepAction4" disabled>Waiting</button></div>
               </div>
             </details>
@@ -299,7 +299,7 @@
           <div class="manual-success">
             <div class="success-mark" aria-hidden="true">✓</div>
             <h2 id="proofTitle" class="success-heading">Checks passed</h2>
-            <a class="success-action" id="returnCommunity" href="../viewCommunity.html">View Community</a>
+            <a class="success-action" id="returnCommunity" href="../membershipRequests.html">View Membership Requests</a>
           </div>
           <details class="proof-details" id="bootstrapEvidence">
             <summary>Inspect the ledger evidence</summary>
@@ -310,7 +310,7 @@
                 <div><div class="label">Current Operating Wallet</div><p class="value wallet" id="operatorWallet">—</p></div>
               </div>
               <p id="requestStatus" class="request-status" role="status" aria-live="polite">Waiting for verified XRPL evidence.</p>
-              <p class="notice">This Bootstrap has verified requests against XRPL. It does not change the Membership Requests report; its destination is View Community.</p>
+              <p class="notice">This Bootstrap has verified the requests against XRPL. Continue to Membership Requests to review them.</p>
             </div>
           </details>
         </section>
@@ -461,7 +461,7 @@ const evidenceDefaults = [
   "Your Get Wild Operator session must identify a wallet and Community ID. A URL alone does not grant access.",
   "Wild Ledger must find this wallet as the current authorized Operator in validated XRPL history.",
   "Verifies each request's memo, successful XRP Payment, historical Operating Wallet authority, and price at the time of payment.",
-  "The bootstrap rechecks your Operator session and confirms the verified request data is ready. The report handoff is not connected in this move."
+  "The bootstrap rechecks your Operator session and confirms the verified request data is ready. The Membership Requests report is ready to open when checks finish."
 ];
 
 function nextStep() { const index = stepStates.findIndex(s => s !== "done"); return index < 0 ? 0 : index + 1; }
@@ -607,8 +607,8 @@ async function performStep(number) {
     $("communityId").textContent = session.communityId;
     $("operatorWallet").textContent = session.wallet;
     $("backLink").href = `../viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
-    $("returnCommunity").href = $("backLink").href;
-    $("guideContinue").href = $("backLink").href;
+    $("returnCommunity").href = `../membershipRequests.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
+    $("guideContinue").href = $("returnCommunity").href;
     document.title = `Membership Requests Bootstrap · ${communityName} | Wild Ledger`;
     $("requestStatus").classList.remove("error");
     $("requestStatus").textContent = "Finding membership-request payments in XRPL history…";
@@ -647,7 +647,7 @@ async function performStep(number) {
     $("backLink").hidden = false;
     $("requestStatus").textContent = `${requests.length} membership ${requests.length === 1 ? "request" : "requests"} verified from XRPL.`;
     document.title = `Membership Requests Bootstrap · ${$("communityName").textContent} | Wild Ledger`;
-    return {message:"All checks passed. Ready to continue to View Community.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nFormer Operating Wallet request history is outside this bootstrap move.`};
+    return {message:"All checks passed. Ready to view Membership Requests.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nFormer Operating Wallet request history is outside this bootstrap move.`};
   }
   throw new Error("Unknown Ledger Trail step.");
 }
