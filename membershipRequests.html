@@ -86,13 +86,51 @@
   .check::before { content:"✓"; font-weight:900; }
   .grid { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:14px; margin-top:18px; }
   .empty { padding:30px 16px; text-align:center; color:var(--muted); line-height:1.55; border:1px dashed rgba(121,213,194,.24); border-radius:15px; }
-  .request-card { padding:15px; border:1px solid rgba(121,213,194,.22); border-radius:15px; background:rgba(121,213,194,.055); }
-  .request-card + .request-card { margin-top:12px; }
-  .request-title { font-weight:850; color:#bdf2c8; margin-bottom:12px; }
-  .request-detail { margin:8px 0 0; color:var(--muted); font-size:.80rem; line-height:1.5; }
-  .request-detail strong { color:var(--ink); font-weight:700; overflow-wrap:anywhere; }
-  .request-status { color:var(--muted); line-height:1.5; }
+  /* Destination report: human-readable rows first, exact XRPL proof on demand. */
+  .report-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+  .report-heading h2 { margin:0 0 5px; }
+  .report-subtitle { max-width:570px; color:var(--muted); font-size:.85rem; line-height:1.55; margin:0 0 13px; }
+  .request-count { color:#bdf2c8; font-size:.83rem; font-weight:850; padding:8px 12px; border:1px solid rgba(121,213,194,.35); background:rgba(121,213,194,.085); border-radius:999px; white-space:nowrap; }
+  .request-status { color:var(--muted); line-height:1.5; font-size:.82rem; margin:0 0 17px; }
   .request-status.error { color:#ffb7aa; }
+  .table-wrap { width:100%; overflow-x:auto; }
+  .requests-table { width:100%; border-collapse:separate; border-spacing:0; text-align:left; font-size:.85rem; }
+  .requests-table th { padding:12px 10px; font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.075em; font-weight:850; border-bottom:1px solid rgba(121,213,194,.29); }
+  .requests-table td { padding:16px 10px; vertical-align:top; border-bottom:1px solid var(--line); line-height:1.45; }
+  .requests-table tbody tr:last-child td { border-bottom:0; }
+  .requests-table tbody tr:hover { background:rgba(121,213,194,.045); }
+  .row-number { color:var(--muted); font-size:.8rem; }
+  .applicant-main { font-weight:850; font-variant-ligatures:none; overflow-wrap:anywhere; }
+  .request-verified { display:block; color:#bdf2c8; font-size:.72rem; font-weight:800; margin-top:5px; }
+  .paid-value { font-weight:800; white-space:nowrap; }
+  .paid-unit { color:var(--muted); font-size:.75rem; }
+  .ledger-value { font-variant-numeric:tabular-nums; font-weight:780; }
+  .proof-toggle { border:1px solid rgba(121,213,194,.38); border-radius:11px; padding:9px 11px; background:rgba(121,213,194,.065); min-width:102px; }
+  .proof-toggle > summary { list-style:none; cursor:pointer; color:#d4fff2; font-weight:850; font-size:.78rem; }
+  .proof-toggle > summary::-webkit-details-marker { display:none; }
+  .proof-toggle > summary::after { content:'  +'; color:var(--sea-glass); }
+  .proof-toggle[open] > summary::after { content:'  −'; }
+  .proof-content { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); color:var(--muted); }
+  .proof-line { margin:0 0 11px; font-size:.75rem; line-height:1.5; }
+  .proof-line:last-child { margin-bottom:0; }
+  .proof-label { display:block; color:var(--muted); font-weight:750; margin-bottom:3px; }
+  .proof-value { display:block; color:var(--ink); overflow-wrap:anywhere; font-variant-ligatures:none; }
+  .copy-wallet { min-height:33px; padding:6px 10px; font-size:.75rem; font-weight:800; color:#dcfff4; border:1px solid rgba(121,213,194,.36); border-radius:9px; background:rgba(121,213,194,.065); cursor:pointer; margin-top:7px; }
+  .copy-wallet:focus-visible,.proof-toggle > summary:focus-visible { outline:2px solid var(--mango); outline-offset:2px; }
+  .report-foot { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-top:17px; }
+  .report-foot .notice { margin:0; font-size:.78rem; }
+  @media(max-width:700px) {
+    .table-wrap { overflow:visible; }
+    .requests-table,.requests-table tbody,.requests-table tr,.requests-table td { display:block; width:100%; }
+    .requests-table thead { display:none; }
+    .requests-table tr { margin-bottom:13px; padding:8px 13px; border:1px solid rgba(121,213,194,.25); border-radius:14px; background:rgba(121,213,194,.035); }
+    .requests-table tr:last-child { margin-bottom:0; }
+    .requests-table td { display:grid; grid-template-columns:87px minmax(0,1fr); gap:11px; align-items:start; border-bottom:1px solid rgba(219,248,244,.08); padding:11px 0; }
+    .requests-table tr td:last-child { border-bottom:0; }
+    .requests-table td::before { content:attr(data-label); color:var(--muted); font-size:.73rem; font-weight:780; padding-top:3px; }
+    .proof-toggle { min-width:0; }
+    .request-count { align-self:flex-start; }
+  }
   .notice { max-width:640px; color:var(--muted); line-height:1.5; }
   .error-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:17px; }
 
@@ -229,10 +267,19 @@
 </div>
 </section>
 <section aria-label="Membership requests discovered on XRPL" class="panel">
-<h2>Membership Requests</h2>
+<div class="report-heading">
+  <div>
+    <h2>Requests received</h2>
+    <p class="report-subtitle">People who have requested to join this community. Each request has been checked against the XRP Ledger.</p>
+  </div>
+  <span id="requestCount" class="request-count" hidden></span>
+</div>
 <p aria-live="polite" class="request-status" id="requestStatus" role="status">Opening verified membership requests…</p>
-<div hidden="" id="requestList"></div>
-<p class="notice" hidden="" id="requestNotice">Verified membership requests are payments, not LEAP awards. Membership begins only after a separate valid LEAP recognition. Requests were verified across current and former authorized Operating Wallet histories by the Ledger Trail.</p>
+<div hidden id="requestList"></div>
+<div class="report-foot" hidden id="requestFoot">
+  <p class="notice" id="requestNotice">A verified request means the payment reached the community. It does not yet tell you whether this person has received their first LEAP.</p>
+  <a class="action" id="refreshLink" href="test-harness/membershipRequestsBootstrap.html">Check for new requests</a>
+</div>
 </section>
 </div>
       <p id="verificationNote" class="trail-note" aria-live="polite"></p>
@@ -291,44 +338,150 @@ function checkedHandoff(session) {
   } catch (_) { return null; }
 }
 
-function requestDetail(label, value) {
+function formatXrp(drops) {
+  // Use integer arithmetic so a one-drop payment displays exactly as 0.000001 XRP.
+  const amount = BigInt(drops);
+  const whole = amount / 1000000n;
+  const fractional = (amount % 1000000n).toString().padStart(6, "0").replace(/0+$/, "");
+  return fractional ? `${whole}.${fractional}` : String(whole);
+}
+
+function shortWallet(address) {
+  return `${address.slice(0, 9)}…${address.slice(-6)}`;
+}
+
+function createCell(label, valueNode) {
+  const td = document.createElement("td");
+  td.dataset.label = label;
+  if (valueNode instanceof Node) td.append(valueNode);
+  else td.textContent = String(valueNode);
+  return td;
+}
+
+function proofLine(label, value) {
   const line = document.createElement("p");
-  line.className = "request-detail";
-  line.textContent = `${label}: `;
-  const strong = document.createElement("strong");
-  strong.textContent = String(value);
-  line.append(strong);
+  line.className = "proof-line";
+  const heading = document.createElement("span");
+  heading.className = "proof-label";
+  heading.textContent = label;
+  const detail = document.createElement("span");
+  detail.className = "proof-value";
+  detail.textContent = String(value);
+  line.append(heading, detail);
   return line;
 }
 
-function showMatchingPayments(requests) {
+async function copyApplicant(address, button) {
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error("Clipboard is unavailable");
+    await navigator.clipboard.writeText(address);
+    button.textContent = "Copied";
+    button.setAttribute("aria-label", "Applicant address copied");
+  } catch (_) {
+    button.textContent = "Copy unavailable";
+    button.setAttribute("aria-label", "Copy unavailable; full address is shown in details");
+  }
+}
+
+function makeRequestRow(request, index, communityId) {
+  const tr = document.createElement("tr");
+  const position = document.createElement("span");
+  position.className = "row-number";
+  position.textContent = String(index + 1);
+  tr.append(createCell("#", position));
+
+  const applicant = document.createElement("div");
+  const address = document.createElement("div");
+  address.className = "applicant-main";
+  address.title = request.applicant;
+  address.textContent = shortWallet(request.applicant);
+  const verified = document.createElement("span");
+  verified.className = "request-verified";
+  verified.textContent = "✓ Request verified";
+  const copy = document.createElement("button");
+  copy.type = "button";
+  copy.className = "copy-wallet";
+  copy.textContent = "Copy address";
+  copy.setAttribute("aria-label", `Copy applicant wallet ${request.applicant}`);
+  copy.addEventListener("click", () => copyApplicant(request.applicant, copy));
+  applicant.append(address, verified, copy);
+  tr.append(createCell("Applicant", applicant));
+
+  const paid = document.createElement("div");
+  const paidNumber = document.createElement("div");
+  paidNumber.className = "paid-value";
+  paidNumber.textContent = formatXrp(request.drops);
+  const paidUnit = document.createElement("div");
+  paidUnit.className = "paid-unit";
+  paidUnit.textContent = "XRP";
+  paid.append(paidNumber, paidUnit);
+  tr.append(createCell("Paid", paid));
+
+  const recorded = document.createElement("span");
+  recorded.className = "ledger-value";
+  recorded.textContent = Number(request.ledger).toLocaleString("en-US");
+  tr.append(createCell("Ledger", recorded));
+
+  const proof = document.createElement("details");
+  proof.className = "proof-toggle";
+  const summary = document.createElement("summary");
+  summary.textContent = "View proof";
+  const evidence = document.createElement("div");
+  evidence.className = "proof-content";
+  evidence.append(
+    proofLine("Applicant wallet", request.applicant),
+    proofLine("Receiving Operating Wallet", request.destination),
+    proofLine("Amount paid", `${formatXrp(request.drops)} XRP (${request.drops} drops)`),
+    proofLine("Required price at that time", `${formatXrp(request.expectedDrops)} XRP`),
+    proofLine("Price source", request.priceStatement ? `Ledger ${request.priceStatement.ledger}, transaction ${request.priceStatement.txIndex}` : "Protocol default: one drop"),
+    proofLine("Validated ledger / transaction", `${request.ledger} / ${request.txIndex}`),
+    proofLine("Membership request memo", `WILD-LEDGER/MEMBERSHIP-REQUEST/${communityId}`),
+    proofLine("Transaction hash", request.hash)
+  );
+  proof.append(summary, evidence);
+  tr.append(createCell("Proof", proof));
+  return tr;
+}
+
+function showMatchingPayments(requests, communityId) {
   const list = $("requestList");
   list.replaceChildren();
   list.hidden = false;
-  $("requestNotice").hidden = false;
+  $("requestFoot").hidden = false;
+  $("refreshLink").href = `test-harness/membershipRequestsBootstrap.html?community=${encodeURIComponent(communityId)}&role=operator`;
+  $("requestCount").hidden = false;
+  $("requestCount").textContent = `${requests.length} verified`;
   if (!requests.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "No verified membership requests were found in the community's authorized Operating Wallet history.";
+    empty.textContent = "No verified membership requests were found. You can check again anytime.";
     list.append(empty);
-    $("requestStatus").textContent = "Verification complete. No qualifying requests found.";
+    $("requestStatus").textContent = "Search complete. No qualifying requests found.";
     return;
   }
-  for (const request of requests) {
-    const card = document.createElement("article");
-    card.className = "request-card";
-    const title = document.createElement("div");
-    title.className = "request-title";
-    title.textContent = "Membership request verified";
-    card.append(title,
-      requestDetail("Applicant", request.applicant),
-      requestDetail("XRP sent", `${request.drops} ${request.drops === "1" ? "drop" : "drops"}`),
-      requestDetail("Required price at that time", `${request.expectedDrops} ${request.expectedDrops === "1" ? "drop" : "drops"}`),
-      requestDetail("Validated ledger", String(request.ledger)),
-      requestDetail("Transaction hash", request.hash));
-    list.append(card);
+  const tableContainer = document.createElement("div");
+  tableContainer.className = "table-wrap";
+  const table = document.createElement("table");
+  table.className = "requests-table";
+  const caption = document.createElement("caption");
+  caption.className = "label";
+  caption.textContent = "Membership requests, newest first";
+  const head = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  for (const text of ["#", "Applicant", "Paid", "Ledger", "Proof"]) {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = text;
+    headRow.append(th);
   }
-  $("requestStatus").textContent = `${requests.length} ${requests.length === 1 ? "membership request" : "membership requests"} verified by the Ledger Trail against LEAP Protocol 0.24.`;
+  head.append(headRow);
+  const body = document.createElement("tbody");
+  const newestFirst = [...requests].sort((a, b) => b.ledger - a.ledger || b.txIndex - a.txIndex || a.hash.localeCompare(b.hash));
+  newestFirst.forEach((request, i) => body.append(makeRequestRow(request, i, communityId)));
+  table.append(caption, head, body);
+  tableContainer.append(table);
+  list.append(tableContainer);
+  $("requestStatus").textContent = `${requests.length} ${requests.length === 1 ? "request" : "requests"} checked and verified on XRPL. Newest requests are first.`;
 }
 
 function showGate(message, url, label) {
@@ -360,7 +513,7 @@ function openReport() {
   $("operatorWallet").textContent = session.wallet;
   document.title = `Membership Requests · ${$("communityName").textContent} | Wild Ledger`;
   $("authorizedContent").hidden = false;
-  showMatchingPayments(data.requests);
+  showMatchingPayments(data.requests, session.communityId);
   const stamp = new Date(data.verifiedAt);
   $("verificationNote").textContent = `Results verified by the Ledger Trail ${stamp.toLocaleString()}. This report is a snapshot, not a live search.`;
 }
