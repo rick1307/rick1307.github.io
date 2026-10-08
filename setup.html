@@ -117,6 +117,14 @@
           </div>
         </section>
 
+        <section class="card" id="joinPriceCard">
+          <div class="section-head"><div><h2>Join Request Price</h2><p>Set the XRP amount someone pays directly to your Operating Wallet to request membership. Paying does not guarantee membership.</p></div><span class="permission">Separate XRPL state</span></div>
+          <div class="field"><label for="joinPriceDrops">Price in XRP drops</label><input id="joinPriceDrops" type="text" inputmode="numeric" pattern="[0-9]*" value="1" autocomplete="off"><div class="hint" id="joinPriceXrp">1 drop = 0.000001 XRP</div></div>
+          <p class="status" id="joinPriceStatus" role="status">Reading the current price from XRPL…</p>
+          <button class="primary" id="publishPriceButton" type="button" disabled>Publish Price</button>
+          <button class="secondary" id="retryPriceReadbackButton" type="button" hidden>Retry Price Readback</button>
+        </section>
+
         <section class="card publish-card">
           <div class="section-head"><div><h2 id="publishTitle">Publish community</h2><p id="publishCopy">The current Operating Wallet publishes the complete compact CONFIG directly to XRPL in one transaction.</p></div></div>
           <p class="status" id="publishStatus">Reading setup state…</p>
@@ -185,6 +193,7 @@ import {
 } from "./js/communityConfigSchema.js";
 import { availableLayouts, availableSkins } from "./js/presentationCatalog.js";
 import { prepareNoOpAccountSet, submitSignedTransaction, textToHex, isClassicAddress } from "./js/xrplTransport.js";
+import { canonicalJoinRequestDrops, joinRequestPriceMemo, readCommunityJoinRequestPrice, assertPreparedJoinPrice } from "./js/communityJoinPrice.js";
 
 const $ = id => document.getElementById(id);
 const runtime = window.WILD_LEDGER_CONFIG || {};
@@ -208,6 +217,8 @@ let formBound = false;
 let draftRestoreInfo = null;
 let draftSaveInfo = null;
 let draftSaveError = "";
+let joinPriceState = null;
+let pendingPrice = null;
 
 const TRAIL_MODES = Object.freeze({
   opening: {
@@ -218,6 +229,18 @@ const TRAIL_MODES = Object.freeze({
       ["community", "Community", "Waiting to identify the community."],
       ["config", "CONFIG", "Waiting to read community state."],
       ["ready", "Ready", "Waiting to open setup."]
+    ]
+  },
+  price: {
+    lede: "Publishing only the Join Request Price. The wallet must approve the price and XRPL must validate it before Wild Ledger marks it published.",
+    steps: [
+      ["authority", "Authority", "Waiting to recheck the current Operating Wallet."],
+      ["prepared", "Price prepared", "Waiting to build and verify the price transaction."],
+      ["connect", "Connect Bifrost", "Waiting for the Operating Wallet connection."],
+      ["signature", "Sign price", "Waiting for the Operating Wallet signature."],
+      ["xrpl", "XRPL", "Waiting for transaction validation."],
+      ["verify", "Verify price", "Waiting to independently read back the ledger-published price."],
+      ["ready", "Price published", "Waiting for final readback proof."]
     ]
   },
   publish: {
@@ -524,6 +547,7 @@ function setBusy(value) {
   busy = Boolean(value);
   document.querySelectorAll("input,textarea,.choice").forEach(el => { el.disabled = busy || role !== "operator"; });
   updatePublishGate();
+  updatePriceGate();
 }
 
 async function resolveContext() {
@@ -715,13 +739,16 @@ function updatePublishGate() {
     formReady = false;
     formError = error?.message || String(error);
   }
-  button.disabled = busy || !operatorAllowed || !formReady || Boolean(pendingPublication);
+  button.disabled = busy || !operatorAllowed || !formReady || Boolean(pendingPublication) || Boolean(pendingPrice);
 
   if (role !== "operator") {
     setStatus("Owner view is read-only here. The current Community Operating Wallet publishes CONFIG.");
     $("ledgerNote").hidden = true;
   } else if (!formReady) {
     setStatus(preLaunch ? "Complete the required before-launch choices to publish." : formError || "Fix the incomplete CONFIG fields before publishing.");
+    $("ledgerNote").hidden = true;
+  } else if (pendingPrice) {
+    setStatus("Finish the validated Join Request Price readback before publishing CONFIG.", "error");
     $("ledgerNote").hidden = true;
   } else if (pendingPublication) {
     setStatus("The CONFIG transaction already validated. Finish the independent XRPL readback before publishing anything else.", "error");
@@ -771,12 +798,12 @@ function assertPrepared(tx, account, memoText) {
   if (String(memo.MemoData || "").toUpperCase() !== textToHex(memoText).toUpperCase()) throw new Error("Prepared CONFIG memo changed unexpectedly.");
 }
 
-async function connectSigner(expectedWallet) {
+async function connectSigner(expectedWallet, description = "Authorize Community CONFIG publication") {
   if (!PROJECT_ID) throw new Error("WalletConnect Project ID is not configured.");
   if (signer) { try { await signer.disconnect(); } catch (_) {} }
   signer = new WalletConnectXrplSigner({
     projectId: PROJECT_ID,
-    metadata: { name: "Wild Ledger Community Setup", description: "Authorize Community CONFIG publication", url: location.origin, icons: [`${location.origin}/favicon.ico`] }
+    metadata: { name: "Wild Ledger Community Setup", description, url: location.origin, icons: [`${location.origin}/favicon.ico`] }
   });
   const connection = await signer.connect({ onUri: async uri => {
     $("trailQrImage").src = await QRCode.toDataURL(uri,{width:520,margin:2,errorCorrectionLevel:"M"});
@@ -855,6 +882,164 @@ async function finishLedgerPublication(pending) {
   } else {
     showSuccess(wasPreLaunch);
   }
+}
+
+function pricePendingKey(id) { return `wildLedger.pendingJoinPricePublication.${id}`; }
+function readPricePending(id) {
+  const value = readJson(pricePendingKey(id));
+  if (value?.communityId !== id || !/^[A-F0-9]{64}$/.test(String(value.txHash || ""))) return null;
+  try { return { communityId: id, txHash: value.txHash, drops: canonicalJoinRequestDrops(value.drops) }; }
+  catch (_) { return null; }
+}
+function writePricePending(value) { sessionStorage.setItem(pricePendingKey(value.communityId), JSON.stringify(value)); }
+function clearPricePending(id) { sessionStorage.removeItem(pricePendingKey(id)); }
+function priceXrpText(drops) {
+  const whole = BigInt(drops);
+  const integer = whole / 1000000n;
+  const remainder = (whole % 1000000n).toString().padStart(6, "0").replace(/0+$/, "");
+  return `${integer}${remainder ? `.${remainder}` : ""} XRP`;
+}
+function priceStatus(message, tone = "") {
+  $("joinPriceStatus").textContent = message;
+  $("joinPriceStatus").className = `status${tone ? ` ${tone}` : ""}`;
+}
+function updatePriceGate() {
+  const button = $("publishPriceButton");
+  if (!button) return;
+  button.disabled = true;
+  const raw = $("joinPriceDrops").value.trim();
+  let drops = "";
+  try { drops = canonicalJoinRequestDrops(raw); }
+  catch (error) {
+    $("joinPriceXrp").textContent = "Enter a positive whole number of XRP drops.";
+    if (!busy && joinPriceState) priceStatus(error.message, "error");
+    return;
+  }
+  $("joinPriceXrp").textContent = `${drops} ${drops === "1" ? "drop" : "drops"} = ${priceXrpText(drops)}`;
+  if (!joinPriceState) return;
+  if (role !== "operator") {
+    priceStatus(`Current price: ${joinPriceState.drops} drops. Owner view is read-only.`);
+    return;
+  }
+  if (pendingPrice) {
+    priceStatus("A price transaction validated. Finish its XRPL readback before signing another.", "error");
+    return;
+  }
+  if (pendingPublication) {
+    priceStatus("Finish the pending CONFIG readback before publishing a price.", "error");
+    return;
+  }
+  if (busy) return;
+  if (drops === joinPriceState.drops) {
+    priceStatus(`Current published price: ${joinPriceState.drops} drops. No change to publish.`, "ok");
+    return;
+  }
+  priceStatus(`Current price: ${joinPriceState.drops} drops. Publish Price will write ${drops} drops to XRPL.`);
+  button.disabled = !operatorSession();
+}
+async function completePriceReadback(pending) {
+  priceStatus("XRPL validated. Independently reading the published price…");
+  let state = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const fresh = await freshOperatorAuthority(operatorSession().connectedWallet);
+    state = await readCommunityJoinRequestPrice({ communityId, authority: fresh, serverUrl: XRPL_SERVER });
+    if (state.latest?.hash === pending.txHash && state.drops === pending.drops) break;
+    await wait(1500);
+  }
+  if (state?.latest?.hash !== pending.txHash || state.drops !== pending.drops) {
+    throw new Error("The validated Join Request Price could not yet be independently reconstructed from XRPL. Retry readback without signing again.");
+  }
+  joinPriceState = state;
+  pendingPrice = null;
+  clearPricePending(communityId);
+  $("retryPriceReadbackButton").hidden = true;
+  $("joinPriceDrops").value = state.drops;
+  setTrailStep("verify", "done", `Validated price: ${state.drops} drops.`);
+  setTrailStep("ready", "done", `Price published for ${communityId}.`);
+  setTrailStatus("Join Request Price independently verified on XRPL.");
+  priceStatus(`Published and verified on XRPL: ${state.drops} drops.`, "ok");
+  await showTrailCompletion("Price published");
+  hideLedgerTrail();
+}
+async function publishPrice() {
+  if (busy || pendingPrice || pendingPublication || role !== "operator" || !joinPriceState) return;
+  const session = operatorSession();
+  if (!session) { priceStatus("Return to Get Wild and reconnect the Operating Wallet.", "error"); return; }
+  let drops;
+  try { drops = canonicalJoinRequestDrops($("joinPriceDrops").value); }
+  catch (error) { priceStatus(error.message, "error"); return; }
+  if (drops === joinPriceState.drops) return;
+  showLedgerTrail("price");
+  setBusy(true);
+  try {
+    const expectedWallet = session.connectedWallet;
+    const memoText = joinRequestPriceMemo(communityId, drops);
+    setTrailStep("authority", "active", "Rechecking the authorized Operating Wallet and current price.");
+    authority = await freshOperatorAuthority(expectedWallet);
+    const current = await readCommunityJoinRequestPrice({ communityId, authority, serverUrl: XRPL_SERVER });
+    if (current.drops !== joinPriceState.drops) throw new Error("Join Request Price changed on XRPL. Reload Setup before publishing.");
+    setTrailStep("authority", "done", "Operating Wallet authority and current price confirmed.");
+
+    setTrailStep("prepared", "active", "Preparing the exact no-op AccountSet price statement.");
+    const prepared = await prepareNoOpAccountSet({
+      serverUrl: XRPL_SERVER, account: expectedWallet, memoText,
+      feeCushion: Number(runtime.xrplFeeCushion || 1.2)
+    });
+    assertPreparedJoinPrice(prepared.preparedTx, expectedWallet, memoText);
+    setTrailStep("prepared", "done", `${drops} drops · canonical price memo verified.`);
+
+    setTrailStep("connect", "active", "Bifrost needs the current Operating Wallet.");
+    showTrailAction("GO TO BIFROST NOW", "First handoff: connect your current Operating Wallet in Bifrost. Wild Ledger will check the wallet before continuing.", { qr: true });
+    await connectSigner(expectedWallet, "Authorize Community Join Request Price");
+    hideTrailAction();
+    setTrailStep("connect", "done", "Correct Operating Wallet connected.");
+
+    setTrailStep("signature", "active", `Bifrost must approve the price of ${drops} drops.`);
+    showTrailAction("GO TO BIFROST NOW", `Second handoff: sign the Join Request Price of ${drops} drops in Bifrost, then return here.`);
+    authority = await freshOperatorAuthority(expectedWallet);
+    assertPreparedJoinPrice(prepared.preparedTx, expectedWallet, memoText);
+    const signed = await signer.signTransaction(prepared.preparedTx);
+    if (!signed.signedBlob) throw new Error("Bifrost did not return a signed transaction.");
+    hideTrailAction();
+    setTrailStep("signature", "done", "Signed price statement returned.");
+
+    setTrailStep("xrpl", "active", "Submitting the price statement and waiting for XRPL validation.");
+    authority = await freshOperatorAuthority(expectedWallet);
+    const submitted = await submitSignedTransaction({ serverUrl: XRPL_SERVER, signedBlob: String(signed.signedBlob) });
+    if (submitted.finalResult !== "tesSUCCESS") throw new Error(`XRPL returned ${submitted.finalResult}.`);
+    const txHash = String(submitted.txHash || "").toUpperCase();
+    if (!/^[A-F0-9]{64}$/.test(txHash)) throw new Error("Validated price transaction hash is missing.");
+    setTrailStep("xrpl", "done", "XRPL validated the Join Request Price statement.");
+    pendingPrice = { communityId, drops, txHash };
+    writePricePending(pendingPrice);
+    $("retryPriceReadbackButton").hidden = false;
+    setTrailStep("verify", "active", "Reading price back from validated ledger history.");
+    await completePriceReadback(pendingPrice);
+  } catch (error) {
+    hideTrailAction();
+    priceStatus(error.message || String(error), "error");
+    if (pendingPrice) {
+      failLedgerTrail(error, retryPriceReadback, "Retry Price Readback");
+    } else {
+      failLedgerTrail(error, () => { hideLedgerTrail(); setTimeout(publishPrice, 220); }, "Try Publish Price Again");
+    }
+  } finally {
+    setBusy(false);
+  }
+}
+async function retryPriceReadback() {
+  if (busy || !pendingPrice) return;
+  showLedgerTrail("price");
+  setTrailStep("authority", "done", "Operating Wallet checked before signing.");
+  setTrailStep("prepared", "done", "Canonical price AccountSet prepared.");
+  setTrailStep("connect", "done", "Bifrost connected.");
+  setTrailStep("signature", "done", "Operating Wallet signed.");
+  setTrailStep("xrpl", "done", "Price statement is already validated. No new signature needed.");
+  setTrailStep("verify", "active", "Retrying independent price readback.");
+  setBusy(true);
+  try { await completePriceReadback(pendingPrice); }
+  catch (error) { priceStatus(error.message || String(error), "error"); failLedgerTrail(error, retryPriceReadback, "Retry Price Readback"); }
+  finally { setBusy(false); }
 }
 
 async function publish() {
@@ -994,6 +1179,9 @@ function bind() {
       clearPendingIfChanged();
     }
   });
+  $("joinPriceDrops").addEventListener("input", updatePriceGate);
+  $("publishPriceButton").addEventListener("click", publishPrice);
+  $("retryPriceReadbackButton").addEventListener("click", retryPriceReadback);
   $("publishButton").addEventListener("click", publish);
   $("retryReadbackButton").addEventListener("click", retryReadback);
   $("backLink").addEventListener("click", event => {
@@ -1020,6 +1208,13 @@ async function init() {
     await resolveContext();
     if (run !== trailRun) return;
 
+    setTrailStep("config", "active", `Reading ${communityId} Join Request Price from XRPL.`);
+    joinPriceState = await readCommunityJoinRequestPrice({ communityId, authority, serverUrl: XRPL_SERVER });
+    pendingPrice = readPricePending(communityId);
+    $("joinPriceDrops").value = pendingPrice?.drops || joinPriceState.drops;
+    $("retryPriceReadbackButton").hidden = !pendingPrice;
+    setTrailStep("config", "done", `CONFIG and Join Request Price (${joinPriceState.drops} drops) read from XRPL.`);
+
     currentConfig = await loadConfig();
     currentConfig.communityId = communityId;
     currentConfig.leapNamespace = `${communityId}-LEAP`;
@@ -1037,6 +1232,7 @@ async function init() {
     // If a saved draft was restored, immediately refresh both storage copies.
     if (role === "operator" && draftRestoreInfo?.restored) writeConfigDraft(currentConfig);
     updatePublishGate();
+    updatePriceGate();
     setTrailStep("ready", "done", preLaunch ? "First-launch Setup is ready." : "Community Setup is ready.");
     setTrailStatus(`Trail complete. ${communityId} is ready.`, "");
     await showTrailCompletion("Setup ready");
@@ -1047,6 +1243,7 @@ async function init() {
     setStatus("Setup is waiting for the Ledger Trail to complete.", "error");
     $("pageLede").textContent = "Wild Ledger is holding Setup until the validated ledger path is complete.";
     $("publishButton").disabled = true;
+    $("publishPriceButton").disabled = true;
   }
 }
 
