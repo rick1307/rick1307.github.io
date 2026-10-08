@@ -95,6 +95,97 @@
   .request-status.error { color:#ffb7aa; }
   .notice { max-width:640px; color:var(--muted); line-height:1.5; }
   .error-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:17px; }
+
+  /* Human-facing Ledger Trail: follow the active step, inspect the proof if wanted. */
+  .trail-panel { margin-bottom:17px; }
+  .trail-intro { color:var(--muted); font-size:.83rem; line-height:1.55; margin:5px 0 14px; }
+  .trail-disclosure { border:0; }
+  .trail-disclosure > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; list-style:none; }
+  .trail-disclosure > summary::-webkit-details-marker, .trail-step > summary::-webkit-details-marker, .trail-proof > summary::-webkit-details-marker { display:none; }
+  .trail-disclosure > summary::after { content:'⌄'; color:var(--sea-glass); font-weight:900; font-size:1.3rem; flex-shrink:0; }
+  .trail-disclosure[open] > summary::after { transform:rotate(180deg); }
+  .trail-heading { font-weight:850; font-size:1.15rem; }
+  .trail-overall { display:block; color:var(--muted); margin-top:5px; font-size:.76rem; font-weight:650; }
+  .trail-complete .trail-overall { color:#bdf2c8; }
+  .trail-failed .trail-overall { color:#ffb7aa; }
+  .trail-body { padding-top:17px; }
+  .trail-step { border:1px solid var(--line); border-radius:16px; margin-bottom:10px; background:rgba(7,29,42,.37); overflow:hidden; }
+  .trail-step > summary { display:grid; grid-template-columns:34px minmax(0,1fr) auto 16px; gap:9px; align-items:center; padding:13px; cursor:pointer; list-style:none; }
+  .trail-step > summary::after { content:'›'; font-size:1.35rem; color:var(--sea-glass); }
+  .trail-step[open] > summary::after { transform:rotate(90deg); }
+  .trail-step.is-working { border-color:rgba(244,189,88,.72); box-shadow:0 0 0 1px rgba(244,189,88,.12); }
+  .trail-step.is-done { border-color:rgba(121,213,194,.32); }
+  .trail-step.is-failed { border-color:rgba(239,118,93,.75); }
+  .trail-step.is-pending { opacity:.67; }
+  .trail-index { display:grid; place-items:center; width:31px; height:31px; border:1px solid rgba(121,213,194,.28); border-radius:11px; font-size:.8rem; font-weight:900; }
+  .trail-step.is-done .trail-index { color:#bdf2c8; border-color:rgba(130,227,159,.5); }
+  .trail-step.is-failed .trail-index { color:#ffb7aa; border-color:rgba(239,118,93,.55); }
+  .trail-step-title { font-size:.93rem; font-weight:800; line-height:1.3; }
+  .trail-step-state { color:var(--muted); font-size:.64rem; font-weight:900; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+  .trail-step.is-working .trail-step-state { color:#ffe6af; }
+  .trail-step.is-done .trail-step-state { color:#bdf2c8; }
+  .trail-step.is-failed .trail-step-state { color:#ffb7aa; }
+  .trail-step-body { border-top:1px solid var(--line); padding:12px 14px 15px; }
+  .trail-message { font-size:.84rem; line-height:1.55; margin:0; color:var(--ink); }
+  .trail-proof { border:1px solid var(--line); border-radius:12px; margin-top:12px; }
+  .trail-proof > summary { padding:10px 12px; cursor:pointer; list-style:none; color:var(--sea-glass); font-size:.76rem; font-weight:800; }
+  .trail-proof > summary::after { content:' +'; }
+  .trail-proof[open] > summary::after { content:' −'; }
+  .trail-proof-content { padding:0 12px 12px; color:var(--muted); font-size:.74rem; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .trail-error { color:#ffb7aa; font-size:.81rem; line-height:1.55; margin-top:8px; overflow-wrap:anywhere; }
+  .trail-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:13px; }
+  .trail-done-note { color:#bdf2c8; font-size:.84rem; font-weight:780; line-height:1.5; padding-top:5px; }
+  .trail-note { color:var(--muted); font-size:.77rem; line-height:1.5; margin:0; }
+
+  /* The same rounded X language as Wild Ledger's established Setup Ledger Trail. */
+  .guide-overlay { position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left)); background:rgba(0,12,19,.80); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .guide-overlay[hidden] { display:none!important; }
+  .guide-window { width:min(470px,100%); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid rgba(121,213,194,.26); border-radius:26px; padding:24px 22px; background:linear-gradient(155deg,rgba(14,60,72,.98),rgba(5,30,42,.99)); box-shadow:0 34px 90px rgba(0,0,0,.58); }
+  .guide-window::before { content:""; display:block; height:3px; margin:-24px -22px 21px; background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral)); }
+  .guide-topline { display:flex; align-items:center; gap:11px; margin-bottom:9px; }
+  .guide-close { flex:0 0 28px; display:grid; place-items:center; width:28px; height:28px; min-width:28px; min-height:28px; padding:0; border:1px solid rgba(236,249,247,.20); border-radius:50%; background:rgba(255,255,255,.035); color:rgba(245,251,250,.78); font:500 1.05rem/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; cursor:pointer; -webkit-appearance:none; }
+  .guide-close:focus-visible,.guide-close:hover { border-color:rgba(121,213,194,.7); background:rgba(255,255,255,.11); color:#fff; outline:2px solid var(--sea-glass); outline-offset:2px; }
+  .guide-kicker { color:var(--mango); text-transform:uppercase; letter-spacing:.14em; font-size:.66rem; font-weight:900; }
+  .guide-window h2 { margin:9px 0 9px; font-size:clamp(1.75rem,7vw,2.65rem); line-height:1.04; letter-spacing:-.045em; }
+  .guide-lede { color:var(--muted); font-size:.85rem; line-height:1.55; margin:0 0 14px; }
+  .guide-readonly { color:#bdf2c8; font-size:.78rem; font-weight:800; margin:0 0 18px; }
+  .guide-route { list-style:none; margin:0 0 14px; padding:0; }
+  .guide-route li { display:grid; grid-template-columns:32px minmax(0,1fr); align-items:center; gap:11px; min-height:56px; color:var(--muted); border-left:2px solid rgba(121,213,194,.15); margin-left:14px; padding:8px 0 8px 14px; position:relative; }
+  .guide-route li::before { content:attr(data-number); position:absolute; left:-16px; top:calc(50% - 15px); display:grid; place-items:center; width:28px; height:28px; border-radius:50%; border:1px solid rgba(121,213,194,.35); background:#082936; color:var(--muted); font-size:.75rem; font-weight:900; }
+  .guide-route li.is-done { color:#bdf2c8; border-left-color:rgba(159,224,176,.48); }
+  .guide-route li.is-done::before { content:'✓'; border-color:rgba(159,224,176,.65); color:#bdf2c8; }
+  .guide-route li.is-working { color:var(--ink); border-left-color:var(--mango); }
+  .guide-route li.is-working::before { border-color:var(--mango); color:#ffe6af; animation:guidePulse 1.4s ease-in-out infinite; }
+  .guide-route li.is-failed,.guide-route li.is-failed::before { color:#ffb7aa; border-color:var(--coral); }
+  .guide-route strong { display:block; font-size:.87rem; }
+  .guide-route small { display:block; margin-top:3px; font-size:.73rem; line-height:1.4; }
+  .guide-status { padding:13px 14px; border:1px solid rgba(244,189,88,.28); border-radius:14px; background:rgba(244,189,88,.05); font-size:.83rem; line-height:1.48; }
+  .guide-status.is-error { border-color:rgba(239,118,93,.6); color:#ffb7aa; }
+  .guide-learn { color:var(--muted); font-size:.72rem; margin:14px 0 0; line-height:1.5; }
+  .guide-recovery { margin-top:13px; display:flex; gap:9px; flex-wrap:wrap; }
+  .guide-recovery[hidden] { display:none!important; }
+  .manual-intro { color:var(--muted); font-size:.79rem; line-height:1.5; margin:0 0 12px; }
+  .manual-tools { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .guide-again { background:rgba(121,213,194,.065); font-size:.76rem; }
+  .step-actions { margin-top:12px; }
+  .step-action { min-height:42px; min-width:170px; padding:10px 16px; border:1px solid rgba(219,248,244,.18); border-radius:12px; font-size:.85rem; font-weight:900; background:rgba(255,255,255,.06); color:var(--muted); cursor:not-allowed; }
+  .step-action.is-next { color:#09291a; border-color:#8ff6ac; background:linear-gradient(110deg,#a2f4b1,#62dba7); box-shadow:0 0 0 2px rgba(159,224,176,.10),0 7px 20px rgba(31,151,91,.15); cursor:pointer; }
+  .step-action.is-next:focus-visible { outline:3px solid var(--mango); outline-offset:2px; }
+  .step-action.is-busy { border-color:rgba(244,189,88,.50); color:#ffe6af; background:rgba(244,189,88,.10); }
+  .step-action.is-busy::before { content:''; display:inline-block; width:11px; height:11px; margin-right:9px; border:2px solid rgba(244,189,88,.3); border-top-color:var(--mango); border-radius:50%; animation:guideSpin .8s linear infinite; vertical-align:-2px; }
+  .step-action.is-done { border-color:rgba(121,213,194,.25); color:#bdf2c8; background:rgba(121,213,194,.04); }
+  .trail-step.is-working .trail-index { border-color:var(--mango); color:#ffe6af; animation:guidePulse 1.4s ease-in-out infinite; }
+  .trail-finished-line { color:#bdf2c8; font-weight:850; }
+  @keyframes guidePulse { 0%,100%{box-shadow:0 0 0 0 rgba(244,189,88,.28)} 50%{box-shadow:0 0 0 5px rgba(244,189,88,0)} }
+  @keyframes guideSpin { to { transform:rotate(360deg); } }
+  @media(prefers-reduced-motion:reduce) { .guide-route li.is-working::before,.trail-step.is-working .trail-index,.step-action.is-busy::before { animation:none; } }
+
+  @media(max-width:420px) {
+    .trail-step > summary { grid-template-columns:29px minmax(0,1fr) auto 12px; gap:7px; padding:12px 9px; }
+    .trail-index { width:28px; height:28px; }
+    .trail-step-title { font-size:.85rem; }
+    .trail-step-state { font-size:.56rem; }
+  }
   @media (max-width:600px) {
     .shell { margin-top:14px; }
     .console { border-radius:22px; }
@@ -112,134 +203,92 @@
       </nav>
       <div class="eyebrow">Wild Ledger · Operator</div>
       <h1 id="pageTitle">Membership Requests</h1>
-
-      <section id="checkingPanel" class="panel" role="status" aria-live="polite">
-        <h2>Checking access</h2>
-        <p id="checkingText" class="status">Reading the Operator session…</p>
+      <section class="panel" id="reportGate" hidden aria-live="polite">
+        <p id="reportGateMessage" class="notice"></p>
+        <a class="action" id="reportGateLink" href="getWild.html">Sign in through Get Wild</a>
       </section>
-
-      <section id="deniedPanel" class="panel" hidden aria-live="polite">
-        <h2>Access not verified</h2>
-        <p id="deniedText" class="status error"></p>
-        <div class="error-actions">
-          <a class="action" href="getWild.html">Sign in through Get Wild</a>
-          <button id="retryButton" class="action" type="button" hidden>Retry authority check</button>
-        </div>
-      </section>
-
-      <div id="authorizedContent" hidden>
-        <p class="lede">Requests to join your community, discovered from XRPL. This page only reads ledger history; no XRP is spent.</p>
-        <section class="panel" aria-label="Verified community">
-          <div class="row">
-            <div>
-              <div class="label">Community</div>
-              <h2 id="communityName">Community</h2>
-            </div>
-            <div class="check">Current authority verified on XRPL</div>
-          </div>
-          <div class="grid">
-            <div>
-              <div class="label">Community ID</div>
-              <p class="value" id="communityId"></p>
-            </div>
-            <div>
-              <div class="label">Operating Wallet</div>
-              <p class="value wallet" id="operatorWallet"></p>
-            </div>
-          </div>
-        </section>
-        <section class="panel" aria-label="Membership requests discovered on XRPL">
-          <h2>Membership Requests</h2>
-          <p id="requestStatus" class="request-status" role="status" aria-live="polite">Ready to read XRPL history.</p>
-          <div id="requestList" hidden></div>
-          <p id="requestNotice" class="notice" hidden>These are matching payments found in XRPL history. Full protocol checks of the historical price and Operating Wallet are reserved for the next development step.</p>
-        </section>
-      </div>
+<div hidden="" id="authorizedContent">
+<p class="lede">Requests to join your community, discovered from XRPL. This page only reads ledger history; no XRP is spent.</p>
+<section aria-label="Verified community" class="panel">
+<div class="row">
+<div>
+<div class="label">Community</div>
+<h2 id="communityName">Community</h2>
+</div>
+<div class="check">Operator authority checked by Ledger Trail</div>
+</div>
+<div class="grid">
+<div>
+<div class="label">Community ID</div>
+<p class="value" id="communityId"></p>
+</div>
+<div>
+<div class="label">Operating Wallet</div>
+<p class="value wallet" id="operatorWallet"></p>
+</div>
+</div>
+</section>
+<section aria-label="Membership requests discovered on XRPL" class="panel">
+<h2>Membership Requests</h2>
+<p aria-live="polite" class="request-status" id="requestStatus" role="status">Opening verified membership requests…</p>
+<div hidden="" id="requestList"></div>
+<p class="notice" hidden="" id="requestNotice">Verified membership requests are payments, not LEAP awards. Membership begins only after a separate valid LEAP recognition. Requests were verified across current and former authorized Operating Wallet histories by the Ledger Trail.</p>
+</section>
+</div>
+      <p id="verificationNote" class="trail-note" aria-live="polite"></p>
     </section>
   </main>
-<script src="js/communityConfig.js" data-registry-only="true"></script>
-<script src="js/wildLedgerConfig.js"></script>
 <script type="module">
-import { DirectXRPLClient, isClassicAddress } from "./js/xrplTransport.js";
-import { resolveWalletAccess } from "./js/communityAccess.js";
+import { isClassicAddress } from "./js/xrplTransport.js";
 
 const $ = id => document.getElementById(id);
+const HANDOFF_KEY = "wildLedger.membershipRequestsHandoff";
+const MAX_HANDOFF_AGE_MS = 60 * 60 * 1000;
 const params = new URLSearchParams(window.location.search);
-const xrplServer = String(window.WILD_LEDGER_CONFIG?.xrplWebSocket || "").trim();
-let checking = false;
 
-// Match the session shapes already accepted by viewCommunity.html.
-// A role or community written into a URL is never proof of Operator authority.
 function readOperatorSession() {
   try {
-    const session = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
-    if (!session || typeof session !== "object") return null;
-    if (String(session.role || "").trim().toLowerCase() !== "operator") return null;
-    const version = Number(session.version);
-    const source = String(session.source || "").trim();
-    const communityId = String(session.communityId || "").trim().toUpperCase();
-    const wallet = String(version === 2 ? session.connectedWallet : session.verifiedWallet || "").trim();
-    const validV1 = version === 1 && source === "wallet-proof + validated-xrpl-authority";
-    const validV2 = version === 2 && source === "wallet-connect + validated-xrpl-authority";
-    if (!validV1 && !validV2) return null;
-    if (!communityId || !isClassicAddress(wallet)) return null;
-    return { communityId, wallet, communityName: String(session.communityName || "").trim() };
-  } catch (_) {
-    return null;
-  }
+    const s = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
+    if (!s || String(s.role || "").toLowerCase() !== "operator") return null;
+    const v = Number(s.version), source = String(s.source || "");
+    if (!(v === 1 && source === "wallet-proof + validated-xrpl-authority") &&
+        !(v === 2 && source === "wallet-connect + validated-xrpl-authority")) return null;
+    const wallet = String(v === 2 ? s.connectedWallet : s.verifiedWallet || "").trim();
+    const communityId = String(s.communityId || "").trim().toUpperCase();
+    if (!isClassicAddress(wallet) || !communityId) return null;
+    const activeWallet = String(sessionStorage.getItem("wildLedgerOperatorWallet") || "").trim();
+    if (activeWallet && activeWallet !== wallet) return null;
+    if (params.has("community") && String(params.get("community")).trim().toUpperCase() !== communityId) return null;
+    if (params.has("role") && String(params.get("role")).trim().toLowerCase() !== "operator") return null;
+    return {wallet, communityId, name:String(s.communityName || "").trim()};
+  } catch (_) { return null; }
 }
 
-// Step 3: Discover memo-matched payments in the current Operating Wallet's
-// validated account history. Price and historical authority checks follow in Step 4.
-function memoText(hex) {
-  const value = String(hex || "");
-  if (!value || !/^(?:[0-9a-fA-F]{2})+$/.test(value)) return "";
+function checkedHandoff(session) {
   try {
-    const bytes = Uint8Array.from(value.match(/../g), pair => Number.parseInt(pair, 16));
-    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-  } catch (_) { return ""; }
-}
-
-function matchingPayment(entry, destination, communityId) {
-  if (entry?.validated !== true) return null;
-  const tx = entry?.tx_json || entry?.tx || entry?.transaction || {};
-  const meta = entry?.meta || entry?.metaData || {};
-  if (meta.TransactionResult !== "tesSUCCESS" || tx.TransactionType !== "Payment" || tx.Destination !== destination || !isClassicAddress(tx.Account)) return null;
-  const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
-  if (memos.length !== 1 || !memos[0]?.Memo || memos[0].Memo.MemoType || memos[0].Memo.MemoFormat ||
-      memoText(memos[0].Memo.MemoData) !== `WILD-LEDGER/MEMBERSHIP-REQUEST/${communityId}`) return null;
-  const amount = tx.Amount ?? tx.DeliverMax;
-  const ledger = Number(entry.ledger_index ?? tx.ledger_index);
-  const hash = String(entry.hash || tx.hash || "").toUpperCase();
-  if (typeof amount !== "string" || !/^[1-9][0-9]*$/.test(amount) || !Number.isInteger(ledger) || ledger < 1 || !/^[0-9A-F]{64}$/.test(hash)) return null;
-  return { applicant: tx.Account, drops: amount, ledger, hash };
-}
-
-async function discoverMatchingPayments(destination, communityId) {
-  const client = new DirectXRPLClient(xrplServer);
-  const found = new Map();
-  let scanned = 0;
-  try {
-    await client.connect();
-    let marker;
-    do {
-      const fields = { account: destination, ledger_index_min: -1, ledger_index_max: -1, binary: false, forward: true, limit: 400 };
-      if (marker !== undefined) fields.marker = marker;
-      const response = await client.request("account_tx", fields, 30000);
-      const entries = response?.result?.transactions;
-      if (!Array.isArray(entries)) throw new Error("XRPL returned no readable transaction list.");
-      for (const entry of entries) {
-        scanned += 1;
-        const request = matchingPayment(entry, destination, communityId);
-        if (request) found.set(request.hash, request);
-      }
-      $("requestStatus").textContent = `Reading XRPL history… ${scanned} transactions checked.`;
-      marker = response.result.marker;
-    } while (marker !== undefined && marker !== null);
-  } finally {
-    client.close();
-  }
-  return [...found.values()].sort((a, b) => b.ledger - a.ledger || a.hash.localeCompare(b.hash));
+    const raw = sessionStorage.getItem(HANDOFF_KEY);
+    if (!raw || raw.length > 5_000_000) return null;
+    const data = JSON.parse(raw);
+    const when = Number(data.verifiedAt);
+    if (data.version !== 1 || data.source !== "membershipRequestsBootstrap" ||
+        data.communityId !== session.communityId || data.operatorWallet !== session.wallet ||
+        !Number.isFinite(when) || when > Date.now() + 30_000 ||
+        Date.now() - when > MAX_HANDOFF_AGE_MS || !Array.isArray(data.requests)) return null;
+    // A handoff is a short-lived browser copy of the Bootstrap's proof, not an
+    // independent authority statement. Do not silently certify arbitrary rows.
+    const validRows = data.requests.every(r => r &&
+      isClassicAddress(r.applicant) && isClassicAddress(r.destination) &&
+      typeof r.drops === "string" && /^[1-9][0-9]*$/.test(r.drops) &&
+      typeof r.expectedDrops === "string" && /^[1-9][0-9]*$/.test(r.expectedDrops) &&
+      r.drops === r.expectedDrops &&
+      Number.isSafeInteger(r.ledger) && r.ledger > 0 &&
+      Number.isSafeInteger(r.txIndex) && r.txIndex >= 0 &&
+      typeof r.hash === "string" && /^[0-9A-F]{64}$/.test(r.hash) &&
+      (r.priceStatement === null || (r.priceStatement &&
+        Number.isSafeInteger(r.priceStatement.ledger) && r.priceStatement.ledger > 0 &&
+        Number.isSafeInteger(r.priceStatement.txIndex) && r.priceStatement.txIndex >= 0)));
+    return validRows ? data : null;
+  } catch (_) { return null; }
 }
 
 function requestDetail(label, value) {
@@ -247,7 +296,7 @@ function requestDetail(label, value) {
   line.className = "request-detail";
   line.textContent = `${label}: `;
   const strong = document.createElement("strong");
-  strong.textContent = value;
+  strong.textContent = String(value);
   line.append(strong);
   return line;
 }
@@ -260,9 +309,9 @@ function showMatchingPayments(requests) {
   if (!requests.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "No matching membership-request payments were found in the available Operating Wallet history.";
+    empty.textContent = "No verified membership requests were found in the community's authorized Operating Wallet history.";
     list.append(empty);
-    $("requestStatus").textContent = "Search complete. No matching payments found.";
+    $("requestStatus").textContent = "Verification complete. No qualifying requests found.";
     return;
   }
   for (const request of requests) {
@@ -270,123 +319,52 @@ function showMatchingPayments(requests) {
     card.className = "request-card";
     const title = document.createElement("div");
     title.className = "request-title";
-    title.textContent = "Request found on XRPL";
+    title.textContent = "Membership request verified";
     card.append(title,
       requestDetail("Applicant", request.applicant),
       requestDetail("XRP sent", `${request.drops} ${request.drops === "1" ? "drop" : "drops"}`),
+      requestDetail("Required price at that time", `${request.expectedDrops} ${request.expectedDrops === "1" ? "drop" : "drops"}`),
       requestDetail("Validated ledger", String(request.ledger)),
       requestDetail("Transaction hash", request.hash));
     list.append(card);
   }
-  $("requestStatus").textContent = `${requests.length} matching ${requests.length === 1 ? "payment" : "payments"} found in XRPL history.`;
+  $("requestStatus").textContent = `${requests.length} ${requests.length === 1 ? "membership request" : "membership requests"} verified by the Ledger Trail against LEAP Protocol 0.24.`;
 }
 
-function showDenied(message, retry = false) {
-  $("checkingPanel").hidden = true;
+function showGate(message, url, label) {
   $("authorizedContent").hidden = true;
-  $("requestList").hidden = true;
-  $("requestNotice").hidden = true;
-  $("backLink").hidden = true;
-  $("deniedPanel").hidden = false;
-  $("deniedText").textContent = message;
-  $("retryButton").hidden = !retry;
+  $("reportGate").hidden = false;
+  $("reportGateMessage").textContent = message;
+  $("reportGateLink").href = url;
+  $("reportGateLink").textContent = label;
 }
 
-async function checkAccess() {
-  if (checking) return;
-  checking = true;
-  $("deniedPanel").hidden = true;
-  $("authorizedContent").hidden = true;
-  $("checkingPanel").hidden = false;
-  $("checkingText").textContent = "Reading the Operator session…";
+function openReport() {
   const session = readOperatorSession();
   if (!session) {
-    showDenied("There is no verified Operator session in this tab. Sign in through Get Wild.");
-    checking = false;
+    showGate("Sign in through Get Wild as a Community Operator to view membership requests.",
+      "getWild.html", "Sign in through Get Wild");
     return;
   }
-
-  // Reject a hand-typed link to another community or another role.
-  const requestedId = String(params.get("community") || "").trim().toUpperCase();
-  const requestedRole = String(params.get("role") || "").trim().toLowerCase();
-  if ((requestedId && requestedId !== session.communityId) || (requestedRole && requestedRole !== "operator")) {
-    showDenied("This link does not match the signed-in Operator's community. Return through Get Wild.");
-    checking = false;
+  const trailURL = `test-harness/membershipRequestsBootstrap.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
+  const data = checkedHandoff(session);
+  if (!data) {
+    showGate("Run the Membership Requests Ledger Trail to verify the latest requests before opening this report.",
+      trailURL, "Run Membership Requests checks");
     return;
   }
-
-  // Catch stale or inconsistent downstream wallet keys without treating them as proof.
-  const downstreamWallet = String(sessionStorage.getItem("wildLedgerOperatorWallet") || "").trim();
-  if (downstreamWallet && downstreamWallet !== session.wallet) {
-    showDenied("The Operator wallet in this tab does not match the current session. Sign in through Get Wild again.");
-    checking = false;
-    return;
-  }
-  if (!xrplServer) {
-    showDenied("Wild Ledger has no configured XRPL server. Current authority could not be checked.");
-    checking = false;
-    return;
-  }
-
-  $("checkingText").textContent = "Reading current Operating Wallet authority from XRPL…";
-  try {
-    const access = await resolveWalletAccess({ account: session.wallet, serverUrl: xrplServer, force: true });
-    const matched = (access?.operatorMatches || []).find(item =>
-      String(item.communityId || "").trim().toUpperCase() === session.communityId &&
-      String(item.currentAccount || "").trim() === session.wallet &&
-      item.authorityEstablished === true
-    );
-    if (!matched) {
-      showDenied("This wallet is not the current authorized Operating Wallet for this community. Sign in through Get Wild again.");
-      return;
-    }
-    // Reconfirm that the session has not changed while XRPL was being read.
-    const stillCurrent = readOperatorSession();
-    if (!stillCurrent || stillCurrent.wallet !== session.wallet || stillCurrent.communityId !== session.communityId) {
-      showDenied("The Operator session changed during verification. Sign in through Get Wild again.");
-      return;
-    }
-    const cachedName = (() => {
-      try {
-        const cached = JSON.parse(sessionStorage.getItem("wildLedger.currentCommunityConfig") || "null");
-        return String(cached?.communityId || "").trim().toUpperCase() === session.communityId
-          ? String(cached?.config?.communityName || "").trim() : "";
-      } catch (_) { return ""; }
-    })();
-    const communityName = cachedName || session.communityName || String(matched.communityName || "").trim() || session.communityId;
-    $("communityName").textContent = communityName;
-    $("communityId").textContent = session.communityId;
-    $("operatorWallet").textContent = session.wallet;
-    $("backLink").href = `viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
-    $("backLink").hidden = false;
-    document.title = `Membership Requests · ${communityName} | Wild Ledger`;
-    $("checkingPanel").hidden = true;
-    $("authorizedContent").hidden = false;
-    $("requestList").hidden = true;
-    $("requestNotice").hidden = true;
-    $("requestStatus").classList.remove("error");
-    $("requestStatus").textContent = "Reading membership-request payments from XRPL…";
-    try {
-      const requests = await discoverMatchingPayments(session.wallet, session.communityId);
-      const afterRead = readOperatorSession();
-      if (!afterRead || afterRead.wallet !== session.wallet || afterRead.communityId !== session.communityId) {
-        showDenied("The Operator session changed during the XRPL search. Sign in through Get Wild again.");
-        return;
-      }
-      showMatchingPayments(requests);
-    } catch (readError) {
-      $("requestStatus").classList.add("error");
-      $("requestStatus").textContent = `XRPL request search could not finish: ${readError?.message || String(readError)}. No result is claimed.`;
-    }
-  } catch (error) {
-    showDenied(`Current XRPL authority could not be checked: ${error?.message || String(error)}`, true);
-  } finally {
-    checking = false;
-  }
+  $("backLink").href = `viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
+  $("backLink").hidden = false;
+  $("communityName").textContent = String(data.communityName || session.name || session.communityId);
+  $("communityId").textContent = session.communityId;
+  $("operatorWallet").textContent = session.wallet;
+  document.title = `Membership Requests · ${$("communityName").textContent} | Wild Ledger`;
+  $("authorizedContent").hidden = false;
+  showMatchingPayments(data.requests);
+  const stamp = new Date(data.verifiedAt);
+  $("verificationNote").textContent = `Results verified by the Ledger Trail ${stamp.toLocaleString()}. This report is a snapshot, not a live search.`;
 }
-
-$("retryButton").addEventListener("click", checkAccess);
-checkAccess();
+openReport();
 </script>
 </body>
 </html>
