@@ -24,7 +24,7 @@ h1{margin:7px 0 10px;font-size:clamp(1.8rem,6vw,3rem);line-height:1.08}p{line-he
 .step.active{border-color:var(--gold);color:#ffe6a7}
 .card{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);padding:16px}
 h2{margin:0 0 8px;font-size:1.07rem}label{display:block;font-size:.79rem;color:var(--muted);font-weight:800;margin-bottom:7px}
-select{width:100%;padding:12px;border-radius:11px;background:#092c39;color:white;border:1px solid rgba(134,215,201,.34);font-size:1rem}
+select,input[type="text"]{width:100%;padding:12px;border-radius:11px;background:#092c39;color:white;border:1px solid rgba(134,215,201,.34);font-size:1rem}
 button{min-height:45px;padding:11px 15px;border:1px solid rgba(134,215,201,.42);border-radius:11px;background:linear-gradient(130deg,#20887e,#146c74);color:white;font-weight:850;font-size:.92rem;cursor:pointer}
 button:disabled{opacity:.38;cursor:not-allowed}button.secondary{background:rgba(255,255,255,.07);border-color:var(--line)}
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1 1 210px}
@@ -100,6 +100,9 @@ details{margin-top:10px;font-size:.75rem;color:var(--muted)}details summary{curs
 <p>Success is shown only after the validated ledger confirms the exact amount, sender, destination, memo, and result.</p>
 <dl class="value-grid" id="proofFacts" hidden><dt>Transaction hash</dt><dd id="proofHash" class="code"></dd><dt>Validated ledger</dt><dd id="proofLedger"></dd><dt>Ledger result</dt><dd id="proofResult"></dd></dl>
 <div class="actions"><button id="verifyButton" class="secondary" hidden>Check validation again (no new payment)</button></div>
+<label for="existingHash" style="margin-top:14px">Already submitted? Recheck the transaction hash without another payment.</label>
+<input id="existingHash" type="text" maxlength="64" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="64-character XRPL transaction hash">
+<div class="actions"><button id="existingVerifyButton" class="secondary" disabled>Verify existing transaction (no new payment)</button></div>
 <div class="status" id="proofStatus">No request submitted.</div>
 </div>
 </div>
@@ -151,6 +154,7 @@ function syncButtons() {
   $("approveCheckbox").disabled = busy || !prepared || attemptedSubmission;
   $("sendButton").disabled = busy || !prepared || !$("approveCheckbox").checked || attemptedSubmission;
   $("verifyButton").disabled = busy || !submittedHash;
+  $("existingVerifyButton").disabled = busy || !context;
 }
 function setBusy(value) { busy = value; syncButtons(); }
 function describeContext(data) {
@@ -228,8 +232,14 @@ async function connectWallet() {
   finally { setBusy(false); }
 }
 function assertPayment(tx, expected) {
-  if (tx?.TransactionType !== "Payment" || tx.Account !== expected.account || tx.Destination !== expected.destination || String(tx.Amount) !== expected.drops)
-    throw new Error("Prepared Payment has unexpected sender, destination, or XRP amount.");
+  // API v1 returns Amount; API v2 returns DeliverMax for the same XRP Payment.
+  // Require exactly one field and the exact expected number of XRP drops.
+  const hasAmount = tx && Object.prototype.hasOwnProperty.call(tx, "Amount");
+  const hasDeliverMax = tx && Object.prototype.hasOwnProperty.call(tx, "DeliverMax");
+  const paymentDrops = hasAmount ? tx.Amount : tx?.DeliverMax;
+  if (tx?.TransactionType !== "Payment" || tx.Account !== expected.account || tx.Destination !== expected.destination ||
+      hasAmount === hasDeliverMax || typeof paymentDrops !== "string" || paymentDrops !== expected.drops)
+    throw new Error("Payment has unexpected sender, destination, or XRP amount.");
   if (tx.SendMax !== undefined || tx.Paths !== undefined || tx.DeliverMin !== undefined || ((Number(tx.Flags || 0) >>> 0) & 0x00020000))
     throw new Error("Prepared Payment includes an unsupported payment option.");
   const memos = tx.Memos;
@@ -288,12 +298,18 @@ async function verifyKnownHash() {
     await client.connect();
     const lookup = await client.request("tx", { transaction: submittedHash, binary:false }, 20000);
     const result = lookup.result || {};
-    const ledger = confirmValidatedRequest(result, prepared);
+    const { tx } = readLedgerFields(result);
+    // A past transaction can be checked after a page reload without reconnecting
+    // Bifrost. The validated Account is the sender; the selected community supplies
+    // the independently checked destination, amount, and canonical memo.
+    const expected = prepared || (context && isClassicAddress(tx.Account) ? { ...context, account:tx.Account } : null);
+    if (!expected) throw new Error("Read the community in Step 1 before checking an existing transaction.");
+    const ledger = confirmValidatedRequest(result, expected);
+    if (String(result.hash || tx.hash || "").toUpperCase() !== submittedHash) throw new Error("XRPL readback hash did not match the requested transaction.");
     $("proofFacts").hidden = false;
     $("proofHash").textContent = submittedHash;
     $("proofLedger").textContent = String(ledger ?? "Validated; ledger number unavailable");
     $("proofResult").textContent = "tesSUCCESS — exact transaction verified";
-    if (String(result.hash || readLedgerFields(result).tx.hash || "").toUpperCase() !== submittedHash) throw new Error("XRPL readback hash did not match the submitted transaction.");
     step(5, "done");
     setStatus("proofStatus", "PROVEN: XRPL validated the exact request Payment. Full historical request eligibility will be tested in the Operator report. No LEAP or membership was awarded.", "good");
     $("verifyButton").hidden = true;
@@ -301,6 +317,26 @@ async function verifyKnownHash() {
     setStatus("proofStatus", `${error.message || String(error)} No new payment has been sent. You may check this hash again.`, "bad");
     $("verifyButton").hidden = false;
   } finally { client.close(); setBusy(false); }
+}
+async function verifyExistingHash() {
+  if (busy) return;
+  if (!context) { setStatus("proofStatus", "Read the community in Step 1 first.", "bad"); return; }
+  const hash = String($("existingHash").value || "").trim().toUpperCase();
+  if (!/^[0-9A-F]{64}$/.test(hash)) {
+    setStatus("proofStatus", "Enter the 64-character transaction hash from the previous request.", "bad");
+    return;
+  }
+  // Proof-only operation: permanently disable sending from this page instance.
+  prepared = null;
+  submittedHash = hash;
+  attemptedSubmission = true;
+  $("proofFacts").hidden = false;
+  $("proofHash").textContent = hash;
+  $("proofLedger").textContent = "Checking XRPL";
+  $("proofResult").textContent = "Not yet proven";
+  step(5);
+  syncButtons();
+  await verifyKnownHash();
 }
 async function sendRequest() {
   if (busy || !prepared || attemptedSubmission || !$("approveCheckbox").checked) return;
@@ -342,6 +378,7 @@ $("prepareButton").addEventListener("click", prepareRequest);
 $("approveCheckbox").addEventListener("change", syncButtons);
 $("sendButton").addEventListener("click", sendRequest);
 $("verifyButton").addEventListener("click", verifyKnownHash);
+$("existingVerifyButton").addEventListener("click", verifyExistingHash);
 loadDirectory();
 </script>
 </body>
