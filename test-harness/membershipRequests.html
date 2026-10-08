@@ -304,7 +304,7 @@
           <h2>Membership Requests</h2>
           <p id="requestStatus" class="request-status" role="status" aria-live="polite">Ready to read XRPL history.</p>
           <div id="requestList" hidden></div>
-          <p id="requestNotice" class="notice" hidden>These are matching payments found in XRPL history. Full protocol checks of the historical price and Operating Wallet are reserved for the next development step.</p>
+          <p id="requestNotice" class="notice" hidden>Verified membership requests are payments, not LEAP awards. Membership begins only after a separate valid LEAP recognition. This step reads the current Operating Wallet; requests to former Operating Wallets will be included in a later step.</p>
         </section>
       </div>
     </section>
@@ -314,6 +314,8 @@
 <script type="module">
 import { DirectXRPLClient, isClassicAddress } from "./js/xrplTransport.js";
 import { resolveWalletAccess } from "./js/communityAccess.js";
+import { isAuthorizedAtLedger } from "./js/communityAuthority.js";
+import { readCommunityJoinRequestPrice, DEFAULT_JOIN_REQUEST_DROPS } from "./js/communityJoinPrice.js";
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(window.location.search);
@@ -341,8 +343,9 @@ function readOperatorSession() {
   }
 }
 
-// Step 3: Discover memo-matched payments in the current Operating Wallet's
-// validated account history. Price and historical authority checks follow in Step 4.
+// Step 3: Discover candidates in the current Operating Wallet's validated
+// history, then verify historical authority and price in canonical ledger order.
+// Historical requests sent to former Operating Wallets are reserved for Step 5.
 function memoText(hex) {
   const value = String(hex || "");
   if (!value || !/^(?:[0-9a-fA-F]{2})+$/.test(value)) return "";
@@ -364,14 +367,41 @@ function matchingPayment(entry, destination, communityId) {
   const ledger = Number(entry.ledger_index ?? tx.ledger_index);
   const hash = String(entry.hash || tx.hash || "").toUpperCase();
   if (typeof amount !== "string" || !/^[1-9][0-9]*$/.test(amount) || !Number.isInteger(ledger) || ledger < 1 || !/^[0-9A-F]{64}$/.test(hash)) return null;
-  return { applicant: tx.Account, drops: amount, ledger, hash };
+  const txIndex = Number(meta.TransactionIndex);
+  return { applicant: tx.Account, destination: tx.Destination, drops: amount, ledger, txIndex,
+    hash, flags: tx.Flags ?? 0, paths: tx.Paths, sendMax: tx.SendMax, deliverMin: tx.DeliverMin,
+    otherAmount: tx.Amount !== undefined && tx.DeliverMax !== undefined ? tx.DeliverMax : null };
 }
 
-async function discoverMatchingPayments(destination, communityId, onProgress = () => {}) {
+function verifyRequestAtLedger(candidate, authority, priceHistory) {
+  // An unknown transaction position can never receive a Verified designation.
+  if (!Number.isInteger(candidate.txIndex) || candidate.txIndex < 0) return null;
+  if (!isAuthorizedAtLedger(authority, candidate.destination, candidate.ledger, candidate.txIndex)) return null;
+  const flags = Number(candidate.flags);
+  if (!Number.isSafeInteger(flags) || flags < 0 || (flags & 0x00020000) !== 0 ||
+      candidate.paths !== undefined || candidate.sendMax !== undefined || candidate.deliverMin !== undefined ||
+      (candidate.otherAmount !== null && candidate.otherAmount !== candidate.drops)) return null;
+
+  // Price is the latest valid, Operator-authorized AccountSet strictly BEFORE
+  // the request, not a price set later in the same ledger or afterward.
+  let expectedDrops = DEFAULT_JOIN_REQUEST_DROPS;
+  let priceStatement = null;
+  for (const record of priceHistory) {
+    if (record.ledger > candidate.ledger ||
+        (record.ledger === candidate.ledger && record.txIndex >= candidate.txIndex)) break;
+    expectedDrops = record.drops;
+    priceStatement = record;
+  }
+  if (candidate.drops !== expectedDrops) return null;
+  return { ...candidate, expectedDrops, priceStatement };
+}
+
+async function discoverMatchingPayments(destination, communityId, authority, priceHistory, onProgress = () => {}) {
   const client = new DirectXRPLClient(xrplServer);
   const found = new Map();
   let scanned = 0;
   let pages = 0;
+  let excluded = 0;
   try {
     await client.connect();
     let marker;
@@ -384,16 +414,22 @@ async function discoverMatchingPayments(destination, communityId, onProgress = (
       pages += 1;
       for (const entry of entries) {
         scanned += 1;
-        const request = matchingPayment(entry, destination, communityId);
-        if (request) found.set(request.hash, request);
+        const candidate = matchingPayment(entry, destination, communityId);
+        if (!candidate) continue;
+        const verified = verifyRequestAtLedger(candidate, authority, priceHistory);
+        if (verified) found.set(verified.hash, verified);
+        else excluded += 1;
       }
-      onProgress({scanned, pages, matches:found.size});
+      onProgress({scanned, pages, matches:found.size, excluded});
       marker = response.result.marker;
     } while (marker !== undefined && marker !== null);
   } finally {
     client.close();
   }
-  return [...found.values()].sort((a, b) => b.ledger - a.ledger || a.hash.localeCompare(b.hash));
+  return {
+    requests: [...found.values()].sort((a, b) => b.ledger - a.ledger || b.txIndex - a.txIndex || a.hash.localeCompare(b.hash)),
+    excluded, scanned, pages
+  };
 }
 
 function requestDetail(label, value) {
@@ -414,9 +450,9 @@ function showMatchingPayments(requests) {
   if (!requests.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "No matching membership-request payments were found in the available Operating Wallet history.";
+    empty.textContent = "No verified membership requests were found in the available current Operating Wallet history.";
     list.append(empty);
-    $("requestStatus").textContent = "Search complete. No matching payments found.";
+    $("requestStatus").textContent = "Verification complete. No qualifying requests found.";
     return;
   }
   for (const request of requests) {
@@ -424,15 +460,16 @@ function showMatchingPayments(requests) {
     card.className = "request-card";
     const title = document.createElement("div");
     title.className = "request-title";
-    title.textContent = "Request found on XRPL";
+    title.textContent = "Membership request verified";
     card.append(title,
       requestDetail("Applicant", request.applicant),
       requestDetail("XRP sent", `${request.drops} ${request.drops === "1" ? "drop" : "drops"}`),
+      requestDetail("Required price at that time", `${request.expectedDrops} ${request.expectedDrops === "1" ? "drop" : "drops"}`),
       requestDetail("Validated ledger", String(request.ledger)),
       requestDetail("Transaction hash", request.hash));
     list.append(card);
   }
-  $("requestStatus").textContent = `${requests.length} matching ${requests.length === 1 ? "payment" : "payments"} found in XRPL history.`;
+  $("requestStatus").textContent = `${requests.length} ${requests.length === 1 ? "membership request" : "membership requests"} verified against LEAP Protocol 0.24.`;
 }
 
 // One operation, two views: guided Ledger Trail or hands-on workbench.
@@ -442,12 +479,12 @@ let busy = false;
 let completed = false;
 let canRetry = true;
 const stepStates = ["pending", "pending", "pending", "pending"];
-const runContext = { session:null, matched:null, requests:null, scanned:0, pages:0 };
+const runContext = { session:null, matched:null, requests:null, scanned:0, pages:0, excluded:0, priceStatements:0 };
 const titles = ["Identify your community", "Confirm current authority", "Find membership requests", "Open your report"];
 const evidenceDefaults = [
   "Your Get Wild Operator session must identify a wallet and Community ID. A URL alone does not grant access.",
   "Wild Ledger must find this wallet as the current authorized Operator in validated XRPL history.",
-  "Reads validated Payments from the current Operating Wallet and looks for the community's exact membership-request memo. Historical price checks come later.",
+  "Verifies each request's memo, successful XRP Payment, historical Operating Wallet authority, and price at the time of payment.",
   "The report opens only after the search finishes and your Operator session is checked again."
 ];
 
@@ -514,7 +551,7 @@ function resetTrail() {
   $("requestNotice").hidden = true;
   $("backLink").hidden = true;
   runContext.session = null; runContext.matched = null; runContext.requests = null;
-  runContext.scanned = 0; runContext.pages = 0;
+  runContext.scanned = 0; runContext.pages = 0; runContext.excluded = 0; runContext.priceStatements = 0;
   for (let n = 1; n <= 4; n++) {
     stepStates[n-1] = "pending";
     $(`trailProof${n}`).textContent = evidenceDefaults[n-1];
@@ -592,17 +629,32 @@ async function performStep(number) {
     document.title = `Membership Requests · ${communityName} | Wild Ledger`;
     $("requestStatus").classList.remove("error");
     $("requestStatus").textContent = "Finding membership-request payments in XRPL history…";
-    const requests = await discoverMatchingPayments(session.wallet, session.communityId, progress => {
+    // Read historical, Operator-authorized price statements using Wild Ledger's
+    // existing Protocol 0.24 reader. CONFIG drafts and today's price are not proof.
+    updateGuideStatus("Checking the community's historical Join Request Prices…");
+    $("trailMessage3").textContent = "Checking the prices in effect when requests were made…";
+    const price = await readCommunityJoinRequestPrice({ communityId:session.communityId, authority:matched, serverUrl:xrplServer });
+    assertSessionUnchanged();
+    runContext.priceStatements = price.history.length;
+    const result = await discoverMatchingPayments(session.wallet, session.communityId, matched, price.history, progress => {
       runContext.scanned = progress.scanned;
       runContext.pages = progress.pages;
-      const message = `Reading community history… ${progress.scanned} entries checked; ${progress.matches} ${progress.matches === 1 ? "request" : "requests"} found.`;
+      runContext.excluded = progress.excluded;
+      const message = `Reading ledger history… ${progress.scanned} entries checked; ${progress.matches} verified ${progress.matches === 1 ? "request" : "requests"}.`;
       $("trailMessage3").textContent = message;
-      $("trailProof3").textContent = `Community: ${session.communityId}\nWallet queried: ${session.wallet}\nTransactions read: ${progress.scanned}\nHistory pages: ${progress.pages}\nMemo: WILD-LEDGER/MEMBERSHIP-REQUEST/${session.communityId}\nFull historical authority and price checks are not part of this step.`;
+      $("trailProof3").textContent = `Community: ${session.communityId}\nWallet queried: ${session.wallet}\nTransactions read: ${progress.scanned}\nHistory pages: ${progress.pages}\nPrice statements checked: ${price.history.length}\nCanonical request memo: WILD-LEDGER/MEMBERSHIP-REQUEST/${session.communityId}\nVerified requests: ${progress.matches}\nCandidates not qualifying: ${progress.excluded}\nRules: successful validated Payment; exact memo; no paths or partial payment; historical Operating Wallet and exact historical price.`;
       updateGuideStatus(message);
     });
     assertSessionUnchanged();
-    runContext.requests = requests;
-    return {message:`Search complete: ${requests.length} matching ${requests.length === 1 ? "request" : "requests"} found.`,evidence:`Community: ${session.communityId}\nWallet queried: ${session.wallet}\nTransactions read: ${runContext.scanned}\nHistory pages: ${runContext.pages}\nMatches: ${requests.length}\nHistorical price and Operating Wallet checks are reserved for the next development step.`};
+    runContext.requests = result.requests;
+    runContext.excluded = result.excluded;
+    const proofs = result.requests.slice(0, 5).map(r =>
+      `Validated ledger: ${r.ledger}, transaction: ${r.txIndex}\nApplicant: ${r.applicant}\nAuthorized recipient: ${r.destination}\nXRP paid: ${r.drops} drops\nRequired price at that time: ${r.expectedDrops} drops\nPrice source: ${r.priceStatement ? `ledger ${r.priceStatement.ledger}, transaction ${r.priceStatement.txIndex}` : "1-drop protocol default"}\nMemo: WILD-LEDGER/MEMBERSHIP-REQUEST/${session.communityId}\nResult: tesSUCCESS\nHash: ${r.hash}`
+    ).join("\n\n");
+    return {
+      message:`${result.requests.length} ${result.requests.length === 1 ? "membership request" : "membership requests"} found and verified.`,
+      evidence:`Community: ${session.communityId}\nWallet queried: ${session.wallet}\nTransactions read: ${result.scanned}\nHistory pages: ${result.pages}\nHistorical price statements: ${price.history.length}\nVerified: ${result.requests.length}\nCandidates that did not qualify: ${result.excluded}\nChecked: Community ID and exact memo; validated successful native-XRP Payment without paths or partial payment; authorized Operating Wallet and Join Request Price immediately before payment.\nHistory of former Operating Wallet requests will follow in Step 5.${proofs ? `\n\nSample verified transaction evidence (up to 5):\n${proofs}` : ""}`
+    };
   }
   if (number === 4) {
     const current = assertSessionUnchanged();
@@ -612,7 +664,7 @@ async function performStep(number) {
     $("authorizedContent").hidden = false;
     $("backLink").hidden = false;
     document.title = `Membership Requests · ${$("communityName").textContent} | Wild Ledger`;
-    return {message:"Your Membership Requests report is ready.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nReport rows: ${requests.length}\nReport contains memo-matched XRPL Payments, not yet full protocol acceptance.`};
+    return {message:"Your Membership Requests report is ready.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nFormer Operating Wallet request history will be included in Step 5.`};
   }
   throw new Error("Unknown Ledger Trail step.");
 }
@@ -622,7 +674,7 @@ function finishTrail() {
   $("trailCompleted").hidden = false;
   $("trailDisclosure").classList.add("trail-complete");
   const count = runContext.requests?.length || 0;
-  $("trailOverall").textContent = `Complete · ${count} ${count === 1 ? "request" : "requests"} found. Open to inspect the proof.`;
+  $("trailOverall").textContent = `Complete · ${count} ${count === 1 ? "request" : "requests"} verified. Open to inspect the proof.`;
   updateGuideStatus("All checks complete. Your report is ready.");
   // Option A: show the report automatically and keep the completed trail available.
   $("trailDisclosure").open = false;
