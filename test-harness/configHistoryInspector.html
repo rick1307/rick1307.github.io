@@ -19,7 +19,7 @@ header{padding:24px 22px;border-bottom:1px solid var(--line)}.eyebrow{font-size:
 <header>
 <div class="eyebrow">Wild Ledger · Test Harness · SFL</div>
 <h1>CONFIG History Inspector</h1>
-<p class="lead">Did Sailing Frog's Leap publish CONFIG on XRPL? This inspector shows older and newer CONFIG records and explains why the current Get Wild reader accepts or ignores each one.</p>
+<p class="lead">Did Sailing Frog's Leap publish CONFIG on XRPL? This inspector checks how far back the XRPL server can see, looks for older CONFIG-like memos, and explains what the current Get Wild reader accepts or ignores.</p>
 <div class="safe">Read-only inspection. No wallet connection, no signatures, no transactions, and no XRP spent.</div>
 </header>
 <section>
@@ -33,14 +33,24 @@ header{padding:24px 22px;border-bottom:1px solid var(--line)}.eyebrow{font-size:
 <div id="authority" class="kv"></div>
 <p class="note">An Operating Wallet can publish CONFIG only while it has authority. Earlier records remain visible for inspection.</p>
 </section>
+<section id="coverageSection" hidden>
+<h2>3. How far back does this server look?</h2>
+<div id="coverage"></div>
+<p class="note">These are the ledger ranges advertised by the connected XRPL server and the wallet transactions it returned. The oldest transaction found is not proof of the wallet's first transaction. Missing ledger ranges may hide earlier publications.</p>
+</section>
 <section id="summarySection" hidden>
-<h2>3. What the current reader finds</h2>
+<h2>4. What the current reader finds</h2>
 <div id="summary"></div>
 </section>
 <section id="historySection" hidden>
-<h2>4. CONFIG publications found</h2>
+<h2>5. CONFIG publications found</h2>
 <div id="history"></div>
 <p class="note">This view includes CONFIG-like statements that the current reader ignores. Records are shown from newest to oldest. A zero result means none appeared in the XRPL history returned by this server; it does not prove the wallet never published one if the server lacks older ledger data.</p>
+</section>
+<section id="otherSection" hidden>
+<h2>6. Possible older CONFIG namespaces</h2>
+<div id="other"></div>
+<p class="note">These are memos containing “CONFIG” in a different namespace or format. They are clues, not recognized SFL CONFIG publications. Some may be unrelated. The original memo and hash are shown for inspection.</p>
 </section>
 <footer>Independent history inspection only. This page does not alter SFL or fix CONFIG. Do not republish based on this report alone.</footer>
 </div></main>
@@ -75,6 +85,36 @@ function allMemoStrings(tx) {
     const memo=x?.Memo||{};
     return [memo.MemoData,memo.MemoType,memo.MemoFormat].map(hexToText).filter(Boolean);
   });
+}
+function otherConfigCandidate(entry) {
+  const tx=normalizeTx(entry);
+  const strings=allMemoStrings(tx);
+  // This is deliberately a broad historical search, not a new protocol parser.
+  // Keep the canonical namespace records in the existing classification above.
+  if (strings.some(resemblesConfig)) return null;
+  const text=strings.find(value => /CONFIG(?:\b|[_-])/i.test(value));
+  if (!text) return null;
+  const {ledger,txIndex}=txOrder(entry,tx);
+  return {
+    account:String(tx.Account||""), ledger, txIndex,
+    hash:String(entry?.hash||entry?.tx_hash||tx.hash||"").toUpperCase(),
+    date:xrplDate(tx), memo:text, qualified:false,
+    reason:"CONFIG-like memo under a different namespace or format. Historical clue only; NOT accepted as current SFL CONFIG."
+  };
+}
+function serverCoverage(info) {
+  const raw=String(info?.complete_ledgers||"").trim();
+  const parts=raw.split(",").map(part => part.trim()).filter(Boolean);
+  const spans=[];
+  for (const part of parts) {
+    const match=/^(\d+)(?:-(\d+))?$/.exec(part);
+    if (!match) continue;
+    const a=Number(match[1]),b=Number(match[2]??match[1]);
+    if(Number.isSafeInteger(a)&&Number.isSafeInteger(b)&&a>0&&b>=a) spans.push([a,b]);
+  }
+  return { raw, spans, first:spans.length ? Math.min(...spans.map(x=>x[0])) : null,
+    last:spans.length ? Math.max(...spans.map(x=>x[1])) : null,
+    disjoint:spans.length>1 };
 }
 function memoDataText(tx) {
   const memos = Array.isArray(tx.Memos) ? tx.Memos : [];
@@ -143,6 +183,7 @@ function classification(entry,authority) {
 }
 async function accountHistory(client,account,onPage) {
   const rows=[];let marker, page=0;
+  let oldest=null,newest=null;
   do {
     const fields={account,ledger_index_min:-1,ledger_index_max:-1,binary:false,forward:true,limit:400};
     if (marker!==undefined) fields.marker=marker;
@@ -150,10 +191,16 @@ async function accountHistory(client,account,onPage) {
     const result=response?.result||{};
     if (!Array.isArray(result.transactions)) throw new Error(`XRPL returned no transaction list for ${account}.`);
     rows.push(...result.transactions);marker=result.marker;page++;
+    for(const entry of result.transactions) {
+      const ledger=txOrder(entry,normalizeTx(entry)).ledger;
+      if(ledger===null) continue;
+      oldest=oldest===null?ledger:Math.min(oldest,ledger);
+      newest=newest===null?ledger:Math.max(newest,ledger);
+    }
     onPage({page,total:rows.length});
     if (page>2000) throw new Error(`Safety stop after 2,000 history pages for ${account}; results would be incomplete.`);
   } while (marker!==undefined&&marker!==null);
-  return rows;
+  return {rows, pages:page, oldest, newest, count:rows.length};
 }
 function renderRecord(row, accepted, readerFailed=false) {
   const box=document.createElement("div");box.className="item";
@@ -180,8 +227,8 @@ function renderRecord(row, accepted, readerFailed=false) {
 }
 async function inspect() {
   runButton.disabled=true;
-  for(const id of ["authoritySection","summarySection","historySection"]) $(id).hidden=true;
-  for(const id of ["authority","summary","history"]) $(id).replaceChildren();
+  for(const id of ["authoritySection","coverageSection","summarySection","historySection","otherSection"]) $(id).hidden=true;
+  for(const id of ["authority","coverage","summary","history","other"]) $(id).replaceChildren();
   try {
     if (!serverUrl) throw new Error("The site's XRPL server is not configured.");
     const community=window.WILD_LEDGER_GET_COMMUNITY?.(COMMUNITY_ID);
@@ -200,18 +247,51 @@ async function inspect() {
     historicalAccounts.forEach((account,index)=>line(summaryAuthority,`Wallet ${index+1}`,account,true));
     show("authoritySection");
     const client=new DirectXRPLClient(serverUrl);
-    let records=[];
+    let records=[], otherRecords=[];
+    let coverageInfo=null, coverageError="";
+    const walletHistory=[];
     try {
       await client.connect();
+      // server_info is read-only. Failure to obtain coverage should not hide actual transactions.
+      try {
+        const response=await client.request("server_info",{},15000);
+        coverageInfo=response?.result?.info||null;
+        if(!coverageInfo) coverageError="This XRPL server did not supply ledger coverage details.";
+      } catch(error) { coverageError=String(error?.message||error); }
       for (let i=0;i<historicalAccounts.length;i++) {
         const wallet=historicalAccounts[i];
         status(`Reading ${i+1} of ${historicalAccounts.length} Operating Wallet histories…`);
-        const rows=await accountHistory(client,wallet,({page,total})=>status(`Reading ${i+1}/${historicalAccounts.length} wallets: page ${page}, ${total} transactions returned…`));
-        records.push(...rows.map(row=>classification(row,authority)).filter(Boolean));
+        const history=await accountHistory(client,wallet,({page,total})=>status(`Reading ${i+1}/${historicalAccounts.length} wallets: page ${page}, ${total} transactions returned…`));
+        walletHistory.push({account:wallet,...history});
+        records.push(...history.rows.map(row=>classification(row,authority)).filter(Boolean));
+        otherRecords.push(...history.rows.map(row=>otherConfigCandidate(row)).filter(Boolean));
       }
     } finally {client.close();}
+    const coverage=$('coverage');
+    const ranges=serverCoverage(coverageInfo);
+    const factsCoverage=document.createElement('div');factsCoverage.className='kv';
+    line(factsCoverage,'Server',serverUrl,true);
+    line(factsCoverage,'Available ledgers',ranges.raw||'Unknown — server did not report a range',true);
+    line(factsCoverage,'Oldest available ledger',ranges.first??'Unknown');
+    line(factsCoverage,'Newest available ledger',ranges.last??'Unknown');
+    line(factsCoverage,'Latest validated ledger',coverageInfo?.validated_ledger?.seq??'Not reported');
+    for (const [index,item] of walletHistory.entries()) {
+      line(factsCoverage,`Wallet ${index+1} transactions`,`${item.count} returned across ${item.pages} page(s)`);
+      line(factsCoverage,`Wallet ${index+1} oldest tx`,item.oldest??'None returned');
+      line(factsCoverage,`Wallet ${index+1} newest tx`,item.newest??'None returned');
+    }
+    coverage.append(factsCoverage);
+    const warning=document.createElement('div'); warning.className='status warn';
+    warning.textContent=coverageError
+      ? `Coverage could not be verified: ${coverageError}. Missing older history is possible; zero records cannot prove no prior CONFIG publication.`
+      : ranges.disjoint
+        ? 'The server reports more than one ledger range. Gaps could hide earlier CONFIG transactions; a zero result is inconclusive.'
+        : ranges.first!==null
+          ? `This server reports history beginning at ledger ${ranges.first}. Earlier ledgers, if any, are outside that reported range. An empty result cannot by itself prove SFL never published CONFIG.`
+          : 'The server did not provide a usable history range. A zero result cannot rule out older CONFIG publications.';
+    coverage.append(warning);show('coverageSection');
     // Use the actual reader Get Wild uses as the final decision, not merely our diagnostic approximation.
-    status(`Found ${records.length} CONFIG-like transaction(s). Rechecking against the exact CONFIG reader used by Get Wild…`);
+    status(`Found ${records.length} current-namespace and ${otherRecords.length} other CONFIG-like memo(s). Rechecking the exact reader used by Get Wild…`);
     let live=null, readerError="";
     try { live=await readCommunityConfig({authority,serverUrl}); }
     catch(error) { readerError=String(error?.message||error); }
@@ -227,6 +307,7 @@ async function inspect() {
     report.append(banner);
     const facts=document.createElement("div");facts.className="kv";
     line(facts,"CONFIG records found",records.length);
+    line(facts,"Other CONFIG-like memos",otherRecords.length);
     line(facts,"Accepted by reader",readerError?"Unknown — reader failed":accepted.size);
     line(facts,"Old / ignored",readerError?"Unknown":records.filter(row=>!accepted.has(row.hash)).length);
     line(facts,"Current CONFIG hash",current?.hash||"None",true);
@@ -237,9 +318,14 @@ async function inspect() {
     if(!records.length){const empty=document.createElement("p");empty.className="empty";empty.textContent="No SFL CONFIG statements were found in the histories returned by this XRPL server.";history.append(empty);}
     else records.forEach(record=>history.append(renderRecord(record,accepted,Boolean(readerError))));
     show("historySection");
+    const other=$('other');
+    otherRecords.sort((a,b)=>(b.ledger??0)-(a.ledger??0)||(b.txIndex??-1)-(a.txIndex??-1));
+    if(!otherRecords.length){const empty=document.createElement('p');empty.className='empty';empty.textContent='No other CONFIG-like memos were found in the histories returned by this XRPL server.';other.append(empty);}
+    else otherRecords.forEach(record=>other.append(renderRecord(record,new Set())));
+    show('otherSection');
     status(readerError
-      ? `Inspection partially finished. ${records.length} CONFIG-like record(s) found, but current-reader verification failed: ${readerError}. No XRPL transactions sent.`
-      : `Inspection finished. ${records.length} CONFIG-like record(s) found; ${accepted.size} accepted by the current reader. No XRPL transactions sent.`,readerError?"warn":"good");
+      ? `Inspection partially finished. ${records.length} current-namespace and ${otherRecords.length} other CONFIG-like record(s) found, but current-reader verification failed: ${readerError}. No XRPL transactions sent.`
+      : `Inspection finished. ${records.length} current-namespace record(s), ${otherRecords.length} other CONFIG-like memo(s); ${accepted.size} accepted by the current reader. No XRPL transactions sent.`,readerError?"warn":"good");
   } catch(error) {
     status(`Inspection could not finish: ${error?.message||error}. No writes were made. An incomplete inspection cannot establish whether CONFIG was ever published.`,"bad");
   } finally {runButton.disabled=false;}
