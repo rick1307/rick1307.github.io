@@ -508,8 +508,8 @@
     <p id="libraryIntro">The operating shelf for Wild Ledger. Core doctrine comes first; working material stays below until it is ready to be absorbed into the authoritative documents.</p>
   </div>
 
-  <div class="section-label">Core Doctrine</div>
-  <div class="section-note">The authoritative foundation of Wild Ledger. The LEAP Protocol defines the rules; the Operations Manual defines how Wild Ledger is operated.</div>
+  <div class="section-label">Core Documents</div>
+  <div class="section-note">The authoritative foundation of Wild Ledger. The LEAP Protocol defines the rules; the Operations Manual defines how Wild Ledger is operated.<span data-audience="owner" hidden> The Working Rules define how AI touches the machine.</span></div>
   <div class="menu primary-docs">
     <a id="leapProtocolLink" href="documentation/leapProtocol.html">
       <span class="link-title">LEAP Protocol</span>
@@ -521,15 +521,25 @@
       <span class="link-subtitle">How Wild Ledger is operated: wallets, allocation, distribution, replenishment, recognition, community operations, and procedures.</span>
       <span class="link-file">documentation/operationsManual.html</span>
     </a>
+    <a id="workingRulesLink" href="documentation/workingRules.html" data-audience="owner" hidden>
+      <span class="link-title">Working Rules</span>
+      <span class="link-subtitle">AI-to-AI handoff rules for working safely on Wild Ledger: source of truth, scope, authority, ambiguity, and narrow execution.</span>
+      <span class="link-file">documentation/workingRules.html</span>
+    </a>
   </div>
 
   <div id="testHubSection" data-audience="owner">
     <div class="section-label">Test Hub</div>
     <div class="section-note">Owner-only proof harnesses for Wild Ledger architecture. These tools are intentionally hidden from the Operator Library view.</div>
     <div class="menu">
+      <a href="test-harness/configStateTest.html">
+        <span class="link-title">CONFIG State Harness</span>
+        <span class="link-subtitle">Step 3 proof: QR wallet address, current Operating Wallet authority, CONFIG Schema 1 publication, XRPL validation, independent readback, off-ledger CONFIG validation, and Operator-backend handoff.</span>
+        <span class="link-file">test-harness/configStateTest.html</span>
+      </a>
       <a href="testHub.html">
-        <span class="link-title">Test Hub</span>
-        <span class="link-subtitle">Open the Owner-only index of Wild Ledger diagnostic and proof harnesses.</span>
+        <span class="link-title">Open Full Test Hub</span>
+        <span class="link-subtitle">Owner-only index of Wild Ledger diagnostic and proof harnesses.</span>
         <span class="link-file">testHub.html</span>
       </a>
     </div>
@@ -558,6 +568,11 @@
         <span class="link-title">Community Chat / Lounge</span>
         <span class="link-subtitle">Architecture and design principles for community rooms, Member Record access, temporary aliases, presence, recognition, and XRP tipping.</span>
         <span class="link-file">documentation/chatDocumentation.html</span>
+      </a>
+      <a href="documentation/accessArchitecture.html">
+        <span class="link-title">Access Architecture</span>
+        <span class="link-subtitle">Working architecture for Owner, Operator, and demo access: workspace routing, session boundaries, future authentication, and the separation between application access and XRPL authority.</span>
+        <span class="link-file">documentation/accessArchitecture.html</span>
       </a>
       <a href="documentation/marketing.html">
         <span class="link-title">Marketing</span>
@@ -636,6 +651,7 @@
   const backLink = document.getElementById('backLink');
   const operationsManualLink = document.getElementById('operationsManualLink');
   const leapProtocolLink = document.getElementById('leapProtocolLink');
+  const workingRulesLink = document.getElementById('workingRulesLink');
 
   if (backLink) {
     if (ownerEntry) {
@@ -648,6 +664,7 @@
   }
   if (operationsManualLink) operationsManualLink.href = `documentation/operationsManual.html?${qs}`;
   if (leapProtocolLink) leapProtocolLink.href = `documentation/leapProtocol.html?${qs}`;
+  if (workingRulesLink) workingRulesLink.href = `documentation/workingRules.html?${qs}`;
 })();
 </script>
 </body>
