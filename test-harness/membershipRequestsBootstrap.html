@@ -176,6 +176,16 @@
   .step-action.is-done { border-color:rgba(121,213,194,.25); color:#bdf2c8; background:rgba(121,213,194,.04); }
   .trail-step.is-working .trail-index { border-color:var(--mango); color:#ffe6af; animation:guidePulse 1.4s ease-in-out infinite; }
   .trail-finished-line { color:#bdf2c8; font-weight:850; }
+  /* Confirmation is the human-facing finish; details remain expandable. */
+  .success-mark { display:grid; place-items:center; width:88px; height:88px; margin:12px auto 15px; border:3px solid #a2f4b1; border-radius:50%; background:rgba(80,215,139,.13); color:#a2f4b1; font-size:3.5rem; font-weight:900; line-height:1; box-shadow:0 0 30px rgba(99,219,151,.13); }
+  .success-heading { color:#bdf2c8; text-align:center; font-size:1.14rem; font-weight:900; margin:0 0 16px; }
+  .guide-success { padding:18px 0 6px; }
+  .manual-success { text-align:center; padding:20px 8px 5px; }
+  .success-action { display:inline-flex; justify-content:center; align-items:center; min-height:47px; padding:12px 25px; background:linear-gradient(110deg,#a2f4b1,#62dba7); border:1px solid #8ff6ac; border-radius:12px; color:#09291a; font-weight:900; text-decoration:none; }
+  .success-action:focus-visible { outline:3px solid var(--mango); outline-offset:3px; }
+  .proof-details { margin-top:19px; border:1px solid var(--line); border-radius:13px; text-align:left; }
+  .proof-details > summary { padding:12px 14px; color:var(--sea-glass); cursor:pointer; font-size:.79rem; font-weight:850; }
+  .proof-details > div { padding:0 14px 14px; }
   @keyframes guidePulse { 0%,100%{box-shadow:0 0 0 0 rgba(244,189,88,.28)} 50%{box-shadow:0 0 0 5px rgba(244,189,88,0)} }
   @keyframes guideSpin { to { transform:rotate(360deg); } }
   @media(prefers-reduced-motion:reduce) { .guide-route li.is-working::before,.trail-step.is-working .trail-index,.step-action.is-busy::before { animation:none; } }
@@ -201,20 +211,25 @@
     <div class="guide-window">
       <div class="guide-topline"><button type="button" class="guide-close" id="guideClose" aria-label="Close guided tour and explore the steps" title="Explore the ledger steps">×</button><span class="guide-kicker">Wild Ledger · Ledger Trail</span></div>
       <h2 id="guideTitle">Preparing your Membership Requests</h2>
-      <p class="guide-lede">This bootstrap proves the steps that will lead into the Membership Requests report. You can close the tour at any time to explore the actual checks.</p>
+      <p class="guide-lede">Wild Ledger checks your membership requests and gets you ready for your community. Tap X at any time to explore the actual checks.</p>
       <p class="guide-readonly">Read-only check. No XRP is spent.</p>
-      <ol class="guide-route" aria-label="Live Ledger Trail steps">
+      <ol class="guide-route" id="guideRoute" aria-label="Live Ledger Trail steps">
         <li id="guideStep1" data-number="1"><div><strong>Identify your community</strong><small id="guideStepText1">Waiting</small></div></li>
         <li id="guideStep2" data-number="2"><div><strong>Confirm your authority</strong><small id="guideStepText2">Waiting</small></div></li>
         <li id="guideStep3" data-number="3"><div><strong>Find membership requests</strong><small id="guideStepText3">Waiting</small></div></li>
         <li id="guideStep4" data-number="4"><div><strong>Prove report readiness</strong><small id="guideStepText4">Waiting</small></div></li>
       </ol>
       <div class="guide-status" id="guideStatus" role="status" aria-live="polite">Reading your Operator session…</div>
+      <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
+        <div class="success-mark" aria-hidden="true">✓</div>
+        <p class="success-heading">Checks passed</p>
+        <div style="text-align:center"><a class="success-action" id="guideContinue" href="../viewCommunity.html" hidden>View Community</a></div>
+      </div>
       <div id="guideRecovery" class="guide-recovery" hidden>
         <button type="button" class="step-action is-next" id="guideRetry" hidden>Try again</button>
         <a href="../getWild.html" class="action" id="guideSignin" hidden>Sign in through Get Wild</a>
       </div>
-      <p class="guide-learn">Want to see how it works? Tap the X to explore the live steps, actions, and XRPL evidence beneath this tour.</p>
+      <p class="guide-learn" id="guideLearn">Want to see how it works? Tap the X to explore the live steps, actions, and XRPL evidence beneath this tour.</p>
     </div>
   </div>
 
@@ -234,7 +249,7 @@
             <span class="trail-heading">Ledger Trail <span id="trailOverall" class="trail-overall" role="status" aria-live="polite">Starting your read-only check…</span></span>
           </summary>
           <div class="trail-body">
-            <p class="trail-intro">Wild Ledger will identify your community, verify Operator authority, find and verify membership requests on XRPL, and prove the result is ready for a later report handoff. No wallet approval or XRP spending.</p>
+            <p class="trail-intro">Wild Ledger will identify your community, verify Operator authority, find and verify membership requests on XRPL, and prepare the next view. No wallet approval or XRP spending.</p>
 
             <details class="trail-step is-working" id="trailStep1" open>
               <summary><span class="trail-index" id="trailIndex1">1</span><span class="trail-step-title">Identify your community</span><span class="trail-step-state" id="trailState1">WORKING</span></summary>
@@ -268,7 +283,7 @@
                 <div class="step-actions" id="stepActions4"><button type="button" class="step-action" id="stepAction4" disabled>Waiting</button></div>
               </div>
             </details>
-            <div id="trailCompleted" class="trail-done-note" hidden>Ledger Trail complete. Bootstrap proof is ready. The report handoff is a separate integration step.</div>
+            <div id="trailCompleted" class="trail-done-note" hidden>Checks passed. Detailed ledger evidence is available above.</div>
             <div class="trail-error" id="trailError" hidden role="alert"></div>
             <div class="trail-actions" id="trailActions" hidden>
               <button type="button" id="retryButton" class="action" hidden>Try this check again</button>
@@ -281,16 +296,23 @@
 
       <div id="authorizedContent" hidden>
         <section class="panel" aria-labelledby="proofTitle">
-          <h2 id="proofTitle">Bootstrap proof complete</h2>
-          <p class="lede">The ledger work has finished. This test does not open or replace the Membership Requests report yet.</p>
-          <div class="grid">
-            <div><div class="label">Community</div><p class="value" id="communityName">—</p></div>
-            <div><div class="label">Community ID</div><p class="value" id="communityId">—</p></div>
-            <div><div class="label">Current Operating Wallet</div><p class="value wallet" id="operatorWallet">—</p></div>
+          <div class="manual-success">
+            <div class="success-mark" aria-hidden="true">✓</div>
+            <h2 id="proofTitle" class="success-heading">Checks passed</h2>
+            <a class="success-action" id="returnCommunity" href="../viewCommunity.html">View Community</a>
           </div>
-          <p id="requestStatus" class="request-status" role="status" aria-live="polite">Waiting for verified XRPL evidence.</p>
-          <p class="notice">The verified applicant records are held only in this running bootstrap; they have not been passed to the destination page. Open the completed steps above to inspect real ledger evidence.</p>
-          <p><a class="action" id="returnCommunity" href="../viewCommunity.html">Return to View Community</a></p>
+          <details class="proof-details" id="bootstrapEvidence">
+            <summary>Inspect the ledger evidence</summary>
+            <div>
+              <div class="grid">
+                <div><div class="label">Community</div><p class="value" id="communityName">—</p></div>
+                <div><div class="label">Community ID</div><p class="value" id="communityId">—</p></div>
+                <div><div class="label">Current Operating Wallet</div><p class="value wallet" id="operatorWallet">—</p></div>
+              </div>
+              <p id="requestStatus" class="request-status" role="status" aria-live="polite">Waiting for verified XRPL evidence.</p>
+              <p class="notice">This Bootstrap has verified requests against XRPL. It does not change the Membership Requests report; its destination is View Community.</p>
+            </div>
+          </details>
         </section>
       </div>
     </section>
@@ -421,9 +443,17 @@ async function discoverMatchingPayments(destination, communityId, authority, pri
 // One operation, two views: guided Ledger Trail or hands-on workbench.
 // Closing the X changes only presentation; any XRPL read already running finishes normally.
 let guideMode = true;
+let choseToExplore = false;
 let busy = false;
 let completed = false;
+let completionNavigationTimer = null;
 let canRetry = true;
+function cancelAutomaticNavigation() {
+  if (completionNavigationTimer !== null) {
+    clearTimeout(completionNavigationTimer);
+    completionNavigationTimer = null;
+  }
+}
 const stepStates = ["pending", "pending", "pending", "pending"];
 const runContext = { session:null, matched:null, requests:null, scanned:0, pages:0, excluded:0, priceStatements:0 };
 const titles = ["Identify your community", "Confirm current authority", "Find membership requests", "Prove report readiness"];
@@ -483,7 +513,14 @@ function setTrailStep(number, state, message, evidence = "") {
   refreshControls();
 }
 function resetTrail() {
+  cancelAutomaticNavigation();
   completed = false;
+  $("guideSuccess").hidden = true;
+  $("guideContinue").hidden = true;
+  choseToExplore = false;
+  $("guideRoute").hidden = false;
+  $("guideStatus").hidden = false;
+  $("guideLearn").hidden = false;
   $("trailDisclosure").open = true;
   $("trailDisclosure").classList.remove("trail-complete", "trail-failed");
   $("trailCompleted").hidden = true;
@@ -571,6 +608,7 @@ async function performStep(number) {
     $("operatorWallet").textContent = session.wallet;
     $("backLink").href = `../viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
     $("returnCommunity").href = $("backLink").href;
+    $("guideContinue").href = $("backLink").href;
     document.title = `Membership Requests Bootstrap · ${communityName} | Wild Ledger`;
     $("requestStatus").classList.remove("error");
     $("requestStatus").textContent = "Finding membership-request payments in XRPL history…";
@@ -607,9 +645,9 @@ async function performStep(number) {
     if (!Array.isArray(requests)) throw new Error("The search has not finished. Return to the previous step.");
     $("authorizedContent").hidden = false;
     $("backLink").hidden = false;
-    $("requestStatus").textContent = `${requests.length} membership ${requests.length === 1 ? "request" : "requests"} verified from XRPL. The report handoff is not yet connected.`;
+    $("requestStatus").textContent = `${requests.length} membership ${requests.length === 1 ? "request" : "requests"} verified from XRPL.`;
     document.title = `Membership Requests Bootstrap · ${$("communityName").textContent} | Wild Ledger`;
-    return {message:"Bootstrap proof is complete. The destination handoff is not yet connected.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nFormer Operating Wallet request history is outside this bootstrap move.`};
+    return {message:"All checks passed. Ready to continue to View Community.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nFormer Operating Wallet request history is outside this bootstrap move.`};
   }
   throw new Error("Unknown Ledger Trail step.");
 }
@@ -620,15 +658,30 @@ function finishTrail() {
   $("trailDisclosure").classList.add("trail-complete");
   const count = runContext.requests?.length || 0;
   $("trailOverall").textContent = `Complete · ${count} ${count === 1 ? "request" : "requests"} verified. Open to inspect the proof.`;
-  updateGuideStatus("All checks complete. Bootstrap proof is ready. No report handoff has occurred.");
-  // Option A: show the report automatically and keep the completed trail available.
   $("trailDisclosure").open = false;
-  closeGuide(true);
+  if (guideMode) {
+    // Human stays on the guided trail: clearly acknowledge success, then proceed.
+    $("guideRoute").hidden = true;
+    $("guideStatus").hidden = true;
+    $("guideLearn").hidden = true;
+    $("guideRecovery").hidden = true;
+    $("guideSuccess").hidden = false;
+    $("guideContinue").hidden = !choseToExplore;
+    if (!choseToExplore) {
+      completionNavigationTimer = setTimeout(() => {
+        completionNavigationTimer = null;
+        if (completed && guideMode && !choseToExplore) window.location.assign($("returnCommunity").href);
+      }, 1100);
+    }
+  }
+  // If the human pressed X, stay on the workbench; the green button lets them leave.
 }
-function closeGuide(finished = false) {
+function closeGuide() {
+  cancelAutomaticNavigation();
+  choseToExplore = true;
   guideMode = false;
   $("guideOverlay").hidden = true;
-  if (!finished) {
+  if (!completed) {
     $("trailDisclosure").open = true;
     const next = nextStep();
     if (next && stepStates[next-1] !== "done") $(`trailStep${next}`).open = true;
