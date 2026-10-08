@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#031c29">
+<title>Membership Request Test — Wild Ledger</title>
+<style>
+:root{--deep:#031c29;--sea:#2fa8a0;--glass:#86d7c9;--gold:#f3b64a;--good:#82e39f;--bad:#ff8878;--text:#f4fbfa;--muted:rgba(236,249,247,.70);--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 14% 3%,#13424a,transparent 35%),linear-gradient(160deg,#031c29,#052e3c);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:780px;margin:0 auto;padding:18px 12px 56px}
+.panel{border:1px solid var(--line);background:rgba(3,27,38,.87);border-radius:22px;overflow:hidden;box-shadow:0 20px 55px rgba(0,0,0,.25)}
+.panel:before{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--sea),var(--glass),var(--gold))}
+header{padding:24px 22px;border-bottom:1px solid var(--line)}
+a{color:#b6efe6}a.back{font-size:.8rem;font-weight:800;text-decoration:none}small.eyebrow{display:block;margin-top:18px;text-transform:uppercase;letter-spacing:.13em;color:var(--glass);font-weight:900;font-size:.65rem}
+h1{margin:7px 0 10px;font-size:clamp(1.8rem,6vw,3rem);line-height:1.08}p{line-height:1.55;margin:7px 0;color:var(--muted)}
+.notice{border:1px solid rgba(243,182,74,.36);border-radius:12px;padding:11px 13px;background:rgba(243,182,74,.08);color:#ffecbf;font-size:.83rem;margin-top:15px}
+.content{padding:16px;display:grid;gap:13px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:7px 0 3px}
+.step{border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;color:var(--muted);font-size:.65rem;line-height:1.3}
+.step b{display:block;color:var(--glass);font-size:.84rem;margin-bottom:3px}
+.step.done{border-color:rgba(130,227,159,.55);background:rgba(130,227,159,.09);color:#d6fbe0}
+.step.active{border-color:var(--gold);color:#ffe6a7}
+.card{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);padding:16px}
+h2{margin:0 0 8px;font-size:1.07rem}label{display:block;font-size:.79rem;color:var(--muted);font-weight:800;margin-bottom:7px}
+select{width:100%;padding:12px;border-radius:11px;background:#092c39;color:white;border:1px solid rgba(134,215,201,.34);font-size:1rem}
+button{min-height:45px;padding:11px 15px;border:1px solid rgba(134,215,201,.42);border-radius:11px;background:linear-gradient(130deg,#20887e,#146c74);color:white;font-weight:850;font-size:.92rem;cursor:pointer}
+button:disabled{opacity:.38;cursor:not-allowed}button.secondary{background:rgba(255,255,255,.07);border-color:var(--line)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1 1 210px}
+.value-grid{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,2.2fr);gap:10px;font-size:.82rem;margin-top:12px}
+.value-grid dt{color:var(--muted)}.value-grid dd{margin:0;overflow-wrap:anywhere;font-weight:750}
+.tag{display:inline-block;color:#d0f7ed;border:1px solid rgba(134,215,201,.23);border-radius:999px;padding:5px 9px;font-size:.69rem;font-weight:750}
+.status{margin-top:12px;border-radius:11px;padding:11px 12px;background:rgba(255,255,255,.05);color:var(--muted);font-size:.82rem;line-height:1.55}
+.status.good{border:1px solid rgba(130,227,159,.45);color:#d9ffe4}.status.bad{border:1px solid rgba(255,136,120,.46);color:#ffd4cf}.status.busy{border:1px solid rgba(134,215,201,.4);color:#dbfff7}
+#qrPanel{text-align:center;margin-top:15px}#qrImage{display:block;width:min(270px,100%);margin:0 auto 9px;background:white;padding:8px;border-radius:12px}#qrPanel p{font-size:.78rem}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere;word-break:break-word}
+.confirm{display:flex;gap:9px;align-items:flex-start;color:var(--text);font-weight:650;font-size:.85rem;margin-top:13px;line-height:1.5}
+.confirm input{margin-top:3px;width:17px;height:17px;flex:none}
+details{margin-top:10px;font-size:.75rem;color:var(--muted)}details summary{cursor:pointer;font-weight:800;color:var(--glass)}pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;padding:10px;background:#021823;border-radius:9px;max-height:250px;overflow:auto;font-size:.69rem}
+[hidden]{display:none!important}
+@media(max-width:520px){header{padding:20px 16px}.content{padding:12px}.card{padding:13px}.value-grid{grid-template-columns:1fr;gap:3px}.value-grid dt:not(:first-child){margin-top:8px}}
+</style>
+</head>
+<body>
+<main><section class="panel">
+<header>
+<a class="back" href="../testHub.html">← Test Hub</a>
+<small class="eyebrow">Wild Ledger · isolated test harness</small>
+<h1>Prove a Membership Request</h1>
+<p>One applicant. One XRPL Payment. One canonical membership-request memo. Nothing on this page awards LEAP or changes Community Setup.</p>
+<div class="notice"><strong>Live XRPL transaction.</strong> The applicant sends the community's published Join Request Price in XRP, plus the XRPL network fee. This is a request, not guaranteed membership. The transaction cannot be undone.</div>
+</header>
+<div class="content">
+<div class="steps" aria-label="Proof stages"><div id="s1" class="step active"><b>1</b>Community</div><div id="s2" class="step"><b>2</b>Bifrost</div><div id="s3" class="step"><b>3</b>Prepare</div><div id="s4" class="step"><b>4</b>Sign</div><div id="s5" class="step"><b>5</b>XRPL proof</div></div>
+<div class="card">
+<h2>1. Find the community and price</h2>
+<label for="communitySelect">Established Community</label>
+<select id="communitySelect" disabled><option>Finding established communities on XRPL…</option></select>
+<div class="actions"><button id="readButton" disabled>Read current authority and price</button></div>
+<dl class="value-grid" id="communityFacts" hidden>
+<dt>Community ID</dt><dd id="communityId"></dd>
+<dt>Operating Wallet</dt><dd id="operatorWallet" class="code"></dd>
+<dt>Join Request Price</dt><dd id="priceValue"></dd>
+<dt>Memo</dt><dd id="memoValue" class="code"></dd>
+</dl>
+<div class="status" id="communityStatus" role="status">Reading the Wild Ledger community directory…</div>
+</div>
+<div class="card">
+<h2>2. Connect the applicant's Bifrost wallet</h2>
+<p>This must be the wallet requesting membership. Wild Ledger reads its public XRP address; no address needs to be typed.</p>
+<div class="actions"><button id="connectButton" disabled>Connect Bifrost</button></div>
+<div id="qrPanel" hidden><img id="qrImage" alt="Bifrost connection QR code"><p>Open this QR code in Bifrost. On the same phone, long-press the code.</p></div>
+<div class="status" id="walletStatus">Waiting for a community.</div>
+</div>
+<div class="card">
+<h2>3. Prepare the exact request</h2>
+<p>Wild Ledger checks the current Operating Wallet and Join Request Price again, then asks XRPL to prepare and simulate the Payment.</p>
+<div class="actions"><button id="prepareButton" disabled>Prepare membership request</button></div>
+<dl class="value-grid" id="preparedFacts" hidden>
+<dt>From</dt><dd id="preparedFrom" class="code"></dd>
+<dt>To</dt><dd id="preparedTo" class="code"></dd>
+<dt>Request amount</dt><dd id="preparedAmount"></dd>
+<dt>Network fee</dt><dd id="preparedFee"></dd>
+<dt>Total debit</dt><dd id="preparedTotal"></dd>
+<dt>Memo</dt><dd id="preparedMemo" class="code"></dd>
+</dl>
+<details id="rawDetails" hidden><summary>View prepared XRPL transaction</summary><pre id="rawTx"></pre></details>
+<div class="status" id="prepareStatus">Waiting for wallet connection.</div>
+</div>
+<div class="card">
+<h2>4. Approve and submit through Bifrost</h2>
+<p>Check the wallet, destination, amount, and memo above. Your wallet will ask for a signature. Wild Ledger will submit only that signed transaction.</p>
+<label class="confirm"><input id="approveCheckbox" type="checkbox" disabled><span>I understand this sends the displayed XRP to this community and does not guarantee membership.</span></label>
+<div class="actions"><button id="sendButton" disabled>Approve and send request</button></div>
+<div class="status" id="sendStatus">Waiting for the prepared transaction.</div>
+</div>
+<div class="card">
+<h2>5. Prove the result on XRPL</h2>
+<p>Success is shown only after the validated ledger confirms the exact amount, sender, destination, memo, and result.</p>
+<dl class="value-grid" id="proofFacts" hidden><dt>Transaction hash</dt><dd id="proofHash" class="code"></dd><dt>Validated ledger</dt><dd id="proofLedger"></dd><dt>Ledger result</dt><dd id="proofResult"></dd></dl>
+<div class="actions"><button id="verifyButton" class="secondary" hidden>Check validation again (no new payment)</button></div>
+<div class="status" id="proofStatus">No request submitted.</div>
+</div>
+</div>
+</section></main>
+<script src="../js/wildLedgerConfig.js"></script>
+<script src="../js/communityConfig.js"></script>
+<script type="module">
+import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+import { WalletConnectXrplSigner } from "../js/walletConnectSigner.js";
+import { discoverWildLedgerCommunities } from "../js/communityDiscovery.js";
+import { resolveWalletAccess } from "../js/communityAccess.js";
+import { readCommunityJoinRequestPrice } from "../js/communityJoinPrice.js";
+import { canonicalCommunityId } from "../js/communityConfigSchema.js";
+import { DirectXRPLClient, isClassicAddress, prepareTransaction, submitSignedTransaction, textToHex } from "../js/xrplTransport.js";
+
+const $ = id => document.getElementById(id);
+const config = window.WILD_LEDGER_CONFIG || {};
+const serverUrl = String(config.xrplWebSocket || "");
+const projectId = String(config.walletConnectProjectId || "");
+const feeCushion = Number(config.xrplFeeCushion || 1.2);
+let directory = [];
+let selected = null;
+let context = null;
+let signer = null;
+let applicant = "";
+let prepared = null;
+let submittedHash = "";
+let attemptedSubmission = false;
+let busy = false;
+
+function setStatus(id, message, tone = "") { $(id).textContent = message; $(id).className = `status${tone ? ` ${tone}` : ""}`; }
+function step(n, state = "active") { const el = $(`s${n}`); el.className = `step ${state}`; }
+function resetFrom(n) {
+  for (let i = n; i <= 5; i++) step(i, i === n ? "active" : "");
+  if (n <= 3) { prepared = null; $("preparedFacts").hidden = true; $("rawDetails").hidden = true; $("approveCheckbox").checked = false; $("approveCheckbox").disabled = true; $("sendButton").disabled = true; }
+}
+function xrpFromDrops(drops) {
+  const value = BigInt(drops), whole = value / 1000000n, fractional = String(value % 1000000n).padStart(6, "0").replace(/0+$/, "");
+  return `${whole}${fractional ? `.${fractional}` : ""} XRP`;
+}
+function displayDrops(drops) { return `${drops} ${drops === "1" ? "drop" : "drops"} (${xrpFromDrops(drops)})`; }
+function makeMemo(id) { return `WILD-LEDGER/MEMBERSHIP-REQUEST/${canonicalCommunityId(id)}`; }
+function clearProof() { submittedHash = ""; attemptedSubmission = false; $("proofFacts").hidden = true; $("verifyButton").hidden = true; setStatus("proofStatus", "No request submitted."); }
+function syncButtons() {
+  $("communitySelect").disabled = busy || !directory.length || attemptedSubmission;
+  $("readButton").disabled = busy || !directory.length || attemptedSubmission;
+  $("connectButton").disabled = busy || !context || attemptedSubmission || Boolean(applicant);
+  $("prepareButton").disabled = busy || !context || !applicant || attemptedSubmission;
+  $("approveCheckbox").disabled = busy || !prepared || attemptedSubmission;
+  $("sendButton").disabled = busy || !prepared || !$("approveCheckbox").checked || attemptedSubmission;
+  $("verifyButton").disabled = busy || !submittedHash;
+}
+function setBusy(value) { busy = value; syncButtons(); }
+function describeContext(data) {
+  $("communityFacts").hidden = false;
+  $("communityId").textContent = data.id;
+  $("operatorWallet").textContent = data.destination;
+  $("priceValue").textContent = displayDrops(data.drops);
+  $("memoValue").textContent = data.memo;
+}
+async function resolveContext(community) {
+  const access = await resolveWalletAccess({ account: community.operatingWallet, serverUrl, force: true });
+  const authority = access.evaluated.find(item => item.communityId === community.communityId && item.authorityEstablished);
+  if (!authority || !isClassicAddress(authority.currentAccount)) throw new Error("Validated current Operating Wallet authority could not be established.");
+  const price = await readCommunityJoinRequestPrice({ communityId: community.communityId, authority, serverUrl });
+  const drops = String(price.drops || "");
+  if (!/^[1-9][0-9]*$/.test(drops)) throw new Error("XRPL returned an invalid Join Request Price.");
+  return { id: canonicalCommunityId(community.communityId), destination: authority.currentAccount, drops, memo: makeMemo(community.communityId) };
+}
+async function loadDirectory() {
+  setBusy(true);
+  try {
+    if (!serverUrl || !projectId) throw new Error("XRPL or WalletConnect is not configured.");
+    const result = await discoverWildLedgerCommunities({ force: true });
+    directory = (result.communities || []).filter(c => c.canonical && isClassicAddress(c.operatingWallet));
+    if (!directory.length) throw new Error("No established community could be verified on XRPL.");
+    const requested = (new URLSearchParams(window.location.search).get("community") || "SFL").toUpperCase();
+    $("communitySelect").replaceChildren(...directory.map(c => {
+      const option = document.createElement("option"); option.value = c.communityId;
+      option.textContent = `${c.communityName || c.communityId} (${c.communityId})`;
+      return option;
+    }));
+    if (directory.some(c => c.communityId === requested)) $("communitySelect").value = requested;
+    setStatus("communityStatus", "Choose a community and read its current Operating Wallet and price.", "good");
+  } catch (error) { setStatus("communityStatus", error.message || String(error), "bad"); }
+  finally { setBusy(false); }
+}
+async function readCommunity() {
+  if (busy || attemptedSubmission) return;
+  const found = directory.find(c => c.communityId === $("communitySelect").value);
+  if (!found) return;
+  setBusy(true);
+  try {
+    context = null; selected = found; resetFrom(1); clearProof();
+    if (signer) { try { await signer.disconnect(); } catch (_) {} }
+    signer = null; applicant = ""; $("qrPanel").hidden = true;
+    setStatus("walletStatus", "Waiting for wallet connection.");
+    setStatus("prepareStatus", "Waiting for wallet connection.");
+    setStatus("sendStatus", "Waiting for preparation.");
+    $("communityFacts").hidden = true;
+    setStatus("communityStatus", "Reading validated authority and Join Request Price…", "busy");
+    const value = await resolveContext(found);
+    context = value; describeContext(value); step(1, "done"); step(2);
+    setStatus("communityStatus", "Current authority and price verified from XRPL.", "good");
+    setStatus("walletStatus", "Ready to connect the applicant's Bifrost wallet.");
+  } catch (error) { setStatus("communityStatus", error.message || String(error), "bad"); }
+  finally { setBusy(false); }
+}
+async function connectWallet() {
+  if (busy || !context || attemptedSubmission) return;
+  setBusy(true);
+  try {
+    setStatus("walletStatus", "Waiting for Bifrost to connect…", "busy");
+    signer = new WalletConnectXrplSigner({projectId, metadata: { name:"Wild Ledger Membership Request Test", description:"Wild Ledger standalone membership request transaction proof", url:window.location.origin, icons:[] }});
+    const connection = await signer.connect({ onUri: async uri => {
+      $("qrImage").src = await QRCode.toDataURL(uri, { width:520, margin:2, errorCorrectionLevel:"M" });
+      $("qrPanel").hidden = false;
+    }});
+    const address = String(connection.account || "");
+    if (!isClassicAddress(address)) throw new Error("WalletConnect did not return a valid XRPL address.");
+    applicant = address; $("qrPanel").hidden = true;
+    setStatus("walletStatus", `Connected applicant: ${applicant}`, "good");
+    setStatus("prepareStatus", "Applicant connected. Prepare the exact Payment next.");
+    step(2, "done"); step(3);
+  } catch (error) { setStatus("walletStatus", error.message || String(error), "bad"); }
+  finally { setBusy(false); }
+}
+function assertPayment(tx, expected) {
+  if (tx?.TransactionType !== "Payment" || tx.Account !== expected.account || tx.Destination !== expected.destination || String(tx.Amount) !== expected.drops)
+    throw new Error("Prepared Payment has unexpected sender, destination, or XRP amount.");
+  if (tx.SendMax !== undefined || tx.Paths !== undefined || tx.DeliverMin !== undefined || ((Number(tx.Flags || 0) >>> 0) & 0x00020000))
+    throw new Error("Prepared Payment includes an unsupported payment option.");
+  const memos = tx.Memos;
+  if (!Array.isArray(memos) || memos.length !== 1 || memos[0]?.Memo?.MemoType || memos[0]?.Memo?.MemoFormat || String(memos[0]?.Memo?.MemoData || "").toUpperCase() !== textToHex(expected.memo))
+    throw new Error("Prepared Payment memo is not the canonical membership request.");
+}
+async function prepareRequest() {
+  if (busy || !context || !applicant || attemptedSubmission) return;
+  setBusy(true);
+  try {
+    resetFrom(3);
+    setStatus("prepareStatus", "Rechecking Operator authority and price before preparing…", "busy");
+    const fresh = await resolveContext(selected);
+    if (fresh.destination !== context.destination || fresh.drops !== context.drops) {
+      context = fresh; describeContext(fresh);
+      throw new Error("The Operating Wallet or Join Request Price changed. New values are shown above. Review them, then prepare again.");
+    }
+    const txJson = {TransactionType:"Payment",Account:applicant,Destination:context.destination,Amount:context.drops,Memos:[{Memo:{MemoData:textToHex(context.memo)}}]};
+    const result = await prepareTransaction({ serverUrl, txJson, feeCushion });
+    assertPayment(result.preparedTx, { ...context, account:applicant });
+    const fee = String(result.preparedTx.Fee || "");
+    if (!/^[1-9][0-9]*$/.test(fee)) throw new Error("XRPL returned an invalid network fee.");
+    prepared = {tx:result.preparedTx, fee, account:applicant, ...context};
+    $("preparedFrom").textContent = applicant; $("preparedTo").textContent = context.destination;
+    $("preparedAmount").textContent = displayDrops(context.drops);
+    $("preparedFee").textContent = displayDrops(fee);
+    $("preparedTotal").textContent = displayDrops(String(BigInt(context.drops) + BigInt(fee)));
+    $("preparedMemo").textContent = context.memo;
+    $("rawTx").textContent = JSON.stringify(result.preparedTx,null,2);
+    $("preparedFacts").hidden = false; $("rawDetails").hidden = false;
+    $("approveCheckbox").checked = false;
+    step(3, "done"); step(4);
+    setStatus("prepareStatus", "XRPL simulation succeeded. Review the exact payment and network fee.", "good");
+    setStatus("sendStatus", "Tick the confirmation box, then approve the request in Bifrost.");
+  } catch (error) { setStatus("prepareStatus", error.message || String(error), "bad"); }
+  finally { setBusy(false); }
+}
+function readLedgerFields(result) {
+  const tx = result?.tx_json || result?.tx || result?.transaction || result || {};
+  const meta = result?.meta || result?.metaData || {};
+  return { tx, meta };
+}
+function confirmValidatedRequest(result, expected) {
+  if (result?.validated !== true) throw new Error("XRPL has not yet validated this transaction.");
+  const {tx,meta} = readLedgerFields(result);
+  assertPayment(tx, expected);
+  if (meta.TransactionResult !== "tesSUCCESS") throw new Error(`XRPL returned ${meta.TransactionResult || "unknown result"}.`);
+  return result.ledger_index ?? tx.ledger_index ?? null;
+}
+async function verifyKnownHash() {
+  if (!submittedHash || busy) return;
+  setBusy(true);
+  const client = new DirectXRPLClient(serverUrl);
+  try {
+    setStatus("proofStatus", "Fetching validated transaction by hash…", "busy");
+    await client.connect();
+    const lookup = await client.request("tx", { transaction: submittedHash, binary:false }, 20000);
+    const result = lookup.result || {};
+    const ledger = confirmValidatedRequest(result, prepared);
+    $("proofFacts").hidden = false;
+    $("proofHash").textContent = submittedHash;
+    $("proofLedger").textContent = String(ledger ?? "Validated; ledger number unavailable");
+    $("proofResult").textContent = "tesSUCCESS — exact transaction verified";
+    if (String(result.hash || readLedgerFields(result).tx.hash || "").toUpperCase() !== submittedHash) throw new Error("XRPL readback hash did not match the submitted transaction.");
+    step(5, "done");
+    setStatus("proofStatus", "PROVEN: XRPL validated the exact request Payment. Full historical request eligibility will be tested in the Operator report. No LEAP or membership was awarded.", "good");
+    $("verifyButton").hidden = true;
+  } catch (error) {
+    setStatus("proofStatus", `${error.message || String(error)} No new payment has been sent. You may check this hash again.`, "bad");
+    $("verifyButton").hidden = false;
+  } finally { client.close(); setBusy(false); }
+}
+async function sendRequest() {
+  if (busy || !prepared || attemptedSubmission || !$("approveCheckbox").checked) return;
+  setBusy(true);
+  try {
+    setStatus("sendStatus", "Checking current authority and price once more before signing…", "busy");
+    const current = await resolveContext(selected);
+    if (current.destination !== prepared.destination || current.drops !== prepared.drops) throw new Error("Operating Wallet or price changed. This prepared Payment must not be signed. Reload and prepare a fresh request.");
+    assertPayment(prepared.tx, prepared);
+    setStatus("sendStatus", "Approve this exact transaction in Bifrost, then return here.", "busy");
+    const signed = await signer.signTransaction(prepared.tx);
+    if (!signed?.signedBlob) throw new Error("Bifrost did not return a signed transaction.");
+    step(4, "done"); step(5);
+    attemptedSubmission = true; // Never offer a second payment after a submission attempt.
+    setStatus("sendStatus", "Signature returned. Sending once; waiting for validated XRPL evidence…", "busy");
+    const submitted = await submitSignedTransaction({serverUrl,signedBlob:String(signed.signedBlob),onSubmitted: ({txHash}) => {
+      submittedHash = String(txHash || "").toUpperCase();
+      $("proofFacts").hidden = false;
+      $("proofHash").textContent = submittedHash;
+      $("proofLedger").textContent = "Waiting for validation";
+      $("proofResult").textContent = "Submitted (not yet proven)";
+      $("verifyButton").hidden = false;
+      setStatus("proofStatus", "Request submitted. Waiting for final ledger validation…", "busy");
+    }});
+    if (submitted.finalResult !== "tesSUCCESS") throw new Error(`XRPL validated with ${submitted.finalResult}.`);
+    if (!submitted.txHash) throw new Error("No transaction hash was returned.");
+    submittedHash = String(submitted.txHash).toUpperCase();
+    setStatus("sendStatus", "XRPL reported validation. Verifying the exact ledger transaction…", "good");
+  } catch (error) {
+    setStatus("sendStatus", error.message || String(error), "bad");
+    if (attemptedSubmission) setStatus("proofStatus", "Submission was attempted. Do not send another payment from this test page. Use the transaction hash to verify where available.", "bad");
+  } finally { setBusy(false); }
+  if (submittedHash) await verifyKnownHash();
+}
+$("communitySelect").addEventListener("change", () => { context=null; $("communityFacts").hidden=true; resetFrom(1); syncButtons(); });
+$("readButton").addEventListener("click", readCommunity);
+$("connectButton").addEventListener("click", connectWallet);
+$("prepareButton").addEventListener("click", prepareRequest);
+$("approveCheckbox").addEventListener("change", syncButtons);
+$("sendButton").addEventListener("click", sendRequest);
+$("verifyButton").addEventListener("click", verifyKnownHash);
+loadDirectory();
+</script>
+</body>
+</html>
