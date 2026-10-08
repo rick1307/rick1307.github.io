@@ -102,6 +102,8 @@
   .row-number { color:var(--muted); font-size:.8rem; }
   .applicant-main { font-weight:850; font-variant-ligatures:none; overflow-wrap:anywhere; }
   .request-verified { display:block; color:#bdf2c8; font-size:.72rem; font-weight:800; margin-top:5px; }
+  .membership-status { display:inline-block; padding:7px 11px; border-radius:999px; border:1px solid rgba(244,189,88,.43); background:rgba(244,189,88,.09); color:#ffe6af; font-size:.76rem; font-weight:850; }
+  .membership-status.fulfilled { border-color:rgba(121,213,194,.44); color:#bdf2c8; background:rgba(121,213,194,.09); }
   .paid-value { font-weight:800; white-space:nowrap; }
   .paid-unit { color:var(--muted); font-size:.75rem; }
   .ledger-value { font-variant-numeric:tabular-nums; font-weight:780; }
@@ -277,7 +279,7 @@
 <p aria-live="polite" class="request-status" id="requestStatus" role="status">Opening verified membership requests…</p>
 <div hidden id="requestList"></div>
 <div class="report-foot" hidden id="requestFoot">
-  <p class="notice" id="requestNotice">A verified request means the payment reached the community. It does not yet tell you whether this person has received their first LEAP.</p>
+  <p class="notice" id="requestNotice">Membership begins with delivered LEAP from a valid community recognition. An offered but uncashed Check is still awaiting recognition. Results are a snapshot; use Check for new requests to update.</p>
   <a class="action" id="refreshLink" href="test-harness/membershipRequestsBootstrap.html">Check for new requests</a>
 </div>
 </section>
@@ -317,7 +319,7 @@ function checkedHandoff(session) {
     if (!raw || raw.length > 5_000_000) return null;
     const data = JSON.parse(raw);
     const when = Number(data.verifiedAt);
-    if (data.version !== 1 || data.source !== "membershipRequestsBootstrap" ||
+    if (data.version !== 2 || data.source !== "membershipRequestsBootstrap" ||
         data.communityId !== session.communityId || data.operatorWallet !== session.wallet ||
         !Number.isFinite(when) || when > Date.now() + 30_000 ||
         Date.now() - when > MAX_HANDOFF_AGE_MS || !Array.isArray(data.requests)) return null;
@@ -333,7 +335,17 @@ function checkedHandoff(session) {
       typeof r.hash === "string" && /^[0-9A-F]{64}$/.test(r.hash) &&
       (r.priceStatement === null || (r.priceStatement &&
         Number.isSafeInteger(r.priceStatement.ledger) && r.priceStatement.ledger > 0 &&
-        Number.isSafeInteger(r.priceStatement.txIndex) && r.priceStatement.txIndex >= 0)));
+        Number.isSafeInteger(r.priceStatement.txIndex) && r.priceStatement.txIndex >= 0)) &&
+      r.recognition && ["awaiting","fulfilled"].includes(r.recognition.status) &&
+      (r.recognition.status === "awaiting" ? r.recognition.proof === null : (
+        r.recognition.proof && ["CheckCash","Payment"].includes(r.recognition.proof.type) &&
+        Number.isSafeInteger(r.recognition.proof.amount) && r.recognition.proof.amount > 0 &&
+        Number.isSafeInteger(r.recognition.proof.ledger) && r.recognition.proof.ledger > 0 &&
+        Number.isSafeInteger(r.recognition.proof.awardLedger) && r.recognition.proof.awardLedger > 0 &&
+        typeof r.recognition.proof.reason === "string" &&
+        /^(BADGE|EVENT|CHALLENGE)=[A-Z0-9-]+$/.test(r.recognition.proof.reason) &&
+        /^[0-9A-F]{64}$/.test(r.recognition.proof.hash) &&
+        /^[0-9A-F]{64}$/.test(r.recognition.proof.awardHash))));
     return validRows ? data : null;
   } catch (_) { return null; }
 }
@@ -407,6 +419,11 @@ function makeRequestRow(request, index, communityId) {
   applicant.append(address, verified, copy);
   tr.append(createCell("Applicant", applicant));
 
+  const status = document.createElement("span");
+  status.className = "membership-status" + (request.recognition.status === "fulfilled" ? " fulfilled" : "");
+  status.textContent = request.recognition.status === "fulfilled" ? "✓ Fulfilled" : "Awaiting LEAP";
+  tr.append(createCell("Membership", status));
+
   const paid = document.createElement("div");
   const paidNumber = document.createElement("div");
   paidNumber.className = "paid-value";
@@ -436,8 +453,21 @@ function makeRequestRow(request, index, communityId) {
     proofLine("Price source", request.priceStatement ? `Ledger ${request.priceStatement.ledger}, transaction ${request.priceStatement.txIndex}` : "Protocol default: one drop"),
     proofLine("Validated ledger / transaction", `${request.ledger} / ${request.txIndex}`),
     proofLine("Membership request memo", `WILD-LEDGER/MEMBERSHIP-REQUEST/${communityId}`),
-    proofLine("Transaction hash", request.hash)
+    proofLine("Transaction hash", request.hash),
+    proofLine("Recognition status", request.recognition.status === "fulfilled" ? "Fulfilled — LEAP delivered" : "Awaiting valid delivered LEAP")
   );
+  if (request.recognition.proof) {
+    const recognized = request.recognition.proof;
+    evidence.append(
+      proofLine("Recognition reason", recognized.reason),
+      proofLine("LEAP delivered", `${recognized.amount} LEAP`),
+      proofLine("Recognition method", recognized.type === "CheckCash" ? "Check created and successfully cashed" : "Direct LEAP Payment"),
+      proofLine("Recognition award ledger", recognized.awardLedger),
+      proofLine("Recognition award hash", recognized.awardHash),
+      proofLine("LEAP delivery ledger", recognized.ledger),
+      proofLine("LEAP delivery hash", recognized.hash)
+    );
+  }
   proof.append(summary, evidence);
   tr.append(createCell("Proof", proof));
   return tr;
@@ -450,7 +480,9 @@ function showMatchingPayments(requests, communityId) {
   $("requestFoot").hidden = false;
   $("refreshLink").href = `test-harness/membershipRequestsBootstrap.html?community=${encodeURIComponent(communityId)}&role=operator`;
   $("requestCount").hidden = false;
-  $("requestCount").textContent = `${requests.length} verified`;
+  const fulfilled = requests.filter(row => row.recognition.status === "fulfilled").length;
+  const awaiting = requests.length - fulfilled;
+  $("requestCount").textContent = `${awaiting} awaiting · ${fulfilled} fulfilled`;
   if (!requests.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
@@ -468,7 +500,7 @@ function showMatchingPayments(requests, communityId) {
   caption.textContent = "Membership requests, newest first";
   const head = document.createElement("thead");
   const headRow = document.createElement("tr");
-  for (const text of ["#", "Applicant", "Paid", "Ledger", "Proof"]) {
+  for (const text of ["#", "Applicant", "Membership", "Paid", "Ledger", "Proof"]) {
     const th = document.createElement("th");
     th.scope = "col";
     th.textContent = text;
@@ -481,7 +513,7 @@ function showMatchingPayments(requests, communityId) {
   table.append(caption, head, body);
   tableContainer.append(table);
   list.append(tableContainer);
-  $("requestStatus").textContent = `${requests.length} ${requests.length === 1 ? "request" : "requests"} checked and verified on XRPL. Newest requests are first.`;
+  $("requestStatus").textContent = `${requests.length} verified ${requests.length === 1 ? "request" : "requests"}: ${awaiting} awaiting LEAP, ${fulfilled} fulfilled. Newest requests are first.`;
 }
 
 function showGate(message, url, label) {
