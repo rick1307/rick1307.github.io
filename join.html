@@ -258,6 +258,34 @@
       font-size:.95rem;font-weight:800;
     }
     .leap-request-message.error{color:var(--rust)}
+    /* New-member wallet connection, using the same Bifrost QR flow as Home. */
+    .leap-request-form .leap-request-row{flex-direction:column;align-items:stretch}
+    .join-wallet-qr{display:flex;align-items:center;gap:18px}
+    .join-wallet-qr-shell{
+      flex:0 0 220px;width:220px;height:220px;padding:9px;
+      display:grid;place-items:center;
+      border:1px solid var(--line);border-radius:12px;background:white;
+    }
+    .join-wallet-qr-shell img{width:100%;height:100%;object-fit:contain}
+    .join-wallet-qr-placeholder{color:var(--muted);text-align:center;font-family:var(--community-ui-font)}
+    .join-wallet-qr-copy{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+    .join-wallet-qr-copy strong{color:var(--navy);font-family:var(--community-ui-font)}
+    .join-wallet-qr-copy span{color:var(--muted)}
+    .join-wallet-qr-copy button{
+      padding:8px 12px;border:1px solid var(--line);border-radius:8px;
+      background:white;color:var(--navy);font-family:var(--community-ui-font);
+      font-weight:750;cursor:pointer;
+    }
+    .join-wallet-status{
+      margin:0;overflow-wrap:anywhere;color:var(--muted);
+      font-family:var(--community-ui-font);font-size:.92rem;
+    }
+    .join-wallet-status.error{color:var(--rust)}
+    .leap-request-form #firstLeapSubmit:disabled{opacity:.55;cursor:not-allowed}
+    @media(max-width:650px){
+      .join-wallet-qr{flex-direction:column;align-items:center;text-align:center}
+      .join-wallet-qr-copy{align-items:center}
+    }
     .request-result{
       margin-top:16px;padding:22px;border-radius:16px;
       border:1px solid rgba(47,116,129,.24);
@@ -576,12 +604,20 @@
 <input id="firstLeapCommunityName" name="community_name" type="hidden" value=""/>
 <input id="firstLeapOperatorName" name="operator_name" type="hidden" value=""/>
 <div class="leap-request-row">
-<div class="wallet-input-wrap wallet-mask-wrap is-masked">
-<input aria-label="Your XRP Ledger address" autocapitalize="off" autocomplete="off" data-1p-ignore="true" data-lpignore="true" data-form-type="other" class="wallet-address-input" id="firstLeapXrplAddress" inputmode="text" name="xrpl_address" pattern="r[1-9A-HJ-NP-Za-km-z]{24,34}" placeholder="XRPL address" required="" spellcheck="false" title="Enter a valid XRP Ledger address beginning with r." type="text"/>
-<span class="wallet-mask-display" aria-hidden="true"></span>
-<button aria-label="Show XRP Ledger address" aria-pressed="false" class="wallet-visibility-toggle" data-wallet-toggle="firstLeapXrplAddress" type="button"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+<div class="join-wallet-qr">
+<div class="join-wallet-qr-shell">
+<div class="join-wallet-qr-placeholder" id="joinQrPlaceholder">Creating QR…</div>
+<img id="joinQrImage" alt="Bifrost wallet connection QR code" hidden/>
 </div>
-<button class="button" type="submit">Request My First LEAP</button>
+<div class="join-wallet-qr-copy">
+<strong>Scan with Bifrost</strong>
+<span>Your wallet supplies your XRP Ledger address. No typing or pasting.</span>
+<button id="refreshJoinQr" type="button">Fresh QR</button>
+</div>
+</div>
+<p aria-live="polite" class="join-wallet-status" id="joinWalletStatus" role="status">Starting wallet connection…</p>
+<input id="firstLeapXrplAddress" name="xrpl_address" type="hidden" value=""/>
+<button class="button" id="firstLeapSubmit" type="submit" disabled>Request My First LEAP</button>
 </div>
 </form><div aria-live="polite" class="request-result" id="firstLeapSuccess" role="status" style="display:none;">
 <div class="result-mark">✓</div>
@@ -733,6 +769,7 @@
 </footer>
 <script defer="" src="https://js.usebasin.com/v2.11.1.min.js"></script>
 <script src="js/communityConfig.js"></script>
+<script src="js/wildLedgerConfig.js"></script>
 <script>
     (() => {
       const community = window.WILD_LEDGER_COMMUNITY;
@@ -799,11 +836,13 @@
       if (firstLeapForm && firstLeapInput) {
         firstLeapForm.addEventListener("submit", event => {
           const account = firstLeapInput.value.trim();
-          if (!classicAddressPattern.test(account)) {
+          if (!classicAddressPattern.test(account) || firstLeapInput.dataset.walletConnected !== "true") {
             event.preventDefault();
-            firstLeapInput.setCustomValidity("Enter a valid XRP Ledger address beginning with r.");
-            firstLeapInput.reportValidity();
-            firstLeapInput.setCustomValidity("");
+            const joinStatus = document.getElementById("joinWalletStatus");
+            if (joinStatus) {
+              joinStatus.textContent = "Connect your Bifrost wallet before sending your request.";
+              joinStatus.className = "join-wallet-status error";
+            }
             return;
           }
 
@@ -948,5 +987,104 @@
       document.documentElement.classList.remove("community-pending");
     })();
   </script>
+<script type="module">
+  import QRCode from "https://esm.sh/qrcode@1.5.4?bundle";
+  import { WalletConnectXrplSigner } from "./js/walletConnectSigner.js";
+
+  const community = window.WILD_LEDGER_COMMUNITY;
+  const communityId = window.WILD_LEDGER_COMMUNITY_ID || community?.id || "";
+  const projectId = String(window.WILD_LEDGER_CONFIG?.walletConnectProjectId || "").trim();
+  const addressInput = document.getElementById("firstLeapXrplAddress");
+  const submitButton = document.getElementById("firstLeapSubmit");
+  const qrImage = document.getElementById("joinQrImage");
+  const qrPlaceholder = document.getElementById("joinQrPlaceholder");
+  const refreshButton = document.getElementById("refreshJoinQr");
+  const status = document.getElementById("joinWalletStatus");
+  const classicAddressPattern = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+  let signer = null;
+  let connectRun = 0;
+
+  function setStatus(message, tone = "") {
+    status.textContent = message;
+    status.className = `join-wallet-status${tone ? ` ${tone}` : ""}`;
+  }
+
+  function walletMetadata() {
+    const live = location.protocol === "http:" || location.protocol === "https:";
+    const origin = live ? location.origin : "https://example.invalid";
+    return {
+      name: "Wild Ledger",
+      description: `Request first LEAP for ${community?.communityName || "this community"}`,
+      url: origin,
+      icons: [`${origin}/favicon.ico`]
+    };
+  }
+
+  async function beginJoinWalletConnection() {
+    const run = ++connectRun;
+    addressInput.value = "";
+    delete addressInput.dataset.walletConnected;
+    submitButton.disabled = true;
+    qrImage.hidden = true;
+    qrImage.removeAttribute("src");
+    qrPlaceholder.hidden = false;
+    qrPlaceholder.textContent = "Creating QR…";
+    setStatus("Starting wallet connection…");
+
+    try {
+      if (!community || !communityId) throw new Error("Community configuration failed to load.");
+      if (!projectId) throw new Error("Wallet connection is not configured.");
+
+      if (signer) {
+        try { await signer.disconnect(); } catch (_) {}
+      }
+
+      signer = new WalletConnectXrplSigner({
+        projectId,
+        metadata: walletMetadata()
+      });
+
+      const connection = await signer.connect({
+        onUri: async uri => {
+          if (run !== connectRun) return;
+          const qrDataUrl = await QRCode.toDataURL(uri, {
+            width: 260,
+            margin: 1,
+            errorCorrectionLevel: "M"
+          });
+          if (run !== connectRun) return;
+          qrImage.src = qrDataUrl;
+          qrImage.hidden = false;
+          qrPlaceholder.hidden = true;
+          setStatus("Open Bifrost and approve the wallet connection.");
+        }
+      });
+
+      if (run !== connectRun) return;
+      const account = String(connection.account || "").trim();
+      if (!classicAddressPattern.test(account)) throw new Error("Invalid XRPL wallet address.");
+
+      addressInput.value = account;
+      addressInput.dataset.walletConnected = "true";
+      submitButton.disabled = false;
+      qrImage.hidden = true;
+      qrImage.removeAttribute("src");
+      qrPlaceholder.hidden = false;
+      qrPlaceholder.textContent = "Connected";
+      setStatus(`Wallet connected: ${account}. You can request your first LEAP.`);
+    } catch (error) {
+      if (run !== connectRun) return;
+      console.warn("Wild Ledger Join wallet connection failed:", error);
+      qrImage.hidden = true;
+      qrImage.removeAttribute("src");
+      qrPlaceholder.hidden = false;
+      qrPlaceholder.textContent = "Try again";
+      setStatus("Wallet connection failed. Tap Fresh QR and try again.", "error");
+    }
+  }
+
+  refreshButton.addEventListener("click", beginJoinWalletConnection);
+  beginJoinWalletConnection();
+</script>
 </body>
 </html>
