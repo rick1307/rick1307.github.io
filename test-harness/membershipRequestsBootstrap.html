@@ -271,7 +271,7 @@
               <summary><span class="trail-index" id="trailIndex3">3</span><span class="trail-step-title">Find membership requests</span><span class="trail-step-state" id="trailState3">WAITING</span></summary>
               <div class="trail-step-body">
                 <p class="trail-message" id="trailMessage3">Waiting for current Operator authority.</p>
-                <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof3">Reads validated Payments from the current Operating Wallet and looks for the community's exact membership-request memo. Historical price checks come later.</div></details>
+                <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof3">Reads each Operating Wallet's validated Payments and checks the community's membership-request memo, historic authority, and price.</div></details>
                 <div class="step-actions" id="stepActions3"><button type="button" class="step-action" id="stepAction3" disabled>Waiting</button></div>
               </div>
             </details>
@@ -351,9 +351,9 @@ function readOperatorSession() {
   }
 }
 
-// Step 3: Discover candidates in the current Operating Wallet's validated
-// history, then verify historical authority and price in canonical ledger order.
-// Historical requests sent to former Operating Wallets are reserved for a separate development step.
+// Step 3: Read each Operating Wallet in the community authority chain,
+// including former wallets. Verify each request against the authority and
+// published price in force at its exact validated ledger position.
 function memoText(hex) {
   const value = String(hex || "");
   if (!value || !/^(?:[0-9a-fA-F]{2})+$/.test(value)) return "";
@@ -404,7 +404,13 @@ function verifyRequestAtLedger(candidate, authority, priceHistory) {
   return { ...candidate, expectedDrops, priceStatement };
 }
 
-async function discoverMatchingPayments(destination, communityId, authority, priceHistory, onProgress = () => {}) {
+async function discoverMatchingPayments(communityId, authority, priceHistory, onProgress = () => {}) {
+  // The same validated authority intervals already used by Wild Ledger's
+  // historical price reader establish which wallet histories must be searched.
+  const accounts = [...new Set((authority?.intervals || []).map(interval => String(interval?.account || "").trim()))];
+  if (!authority?.authorityEstablished || !accounts.length || accounts.some(account => !isClassicAddress(account))) {
+    throw new Error("Community authority history does not provide a valid Operating Wallet chain.");
+  }
   const client = new DirectXRPLClient(xrplServer);
   const found = new Map();
   let scanned = 0;
@@ -412,31 +418,34 @@ async function discoverMatchingPayments(destination, communityId, authority, pri
   let excluded = 0;
   try {
     await client.connect();
-    let marker;
-    do {
-      const fields = { account: destination, ledger_index_min: -1, ledger_index_max: -1, binary: false, forward: true, limit: 400 };
-      if (marker !== undefined) fields.marker = marker;
-      const response = await client.request("account_tx", fields, 30000);
-      const entries = response?.result?.transactions;
-      if (!Array.isArray(entries)) throw new Error("XRPL returned no readable transaction list.");
-      pages += 1;
-      for (const entry of entries) {
-        scanned += 1;
-        const candidate = matchingPayment(entry, destination, communityId);
-        if (!candidate) continue;
-        const verified = verifyRequestAtLedger(candidate, authority, priceHistory);
-        if (verified) found.set(verified.hash, verified);
-        else excluded += 1;
-      }
-      onProgress({scanned, pages, matches:found.size, excluded});
-      marker = response.result.marker;
-    } while (marker !== undefined && marker !== null);
+    for (const [index, account] of accounts.entries()) {
+      let marker;
+      do {
+        const fields = { account, ledger_index_min: -1, ledger_index_max: -1, binary: false, forward: true, limit: 400 };
+        if (marker !== undefined) fields.marker = marker;
+        const response = await client.request("account_tx", fields, 30000);
+        const entries = response?.result?.transactions;
+        if (!Array.isArray(entries)) throw new Error("XRPL returned no readable transaction list.");
+        pages += 1;
+        for (const entry of entries) {
+          scanned += 1;
+          const candidate = matchingPayment(entry, account, communityId);
+          if (!candidate) continue;
+          const verified = verifyRequestAtLedger(candidate, authority, priceHistory);
+          if (verified) found.set(verified.hash, verified);
+          else excluded += 1;
+        }
+        onProgress({scanned, pages, matches:found.size, excluded,
+          wallet:account, walletIndex:index + 1, walletCount:accounts.length});
+        marker = response.result.marker;
+      } while (marker !== undefined && marker !== null);
+    }
   } finally {
     client.close();
   }
   return {
     requests: [...found.values()].sort((a, b) => b.ledger - a.ledger || b.txIndex - a.txIndex || a.hash.localeCompare(b.hash)),
-    excluded, scanned, pages
+    excluded, scanned, pages, walletCount:accounts.length
   };
 }
 
@@ -619,13 +628,13 @@ async function performStep(number) {
     const price = await readCommunityJoinRequestPrice({ communityId:session.communityId, authority:matched, serverUrl:xrplServer });
     assertSessionUnchanged();
     runContext.priceStatements = price.history.length;
-    const result = await discoverMatchingPayments(session.wallet, session.communityId, matched, price.history, progress => {
+    const result = await discoverMatchingPayments(session.communityId, matched, price.history, progress => {
       runContext.scanned = progress.scanned;
       runContext.pages = progress.pages;
       runContext.excluded = progress.excluded;
-      const message = `Reading ledger history… ${progress.scanned} entries checked; ${progress.matches} verified ${progress.matches === 1 ? "request" : "requests"}.`;
+      const message = `Reading wallet ${progress.walletIndex} of ${progress.walletCount}… ${progress.scanned} entries checked; ${progress.matches} verified ${progress.matches === 1 ? "request" : "requests"}.`;
       $("trailMessage3").textContent = message;
-      $("trailProof3").textContent = `Community: ${session.communityId}\nWallet queried: ${session.wallet}\nTransactions read: ${progress.scanned}\nHistory pages: ${progress.pages}\nPrice statements checked: ${price.history.length}\nCanonical request memo: WILD-LEDGER/MEMBERSHIP-REQUEST/${session.communityId}\nVerified requests: ${progress.matches}\nCandidates not qualifying: ${progress.excluded}\nRules: successful validated Payment; exact memo; no paths or partial payment; historical Operating Wallet and exact historical price.`;
+      $("trailProof3").textContent = `Community: ${session.communityId}\nWallet being read (${progress.walletIndex}/${progress.walletCount}): ${progress.wallet}\nTransactions read: ${progress.scanned}\nHistory pages: ${progress.pages}\nPrice statements checked: ${price.history.length}\nCanonical request memo: WILD-LEDGER/MEMBERSHIP-REQUEST/${session.communityId}\nVerified requests: ${progress.matches}\nCandidates not qualifying: ${progress.excluded}\nRules: successful validated Payment; exact memo; no paths or partial payment; historical Operating Wallet and exact historical price.`;
       updateGuideStatus(message);
     });
     assertSessionUnchanged();
@@ -636,7 +645,7 @@ async function performStep(number) {
     ).join("\n\n");
     return {
       message:`${result.requests.length} ${result.requests.length === 1 ? "membership request" : "membership requests"} found and verified.`,
-      evidence:`Community: ${session.communityId}\nWallet queried: ${session.wallet}\nTransactions read: ${result.scanned}\nHistory pages: ${result.pages}\nHistorical price statements: ${price.history.length}\nVerified: ${result.requests.length}\nCandidates that did not qualify: ${result.excluded}\nChecked: Community ID and exact memo; validated successful native-XRP Payment without paths or partial payment; authorized Operating Wallet and Join Request Price immediately before payment.\nHistory of former Operating Wallet requests is not yet part of this bootstrap.${proofs ? `\n\nSample verified transaction evidence (up to 5):\n${proofs}` : ""}`
+      evidence:`Community: ${session.communityId}\nOperating Wallet histories searched: ${result.walletCount}\nTransactions read: ${result.scanned}\nHistory pages: ${result.pages}\nHistorical price statements: ${price.history.length}\nVerified: ${result.requests.length}\nCandidates that did not qualify: ${result.excluded}\nChecked: Community ID and exact memo; validated successful native-XRP Payment without paths or partial payment; authorized Operating Wallet and Join Request Price immediately before payment.${proofs ? `\n\nSample verified transaction evidence (up to 5):\n${proofs}` : ""}`
     };
   }
   if (number === 4) {
@@ -647,7 +656,7 @@ async function performStep(number) {
     $("backLink").hidden = false;
     $("requestStatus").textContent = `${requests.length} membership ${requests.length === 1 ? "request" : "requests"} verified from XRPL.`;
     document.title = `Membership Requests Bootstrap · ${$("communityName").textContent} | Wild Ledger`;
-    return {message:"All checks passed. Ready to view Membership Requests.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nFormer Operating Wallet request history is outside this bootstrap move.`};
+    return {message:"All checks passed. Ready to view Membership Requests.",evidence:`Session rechecked: ${current.communityId}\nOperator wallet: ${current.wallet}\nVerified report rows: ${requests.length}\nCandidates not qualifying under Protocol 0.24: ${runContext.excluded}\nHistorical Operating Wallet request records included.`};
   }
   throw new Error("Unknown Ledger Trail step.");
 }
