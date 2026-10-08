@@ -347,6 +347,16 @@
 
     .panel h3{margin:0 0 8px;color:var(--navy)}
     .panel p{margin:0;color:var(--muted)}
+    .recognition-card{
+      margin-top:18px;
+      padding:18px;
+      background:var(--foam);
+      border:1px solid var(--line);
+      border-radius:12px;
+    }
+    .recognition-card h4{margin:0 0 12px;color:var(--navy);font-size:1.15rem}
+    .recognition-links{display:flex;gap:10px;flex-wrap:wrap}
+    .recognition-links .button{margin-top:0}
 
     .safety{
       background:#fff7e9;
@@ -452,19 +462,9 @@
     .process-three .mini p+p{margin-top:8px}
     .after-cash{padding:28px}
     .after-cash .status{margin-top:18px}
-    .help-box{
-      display:flex;align-items:center;justify-content:space-between;gap:22px;padding:24px 26px;
-      background:#fff7e9;border:1px solid rgba(210,163,79,.42);border-radius:16px
-    }
-    .help-box h3{margin:0;color:#714c15}
-    .help-box p{flex:1;margin:0;color:#62584b}
-    .help-copy{flex:1}
-    .help-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .help-box .button{margin-top:0;white-space:nowrap}
-
     body[data-community-layout="garage"] .gateway-card,
     body[data-community-layout="garage"] .prep-item,
-    body[data-community-layout="garage"] .help-box{border-radius:10px}
+    body[data-community-layout="garage"] .recognition-card{border-radius:10px}
 
     @media(max-width:800px){
       header{padding:38px 0 28px}
@@ -472,10 +472,6 @@
       section{padding:27px 0}
       .gateway-grid,.prep-grid{grid-template-columns:1fr}
       .gateway-card{padding:21px}
-      .help-box{display:block;padding:21px}
-      .help-box p{margin-top:6px}
-      .help-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
-      .help-box .button{width:100%;margin-top:0}
       .after-cash{padding:22px}
     }
 
@@ -637,23 +633,14 @@
               Every recognition adds another piece to the story of what you’ve done here.
               <span id="storyGrowthCopy">Your history grows as you earn badges, complete challenges, and show up for events.</span>
 </p>
-<a class="button secondary" href="recognitions.html?category=badge" id="nextBadgesLink">See the badges →</a>
-<a class="button secondary" href="recognitions.html?category=challenge" id="nextChallengesLink">See the challenges →</a>
-<a class="button secondary" href="recognitions.html?category=event" id="nextEventsLink">See the events →</a>
+<div class="recognition-card">
+<h4>Recognition</h4>
+<div class="recognition-links">
+<a class="button secondary" href="recognitions.html?category=badge" id="nextBadgesLink">Badges</a>
+<a class="button secondary" href="recognitions.html?category=challenge" id="nextChallengesLink">Challenges</a>
+<a class="button secondary" href="recognitions.html?category=event" id="nextEventsLink">Events</a>
 </div>
 </div>
-</div>
-</section>
-<section>
-<div class="wrap">
-<div class="help-box">
-<div class="help-copy">
-<h3>Need help before you start?</h3>
-<p id="bottomHelpCopy">If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about stars, badges, challenges, events, or participation here, use the Community FAQ.</p>
-</div>
-<div class="help-actions">
-<a class="button secondary" href="wildLedgerFaq.html" id="wildLedgerFaqLink">Wild Ledger FAQ →</a>
-<a class="button secondary" href="faq.html" id="bottomCommunityFaqLink">Community FAQ →</a>
 </div>
 </div>
 </div>
@@ -750,8 +737,7 @@
         ["nextRanksLink", pageHref("ranks.html")],
         ["nextBadgesLink", `recognitions.html?category=badge&community=${encodeURIComponent(communityId)}`],
         ["nextChallengesLink", `recognitions.html?category=challenge&community=${encodeURIComponent(communityId)}`],
-        ["nextEventsLink", `recognitions.html?category=event&community=${encodeURIComponent(communityId)}`],
-        ["bottomCommunityFaqLink", pageHref("faq.html")]
+        ["nextEventsLink", `recognitions.html?category=event&community=${encodeURIComponent(communityId)}`]
       ];
       routeMap.forEach(([id, href]) => {
         const el = document.getElementById(id);
@@ -760,15 +746,6 @@
 
       const nameLabel = document.getElementById("communityNameLabel");
       if (nameLabel) nameLabel.textContent = communityName;
-
-      const bottomHelpCopy = document.getElementById("bottomHelpCopy");
-      if (bottomHelpCopy) {
-        bottomHelpCopy.textContent =
-          `If you need help with Xaman, your public address, or LEAP Checks, use the Wild Ledger FAQ. If you want to know more about stars, badges, challenges, events, or participation in ${communityName}, use the ${communityName} FAQ.`;
-      }
-
-      const bottomCommunityFaqLink = document.getElementById("bottomCommunityFaqLink");
-      if (bottomCommunityFaqLink) bottomCommunityFaqLink.textContent = `${communityName} FAQ →`;
 
       const bannerDesktop = document.getElementById("communityBannerDesktop");
       const bannerMobile = document.getElementById("communityBannerMobile");
