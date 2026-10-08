@@ -245,6 +245,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
           <a class="community-link" id="communityTokenomicsLink" href="viewCommunityTokenomics.html">Tokenomics</a>
           <a class="community-link" id="communityRecognitionLink" href="viewCommunityRecognition.html">Recognition</a>
           <a class="community-link" id="communityCheckbookLink" href="operatorCheckbook.html">Checkbook</a>
+          <a class="community-link" id="communityMembershipRequestsLink" href="membershipRequests.html">Membership Requests</a>
           <a class="community-link" id="communityLibraryLink" href="viewCommunityLibrary.html">Library</a>
         </div>
       </header>
@@ -340,6 +341,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
   const communityTokenomicsLink = document.getElementById("communityTokenomicsLink");
   const communityRecognitionLink = document.getElementById("communityRecognitionLink");
   const communityCheckbookLink = document.getElementById("communityCheckbookLink");
+  const communityMembershipRequestsLink = document.getElementById("communityMembershipRequestsLink");
   const communityLibraryLink = document.getElementById("communityLibraryLink");
   const communityEditLink = document.getElementById("communityEditLink");
 
@@ -368,6 +370,14 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
     communityCheckbookLink.href = `operatorCheckbook.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
+  if (communityMembershipRequestsLink) {
+    if (role === "operator") {
+      communityMembershipRequestsLink.href = `membershipRequests.html?community=${encodeURIComponent(requestedId)}&role=operator`;
+    } else {
+      communityMembershipRequestsLink.remove();
+    }
+  }
+
   if (communityLibraryLink) {
     communityLibraryLink.href = `viewCommunityLibrary.html?community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}&from=viewCommunity`;
   }
@@ -376,7 +386,7 @@ body.wl-view-leaving{opacity:0;transition:opacity .28s ease;pointer-events:none}
     communityEditLink.href = `setup.html?mode=edit&community=${encodeURIComponent(requestedId)}&role=${encodeURIComponent(role)}`;
   }
 
-  [ownerCommunitiesBack, communityEditLink, communityTokenomicsLink, communityRecognitionLink, communityCheckbookLink, communityLibraryLink]
+  [ownerCommunitiesBack, communityEditLink, communityTokenomicsLink, communityRecognitionLink, communityCheckbookLink, ...(role === "operator" ? [communityMembershipRequestsLink] : []), communityLibraryLink]
     .filter(Boolean)
     .forEach(link => link.addEventListener("click", event => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
