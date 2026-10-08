@@ -20,6 +20,7 @@
 .trail-kicker{padding-left:0;color:var(--mango);font-size:.64rem;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
 .ledger-trail h2{margin:7px 0 6px;font-size:clamp(1.8rem,8vw,2.8rem);letter-spacing:-.045em}
 .trail-lede{margin:0 0 20px;color:var(--muted);font-size:.78rem;line-height:1.5}
+.trail-readonly{margin:-12px 0 16px;color:rgba(189,242,200,.82);font-size:.74rem;font-weight:700;line-height:1.4}
 .trail-route{display:grid;gap:0;margin:4px 0 18px}
 .trail-step{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:11px;min-height:58px;align-items:start}
 .trail-marker{position:relative;display:grid;place-items:center;width:28px;height:28px;margin-top:1px;border:1px solid rgba(236,249,247,.22);border-radius:50%;background:#082936;color:rgba(236,249,247,.40);font-size:.76rem;font-weight:950;z-index:1}
@@ -147,6 +148,7 @@
     </div>
     <h2 id="ledgerTrailTitle">The Ledger Trail</h2>
     <p class="trail-lede" id="ledgerTrailLede">Following the validated path to this community. Each breadcrumb lights only when that step is real.</p>
+    <p class="trail-readonly" id="ledgerTrailReadOnly">Read-only check. No XRP is spent.</p>
     <div class="trail-action" id="trailAction">
       <strong id="trailActionTitle">GO TO BIFROST NOW</strong>
       <p id="trailActionCopy"></p>
@@ -271,6 +273,7 @@ function renderTrail(mode = "opening") {
   trailMode = TRAIL_MODES[mode] ? mode : "opening";
   const definition = TRAIL_MODES[trailMode];
   $("ledgerTrailLede").textContent = definition.lede;
+  $("ledgerTrailReadOnly").hidden = trailMode !== "opening";
   $("trailRoute").innerHTML = definition.steps.map(([id, label, detail]) =>
     `<div class="trail-step" data-trail-step="${id}"><div class="trail-marker">○</div><div class="trail-copy"><strong>${label}</strong><span>${detail}</span></div></div>`
   ).join("");
@@ -1213,7 +1216,7 @@ async function init() {
     pendingPrice = readPricePending(communityId);
     $("joinPriceDrops").value = pendingPrice?.drops || joinPriceState.drops;
     $("retryPriceReadbackButton").hidden = !pendingPrice;
-    setTrailStep("config", "done", `CONFIG and Join Request Price (${joinPriceState.drops} drops) read from XRPL.`);
+    setTrailStep("config", "done", "Community settings verified.");
 
     currentConfig = await loadConfig();
     currentConfig.communityId = communityId;
