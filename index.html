@@ -1117,6 +1117,35 @@
 
 
 
+    /* Gentle handoff between Wild Ledger Splash and a community front door. */
+    @keyframes wlIndexFromSplashEnter {
+      from { opacity:0; }
+      to { opacity:1; }
+    }
+
+    @keyframes wlIndexToSplashExit {
+      from { opacity:1; }
+      to { opacity:0; }
+    }
+
+    html.wl-index-from-splash-pending body {
+      opacity:0;
+    }
+
+    body.wl-index-from-splash-enter {
+      animation:wlIndexFromSplashEnter 320ms ease-out both;
+    }
+
+    body.wl-index-to-splash-exit {
+      animation:wlIndexToSplashExit 280ms ease forwards;
+      pointer-events:none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.wl-index-from-splash-enter,
+      body.wl-index-to-splash-exit { animation-duration:1ms; }
+    }
+
     /* Gentle handoff into Member Record. */
     @keyframes wlMemberRecordExit {
       from { opacity:1; }
@@ -1135,6 +1164,14 @@
 <link rel="stylesheet" href="communityTypography.css">
 <link rel="stylesheet" href="communitySurface.css">
 <link rel="stylesheet" href="wildLedgerControls.css">
+<script>
+  try {
+    if (sessionStorage.getItem("wildLedger.indexTransition") === "1") {
+      sessionStorage.removeItem("wildLedger.indexTransition");
+      document.documentElement.classList.add("wl-index-from-splash-pending");
+    }
+  } catch (_) {}
+</script>
 </head>
 
 <body class="wl-community-surface">
@@ -1320,6 +1357,17 @@
         } catch (_) {
           wildLedgerLink.hidden = true;
         }
+
+        wildLedgerLink.addEventListener("click", async event => {
+          if (event.button !== 0) return;
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+          event.preventDefault();
+          try { sessionStorage.setItem("wildLedger.splashTransition", "1"); } catch (_) {}
+          document.body.classList.add("wl-index-to-splash-exit");
+          await new Promise(resolve => setTimeout(resolve, 280));
+          window.location.href = wildLedgerLink.href;
+        });
       }
 
       if (!community || !communityId) {
@@ -1429,7 +1477,12 @@
         joinButton.href = `join.html?community=${encodeURIComponent(communityId)}`;
       }
 
+      const enteringFromSplash = document.documentElement.classList.contains("wl-index-from-splash-pending");
       document.documentElement.classList.remove("community-pending");
+      if (enteringFromSplash) {
+        document.documentElement.classList.remove("wl-index-from-splash-pending");
+        document.body.classList.add("wl-index-from-splash-enter");
+      }
     })();
   </script>
   <script src="js/wildLedgerConfig.js"></script>
