@@ -609,9 +609,8 @@ let busy = false;
 let completed = false;
 let completionNavigationTimer = null;
 let canRetry = true;
-// Give the final Ledger Trail checkpoint time to be seen and confirmed.
-const FINAL_STEP_WORKING_MS = 900;
-const FINAL_STEP_PROOF_MS = 1500;
+// The final checkpoint completes as soon as its evidence is verified.
+// The completed card and large green check remain visible for one second.
 function cancelAutomaticNavigation() {
   if (completionNavigationTimer !== null) {
     clearTimeout(completionNavigationTimer);
@@ -947,27 +946,18 @@ async function runNext() {
   const workingMessage = ["Reading your existing Operator session…", "Reading validated XRPL authority history…", "Reading community wallet history…", "Checking your Operator session before finishing the bootstrap…"][number-1];
   setTrailStep(number,"working",workingMessage);
   updateGuideStatus(workingMessage);
-  // The final checkpoint is a quick local proof. Keep its working state
-  // visible, just as the earlier ledger checks visibly run.
+  // Checkpoint 4 runs immediately; its result depends on genuine proof.
   if (number === 4 && guideMode) $("guideStep4").scrollIntoView({block:"nearest"});
   let succeeded = false;
   try {
-    if (number === 4 && guideMode) {
-      await new Promise(resolve => setTimeout(resolve, FINAL_STEP_WORKING_MS));
-    }
     const result = await performWithAutomaticReadRetry(number);
     setTrailStep(number,"done",result.message,result.evidence);
     $("trailOverall").textContent = result.message;
     updateGuideStatus(result.message);
     succeeded = true;
     if (reportIsReady()) {
-      // Let the human see checkpoint 4 turn green before showing the large
-      // confirmation BELOW the complete step list on the same card. Pressing X
-      // during this wait changes presentation but preserves the evidence.
-      if (number === 4 && guideMode) {
-        $("guideStep4").scrollIntoView({block:"nearest"});
-        await new Promise(resolve => setTimeout(resolve, FINAL_STEP_PROOF_MS));
-      }
+      // Show the large green confirmation BELOW all four proven checkpoints
+      // immediately. The existing one-second completed-card pause remains.
       finishTrail();
     }
   } catch (error) {
