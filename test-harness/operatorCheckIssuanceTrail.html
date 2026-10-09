@@ -213,7 +213,7 @@
 <link rel="stylesheet" href="../wildLedgerBackend.css">
 </head>
 <body>
-<!-- WILD LEDGER MOVE 3A: display confirmed Check preparation details within the dedicated Ledger Trail. The Check Builder and signing flows are unchanged. -->
+<!-- WILD LEDGER MOVE 3A FINAL: proof-based 4-step Ledger Trail, with established 1.1-second guided completion handoff. Only this file is modified. -->
 <!-- The X changes presentation only: it never resets the evidence or cancels an active XRPL read. -->
 <div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-window">
@@ -240,9 +240,10 @@
     </section>
     <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
       <div class="success-mark" aria-hidden="true">✓</div>
-      <p class="success-heading">Applicant handoff verified</p>
+      <p class="success-heading">Check preparation details confirmed</p>
       <p class="guide-lede" style="text-align:center">Applicant and Operating Wallet confirmed. Continue to the existing Check Builder, with the recipient and 1 LEAP filled in. No Check has been created.</p>
       <div style="text-align:center"><a class="success-action" id="guideContinue" href="../operatorCheckCreate.html">Open Check Builder</a></div>
+      <p class="guide-learn" id="guideHandoffError" role="alert" hidden></p>
       <p class="guide-learn" style="text-align:center"><a id="guideBackRequests" href="../membershipRequests.html">Return to Membership Requests</a></p>
     </div>
     <div id="guideRecovery" class="guide-recovery" hidden>
@@ -361,6 +362,14 @@ let busy = false;
 let completed = false;
 let retryable = true;
 let recovery = "";
+let completionNavigationTimer = null;
+let choseToExplore = false;
+function cancelAutomaticNavigation() {
+  if (completionNavigationTimer !== null) {
+    clearTimeout(completionNavigationTimer);
+    completionNavigationTimer = null;
+  }
+}
 
 function readOperatorSession() {
   try {
@@ -571,7 +580,7 @@ function complete() {
   $("successPanel").hidden = false;
   $("trailCompleted").hidden = false;
   $("trailDisclosure").classList.add("trail-complete");
-  $("trailOverall").textContent = "Complete · verified applicant and current Operating Wallet.";
+  $("trailOverall").textContent = "All four checkpoints complete · applicant, authority and 1 LEAP details confirmed.";
   $("trailDisclosure").open = false;
   $("guideRoute").hidden = true;
   $("guideStatus").hidden = true;
@@ -579,6 +588,25 @@ function complete() {
   $("guideRecovery").hidden = true;
   $("guideSuccess").hidden = !guideMode;
   refreshControls();
+  if (guideMode && !choseToExplore) {
+    // Match the established Membership Requests Bootstrap Ledger Trail: show
+    // confirmed success before continuing automatically after 1.1 seconds.
+    // The X cancels navigation without losing any proof or transaction state.
+    cancelAutomaticNavigation();
+    completionNavigationTimer = setTimeout(() => {
+      completionNavigationTimer = null;
+      if (!completed || !guideMode || choseToExplore) return;
+      try {
+        // A timed navigation must establish exactly the same verified browser
+        // handoff as pressing Open Check Builder. Never bypass the guard.
+        stageCheckBuilderHandoff();
+        window.location.assign($("guideContinue").href);
+      } catch (error) {
+        $("guideHandoffError").textContent = `The automatic handoff could not be completed: ${String(error?.message || error)}. You can retry with Open Check Builder or return to Membership Requests.`;
+        $("guideHandoffError").hidden = false;
+      }
+    }, 1100);
+  }
 }
 function fail(n,message) {
   recovery = /sign in|operator session|session changed/i.test(message) ? "signin" :
@@ -594,6 +622,33 @@ function fail(n,message) {
   $("signinLink").hidden = recovery !== "signin";
   refreshControls();
 }
+// Same evidence-preserving transient-read retry as Membership Requests Bootstrap.
+// Only Step 3 reads XRPL here. No transaction or signature can be initiated.
+function isTemporaryXRPLReadFailure(error) {
+  const message = String(error?.message || error || "");
+  return /(?:server.{0,25}busy|too busy|overload|slow.?down|rate.?limit|too many requests|\b429\b|\b503\b|timed? out|timeout|temporarily unavailable|connection (?:closed|lost))/i.test(message);
+}
+async function performWithAutomaticReadRetry(n) {
+  if (n !== 3) return performStep(n);
+  const delays = [1500, 3000, 6000];
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    assertSession();
+    try {
+      return await performStep(n);
+    } catch (error) {
+      if (!isTemporaryXRPLReadFailure(error) || attempt === delays.length) throw error;
+      assertSession();
+      const number = attempt + 2;
+      const message = `The XRPL server is busy. Trying the authority check again (${number} of ${delays.length+1})…`;
+      $("trailMessage3").textContent = message;
+      $("trailProof3").textContent = `Temporary XRPL read error: ${String(error?.message || error)}\nNext attempt: ${number} of ${delays.length+1}\nWaiting ${delays[attempt]/1000} seconds. Earlier completed checks remain proven.`;
+      $("guideStatus").textContent = message;
+      await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+      assertSession();
+      $("guideStatus").textContent = `Reading validated XRPL authority again (${number} of ${delays.length+1})…`;
+    }
+  }
+}
 async function runNext() {
   if (busy || completed) return;
   const n = nextStep();
@@ -605,7 +660,7 @@ async function runNext() {
   setStep(n,"working",["Reading the Get Wild Operator session…","Matching this selection with verified membership requests…","Reading validated XRPL Operating Wallet authority…","Displaying verified applicant and 1 LEAP details…"][n-1]);
   let ok = false;
   try {
-    const result = await performStep(n);
+    const result = await performWithAutomaticReadRetry(n);
     setStep(n,"done",result.message,result.evidence);
     ok = true;
     if (states.every(s => s === "done")) complete();
@@ -625,6 +680,8 @@ async function runNext() {
   }
 }
 function closeGuide() {
+  cancelAutomaticNavigation();
+  choseToExplore = true;
   guideMode = false;
   $("guideOverlay").hidden = true;
   if (!completed) {
@@ -641,8 +698,7 @@ function openGuide() {
   refreshControls();
   if (!busy) void runNext();
 }
-function openCheckBuilder(event) {
-  try {
+function stageCheckBuilderHandoff() {
     if (!completed || states.some(s => s !== "done")) throw new Error("Complete all four Ledger Trail checkpoints first.");
     const session = assertSession();
     const {selection, row} = checkedApplicant(session);
@@ -657,6 +713,11 @@ function openCheckBuilder(event) {
       requestHash:selection.requestHash, selectedAt:selection.selectedAt,
       handedOffAt:Date.now()
     }));
+}
+function openCheckBuilder(event) {
+  cancelAutomaticNavigation();
+  try {
+    stageCheckBuilderHandoff();
   } catch (error) {
     event.preventDefault();
     window.alert(String(error?.message || error));
