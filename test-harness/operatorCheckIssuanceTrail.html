@@ -213,7 +213,7 @@
 <link rel="stylesheet" href="../wildLedgerBackend.css">
 </head>
 <body>
-<!-- WILD LEDGER MOVE 3A FINAL: proof-based 4-step Ledger Trail, with established 1.1-second guided completion handoff. Only this file is modified. -->
+<!-- WILD LEDGER MOVE 3A: checkpoint 4 visibly WORKING then DONE before success and the established 1.1-second guided handoff. -->
 <!-- The X changes presentation only: it never resets the evidence or cancels an active XRPL read. -->
 <div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-window">
@@ -355,6 +355,9 @@ const BUILDER_KEY = "wildLedger.checkIssuanceBuilderHandoff";
 const REPORT_MAX_AGE_MS = 60 * 60 * 1000;
 const SELECTION_MAX_AGE_MS = 10 * 60 * 1000;
 const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority", "Check preparation details"];
+// The fourth checkpoint must be visibly observed, not immediately replaced by the success panel.
+const FINAL_STEP_WORKING_MS = 900;
+const FINAL_STEP_PROOF_MS = 1500;
 const states = ["pending", "pending", "pending", "pending"];
 const context = {session:null, selection:null, applicant:null, proof:null, authority:null};
 let guideMode = true;
@@ -658,12 +661,26 @@ async function runNext() {
   $("trailActions").hidden = true;
   $("trailDisclosure").classList.remove("trail-failed");
   setStep(n,"working",["Reading the Get Wild Operator session…","Matching this selection with verified membership requests…","Reading validated XRPL Operating Wallet authority…","Displaying verified applicant and 1 LEAP details…"][n-1]);
+  if (n === 4 && guideMode) $("guideStep4").scrollIntoView({block:"nearest"});
   let ok = false;
   try {
+    // Step 4 is presentation-only and can complete within a single animation frame.
+    // Keep its amber WORKING state visible before proving the details.
+    if (n === 4 && guideMode) await new Promise(resolve => setTimeout(resolve, FINAL_STEP_WORKING_MS));
     const result = await performWithAutomaticReadRetry(n);
     setStep(n,"done",result.message,result.evidence);
     ok = true;
-    if (states.every(s => s === "done")) complete();
+    if (states.every(s => s === "done")) {
+      // Do NOT call complete() immediately. That hides guideRoute and makes the
+      // green fourth checkpoint impossible for a human to see.
+      // Closing the guide with X during this pause changes presentation only.
+      if (n === 4 && guideMode) {
+        $("guideStatus").textContent = "Checkpoint 4 complete. Verified applicant, community and 1 LEAP confirmed.";
+        $("guideStep4").scrollIntoView({block:"nearest"});
+        await new Promise(resolve => setTimeout(resolve, FINAL_STEP_PROOF_MS));
+      }
+      complete();
+    }
   } catch (error) {
     fail(n,String(error?.message || error));
   } finally {
