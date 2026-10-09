@@ -180,6 +180,13 @@
   .success-mark { display:grid; place-items:center; width:88px; height:88px; margin:12px auto 15px; border:3px solid #a2f4b1; border-radius:50%; background:rgba(80,215,139,.13); color:#a2f4b1; font-size:3.5rem; font-weight:900; line-height:1; box-shadow:0 0 30px rgba(99,219,151,.13); }
   .success-heading { color:#bdf2c8; text-align:center; font-size:1.14rem; font-weight:900; margin:0 0 16px; }
   .guide-success { padding:18px 0 6px; }
+  .check-details { margin:12px 0 16px; padding:16px; border:1px solid rgba(121,213,194,.33); border-radius:15px; background:rgba(121,213,194,.075); }
+  .check-details-heading { font-size:.84rem; font-weight:850; color:#bdf2c8; margin:0 0 12px; }
+  .check-detail-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .check-detail-label { color:var(--muted); font-size:.78rem; }
+  .check-detail-value { font-weight:800; font-size:.85rem; overflow-wrap:anywhere; max-width:100%; }
+  .check-detail-wallet { width:100%; font-size:.78rem; line-height:1.45; }
+  .check-details-note { color:var(--muted); font-size:.75rem; line-height:1.5; margin:13px 0 0; }
   .manual-success { text-align:center; padding:20px 8px 5px; }
   .success-action { display:inline-flex; justify-content:center; align-items:center; min-height:47px; padding:12px 25px; background:linear-gradient(110deg,#a2f4b1,#62dba7); border:1px solid #8ff6ac; border-radius:12px; color:#09291a; font-weight:900; text-decoration:none; }
   .success-action:focus-visible { outline:3px solid var(--mango); outline-offset:3px; }
@@ -206,7 +213,7 @@
 <link rel="stylesheet" href="../wildLedgerBackend.css">
 </head>
 <body>
-<!-- WILD LEDGER MOVE 3 VERIFIED: Check Builder handoff is available. Dedicated Operator Check Issuance Ledger Trail, based on the verified Membership Requests Bootstrap. -->
+<!-- WILD LEDGER MOVE 3A: display confirmed Check preparation details within the dedicated Ledger Trail. The Check Builder and signing flows are unchanged. -->
 <!-- The X changes presentation only: it never resets the evidence or cancels an active XRPL read. -->
 <div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-window">
@@ -216,13 +223,21 @@
     </div>
     <h2 id="guideTitle">Preparing a Check for an applicant</h2>
     <p class="guide-lede">Wild Ledger confirms the selected applicant and the Community Operator before Check preparation begins. Press X at any time to work through each check yourself.</p>
-    <p class="guide-readonly">Move 3 · Check Builder handoff. No Check is issued, no signature, no XRP spent.</p>
+    <p class="guide-readonly">Move 3A · Check preparation details. No Check is issued, no signature, no XRP spent.</p>
     <ol class="guide-route" id="guideRoute" aria-label="Current Ledger Trail checkpoints">
       <li id="guideStep1" data-number="1"><div><strong>Identify the Operator</strong><small id="guideStepText1">Waiting</small></div></li>
       <li id="guideStep2" data-number="2"><div><strong>Confirm selected applicant</strong><small id="guideStepText2">Waiting</small></div></li>
       <li id="guideStep3" data-number="3"><div><strong>Confirm current authority</strong><small id="guideStepText3">Waiting</small></div></li>
+      <li id="guideStep4" data-number="4"><div><strong>Check preparation details</strong><small id="guideStepText4">Waiting</small></div></li>
     </ol>
     <div class="guide-status" id="guideStatus" role="status" aria-live="polite">Reading your Operator session…</div>
+    <section class="check-details" id="guidePreparation" aria-label="Check preparation details" hidden>
+      <p class="check-details-heading">Check preparation details</p>
+      <div class="check-detail-row"><span class="check-detail-label">Community ID</span><span class="check-detail-value" id="guidePreparationCommunity">—</span></div>
+      <div class="check-detail-row"><span class="check-detail-label">Applicant wallet</span><span class="check-detail-value check-detail-wallet" id="guidePreparationWallet">—</span></div>
+      <div class="check-detail-row"><span class="check-detail-label">Amount</span><span class="check-detail-value">1 LEAP</span></div>
+      <p class="check-details-note">Details only. No recognition selected, Check created, or transaction signed.</p>
+    </section>
     <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
       <div class="success-mark" aria-hidden="true">✓</div>
       <p class="success-heading">Applicant handoff verified</p>
@@ -281,7 +296,22 @@
     <div class="step-actions" id="stepActions3" hidden><button type="button" class="step-action" id="stepAction3" disabled>Waiting</button></div>
   </div>
 </details>
-        <div id="trailCompleted" class="trail-done-note" hidden>Applicant and current authority verified. Ready to open the existing Check Builder.</div>
+        <details class="trail-step is-pending" id="trailStep4">
+          <summary><span class="trail-index" id="trailIndex4">4</span><span class="trail-step-title">Check preparation details</span><span class="trail-step-state" id="trailState4">WAITING</span></summary>
+          <div class="trail-step-body">
+            <p class="trail-message" id="trailMessage4">Display the verified applicant, community, and 1 LEAP before Check building.</p>
+            <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof4">Uses the applicant and Community ID already verified in checkpoints 1–3. The amount is 1 LEAP. This step does not build or issue a Check.</div></details>
+            <section class="check-details" id="manualPreparation" aria-label="Manual Check preparation details" hidden>
+              <p class="check-details-heading">Check preparation details</p>
+              <div class="check-detail-row"><span class="check-detail-label">Community ID</span><span class="check-detail-value" id="manualPreparationCommunity">—</span></div>
+              <div class="check-detail-row"><span class="check-detail-label">Applicant wallet</span><span class="check-detail-value check-detail-wallet" id="manualPreparationWallet">—</span></div>
+              <div class="check-detail-row"><span class="check-detail-label">Amount</span><span class="check-detail-value">1 LEAP</span></div>
+              <p class="check-details-note">Details only. No recognition selected, Check created, or transaction signed.</p>
+            </section>
+            <div class="step-actions" id="stepActions4" hidden><button type="button" class="step-action" id="stepAction4" disabled>Waiting</button></div>
+          </div>
+        </details>
+        <div id="trailCompleted" class="trail-done-note" hidden>Applicant and current authority verified. Check preparation details displayed. Ready to open the existing Check Builder.</div>
         <div id="trailError" class="trail-error" role="alert" hidden></div>
         <div id="trailActions" class="trail-actions" hidden>
           <button type="button" class="action" id="retryButton" hidden>Try this check again</button>
@@ -299,6 +329,7 @@
       <div><div class="label">Applicant wallet</div><p class="value wallet" id="applicantWallet">—</p></div>
       <div><div class="label">Current Operating Wallet</div><p class="value wallet" id="operatorWallet">—</p></div>
       <div><div class="label">Verified request hash</div><p class="value wallet" id="requestHash">—</p></div>
+      <div><div class="label">Check amount</div><p class="value">1 LEAP</p></div>
     </div>
     <p class="notice">Ready for the existing Check Builder. The applicant and 1 LEAP will be filled in; Check review and signing are not yet enabled for this onboarding path.</p>
     <div class="trail-actions">
@@ -322,8 +353,8 @@ const SELECTION_KEY = "wildLedger.checkIssuanceHandoff";
 const BUILDER_KEY = "wildLedger.checkIssuanceBuilderHandoff";
 const REPORT_MAX_AGE_MS = 60 * 60 * 1000;
 const SELECTION_MAX_AGE_MS = 10 * 60 * 1000;
-const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority"];
-const states = ["pending", "pending", "pending"];
+const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority", "Check preparation details"];
+const states = ["pending", "pending", "pending", "pending"];
 const context = {session:null, selection:null, applicant:null, proof:null, authority:null};
 let guideMode = true;
 let busy = false;
@@ -417,7 +448,7 @@ function nextStep() {
 }
 function refreshControls() {
   const next = nextStep();
-  for (let n=1;n<=3;n++) {
+  for (let n=1;n<=4;n++) {
     const state = states[n-1], canAct = !busy && !completed && n === next &&
       (state === "pending" || (state === "failed" && retryable));
     const button = $(`stepAction${n}`);
@@ -446,7 +477,7 @@ function setStep(n,state,message,evidence) {
   $(`trailMessage${n}`).textContent = message;
   if (evidence !== undefined) $(`trailProof${n}`).textContent = evidence;
   if (state === "working" || state === "failed") {
-    for(let i=1;i<=3;i++) $(`trailStep${i}`).open = i === n;
+    for(let i=1;i<=4;i++) $(`trailStep${i}`).open = i === n;
     $("trailDisclosure").open = true;
   } else if (state === "done") el.open = false;
   $("trailOverall").textContent = message;
@@ -512,6 +543,27 @@ Verified membership request: ${context.applicant.hash}
 Source: validated XRPL authority history via the existing access resolver.
 No Check was created. Issuance eligibility will be independently rechecked before any eventual signing or submission.`};
   }
+  if (n === 4) {
+    const session = assertSession();
+    const {row} = checkedApplicant(session);
+    if (!context.authority || !context.applicant ||
+        String(context.authority.currentAccount || "") !== session.wallet ||
+        row.hash !== context.applicant.hash || row.applicant !== context.applicant.applicant)
+      throw new Error("Applicant or Operating Wallet evidence changed. Run the verification again.");
+    // This checkpoint only presents already-proven details. It does not prepare
+    // an XRPL transaction, select recognition, create a Check or sign anything.
+    $("guidePreparationCommunity").textContent = session.communityId;
+    $("manualPreparationCommunity").textContent = session.communityId;
+    $("guidePreparationWallet").textContent = row.applicant;
+    $("manualPreparationWallet").textContent = row.applicant;
+    $("guidePreparation").hidden = false;
+    $("manualPreparation").hidden = false;
+    return {message:"Check preparation details displayed: verified applicant, community, and 1 LEAP.", evidence:`Community ID: ${session.communityId}
+Verified applicant wallet: ${row.applicant}
+Check amount: 1 LEAP
+Sources: validated Membership Requests handoff and previously verified Operating Wallet authority.
+Presentation only. No CheckCreate, CheckCash, TrustSet, or signing request was initiated.`};
+  }
   throw new Error("Unknown Check Issuance Ledger Trail checkpoint.");
 }
 function complete() {
@@ -550,7 +602,7 @@ async function runNext() {
   $("trailError").hidden = true;
   $("trailActions").hidden = true;
   $("trailDisclosure").classList.remove("trail-failed");
-  setStep(n,"working",["Reading the Get Wild Operator session…","Matching this selection with verified membership requests…","Reading validated XRPL Operating Wallet authority…"][n-1]);
+  setStep(n,"working",["Reading the Get Wild Operator session…","Matching this selection with verified membership requests…","Reading validated XRPL Operating Wallet authority…","Displaying verified applicant and 1 LEAP details…"][n-1]);
   let ok = false;
   try {
     const result = await performStep(n);
@@ -591,7 +643,7 @@ function openGuide() {
 }
 function openCheckBuilder(event) {
   try {
-    if (!completed || states.some(s => s !== "done")) throw new Error("Complete the three Ledger Trail checks first.");
+    if (!completed || states.some(s => s !== "done")) throw new Error("Complete all four Ledger Trail checkpoints first.");
     const session = assertSession();
     const {selection, row} = checkedApplicant(session);
     if (!context.authority || String(context.authority.currentAccount || "") !== session.wallet ||
@@ -616,7 +668,7 @@ $("guideClose").addEventListener("click",closeGuide);
 $("guideAgain").addEventListener("click",openGuide);
 $("guideRetry").addEventListener("click",runNext);
 $("retryButton").addEventListener("click",runNext);
-for (let n=1;n<=3;n++) $(`stepAction${n}`).addEventListener("click",()=>{if (!guideMode && nextStep()===n) void runNext();});
+for (let n=1;n<=4;n++) $(`stepAction${n}`).addEventListener("click",()=>{if (!guideMode && nextStep()===n) void runNext();});
 refreshControls();
 void runNext();
 </script>
