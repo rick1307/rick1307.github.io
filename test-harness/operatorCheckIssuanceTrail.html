@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071f2c">
+<title>Check Issuance Ledger Trail | Wild Ledger</title>
+<style>
+  :root {
+    --ink: #f5fbfa;
+    --lagoon: #29b8b1;
+    --sea-glass: #79d5c2;
+    --mango: #f4bd58;
+    --coral: #ef765d;
+    --muted: rgba(236,249,247,.68);
+    --panel: rgba(10,45,58,.70);
+    --line: rgba(219,248,244,.14);
+    --shadow: 0 28px 78px rgba(0,16,24,.38);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { min-height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(41,184,177,.34) 0, rgba(41,184,177,.12) 22%, transparent 44%),
+      radial-gradient(circle at 87% 15%, rgba(244,189,88,.24) 0, rgba(244,189,88,.07) 21%, transparent 42%),
+      radial-gradient(circle at 88% 86%, rgba(239,118,93,.24) 0, rgba(239,118,93,.07) 23%, transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(121,213,194,.19) 0, transparent 42%),
+      linear-gradient(145deg,#06202e 0%,#0a3444 48%,#071d2a 100%);
+  }
+  .shell { width: min(100% - 28px, 920px); margin: 34px auto 50px; }
+  .console {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--panel);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: clamp(22px,5vw,38px);
+  }
+  .console::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral));
+  }
+  .nav { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-bottom: 38px; }
+  .back-link, .action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 16px;
+    border: 1px solid rgba(121,213,194,.34);
+    border-radius: 999px;
+    background: rgba(121,213,194,.09);
+    color: #dbfff4;
+    text-decoration: none;
+    font-size: .84rem;
+    font-weight: 800;
+    cursor:pointer;
+  }
+  .back-link:hover,.back-link:focus-visible,.action:hover,.action:focus-visible {
+    background: rgba(121,213,194,.17);
+    border-color: rgba(121,213,194,.6);
+  }
+  .eyebrow { color:var(--mango); font-size:.68rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; }
+  h1 { margin: 10px 0 15px; font-size:clamp(2.3rem,7vw,4.25rem); line-height:1; letter-spacing:-.055em; }
+  .lede { max-width: 660px; margin:0 0 25px; color:var(--muted); line-height:1.55; }
+  .panel { padding:21px; border:1px solid var(--line); border-radius:20px; background:rgba(5,34,46,.49); }
+  .panel + .panel { margin-top:16px; }
+  .row { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .panel h2 { margin:0 0 13px; font-size:1.22rem; letter-spacing:-.02em; }
+  .label { color:var(--muted); font-size:.75rem; font-weight:700; margin-bottom:6px; }
+  .value { margin:0; font-weight:800; font-size:1.04rem; }
+  .wallet { overflow-wrap:anywhere; font-size:.84rem; line-height:1.5; font-variant-ligatures:none; }
+  .status { color:#ffe6af; line-height:1.5; }
+  .status.error { color:#ffb7aa; }
+  .check { display:inline-flex; gap:7px; align-items:center; color:#bdf2c8; font-size:.85rem; font-weight:850; }
+  .check::before { content:"✓"; font-weight:900; }
+  .grid { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:14px; margin-top:18px; }
+  .empty { padding:30px 16px; text-align:center; color:var(--muted); line-height:1.55; border:1px dashed rgba(121,213,194,.24); border-radius:15px; }
+  .request-card { padding:15px; border:1px solid rgba(121,213,194,.22); border-radius:15px; background:rgba(121,213,194,.055); }
+  .request-card + .request-card { margin-top:12px; }
+  .request-title { font-weight:850; color:#bdf2c8; margin-bottom:12px; }
+  .request-detail { margin:8px 0 0; color:var(--muted); font-size:.80rem; line-height:1.5; }
+  .request-detail strong { color:var(--ink); font-weight:700; overflow-wrap:anywhere; }
+  .request-status { color:var(--muted); line-height:1.5; }
+  .request-status.error { color:#ffb7aa; }
+  .notice { max-width:640px; color:var(--muted); line-height:1.5; }
+  .error-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:17px; }
+
+  /* Human-facing Ledger Trail: follow the active step, inspect the proof if wanted. */
+  .trail-panel { margin-bottom:17px; }
+  .trail-intro { color:var(--muted); font-size:.83rem; line-height:1.55; margin:5px 0 14px; }
+  .trail-disclosure { border:0; }
+  .trail-disclosure > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; list-style:none; }
+  .trail-disclosure > summary::-webkit-details-marker, .trail-step > summary::-webkit-details-marker, .trail-proof > summary::-webkit-details-marker { display:none; }
+  .trail-disclosure > summary::after { content:'⌄'; color:var(--sea-glass); font-weight:900; font-size:1.3rem; flex-shrink:0; }
+  .trail-disclosure[open] > summary::after { transform:rotate(180deg); }
+  .trail-heading { font-weight:850; font-size:1.15rem; }
+  .trail-overall { display:block; color:var(--muted); margin-top:5px; font-size:.76rem; font-weight:650; }
+  .trail-complete .trail-overall { color:#bdf2c8; }
+  .trail-failed .trail-overall { color:#ffb7aa; }
+  .trail-body { padding-top:17px; }
+  .trail-step { border:1px solid var(--line); border-radius:16px; margin-bottom:10px; background:rgba(7,29,42,.37); overflow:hidden; }
+  .trail-step > summary { display:grid; grid-template-columns:34px minmax(0,1fr) auto 16px; gap:9px; align-items:center; padding:13px; cursor:pointer; list-style:none; }
+  .trail-step > summary::after { content:'›'; font-size:1.35rem; color:var(--sea-glass); }
+  .trail-step[open] > summary::after { transform:rotate(90deg); }
+  .trail-step.is-working { border-color:rgba(244,189,88,.72); box-shadow:0 0 0 1px rgba(244,189,88,.12); }
+  .trail-step.is-done { border-color:rgba(121,213,194,.32); }
+  .trail-step.is-failed { border-color:rgba(239,118,93,.75); }
+  .trail-step.is-pending { opacity:.67; }
+  .trail-index { display:grid; place-items:center; width:31px; height:31px; border:1px solid rgba(121,213,194,.28); border-radius:11px; font-size:.8rem; font-weight:900; }
+  .trail-step.is-done .trail-index { color:#bdf2c8; border-color:rgba(130,227,159,.5); }
+  .trail-step.is-failed .trail-index { color:#ffb7aa; border-color:rgba(239,118,93,.55); }
+  .trail-step-title { font-size:.93rem; font-weight:800; line-height:1.3; }
+  .trail-step-state { color:var(--muted); font-size:.64rem; font-weight:900; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+  .trail-step.is-working .trail-step-state { color:#ffe6af; }
+  .trail-step.is-done .trail-step-state { color:#bdf2c8; }
+  .trail-step.is-failed .trail-step-state { color:#ffb7aa; }
+  .trail-step-body { border-top:1px solid var(--line); padding:12px 14px 15px; }
+  .trail-message { font-size:.84rem; line-height:1.55; margin:0; color:var(--ink); }
+  .trail-proof { border:1px solid var(--line); border-radius:12px; margin-top:12px; }
+  .trail-proof > summary { padding:10px 12px; cursor:pointer; list-style:none; color:var(--sea-glass); font-size:.76rem; font-weight:800; }
+  .trail-proof > summary::after { content:' +'; }
+  .trail-proof[open] > summary::after { content:' −'; }
+  .trail-proof-content { padding:0 12px 12px; color:var(--muted); font-size:.74rem; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .trail-error { color:#ffb7aa; font-size:.81rem; line-height:1.55; margin-top:8px; overflow-wrap:anywhere; }
+  .trail-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:13px; }
+  .trail-done-note { color:#bdf2c8; font-size:.84rem; font-weight:780; line-height:1.5; padding-top:5px; }
+  .trail-note { color:var(--muted); font-size:.77rem; line-height:1.5; margin:0; }
+
+  /* The same rounded X language as Wild Ledger's established Setup Ledger Trail. */
+  .guide-overlay { position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left)); background:rgba(0,12,19,.80); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .guide-overlay[hidden] { display:none!important; }
+  .guide-window { width:min(470px,100%); max-height:calc(100dvh - 40px); overflow:auto; border:1px solid rgba(121,213,194,.26); border-radius:26px; padding:24px 22px; background:linear-gradient(155deg,rgba(14,60,72,.98),rgba(5,30,42,.99)); box-shadow:0 34px 90px rgba(0,0,0,.58); }
+  .guide-window::before { content:""; display:block; height:3px; margin:-24px -22px 21px; background:linear-gradient(90deg,var(--lagoon),var(--sea-glass),var(--mango),var(--coral)); }
+  .guide-topline { display:flex; align-items:center; gap:11px; margin-bottom:9px; }
+  .guide-close { flex:0 0 28px; display:grid; place-items:center; width:28px; height:28px; min-width:28px; min-height:28px; padding:0; border:1px solid rgba(236,249,247,.20); border-radius:50%; background:rgba(255,255,255,.035); color:rgba(245,251,250,.78); font:500 1.05rem/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; cursor:pointer; -webkit-appearance:none; }
+  .guide-close:focus-visible,.guide-close:hover { border-color:rgba(121,213,194,.7); background:rgba(255,255,255,.11); color:#fff; outline:2px solid var(--sea-glass); outline-offset:2px; }
+  .guide-kicker { color:var(--mango); text-transform:uppercase; letter-spacing:.14em; font-size:.66rem; font-weight:900; }
+  .guide-window h2 { margin:9px 0 9px; font-size:clamp(1.75rem,7vw,2.65rem); line-height:1.04; letter-spacing:-.045em; }
+  .guide-lede { color:var(--muted); font-size:.85rem; line-height:1.55; margin:0 0 14px; }
+  .guide-readonly { color:#bdf2c8; font-size:.78rem; font-weight:800; margin:0 0 18px; }
+  .guide-route { list-style:none; margin:0 0 14px; padding:0; }
+  .guide-route li { display:grid; grid-template-columns:32px minmax(0,1fr); align-items:center; gap:11px; min-height:56px; color:var(--muted); border-left:2px solid rgba(121,213,194,.15); margin-left:14px; padding:8px 0 8px 14px; position:relative; }
+  .guide-route li::before { content:attr(data-number); position:absolute; left:-16px; top:calc(50% - 15px); display:grid; place-items:center; width:28px; height:28px; border-radius:50%; border:1px solid rgba(121,213,194,.35); background:#082936; color:var(--muted); font-size:.75rem; font-weight:900; }
+  .guide-route li.is-done { color:#bdf2c8; border-left-color:rgba(159,224,176,.48); }
+  .guide-route li.is-done::before { content:'✓'; border-color:rgba(159,224,176,.65); color:#bdf2c8; }
+  .guide-route li.is-working { color:var(--ink); border-left-color:var(--mango); }
+  .guide-route li.is-working::before { border-color:var(--mango); color:#ffe6af; animation:guidePulse 1.4s ease-in-out infinite; }
+  .guide-route li.is-failed,.guide-route li.is-failed::before { color:#ffb7aa; border-color:var(--coral); }
+  .guide-route strong { display:block; font-size:.87rem; }
+  .guide-route small { display:block; margin-top:3px; font-size:.73rem; line-height:1.4; }
+  .guide-status { padding:13px 14px; border:1px solid rgba(244,189,88,.28); border-radius:14px; background:rgba(244,189,88,.05); font-size:.83rem; line-height:1.48; }
+  .guide-status.is-error { border-color:rgba(239,118,93,.6); color:#ffb7aa; }
+  .guide-learn { color:var(--muted); font-size:.72rem; margin:14px 0 0; line-height:1.5; }
+  .guide-recovery { margin-top:13px; display:flex; gap:9px; flex-wrap:wrap; }
+  .guide-recovery[hidden] { display:none!important; }
+  .manual-intro { color:var(--muted); font-size:.79rem; line-height:1.5; margin:0 0 12px; }
+  .manual-tools { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .guide-again { background:rgba(121,213,194,.065); font-size:.76rem; }
+  .step-actions { margin-top:12px; }
+  .step-action { min-height:42px; min-width:170px; padding:10px 16px; border:1px solid rgba(219,248,244,.18); border-radius:12px; font-size:.85rem; font-weight:900; background:rgba(255,255,255,.06); color:var(--muted); cursor:not-allowed; }
+  .step-action.is-next { color:#09291a; border-color:#8ff6ac; background:linear-gradient(110deg,#a2f4b1,#62dba7); box-shadow:0 0 0 2px rgba(159,224,176,.10),0 7px 20px rgba(31,151,91,.15); cursor:pointer; }
+  .step-action.is-next:focus-visible { outline:3px solid var(--mango); outline-offset:2px; }
+  .step-action.is-busy { border-color:rgba(244,189,88,.50); color:#ffe6af; background:rgba(244,189,88,.10); }
+  .step-action.is-busy::before { content:''; display:inline-block; width:11px; height:11px; margin-right:9px; border:2px solid rgba(244,189,88,.3); border-top-color:var(--mango); border-radius:50%; animation:guideSpin .8s linear infinite; vertical-align:-2px; }
+  .step-action.is-done { border-color:rgba(121,213,194,.25); color:#bdf2c8; background:rgba(121,213,194,.04); }
+  .trail-step.is-working .trail-index { border-color:var(--mango); color:#ffe6af; animation:guidePulse 1.4s ease-in-out infinite; }
+  .trail-finished-line { color:#bdf2c8; font-weight:850; }
+  /* Confirmation is the human-facing finish; details remain expandable. */
+  .success-mark { display:grid; place-items:center; width:88px; height:88px; margin:12px auto 15px; border:3px solid #a2f4b1; border-radius:50%; background:rgba(80,215,139,.13); color:#a2f4b1; font-size:3.5rem; font-weight:900; line-height:1; box-shadow:0 0 30px rgba(99,219,151,.13); }
+  .success-heading { color:#bdf2c8; text-align:center; font-size:1.14rem; font-weight:900; margin:0 0 16px; }
+  .guide-success { padding:18px 0 6px; }
+  .manual-success { text-align:center; padding:20px 8px 5px; }
+  .success-action { display:inline-flex; justify-content:center; align-items:center; min-height:47px; padding:12px 25px; background:linear-gradient(110deg,#a2f4b1,#62dba7); border:1px solid #8ff6ac; border-radius:12px; color:#09291a; font-weight:900; text-decoration:none; }
+  .success-action:focus-visible { outline:3px solid var(--mango); outline-offset:3px; }
+  .proof-details { margin-top:19px; border:1px solid var(--line); border-radius:13px; text-align:left; }
+  .proof-details > summary { padding:12px 14px; color:var(--sea-glass); cursor:pointer; font-size:.79rem; font-weight:850; }
+  .proof-details > div { padding:0 14px 14px; }
+  @keyframes guidePulse { 0%,100%{box-shadow:0 0 0 0 rgba(244,189,88,.28)} 50%{box-shadow:0 0 0 5px rgba(244,189,88,0)} }
+  @keyframes guideSpin { to { transform:rotate(360deg); } }
+  @media(prefers-reduced-motion:reduce) { .guide-route li.is-working::before,.trail-step.is-working .trail-index,.step-action.is-busy::before { animation:none; } }
+
+  @media(max-width:420px) {
+    .trail-step > summary { grid-template-columns:29px minmax(0,1fr) auto 12px; gap:7px; padding:12px 9px; }
+    .trail-index { width:28px; height:28px; }
+    .trail-step-title { font-size:.85rem; }
+    .trail-step-state { font-size:.56rem; }
+  }
+  @media (max-width:600px) {
+    .shell { margin-top:14px; }
+    .console { border-radius:22px; }
+    .nav { margin-bottom:30px; }
+    .grid { grid-template-columns:1fr; }
+  }
+</style>
+<link rel="stylesheet" href="../wildLedgerBackend.css">
+</head>
+<body>
+<!-- Dedicated Operator Check Issuance Ledger Trail, based on the verified Membership Requests Bootstrap. -->
+<!-- The X changes presentation only: it never resets the evidence or cancels an active XRPL read. -->
+<div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+  <div class="guide-window">
+    <div class="guide-topline">
+      <button type="button" class="guide-close" id="guideClose" aria-label="Close guided tour and use the manual workbench" title="Explore the ledger steps">×</button>
+      <span class="guide-kicker">Wild Ledger · Ledger Trail</span>
+    </div>
+    <h2 id="guideTitle">Preparing a Check for an applicant</h2>
+    <p class="guide-lede">Wild Ledger confirms the selected applicant and the Community Operator before Check preparation begins. Press X at any time to work through each check yourself.</p>
+    <p class="guide-readonly">Step 1 checks only. No Check is issued, no wallet signature, no XRP spent.</p>
+    <ol class="guide-route" id="guideRoute" aria-label="Current Ledger Trail checkpoints">
+      <li id="guideStep1" data-number="1"><div><strong>Identify the Operator</strong><small id="guideStepText1">Waiting</small></div></li>
+      <li id="guideStep2" data-number="2"><div><strong>Confirm selected applicant</strong><small id="guideStepText2">Waiting</small></div></li>
+      <li id="guideStep3" data-number="3"><div><strong>Confirm current authority</strong><small id="guideStepText3">Waiting</small></div></li>
+    </ol>
+    <div class="guide-status" id="guideStatus" role="status" aria-live="polite">Reading your Operator session…</div>
+    <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
+      <div class="success-mark" aria-hidden="true">✓</div>
+      <p class="success-heading">Applicant handoff verified</p>
+      <p class="guide-lede" style="text-align:center">Step 1 complete. No Check has been created. The Check-building connection comes in a later move.</p>
+      <div style="text-align:center"><a class="success-action" id="guideContinue" href="../membershipRequests.html">Return to Membership Requests</a></div>
+    </div>
+    <div id="guideRecovery" class="guide-recovery" hidden>
+      <button type="button" class="step-action is-next" id="guideRetry" hidden>Try again</button>
+      <a href="../membershipRequests.html" class="action" id="guideRequests" hidden>Membership Requests</a>
+      <a href="../getWild.html" class="action" id="guideSignin" hidden>Sign in through Get Wild</a>
+    </div>
+    <p class="guide-learn" id="guideLearn">Press X to inspect each checkpoint, its proof, and its individual action button. Closing the guide will not reset a running check.</p>
+  </div>
+</div>
+<main class="shell">
+<section class="console" aria-labelledby="pageTitle">
+  <nav class="nav" aria-label="Community Operator navigation">
+    <a class="back-link" id="backLink" href="../membershipRequests.html">← Membership Requests</a>
+  </nav>
+  <div class="eyebrow">Wild Ledger · Community Operator</div>
+  <h1 id="pageTitle">Check Issuance Ledger Trail</h1>
+  <p class="lede">A separate workspace for moving one verified applicant toward an Operator-issued identification Check. This first development move establishes the applicant handoff and verifies Operator authority; Check creation remains in the existing builder.</p>
+
+  <section class="panel trail-panel" aria-label="Check Issuance Ledger Trail">
+    <div class="manual-tools">
+      <span class="trail-finished-line" id="manualHeadline">Applicant handoff checks</span>
+      <button type="button" class="action guide-again" id="guideAgain" hidden>Continue guided tour</button>
+    </div>
+    <p class="manual-intro" id="manualIntro" hidden>Explore the same checks at your own pace. The <strong>green button</strong> marks your next step. Expand <strong>What this step checks</strong> to see its XRPL and session evidence.</p>
+    <details class="trail-disclosure" id="trailDisclosure" open>
+      <summary><span class="trail-heading">Ledger Trail <span class="trail-overall" id="trailOverall" role="status" aria-live="polite">Checking Operator session…</span></span></summary>
+      <div class="trail-body">
+        <p class="trail-intro">The selected applicant must come from an already-verified Membership Requests report. Live Operating Wallet authority is independently rechecked. This page never signs or submits a transaction.</p>
+        <details class="trail-step is-pending" id="trailStep1" open>
+  <summary><span class="trail-index" id="trailIndex1">1</span><span class="trail-step-title">Identify the Operator</span><span class="trail-step-state" id="trailState1">WAITING</span></summary>
+  <div class="trail-step-body">
+    <p class="trail-message" id="trailMessage1">Read the existing Operator session and Community ID.</p>
+    <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof1">A URL alone is not Operator authority. The session must be the established Get Wild Operator session.</div></details>
+    <div class="step-actions" id="stepActions1" hidden><button type="button" class="step-action" id="stepAction1" disabled>Waiting</button></div>
+  </div>
+</details>
+        <details class="trail-step is-pending" id="trailStep2" >
+  <summary><span class="trail-index" id="trailIndex2">2</span><span class="trail-step-title">Confirm selected applicant</span><span class="trail-step-state" id="trailState2">WAITING</span></summary>
+  <div class="trail-step-body">
+    <p class="trail-message" id="trailMessage2">Match the chosen applicant to the verified Membership Requests report.</p>
+    <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof2">Uses the short-lived selection and request hash. The applicant must belong to this community and be marked Awaiting LEAP by the verified report.</div></details>
+    <div class="step-actions" id="stepActions2" hidden><button type="button" class="step-action" id="stepAction2" disabled>Waiting</button></div>
+  </div>
+</details>
+        <details class="trail-step is-pending" id="trailStep3" >
+  <summary><span class="trail-index" id="trailIndex3">3</span><span class="trail-step-title">Confirm current authority</span><span class="trail-step-state" id="trailState3">WAITING</span></summary>
+  <div class="trail-step-body">
+    <p class="trail-message" id="trailMessage3">Read live XRPL authority for the current Operating Wallet.</p>
+    <details class="trail-proof"><summary>What this step checks</summary><div class="trail-proof-content" id="trailProof3">The connected wallet must still be the current authoritative Operating Wallet for the selected Community ID.</div></details>
+    <div class="step-actions" id="stepActions3" hidden><button type="button" class="step-action" id="stepAction3" disabled>Waiting</button></div>
+  </div>
+</details>
+        <div id="trailCompleted" class="trail-done-note" hidden>Applicant and current authority verified. This first move does not issue a Check.</div>
+        <div id="trailError" class="trail-error" role="alert" hidden></div>
+        <div id="trailActions" class="trail-actions" hidden>
+          <button type="button" class="action" id="retryButton" hidden>Try this check again</button>
+          <a href="../membershipRequests.html" class="action" id="requestsLink" hidden>Back to Membership Requests</a>
+          <a href="../getWild.html" class="action" id="signinLink" hidden>Sign in through Get Wild</a>
+        </div>
+      </div>
+    </details>
+    <p class="trail-note" style="margin-top:12px">Step 1 only · Read-only · No Check, Bifrost signature, or XRP transaction is created here.</p>
+  </section>
+  <section class="panel" id="successPanel" hidden aria-label="Verified applicant">
+    <h2>Applicant handoff verified</h2>
+    <div class="grid">
+      <div><div class="label">Community ID</div><p class="value" id="communityId">—</p></div>
+      <div><div class="label">Applicant wallet</div><p class="value wallet" id="applicantWallet">—</p></div>
+      <div><div class="label">Current Operating Wallet</div><p class="value wallet" id="operatorWallet">—</p></div>
+      <div><div class="label">Verified request hash</div><p class="value wallet" id="requestHash">—</p></div>
+    </div>
+    <p class="notice">Ready for the later Check preparation connection. No Check has been prepared, signed, submitted, or issued.</p>
+    <a class="action" id="returnRequests" href="../membershipRequests.html">Return to Membership Requests</a>
+  </section>
+</section>
+</main>
+<script src="../js/communityConfig.js" data-registry-only="true"></script>
+<script src="../js/wildLedgerConfig.js"></script>
+<script type="module">
+import { isClassicAddress } from "../js/xrplTransport.js";
+import { resolveWalletAccess } from "../js/communityAccess.js";
+
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(window.location.search);
+const XRPL_SERVER = String(window.WILD_LEDGER_CONFIG?.xrplWebSocket || "").trim();
+const REPORT_KEY = "wildLedger.membershipRequestsHandoff";
+const SELECTION_KEY = "wildLedger.checkIssuanceHandoff";
+const REPORT_MAX_AGE_MS = 60 * 60 * 1000;
+const SELECTION_MAX_AGE_MS = 10 * 60 * 1000;
+const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority"];
+const states = ["pending", "pending", "pending"];
+const context = {session:null, selection:null, applicant:null, proof:null, authority:null};
+let guideMode = true;
+let busy = false;
+let completed = false;
+let retryable = true;
+let recovery = "";
+
+function readOperatorSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem("wildLedgerOperatorSession") || "null");
+    if (!s || String(s.role || "").toLowerCase() !== "operator") return null;
+    const v = Number(s.version), source = String(s.source || "");
+    if (!(v === 1 && source === "wallet-proof + validated-xrpl-authority") &&
+        !(v === 2 && source === "wallet-connect + validated-xrpl-authority")) return null;
+    const wallet = String(v === 2 ? s.connectedWallet : s.verifiedWallet || "").trim();
+    const communityId = String(s.communityId || "").trim().toUpperCase();
+    if (!isClassicAddress(wallet) || !communityId) return null;
+    const downstreamWallet = String(sessionStorage.getItem("wildLedgerOperatorWallet") || "").trim();
+    if (downstreamWallet && downstreamWallet !== wallet) return null;
+    const qCommunity = String(params.get("community") || "").trim().toUpperCase();
+    const qRole = String(params.get("role") || "").trim().toLowerCase();
+    if ((qCommunity && qCommunity !== communityId) || (qRole && qRole !== "operator")) return null;
+    return {wallet, communityId, name:String(s.communityName || "").trim()};
+  } catch (_) { return null; }
+}
+function assertSession() {
+  const fresh = readOperatorSession();
+  if (!fresh || !context.session || fresh.wallet !== context.session.wallet ||
+      fresh.communityId !== context.session.communityId)
+    throw new Error("Your Operator session changed. Sign in through Get Wild and check the request again.");
+  return fresh;
+}
+function isCurrentTimestamp(timestamp,maxAge) {
+  const t = Number(timestamp);
+  return Number.isFinite(t) && t <= Date.now() + 30000 && Date.now()-t <= maxAge;
+}
+function checkedReport(session) {
+  const raw = sessionStorage.getItem(REPORT_KEY);
+  if (!raw || raw.length > 5000000) throw new Error("Run the Membership Requests Ledger Trail to verify the applicant first.");
+  let report;
+  try { report = JSON.parse(raw); }
+  catch (_) { throw new Error("Membership Requests evidence could not be read. Please run its Ledger Trail again."); }
+  if (report?.version !== 2 || report.source !== "membershipRequestsBootstrap" ||
+      report.communityId !== session.communityId || report.operatorWallet !== session.wallet ||
+      !isCurrentTimestamp(report.verifiedAt, REPORT_MAX_AGE_MS) || !Array.isArray(report.requests))
+    throw new Error("Membership Requests evidence expired or does not match this Operator session. Run its Ledger Trail again.");
+  // Match the structural verification performed by membershipRequests.html. The
+  // report is carried proof from the Bootstrap, not an independent authority source.
+  const valid = report.requests.every(r => r && isClassicAddress(r.applicant) && isClassicAddress(r.destination) &&
+    typeof r.drops === "string" && /^[1-9][0-9]*$/.test(r.drops) &&
+    typeof r.expectedDrops === "string" && /^[1-9][0-9]*$/.test(r.expectedDrops) && r.drops === r.expectedDrops &&
+    Number.isSafeInteger(r.ledger) && r.ledger > 0 &&
+    Number.isSafeInteger(r.txIndex) && r.txIndex >= 0 &&
+    typeof r.hash === "string" && /^[0-9A-F]{64}$/.test(r.hash) &&
+    (r.priceStatement === null || (r.priceStatement &&
+      Number.isSafeInteger(r.priceStatement.ledger) && r.priceStatement.ledger > 0 &&
+      Number.isSafeInteger(r.priceStatement.txIndex) && r.priceStatement.txIndex >= 0)) &&
+    r.recognition && ["awaiting","fulfilled"].includes(r.recognition.status) &&
+    (r.recognition.status === "awaiting" ? r.recognition.proof === null : (
+      r.recognition.proof && ["CheckCash","Payment"].includes(r.recognition.proof.type) &&
+      Number.isSafeInteger(r.recognition.proof.amount) && r.recognition.proof.amount > 0 &&
+      Number.isSafeInteger(r.recognition.proof.ledger) && r.recognition.proof.ledger > 0 &&
+      Number.isSafeInteger(r.recognition.proof.awardLedger) && r.recognition.proof.awardLedger > 0 &&
+      typeof r.recognition.proof.reason === "string" &&
+      /^(BADGE|EVENT|CHALLENGE)=[A-Z0-9-]+$/.test(r.recognition.proof.reason) &&
+      /^[0-9A-F]{64}$/.test(r.recognition.proof.hash) &&
+      /^[0-9A-F]{64}$/.test(r.recognition.proof.awardHash))));
+  if (!valid) throw new Error("The verified Membership Requests report is incomplete. Run its Ledger Trail again.");
+  return report;
+}
+function checkedApplicant(session) {
+  let selection;
+  try { selection = JSON.parse(sessionStorage.getItem(SELECTION_KEY) || "null"); }
+  catch (_) { /* rejected below */ }
+  if (selection?.version !== 1 || selection.source !== "membershipRequests" ||
+      selection.communityId !== session.communityId || selection.operatorWallet !== session.wallet ||
+      !isClassicAddress(selection.applicant) || !/^[0-9A-F]{64}$/.test(String(selection.requestHash || "")) ||
+      !isCurrentTimestamp(selection.selectedAt, SELECTION_MAX_AGE_MS))
+    throw new Error("No current applicant is selected. Return to Membership Requests. The Issue First LEAP button will be added in Move 2.");
+  const proof = checkedReport(session);
+  if (Number(selection.selectedAt) < Number(proof.verifiedAt)-30000)
+    throw new Error("The applicant was selected before the current verified report. Return to Membership Requests.");
+  const row = proof.requests.find(r => r.applicant === selection.applicant && r.hash === selection.requestHash);
+  if (!row || row.recognition.status !== "awaiting")
+    throw new Error("The selected applicant is not among this community's verified requests awaiting LEAP. Run Membership Requests verification again.");
+  return {selection, proof, row};
+}
+function nextStep() {
+  const i = states.findIndex(s => s !== "done");
+  return i < 0 ? 0 : i+1;
+}
+function refreshControls() {
+  const next = nextStep();
+  for (let n=1;n<=3;n++) {
+    const state = states[n-1], canAct = !busy && !completed && n === next &&
+      (state === "pending" || (state === "failed" && retryable));
+    const button = $(`stepAction${n}`);
+    button.disabled = guideMode || !canAct;
+    button.className = `step-action ${state === "done" ? "is-done" : state === "working" ? "is-busy" : canAct ? "is-next" : ""}`;
+    button.textContent = state === "done" ? "✓ Complete" : state === "working" ? "Checking…" : canAct ? "Run this check" : "Waiting for the previous check";
+    $(`stepActions${n}`).hidden = guideMode;
+    $(`guideStep${n}`).className = `is-${state}`;
+    $(`guideStepText${n}`).textContent = ({pending:"Waiting",working:"Checking…",done:"Complete",failed:"Needs attention"})[state];
+  }
+  $("manualIntro").hidden = guideMode || completed;
+  $("guideAgain").hidden = guideMode || completed;
+  $("manualHeadline").textContent = completed ? "Applicant handoff verified" : guideMode ? "Applicant handoff checks" : "Explore your ledger checks";
+  $("guideRecovery").hidden = !(guideMode && states.includes("failed"));
+  $("guideRetry").hidden = !retryable;
+  $("guideRequests").hidden = recovery !== "requests";
+  $("guideSignin").hidden = recovery !== "signin";
+}
+function setStep(n,state,message,evidence) {
+  states[n-1] = state;
+  const el = $(`trailStep${n}`);
+  el.className = `trail-step is-${state}`;
+  el.setAttribute("aria-busy", state === "working" ? "true" : "false");
+  $(`trailIndex${n}`).textContent = state === "done" ? "✓" : state === "failed" ? "×" : String(n);
+  $(`trailState${n}`).textContent = ({pending:"WAITING",working:"WORKING",done:"DONE",failed:"NEEDS ATTENTION"})[state];
+  $(`trailMessage${n}`).textContent = message;
+  if (evidence !== undefined) $(`trailProof${n}`).textContent = evidence;
+  if (state === "working" || state === "failed") {
+    for(let i=1;i<=3;i++) $(`trailStep${i}`).open = i === n;
+    $("trailDisclosure").open = true;
+  } else if (state === "done") el.open = false;
+  $("trailOverall").textContent = message;
+  $("guideStatus").textContent = message;
+  $("guideStatus").classList.toggle("is-error",state === "failed");
+  refreshControls();
+}
+async function performStep(n) {
+  if (n === 1) {
+    const session = readOperatorSession();
+    if (!session) throw new Error("Sign in through Get Wild as the authorized Community Operator in this tab.");
+    if (!XRPL_SERVER) throw new Error("No XRPL server is configured. Current authority cannot be proven.");
+    context.session = session;
+    const url = `../membershipRequests.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
+    $("backLink").href = url;
+    $("returnRequests").href = url;
+    $("guideContinue").href = url;
+    $("guideRequests").href = url;
+    $("requestsLink").href = url;
+    document.title = `Check Issuance Ledger Trail · ${session.communityId} | Wild Ledger`;
+    return {message:`Operator session found for ${session.communityId}.`, evidence:`Community ID: ${session.communityId}
+Operator wallet: ${session.wallet}
+Source: existing Get Wild Operator session.
+The session alone does not establish current XRPL authority.`};
+  }
+  if (n === 2) {
+    const session = assertSession();
+    const {selection,proof,row} = checkedApplicant(session);
+    context.selection = selection;
+    context.proof = proof;
+    context.applicant = row;
+    return {message:`Selected applicant ${row.applicant.slice(0,9)}…${row.applicant.slice(-6)} matches verified Membership Requests.`, evidence:`Community: ${session.communityId}
+Applicant wallet: ${row.applicant}
+Verified request hash: ${row.hash}
+Validated request ledger: ${row.ledger}
+Transaction position: ${row.txIndex}
+Membership status at verification: ${row.recognition.status}
+Report verified at: ${new Date(proof.verifiedAt).toLocaleString()}
+This proof was carried by Membership Requests Bootstrap, not typed in a URL.
+Membership status here is a snapshot, not a fresh delivery check.`};
+  }
+  if (n === 3) {
+    const session = assertSession();
+    const check = checkedApplicant(session);
+    if (check.row.hash !== context.applicant?.hash) throw new Error("The selected applicant changed. Return to Membership Requests.");
+    const access = await resolveWalletAccess({account:session.wallet,serverUrl:XRPL_SERVER,force:true});
+    assertSession();
+    const matched = (access?.operatorMatches || []).find(item =>
+      String(item.communityId || "").trim().toUpperCase() === session.communityId &&
+      String(item.currentAccount || "").trim() === session.wallet && item.authorityEstablished === true);
+    if (!matched) throw new Error("XRPL does not confirm this wallet as the current authorized Operating Wallet for the selected community.");
+    context.authority = matched;
+    $("communityId").textContent = session.communityId;
+    $("applicantWallet").textContent = context.applicant.applicant;
+    $("operatorWallet").textContent = session.wallet;
+    $("requestHash").textContent = context.applicant.hash;
+    return {message:"Current Operating Wallet authority confirmed on XRPL. Applicant handoff verified.", evidence:`Community ID: ${session.communityId}
+Current Operating Wallet: ${session.wallet}
+Verified applicant: ${context.applicant.applicant}
+Verified membership request: ${context.applicant.hash}
+Source: validated XRPL authority history via the existing access resolver.
+No Check was created. Issuance eligibility will be independently rechecked before any eventual signing or submission.`};
+  }
+  throw new Error("Unknown Check Issuance Ledger Trail checkpoint.");
+}
+function complete() {
+  completed = true;
+  $("successPanel").hidden = false;
+  $("trailCompleted").hidden = false;
+  $("trailDisclosure").classList.add("trail-complete");
+  $("trailOverall").textContent = "Complete · verified applicant and current Operating Wallet.";
+  $("trailDisclosure").open = false;
+  $("guideRoute").hidden = true;
+  $("guideStatus").hidden = true;
+  $("guideLearn").hidden = true;
+  $("guideRecovery").hidden = true;
+  $("guideSuccess").hidden = !guideMode;
+  refreshControls();
+}
+function fail(n,message) {
+  recovery = /sign in|operator session|session changed/i.test(message) ? "signin" :
+    /membership request|applicant|selected|report|verified request/i.test(message) ? "requests" : "";
+  retryable = recovery === "";
+  setStep(n,"failed","This checkpoint needs attention. No success is claimed.",message);
+  $("trailDisclosure").classList.add("trail-failed");
+  $("trailError").textContent = message;
+  $("trailError").hidden = false;
+  $("trailActions").hidden = false;
+  $("retryButton").hidden = !retryable;
+  $("requestsLink").hidden = recovery !== "requests";
+  $("signinLink").hidden = recovery !== "signin";
+  refreshControls();
+}
+async function runNext() {
+  if (busy || completed) return;
+  const n = nextStep();
+  if (!n || (states[n-1] === "failed" && !retryable)) return;
+  busy = true;
+  $("trailError").hidden = true;
+  $("trailActions").hidden = true;
+  $("trailDisclosure").classList.remove("trail-failed");
+  setStep(n,"working",["Reading the Get Wild Operator session…","Matching this selection with verified membership requests…","Reading validated XRPL Operating Wallet authority…"][n-1]);
+  let ok = false;
+  try {
+    const result = await performStep(n);
+    setStep(n,"done",result.message,result.evidence);
+    ok = true;
+    if (states.every(s => s === "done")) complete();
+  } catch (error) {
+    fail(n,String(error?.message || error));
+  } finally {
+    busy = false;
+    refreshControls();
+    // A finished read is preserved when the Operator has pressed X.
+    // Only guided mode may start another checkpoint automatically.
+    if (ok && guideMode && !completed) void runNext();
+  }
+}
+function closeGuide() {
+  guideMode = false;
+  $("guideOverlay").hidden = true;
+  if (!completed) {
+    $("trailDisclosure").open = true;
+    const n = nextStep();
+    if (n) $(`trailStep${n}`).open = true;
+  }
+  refreshControls();
+}
+function openGuide() {
+  if (completed) return;
+  guideMode = true;
+  $("guideOverlay").hidden = false;
+  refreshControls();
+  if (!busy) void runNext();
+}
+$("guideClose").addEventListener("click",closeGuide);
+$("guideAgain").addEventListener("click",openGuide);
+$("guideRetry").addEventListener("click",runNext);
+$("retryButton").addEventListener("click",runNext);
+for (let n=1;n<=3;n++) $(`stepAction${n}`).addEventListener("click",()=>{if (!guideMode && nextStep()===n) void runNext();});
+refreshControls();
+void runNext();
+</script>
+</body>
+</html>
