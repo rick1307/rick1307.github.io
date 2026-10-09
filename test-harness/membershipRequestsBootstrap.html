@@ -608,6 +608,9 @@ let busy = false;
 let completed = false;
 let completionNavigationTimer = null;
 let canRetry = true;
+// Give the final Ledger Trail checkpoint time to be seen and confirmed.
+const FINAL_STEP_WORKING_MS = 900;
+const FINAL_STEP_PROOF_MS = 1500;
 function cancelAutomaticNavigation() {
   if (completionNavigationTimer !== null) {
     clearTimeout(completionNavigationTimer);
@@ -947,14 +950,29 @@ async function runNext() {
   const workingMessage = ["Reading your existing Operator session…", "Reading validated XRPL authority history…", "Reading community wallet history…", "Checking your Operator session before finishing the bootstrap…"][number-1];
   setTrailStep(number,"working",workingMessage);
   updateGuideStatus(workingMessage);
+  // The final checkpoint is a quick local proof. Keep its working state
+  // visible, just as the earlier ledger checks visibly run.
+  if (number === 4 && guideMode) $("guideStep4").scrollIntoView({block:"nearest"});
   let succeeded = false;
   try {
+    if (number === 4 && guideMode) {
+      await new Promise(resolve => setTimeout(resolve, FINAL_STEP_WORKING_MS));
+    }
     const result = await performWithAutomaticReadRetry(number);
     setTrailStep(number,"done",result.message,result.evidence);
     $("trailOverall").textContent = result.message;
     updateGuideStatus(result.message);
     succeeded = true;
-    if (reportIsReady()) finishTrail();
+    if (reportIsReady()) {
+      // finishTrail hides the step list to display success. Let the human
+      // see checkpoint 4 turn green before replacing the list. Pressing X
+      // during this wait changes presentation but preserves the evidence.
+      if (number === 4 && guideMode) {
+        $("guideStep4").scrollIntoView({block:"nearest"});
+        await new Promise(resolve => setTimeout(resolve, FINAL_STEP_PROOF_MS));
+      }
+      finishTrail();
+    }
   } catch (error) {
     trailFailure(number, String(error?.message || error));
   } finally {
