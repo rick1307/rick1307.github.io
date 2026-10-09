@@ -225,7 +225,6 @@
       <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
         <p class="success-heading">Checks passed</p>
         <div class="success-mark" aria-hidden="true">✓</div>
-        <div style="text-align:center"><a class="success-action" id="guideContinue" href="../membershipRequests.html" hidden>View Membership Requests</a></div>
       </div>
       <div id="guideRecovery" class="guide-recovery" hidden>
         <button type="button" class="step-action is-next" id="guideRetry" hidden>Try again</button>
@@ -681,7 +680,6 @@ function resetTrail() {
   cancelAutomaticNavigation();
   completed = false;
   $("guideSuccess").hidden = true;
-  $("guideContinue").hidden = true;
   choseToExplore = false;
   $("guideRoute").hidden = false;
   $("guideStatus").hidden = false;
@@ -775,7 +773,6 @@ async function performStep(number) {
     $("operatorWallet").textContent = session.wallet;
     $("backLink").href = `../viewCommunity.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
     $("returnCommunity").href = `../membershipRequests.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
-    $("guideContinue").href = $("returnCommunity").href;
     document.title = `Membership Requests Bootstrap · ${communityName} | Wild Ledger`;
     $("requestStatus").classList.remove("error");
     $("requestStatus").textContent = "Finding membership-request payments in XRPL history…";
@@ -870,12 +867,11 @@ function finishTrail() {
     $("guideLearn").hidden = true;
     $("guideRecovery").hidden = true;
     $("guideSuccess").hidden = false;
-    $("guideContinue").hidden = !choseToExplore;
     if (!choseToExplore) {
       completionNavigationTimer = setTimeout(() => {
         completionNavigationTimer = null;
         if (completed && guideMode && !choseToExplore) window.location.assign($("returnCommunity").href);
-      }, 1100);
+      }, 1000);
     }
   }
   // If the human pressed X, stay on the workbench; the green button lets them leave.
