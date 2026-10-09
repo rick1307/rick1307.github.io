@@ -180,6 +180,10 @@
   .success-mark { display:grid; place-items:center; width:88px; height:88px; margin:12px auto 15px; border:3px solid #a2f4b1; border-radius:50%; background:rgba(80,215,139,.13); color:#a2f4b1; font-size:3.5rem; font-weight:900; line-height:1; box-shadow:0 0 30px rgba(99,219,151,.13); }
   .success-heading { color:#bdf2c8; text-align:center; font-size:1.14rem; font-weight:900; margin:0 0 16px; }
   .guide-success { padding:18px 0 6px; }
+  /* At completion, retire the instructions so every proven checkpoint AND the
+     green confirmation fit together on an iPhone-sized screen. */
+  .guide-window.is-finished .guide-lede { display:none; }
+  .guide-window.is-finished .guide-readonly { margin-bottom:12px; }
   .check-details { margin:12px 0 16px; padding:16px; border:1px solid rgba(121,213,194,.33); border-radius:15px; background:rgba(121,213,194,.075); }
   .check-details-heading { font-size:.84rem; font-weight:850; color:#bdf2c8; margin:0 0 12px; }
   .check-detail-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-top:10px; flex-wrap:wrap; }
@@ -213,7 +217,7 @@
 <link rel="stylesheet" href="../wildLedgerBackend.css">
 </head>
 <body>
-<!-- WILD LEDGER MOVE 3A: checkpoint 4 visibly WORKING then DONE before success and the established 1.1-second guided handoff. -->
+<!-- WILD LEDGER MOVE 3A: checkpoint 4 finishes on proof; the large green checkmark stays on the same card for one second, then guided mode hands off. -->
 <!-- The X changes presentation only: it never resets the evidence or cancels an active XRPL read. -->
 <div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-window">
@@ -239,12 +243,12 @@
       <p class="check-details-note">Details only. No recognition selected, Check created, or transaction signed.</p>
     </section>
     <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
+      <p class="success-heading">Checks passed</p>
       <div class="success-mark" aria-hidden="true">✓</div>
-      <p class="success-heading">Check preparation details confirmed</p>
-      <p class="guide-lede" style="text-align:center">Applicant and Operating Wallet confirmed. Continue to the existing Check Builder, with the recipient and 1 LEAP filled in. No Check has been created.</p>
-      <div style="text-align:center"><a class="success-action" id="guideContinue" href="../operatorCheckCreate.html">Open Check Builder</a></div>
+      <!-- Keep the target for the existing verified handoff; guided mode does not show a button. -->
+      <a id="guideContinue" href="../operatorCheckCreate.html" hidden aria-hidden="true" tabindex="-1">Open Check Builder</a>
+      <a id="guideBackRequests" href="../membershipRequests.html" hidden aria-hidden="true" tabindex="-1">Return to Membership Requests</a>
       <p class="guide-learn" id="guideHandoffError" role="alert" hidden></p>
-      <p class="guide-learn" style="text-align:center"><a id="guideBackRequests" href="../membershipRequests.html">Return to Membership Requests</a></p>
     </div>
     <div id="guideRecovery" class="guide-recovery" hidden>
       <button type="button" class="step-action is-next" id="guideRetry" hidden>Try again</button>
@@ -355,10 +359,7 @@ const BUILDER_KEY = "wildLedger.checkIssuanceBuilderHandoff";
 const REPORT_MAX_AGE_MS = 60 * 60 * 1000;
 const SELECTION_MAX_AGE_MS = 10 * 60 * 1000;
 const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority", "Check preparation details"];
-// The fourth checkpoint must be visibly observed, not immediately replaced by the success panel.
-const BEFORE_FINAL_STEP_MS = 650; // Let completed XRPL authority be seen before checkpoint 4 begins.
-const FINAL_STEP_WORKING_MS = 900;
-const FINAL_STEP_PROOF_MS = 1500;
+// Each checkpoint completes as soon as its proof succeeds. The final card remains for 1 second.
 const states = ["pending", "pending", "pending", "pending"];
 const context = {session:null, selection:null, applicant:null, proof:null, authority:null};
 let guideMode = true;
@@ -586,15 +587,17 @@ function complete() {
   $("trailDisclosure").classList.add("trail-complete");
   $("trailOverall").textContent = "All four checkpoints complete · applicant, authority and 1 LEAP details confirmed.";
   $("trailDisclosure").open = false;
-  $("guideRoute").hidden = true;
-  $("guideStatus").hidden = true;
+  // Keep all four green checkpoints and the final checkmark on one readable card.
+  // Detailed preparation evidence remains in the manual workbench when X is pressed.
+  document.querySelector(".guide-window").classList.add("is-finished");
+  $("guidePreparation").hidden = true;
   $("guideLearn").hidden = true;
   $("guideRecovery").hidden = true;
   $("guideSuccess").hidden = !guideMode;
   refreshControls();
   if (guideMode && !choseToExplore) {
-    // Match the established Membership Requests Bootstrap Ledger Trail: show
-    // confirmed success before continuing automatically after 1.1 seconds.
+    // Match Membership Requests Bootstrap: show the completed card and its
+    // green checkmark for one second, then navigate. X cancels navigation.
     // The X cancels navigation without losing any proof or transaction state.
     cancelAutomaticNavigation();
     completionNavigationTimer = setTimeout(() => {
@@ -606,10 +609,10 @@ function complete() {
         stageCheckBuilderHandoff();
         window.location.assign($("guideContinue").href);
       } catch (error) {
-        $("guideHandoffError").textContent = `The automatic handoff could not be completed: ${String(error?.message || error)}. You can retry with Open Check Builder or return to Membership Requests.`;
+        $("guideHandoffError").textContent = `The automatic handoff could not be completed: ${String(error?.message || error)}. Press X to use the manual workbench and Open Check Builder.`;
         $("guideHandoffError").hidden = false;
       }
-    }, 1100);
+    }, 1000);
   }
 }
 function fail(n,message) {
@@ -665,21 +668,12 @@ async function runNext() {
   if (n === 4 && guideMode) $("guideStep4").scrollIntoView({block:"nearest"});
   let ok = false;
   try {
-    // Step 4 is presentation-only and can complete within a single animation frame.
-    // Keep its amber WORKING state visible before proving the details.
-    if (n === 4 && guideMode) await new Promise(resolve => setTimeout(resolve, FINAL_STEP_WORKING_MS));
     const result = await performWithAutomaticReadRetry(n);
     setStep(n,"done",result.message,result.evidence);
     ok = true;
     if (states.every(s => s === "done")) {
-      // Do NOT call complete() immediately. That hides guideRoute and makes the
-      // green fourth checkpoint impossible for a human to see.
-      // Closing the guide with X during this pause changes presentation only.
-      if (n === 4 && guideMode) {
-        $("guideStatus").textContent = "Checkpoint 4 complete. Verified applicant, community and 1 LEAP confirmed.";
-        $("guideStep4").scrollIntoView({block:"nearest"});
-        await new Promise(resolve => setTimeout(resolve, FINAL_STEP_PROOF_MS));
-      }
+      // Checkpoint 4 and the large checkmark appear together as soon as
+      // verified details are proven, with no artificial delay beforehand.
       complete();
     }
   } catch (error) {
@@ -692,17 +686,6 @@ async function runNext() {
     if (ok && !guideMode && !completed) {
       const next = nextStep();
       if (next) $(`trailStep${next}`).open = true;
-    }
-    // After proof of XRPL authority (Step 3), pause before revealing Step 4.
-    // This preserves the visible completed checkpoint rather than replacing it
-    // with an amber Step 4 on the same paint. Pressing X during this pause
-    // stops automatic progression without losing the completed proof.
-    if (ok && n === 3 && guideMode && !completed) {
-      busy = true;
-      refreshControls();
-      await new Promise(resolve => setTimeout(resolve, BEFORE_FINAL_STEP_MS));
-      busy = false;
-      refreshControls();
     }
     // Only guided mode may start another checkpoint automatically.
     if (ok && guideMode && !completed) void runNext();
