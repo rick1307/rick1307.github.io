@@ -206,7 +206,7 @@
 <link rel="stylesheet" href="../wildLedgerBackend.css">
 </head>
 <body>
-<!-- Dedicated Operator Check Issuance Ledger Trail, based on the verified Membership Requests Bootstrap. -->
+<!-- WILD LEDGER MOVE 3 VERIFIED: Check Builder handoff is available. Dedicated Operator Check Issuance Ledger Trail, based on the verified Membership Requests Bootstrap. -->
 <!-- The X changes presentation only: it never resets the evidence or cancels an active XRPL read. -->
 <div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
   <div class="guide-window">
@@ -216,7 +216,7 @@
     </div>
     <h2 id="guideTitle">Preparing a Check for an applicant</h2>
     <p class="guide-lede">Wild Ledger confirms the selected applicant and the Community Operator before Check preparation begins. Press X at any time to work through each check yourself.</p>
-    <p class="guide-readonly">Applicant handoff checks only. No Check is issued, no signature, no XRP spent.</p>
+    <p class="guide-readonly">Move 3 · Check Builder handoff. No Check is issued, no signature, no XRP spent.</p>
     <ol class="guide-route" id="guideRoute" aria-label="Current Ledger Trail checkpoints">
       <li id="guideStep1" data-number="1"><div><strong>Identify the Operator</strong><small id="guideStepText1">Waiting</small></div></li>
       <li id="guideStep2" data-number="2"><div><strong>Confirm selected applicant</strong><small id="guideStepText2">Waiting</small></div></li>
@@ -402,7 +402,7 @@ function checkedApplicant(session) {
       selection.communityId !== session.communityId || selection.operatorWallet !== session.wallet ||
       !isClassicAddress(selection.applicant) || !/^[0-9A-F]{64}$/.test(String(selection.requestHash || "")) ||
       !isCurrentTimestamp(selection.selectedAt, SELECTION_MAX_AGE_MS))
-    throw new Error("No current applicant is selected. Return to Membership Requests. The Issue First LEAP button will be added in Move 2.");
+    throw new Error("No current applicant is selected. Return to Membership Requests and choose Issue First LEAP.");
   const proof = checkedReport(session);
   if (Number(selection.selectedAt) < Number(proof.verifiedAt)-30000)
     throw new Error("The applicant was selected before the current verified report. Return to Membership Requests.");
