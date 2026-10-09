@@ -179,7 +179,9 @@
   /* Confirmation is the human-facing finish; details remain expandable. */
   .success-mark { display:grid; place-items:center; width:88px; height:88px; margin:12px auto 15px; border:3px solid #a2f4b1; border-radius:50%; background:rgba(80,215,139,.13); color:#a2f4b1; font-size:3.5rem; font-weight:900; line-height:1; box-shadow:0 0 30px rgba(99,219,151,.13); }
   .success-heading { color:#bdf2c8; text-align:center; font-size:1.14rem; font-weight:900; margin:0 0 16px; }
-  .guide-success { padding:18px 0 6px; }
+  .guide-success { padding:14px 0 0; }
+  .guide-success .success-heading { margin:0; }
+  .guide-success .success-mark { margin:12px auto 0; }
   .manual-success { text-align:center; padding:20px 8px 5px; }
   .success-action { display:inline-flex; justify-content:center; align-items:center; min-height:47px; padding:12px 25px; background:linear-gradient(110deg,#a2f4b1,#62dba7); border:1px solid #8ff6ac; border-radius:12px; color:#09291a; font-weight:900; text-decoration:none; }
   .success-action:focus-visible { outline:3px solid var(--mango); outline-offset:3px; }
@@ -221,8 +223,8 @@
       </ol>
       <div class="guide-status" id="guideStatus" role="status" aria-live="polite">Reading your Operator session…</div>
       <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
-        <div class="success-mark" aria-hidden="true">✓</div>
         <p class="success-heading">Checks passed</p>
+        <div class="success-mark" aria-hidden="true">✓</div>
         <div style="text-align:center"><a class="success-action" id="guideContinue" href="../membershipRequests.html" hidden>View Membership Requests</a></div>
       </div>
       <div id="guideRecovery" class="guide-recovery" hidden>
@@ -863,9 +865,8 @@ function finishTrail() {
   $("trailOverall").textContent = `Complete · ${count} ${count === 1 ? "request" : "requests"} verified. Open to inspect the proof.`;
   $("trailDisclosure").open = false;
   if (guideMode) {
-    // Human stays on the guided trail: clearly acknowledge success, then proceed.
-    $("guideRoute").hidden = true;
-    $("guideStatus").hidden = true;
+    // Keep all four proven checkpoints visible on the same Ledger Trail card.
+    // The large green confirmation appears BELOW them, never on a replacement card.
     $("guideLearn").hidden = true;
     $("guideRecovery").hidden = true;
     $("guideSuccess").hidden = false;
@@ -964,8 +965,8 @@ async function runNext() {
     updateGuideStatus(result.message);
     succeeded = true;
     if (reportIsReady()) {
-      // finishTrail hides the step list to display success. Let the human
-      // see checkpoint 4 turn green before replacing the list. Pressing X
+      // Let the human see checkpoint 4 turn green before showing the large
+      // confirmation BELOW the complete step list on the same card. Pressing X
       // during this wait changes presentation but preserves the evidence.
       if (number === 4 && guideMode) {
         $("guideStep4").scrollIntoView({block:"nearest"});
