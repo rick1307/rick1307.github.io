@@ -119,6 +119,8 @@
   .proof-value { display:block; color:var(--ink); overflow-wrap:anywhere; font-variant-ligatures:none; }
   .copy-wallet { min-height:33px; padding:6px 10px; font-size:.75rem; font-weight:800; color:#dcfff4; border:1px solid rgba(121,213,194,.36); border-radius:9px; background:rgba(121,213,194,.065); cursor:pointer; margin-top:7px; }
   .copy-wallet:focus-visible,.proof-toggle > summary:focus-visible { outline:2px solid var(--mango); outline-offset:2px; }
+  .issue-first-leap { display:block; margin-top:11px; min-height:40px; padding:9px 13px; border:1px solid rgba(121,213,194,.58); border-radius:12px; background:rgba(121,213,194,.16); color:#dbfff4; font-size:.79rem; font-weight:850; cursor:pointer; text-align:center; }
+  .issue-first-leap:hover,.issue-first-leap:focus-visible { border-color:#bdf2c8; background:rgba(121,213,194,.27); outline-offset:2px; }
   .report-foot { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-top:17px; }
   .report-foot .notice { margin:0; font-size:.78rem; }
   @media(max-width:700px) {
@@ -292,6 +294,7 @@ import { isClassicAddress } from "./js/xrplTransport.js";
 
 const $ = id => document.getElementById(id);
 const HANDOFF_KEY = "wildLedger.membershipRequestsHandoff";
+const CHECK_ISSUANCE_HANDOFF_KEY = "wildLedger.checkIssuanceHandoff";
 const MAX_HANDOFF_AGE_MS = 60 * 60 * 1000;
 const params = new URLSearchParams(window.location.search);
 
@@ -395,6 +398,36 @@ async function copyApplicant(address, button) {
   }
 }
 
+function beginCheckIssuance(request) {
+  // Use only the applicant already proven by the existing Membership Requests
+  // Ledger Trail. The dedicated issuance page independently checks this handoff.
+  const session = readOperatorSession();
+  const report = session && checkedHandoff(session);
+  const matching = report?.requests.find(row =>
+    row.applicant === request.applicant && row.hash === request.hash &&
+    row.recognition.status === "awaiting");
+  if (!matching) {
+    window.alert("This applicant's verified report is no longer current. Run the Membership Requests Ledger Trail again.");
+    return;
+  }
+  const selection = {
+    version: 1,
+    source: "membershipRequests",
+    communityId: session.communityId,
+    operatorWallet: session.wallet,
+    applicant: matching.applicant,
+    requestHash: matching.hash,
+    selectedAt: Date.now()
+  };
+  try {
+    sessionStorage.setItem(CHECK_ISSUANCE_HANDOFF_KEY, JSON.stringify(selection));
+  } catch (_) {
+    window.alert("Wild Ledger could not carry this applicant to Check Issuance. Please try again.");
+    return;
+  }
+  window.location.assign(`test-harness/operatorCheckIssuanceTrail.html?community=${encodeURIComponent(session.communityId)}&role=operator`);
+}
+
 function makeRequestRow(request, index, communityId) {
   const tr = document.createElement("tr");
   const position = document.createElement("span");
@@ -422,7 +455,18 @@ function makeRequestRow(request, index, communityId) {
   const status = document.createElement("span");
   status.className = "membership-status" + (request.recognition.status === "fulfilled" ? " fulfilled" : "");
   status.textContent = request.recognition.status === "fulfilled" ? "✓ Fulfilled" : "Awaiting LEAP";
-  tr.append(createCell("Membership", status));
+  const membership = document.createElement("div");
+  membership.append(status);
+  if (request.recognition.status === "awaiting") {
+    const issue = document.createElement("button");
+    issue.type = "button";
+    issue.className = "issue-first-leap";
+    issue.textContent = "Issue First LEAP";
+    issue.setAttribute("aria-label", `Issue First LEAP to ${request.applicant}`);
+    issue.addEventListener("click", () => beginCheckIssuance(request));
+    membership.append(issue);
+  }
+  tr.append(createCell("Membership", membership));
 
   const paid = document.createElement("div");
   const paidNumber = document.createElement("div");
