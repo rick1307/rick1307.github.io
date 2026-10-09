@@ -356,6 +356,7 @@ const REPORT_MAX_AGE_MS = 60 * 60 * 1000;
 const SELECTION_MAX_AGE_MS = 10 * 60 * 1000;
 const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority", "Check preparation details"];
 // The fourth checkpoint must be visibly observed, not immediately replaced by the success panel.
+const BEFORE_FINAL_STEP_MS = 650; // Let completed XRPL authority be seen before checkpoint 4 begins.
 const FINAL_STEP_WORKING_MS = 900;
 const FINAL_STEP_PROOF_MS = 1500;
 const states = ["pending", "pending", "pending", "pending"];
@@ -691,6 +692,17 @@ async function runNext() {
     if (ok && !guideMode && !completed) {
       const next = nextStep();
       if (next) $(`trailStep${next}`).open = true;
+    }
+    // After proof of XRPL authority (Step 3), pause before revealing Step 4.
+    // This preserves the visible completed checkpoint rather than replacing it
+    // with an amber Step 4 on the same paint. Pressing X during this pause
+    // stops automatic progression without losing the completed proof.
+    if (ok && n === 3 && guideMode && !completed) {
+      busy = true;
+      refreshControls();
+      await new Promise(resolve => setTimeout(resolve, BEFORE_FINAL_STEP_MS));
+      busy = false;
+      refreshControls();
     }
     // Only guided mode may start another checkpoint automatically.
     if (ok && guideMode && !completed) void runNext();
