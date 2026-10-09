@@ -216,7 +216,7 @@
     </div>
     <h2 id="guideTitle">Preparing a Check for an applicant</h2>
     <p class="guide-lede">Wild Ledger confirms the selected applicant and the Community Operator before Check preparation begins. Press X at any time to work through each check yourself.</p>
-    <p class="guide-readonly">Step 1 checks only. No Check is issued, no wallet signature, no XRP spent.</p>
+    <p class="guide-readonly">Applicant handoff checks only. No Check is issued, no signature, no XRP spent.</p>
     <ol class="guide-route" id="guideRoute" aria-label="Current Ledger Trail checkpoints">
       <li id="guideStep1" data-number="1"><div><strong>Identify the Operator</strong><small id="guideStepText1">Waiting</small></div></li>
       <li id="guideStep2" data-number="2"><div><strong>Confirm selected applicant</strong><small id="guideStepText2">Waiting</small></div></li>
@@ -226,8 +226,9 @@
     <div class="guide-success" id="guideSuccess" role="status" aria-live="polite" hidden>
       <div class="success-mark" aria-hidden="true">✓</div>
       <p class="success-heading">Applicant handoff verified</p>
-      <p class="guide-lede" style="text-align:center">Step 1 complete. No Check has been created. The Check-building connection comes in a later move.</p>
-      <div style="text-align:center"><a class="success-action" id="guideContinue" href="../membershipRequests.html">Return to Membership Requests</a></div>
+      <p class="guide-lede" style="text-align:center">Applicant and Operating Wallet confirmed. Continue to the existing Check Builder, with the recipient and 1 LEAP filled in. No Check has been created.</p>
+      <div style="text-align:center"><a class="success-action" id="guideContinue" href="../operatorCheckCreate.html">Open Check Builder</a></div>
+      <p class="guide-learn" style="text-align:center"><a id="guideBackRequests" href="../membershipRequests.html">Return to Membership Requests</a></p>
     </div>
     <div id="guideRecovery" class="guide-recovery" hidden>
       <button type="button" class="step-action is-next" id="guideRetry" hidden>Try again</button>
@@ -244,7 +245,7 @@
   </nav>
   <div class="eyebrow">Wild Ledger · Community Operator</div>
   <h1 id="pageTitle">Check Issuance Ledger Trail</h1>
-  <p class="lede">A separate workspace for moving one verified applicant toward an Operator-issued identification Check. This first development move establishes the applicant handoff and verifies Operator authority; Check creation remains in the existing builder.</p>
+  <p class="lede">Verify one selected applicant and the Operating Wallet, then carry the verified details to the existing Check Builder. Review and signing are not part of this move.</p>
 
   <section class="panel trail-panel" aria-label="Check Issuance Ledger Trail">
     <div class="manual-tools">
@@ -280,7 +281,7 @@
     <div class="step-actions" id="stepActions3" hidden><button type="button" class="step-action" id="stepAction3" disabled>Waiting</button></div>
   </div>
 </details>
-        <div id="trailCompleted" class="trail-done-note" hidden>Applicant and current authority verified. This first move does not issue a Check.</div>
+        <div id="trailCompleted" class="trail-done-note" hidden>Applicant and current authority verified. Ready to open the existing Check Builder.</div>
         <div id="trailError" class="trail-error" role="alert" hidden></div>
         <div id="trailActions" class="trail-actions" hidden>
           <button type="button" class="action" id="retryButton" hidden>Try this check again</button>
@@ -289,7 +290,7 @@
         </div>
       </div>
     </details>
-    <p class="trail-note" style="margin-top:12px">Step 1 only · Read-only · No Check, Bifrost signature, or XRP transaction is created here.</p>
+    <p class="trail-note" style="margin-top:12px">Handoff and preparation only · No Check, Bifrost signature, or XRP transaction is created here.</p>
   </section>
   <section class="panel" id="successPanel" hidden aria-label="Verified applicant">
     <h2>Applicant handoff verified</h2>
@@ -299,8 +300,11 @@
       <div><div class="label">Current Operating Wallet</div><p class="value wallet" id="operatorWallet">—</p></div>
       <div><div class="label">Verified request hash</div><p class="value wallet" id="requestHash">—</p></div>
     </div>
-    <p class="notice">Ready for the later Check preparation connection. No Check has been prepared, signed, submitted, or issued.</p>
-    <a class="action" id="returnRequests" href="../membershipRequests.html">Return to Membership Requests</a>
+    <p class="notice">Ready for the existing Check Builder. The applicant and 1 LEAP will be filled in; Check review and signing are not yet enabled for this onboarding path.</p>
+    <div class="trail-actions">
+      <a class="success-action" id="manualBuilder" href="../operatorCheckCreate.html">Open Check Builder</a>
+      <a class="action" id="returnRequests" href="../membershipRequests.html">Return to Membership Requests</a>
+    </div>
   </section>
 </section>
 </main>
@@ -315,6 +319,7 @@ const params = new URLSearchParams(window.location.search);
 const XRPL_SERVER = String(window.WILD_LEDGER_CONFIG?.xrplWebSocket || "").trim();
 const REPORT_KEY = "wildLedger.membershipRequestsHandoff";
 const SELECTION_KEY = "wildLedger.checkIssuanceHandoff";
+const BUILDER_KEY = "wildLedger.checkIssuanceBuilderHandoff";
 const REPORT_MAX_AGE_MS = 60 * 60 * 1000;
 const SELECTION_MAX_AGE_MS = 10 * 60 * 1000;
 const titles = ["Identify the Operator", "Confirm selected applicant", "Confirm current authority"];
@@ -458,7 +463,9 @@ async function performStep(n) {
     const url = `../membershipRequests.html?community=${encodeURIComponent(session.communityId)}&role=operator`;
     $("backLink").href = url;
     $("returnRequests").href = url;
-    $("guideContinue").href = url;
+    $("guideBackRequests").href = url;
+    $("guideContinue").href = `../operatorCheckCreate.html?community=${encodeURIComponent(session.communityId)}&role=operator&issuance=1`;
+    $("manualBuilder").href = $("guideContinue").href;
     $("guideRequests").href = url;
     $("requestsLink").href = url;
     document.title = `Check Issuance Ledger Trail · ${session.communityId} | Wild Ledger`;
@@ -556,6 +563,11 @@ async function runNext() {
     busy = false;
     refreshControls();
     // A finished read is preserved when the Operator has pressed X.
+    // In manual mode, reveal the next checkpoint without running it.
+    if (ok && !guideMode && !completed) {
+      const next = nextStep();
+      if (next) $(`trailStep${next}`).open = true;
+    }
     // Only guided mode may start another checkpoint automatically.
     if (ok && guideMode && !completed) void runNext();
   }
@@ -577,6 +589,29 @@ function openGuide() {
   refreshControls();
   if (!busy) void runNext();
 }
+function openCheckBuilder(event) {
+  try {
+    if (!completed || states.some(s => s !== "done")) throw new Error("Complete the three Ledger Trail checks first.");
+    const session = assertSession();
+    const {selection, row} = checkedApplicant(session);
+    if (!context.authority || String(context.authority.currentAccount || "") !== session.wallet ||
+        row.hash !== context.applicant?.hash || row.applicant !== context.applicant?.applicant)
+      throw new Error("The applicant or Operator authority changed. Check this applicant again.");
+    // This is a browser handoff, not a grant of authority. The builder independently
+    // confirms the same session, verified request, and XRPL Operating Wallet.
+    sessionStorage.setItem(BUILDER_KEY, JSON.stringify({
+      version:1, source:"operatorCheckIssuanceTrail", communityId:session.communityId,
+      operatorWallet:session.wallet, applicant:row.applicant,
+      requestHash:selection.requestHash, selectedAt:selection.selectedAt,
+      handedOffAt:Date.now()
+    }));
+  } catch (error) {
+    event.preventDefault();
+    window.alert(String(error?.message || error));
+  }
+}
+$("guideContinue").addEventListener("click",openCheckBuilder);
+$("manualBuilder").addEventListener("click",openCheckBuilder);
 $("guideClose").addEventListener("click",closeGuide);
 $("guideAgain").addEventListener("click",openGuide);
 $("guideRetry").addEventListener("click",runNext);
